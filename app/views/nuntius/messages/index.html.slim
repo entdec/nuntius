@@ -1,0 +1,5 @@
+.p-t-20
+  = action_table_named :messages
+
+- content_for :context_menu do
+  =< link_to(t('context_menu.add'), new_admin_message_path, class: 'btn btn-primary')

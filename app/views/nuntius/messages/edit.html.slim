@@ -1,0 +1,58 @@
+= simple_form_for([:admin, @message]) do |f|
+  = tabs(tab_html: { class: 'nav-tabs-fillup nav-tabs-primary' }) do |t|
+    - t.tab t('.basic') do
+      = f.input :description
+      .row
+        .col-sm-4
+          = f.input :kind, collection: ['email', 'sms', 'push']
+        .col-sm-4
+          = f.input :klass, as: :string
+        .col-sm-4
+          = f.input :event
+      .row
+        .col-sm-6
+          = f.input :timestamp
+        .col-sm-6
+          = f.input :interval
+      = f.association :retailer, collection: @retailers, hint: t('.help_block.retailer'), input_html: { class: 'select2' }
+      = f.association :company, collection: @companies, input_html: { class: 'select2' }
+    - t.tab t('.text') do
+      = f.input :to, as: :code_mirror, input_html: { data: { mode: { name: 'liquid', base: 'text/plain' } } }
+      = f.input :subject, as: :code_mirror, input_html: { data: { mode: { name: 'liquid', base: 'text/plain' } } }
+      .row
+        .col-sm-6
+          = f.association :layout, collection: @layouts, selected: @message.layout_id, label_method: :description, include_blank: true
+        .col-sm-6
+          = f.input :filter, collection: [['Slim', 'slim']], include_blank: true
+
+      = f.input :html, as: :code_mirror, input_html: { data: { lang: f.object.filter == 'slim' ? 'application/x-slim' : 'text/html', mode: { name: 'liquid', base: f.object.filter == 'slim' ? 'application/x-slim' : 'text/html' } } }
+      = f.input :text, as: :code_mirror, input_html: { data: { mode: { name: 'liquid', base: 'text/plain' } } }
+
+    - t.tab t('.advanced') do
+      = f.input :conditions, as: :code_mirror, input_html: { data: { mode: { name: 'liquid', base: 'text/plain' } } }
+      = f.input :query, as: :code_mirror, input_html: { data: { mode: { name: 'liquid', base: 'application/json' } }, value: JSON.pretty_generate(f.object.query)}
+      = f.input :preview_ids, collection: @message.preview_ids, selected: @message.preview_ids, input_html: {multiple: true, class: 'select2', 'data-tags' => 'true'}
+
+      - if @message.preview_ids.present? && @message.klass.present? && @message.persisted?
+        hr
+        table.table.table-bordered
+          thead
+            th id
+            th applicable
+            th to
+            th preview
+          tbody
+          - for preview_id in @message.preview_ids
+            ruby:
+              obj = Kernel.const_get(@message.klass).find(preview_id)
+            tr
+              td = obj.human_id
+              td = @message.applicable_with_object?(obj)
+              td = @message.tpl_with_obj(:to, obj)
+              td = link_to 'Preview', messages_show_url(@message, obj)
+
+
+        hr
+    = f.button :button, t('.save'), name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: t('.save') }
+    = f.button :button, t('.continue'), name: 'commit', value: 'continue', data: { disable_with: t('.continue') }
+
