@@ -3,7 +3,7 @@
 module Nuntius
   class MailAdapter < BaseAdapter
 
-    def send(to)
+    def send(message)
       # Try each driver in turn until message is delivered
       # Use timeout, break if delivered
 
