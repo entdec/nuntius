@@ -9,14 +9,14 @@ Gem::Specification.new do |s|
   s.version     = Nuntius::VERSION
   s.authors     = ["Tom de Grunt"]
   s.email       = ["tom@degrunt.nl"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Nuntius."
-  s.description = "TODO: Description of Nuntius."
+  s.homepage    = 'https://code.entropydecelerator.com/components/nuntius'
+  s.summary     = 'Messaging and notification for Ruby on Rails'
+  s.description = 'Messages are defined in templates editable by users.'
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
+  s.add_dependency 'liquid', '~> 4.0.0'
   s.add_dependency "rails", "~> 5.1.6"
-
-  s.add_development_dependency "sqlite3"
+  s.add_dependency 'pg'
 end

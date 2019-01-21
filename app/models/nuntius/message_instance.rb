@@ -2,10 +2,16 @@
 
 class MessageInstance < ApplicationRecord
   belongs_to :message
-  belongs_to :messagable, polymorphic: true
+  belongs_to :messagable, polymorphic: true, optional: true
 
   def resend!
-    event = message.event == '*' ? 'anything' : message.event.split(',').first.strip
-    MessageJob.perform_now(messagable, event)
+    case message.kind
+    when 'email'
+      message.send_mail(messagable, {})
+    when 'sms'
+      message.send_sms(messagable, {})
+    when 'push'
+      message.send_push(messagable, {})
+    end
   end
 end
