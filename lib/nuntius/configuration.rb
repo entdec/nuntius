@@ -4,12 +4,15 @@ module Nuntius
     attr_accessor :base_controller
     attr_writer   :logger
 
+    attr_reader :adapters
+    attr_reader :drivers
+
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
       @adapters = []
-      @drivers = []
+      @drivers = {}
     end
 
     # logger [Object].
@@ -24,7 +27,8 @@ module Nuntius
 
     def driver(driver, adapter:, priority: 1, timeout: nil, settings: {})
       if @adapters.include? adapter
-        @drivers.push(driver: driver, adapter: adapter, priority: priority, timeout: timeout, settings: settings)
+        @drivers[adapter.to_sym] ||= []
+        @drivers[adapter.to_sym].push(driver: driver, priority: priority, timeout: timeout, settings: settings)
       else
         Nuntius.logger.warn "Driver #{driver} not enabled as adapter #{adapter} is not enabled"
       end

@@ -11,7 +11,7 @@ module Nuntius
     end
 
     def drivers(priority = nil)
-      results = Nuntius.drivers[kind].to_a
+      results = Nuntius.config.drivers[kind].to_a
       results = results.select { |d| d[:priority] == priority } if priority
       results
     end
