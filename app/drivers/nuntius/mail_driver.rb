@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'mail'
+
 module Nuntius
   class MailDriver < BaseDriver
     adapter :mail

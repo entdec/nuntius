@@ -10,6 +10,16 @@ module Nuntius
       # Not implemented
     end
 
+    def drivers(priority = nil)
+      results = Nuntius.drivers[kind].to_a
+      results = results.select { |d| d[:priority] == priority } if priority
+      results
+    end
+
+    def kind
+      :null
+    end
+
     private
 
     def with_message_instance(obj)
