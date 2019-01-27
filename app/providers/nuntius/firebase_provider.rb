@@ -3,8 +3,8 @@
 require 'fcm'
 
 module Nuntius
-  class FirebaseDriver < BaseDriver
-    adapter :push
+  class FirebaseProvider < BaseProvider
+    protocol :push
 
     def send(to, text)
       body = "#{environment_string}#{tpl(:text, obj, context)}"

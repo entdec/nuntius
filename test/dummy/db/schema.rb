@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190122161918) do
+ActiveRecord::Schema.define(version: 20190125202436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pgcrypto"
   enable_extension "uuid-ossp"
 
   create_table "accounts", force: :cascade do |t|
@@ -22,19 +23,40 @@ ActiveRecord::Schema.define(version: 20190122161918) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "nuntius_messages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+  create_table "nuntius_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "template_id"
+    t.string "status", default: "draft"
+    t.string "protocol"
+    t.string "provider"
+    t.string "provider_id"
+    t.string "request_id"
     t.string "from"
     t.string "to"
     t.string "subject"
     t.text "html"
     t.text "text"
-    t.string "request_id"
-    t.string "adapter"
-    t.string "driver"
-    t.string "driver_id"
-    t.string "status", default: "draft"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["template_id"], name: "index_nuntius_messages_on_template_id"
   end
 
+  create_table "nuntius_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "klass"
+    t.string "event"
+    t.string "protocol"
+    t.string "description"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "layout_id"
+    t.string "from"
+    t.string "to"
+    t.string "subject"
+    t.text "html"
+    t.text "text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
+  end
+
+  add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"
+  add_foreign_key "nuntius_templates", "nuntius_templates", column: "layout_id"
 end

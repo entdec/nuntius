@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Nuntius
-  class BaseDriver
-    def initialize(message = nil)
-      @message = message
+  class BaseProvider
+    def initialize(settings = nil)
+      @settings = settings
     end
 
     def self.all_settings
@@ -16,9 +16,9 @@ module Nuntius
       define_method(name) { settings[name] }
     end
 
-    def self.adapter(adapter=nil)
-      @adapter = adapter if adapter
-      @adapter
+    def self.protocol(protocol=nil)
+      @protocol = protocol if protocol
+      @protocol
     end
 
     def self.states(mapping=nil)
@@ -31,17 +31,17 @@ module Nuntius
     end
 
     def name
-      self.class.name.demodulize.underscore.gsub(/_driver$/, '').to_sym
+      self.class.name.demodulize.underscore.gsub(/_provider$/, '').to_sym
     end
 
     private
 
     def translated_status(status)
-      states.find { |key| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sending'
+      self.class.states.find { |key| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sending'
     end
 
     def settings
-      Nuntius.config.drivers[self.class.adapter].to_a.find { |d| d[:driver] == name }[:settings]
+      @settings ||= Nuntius.config.providers[self.class.protocol].to_a.find { |d| d[:provider] == name }[:settings]
     end
   end
 end

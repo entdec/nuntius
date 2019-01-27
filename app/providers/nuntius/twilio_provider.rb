@@ -4,8 +4,8 @@ require 'twilio-ruby'
 
 module Nuntius
   # Send SMS messages using twilio.com
-  class TwilioDriver < BaseDriver
-    adapter :sms
+  class TwilioProvider < BaseProvider
+    protocol :sms
 
     setting_reader :auth_token, required: true, description: 'Authentication token'
     setting_reader :sid, required: true, description: 'Application SID, see Twilio console'
@@ -15,15 +15,15 @@ module Nuntius
     states %w[failed undelivered] => 'undelivered', 'delivered' => 'delivered'
 
     def send(message)
-      response = client.messages.create(from: message.from, to: message.to, body: message.text)
-      message.driver_id = response.sid
+      response = client.messages.create(from: message.from || from, to: message.to, body: message.text)
+      message.provider_id = response.sid
       message.status = translated_status(response.status)
       message
     end
 
     def refresh(message)
-      response = client.messages(message.driver_id).fetch
-      message.driver_id = response.sid
+      response = client.messages(message.provider_id).fetch
+      message.provider_id = response.sid
       message.status = translated_status(response.status)
       message
     end

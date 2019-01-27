@@ -12,6 +12,8 @@ module Nuntius
   #   unknown - unknow status
   class Message < ApplicationRecord
 
+    belongs_to :template
+
     delegate :delivered?, to: :driver_message
 
     def draft?

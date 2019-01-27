@@ -3,8 +3,8 @@
 require 'houston'
 
 module Nuntius
-  class HoustonDriver < BaseDriver
-    adapter :push
+  class HoustonProvider < BaseProvider
+    protocol :push
 
     # html, text, attachments
 

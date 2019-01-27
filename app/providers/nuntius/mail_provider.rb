@@ -3,8 +3,8 @@
 require 'mail'
 
 module Nuntius
-  class MailDriver < BaseDriver
-    adapter :mail
+  class MailProvider < BaseProvider
+    protocol :mail
 
     # html, text, attachments
 

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Nuntius
-  class BaseAdapter
-    # def self.adapter(adapter)
-    #   @adapter = adapter
+  class BaseProtocol
+    # def self.protocol(protocol)
+    #   @protocol = protocol
     # end
 
     def process

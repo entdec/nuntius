@@ -4,15 +4,15 @@ module Nuntius
     attr_accessor :base_controller
     attr_writer   :logger
 
-    attr_reader :adapters
-    attr_reader :drivers
+    attr_reader :protocols
+    attr_reader :providers
 
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
-      @adapters = []
-      @drivers = {}
+      @protocols = []
+      @providers = {}
     end
 
     # logger [Object].
@@ -25,17 +25,17 @@ module Nuntius
       @admin_mount_point ||= '/scribo'
     end
 
-    def driver(driver, adapter:, priority: 1, timeout: nil, settings: {})
-      if @adapters.include? adapter
-        @drivers[adapter.to_sym] ||= []
-        @drivers[adapter.to_sym].push(driver: driver, priority: priority, timeout: timeout, settings: settings)
+    def provider(provider, protocol:, priority: 1, timeout: nil, settings: {})
+      if @protocols.include? protocol
+        @providers[protocol.to_sym] ||= []
+        @providers[protocol.to_sym].push(provider: provider, priority: priority, timeout: timeout, settings: settings)
       else
-        Nuntius.logger.warn "Driver #{driver} not enabled as adapter #{adapter} is not enabled"
+        Nuntius.logger.warn "provider #{provider} not enabled as protocol #{protocol} is not enabled"
       end
     end
 
-    def adapter(adapter)
-      @adapters.push(adapter) if adapter
+    def protocol(protocol)
+      @protocols.push(protocol) if protocol
     end
   end
 end
