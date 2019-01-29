@@ -3,14 +3,22 @@
 require 'mail'
 
 module Nuntius
-  class MailProvider < BaseProvider
+  class SmtpProvider < BaseProvider
     protocol :mail
 
-    # html, text, attachments
+    setting_reader :from_header, required: true, description: 'From header (example: Nuntius Messenger <nuntius@entdec.com>)'
+    setting_reader :host, required: true, description: 'Host (example: smtp.soverin.net)'
+    setting_reader :port, required: true, description: 'Port (example: 578)'
+    setting_reader :username, required: true, description: 'Username (nuntius@entdec.com)'
+    setting_reader :password, required: true, description: 'Password'
 
     def send(to)
-      mail = Mail.new(from: config['from_header'])
-      mail.delivery_method :smtp, address: config['host'], port: config['port'], user_name: config['username'], password: config['password']
+      mail = Mail.new(from: from_header)
+      mail.delivery_method :smtp,
+                           address: host,
+                           port: port,
+                           user_name: username,
+                           password: password
 
       mail.to = remove_plus_notations(to).join(',')
       mail.subject = "#{environment_string}#{tpl(:subject, obj, context)}"

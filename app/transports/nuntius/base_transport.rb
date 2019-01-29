@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Nuntius
-  class BaseProtocol
+  class BaseTransport
     # def self.protocol(protocol)
     #   @protocol = protocol
     # end

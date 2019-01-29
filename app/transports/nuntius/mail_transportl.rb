@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Nuntius
-  class MailProtocol < BaseProtocol
+  class MailTransport < BaseTransport
 
     def send(message)
       # Try each driver in turn until message is delivered

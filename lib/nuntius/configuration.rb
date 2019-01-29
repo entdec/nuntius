@@ -4,14 +4,14 @@ module Nuntius
     attr_accessor :base_controller
     attr_writer   :logger
 
-    attr_reader :protocols
+    attr_reader :transports
     attr_reader :providers
 
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
-      @protocols = []
+      @transports = []
       @providers = {}
     end
 
@@ -25,17 +25,17 @@ module Nuntius
       @admin_mount_point ||= '/scribo'
     end
 
-    def provider(provider, protocol:, priority: 1, timeout: nil, settings: {})
-      if @protocols.include? protocol
-        @providers[protocol.to_sym] ||= []
-        @providers[protocol.to_sym].push(provider: provider, priority: priority, timeout: timeout, settings: settings)
+    def provider(provider, transport:, priority: 1, timeout: nil, settings: {})
+      if @transports.include? transport
+        @providers[transport.to_sym] ||= []
+        @providers[transport.to_sym].push(provider: provider, priority: priority, timeout: timeout, settings: settings)
       else
-        Nuntius.logger.warn "provider #{provider} not enabled as protocol #{protocol} is not enabled"
+        Nuntius.logger.warn "provider #{provider} not enabled as transport #{transport} is not enabled"
       end
     end
 
-    def protocol(protocol)
-      @protocols.push(protocol) if protocol
+    def transport(transport)
+      @transports.push(transport) if transport
     end
   end
 end

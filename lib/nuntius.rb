@@ -17,8 +17,17 @@ module Nuntius
       yield config
     end
 
-    def message(obj, event)
-      MessageJob.perform_later(obj, event)
+    def message(event)
+      return unless event
+
+      Nuntius::MessengerJob.perform_later(@obj, event, @params)
+    end
+
+    def with(obj, params = {})
+      @obj = obj
+      @params = params
+
+      self
     end
   end
 end

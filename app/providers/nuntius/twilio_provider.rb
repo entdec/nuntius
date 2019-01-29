@@ -9,7 +9,7 @@ module Nuntius
 
     setting_reader :auth_token, required: true, description: 'Authentication token'
     setting_reader :sid, required: true, description: 'Application SID, see Twilio console'
-    setting_reader :from, required: true, description: "Phone-number or name (say: 'Nuntius') to send the message from"
+    setting_reader :from, required: true, description: "Phone-number or name (example: 'Nuntius') to send the message from"
 
     # Twilio statusses: queued, failed, sent, delivered, or undelivered
     states %w[failed undelivered] => 'undelivered', 'delivered' => 'delivered'

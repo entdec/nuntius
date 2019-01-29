@@ -8,14 +8,14 @@ class Account < ApplicationRecord
   private
 
   def send_create
-    Nuntius.message(self, 'create')
+    Nuntius.with(self).message('create')
   end
 
   def send_update
-    Nuntius.message(self, 'update')
+    Nuntius.message(self).message('update')
   end
 
   def send_destroy
-    Nuntius.message(self, 'destroy')
+    Nuntius.message(self).message('destroy')
   end
 end
