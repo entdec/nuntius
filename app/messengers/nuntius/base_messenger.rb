@@ -24,7 +24,8 @@ module Nuntius
     def self.dispatch(filtered_templates)
       filtered_templates.each do |template|
         msg = template.new_message
-
+        transport = BaseTransport.class_from_name(template.transport).new
+        transport.deliver(msg)
       end
     end
 
