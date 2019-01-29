@@ -3,21 +3,31 @@
 # puts status_mapping
 require 'pp'
 
-m = Nuntius::Message.new(to: '+31641085630', text: 'test')
-t = Nuntius::TwilioProvider.new(sid: 'AC92bf1782ac7790aa62d13f2135a887aa', auth_token: '811738b3a314daa224ce55ca400a97c2', from: 'Boxture')
-response = t.send(m)
+m = Nuntius::Message.create(to: '+31641085630', text: "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} - test", transport: 'sms')
 
-pp response
+t = Nuntius::TwilioSmsProvider.new()
+
+st = Nuntius::SmsTransport.new
+
+pp st.deliver(m)
 
 binding.pry
 
-response = t.refresh(m)
+pp m
 
-pp response
-
-puts "done!"
-
-Nuntius::Template.where("metadata->>'retailer_id' = '4bfeea93-3b4b-449a-8bdf-01b030219ade'")
+# response = t.send(m)
+#
+# pp response
+#
+# binding.pry
+#
+# response = t.refresh(m)
+#
+# pp response
+#
+# puts "done!"
+#
+# Nuntius::Template.where("metadata->>'retailer_id' = '4bfeea93-3b4b-449a-8bdf-01b030219ade'")
 
 # Nuntius.with(shipment: s).message(:picked_up)
 #

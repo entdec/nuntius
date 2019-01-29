@@ -2,22 +2,44 @@
 
 module Nuntius
   class BaseTransport
-    # def self.protocol(protocol)
-    #   @protocol = protocol
-    # end
-
-    def process
-      # Not implemented
+    def kind
+      self.class.name.demodulize.gsub(/Transport$/, '').underscore.to_sym
     end
 
-    def drivers(priority = nil)
-      results = Nuntius.config.drivers[kind].to_a
-      results = results.select { |d| d[:priority] == priority } if priority
+    def deliver(message)
+      priority = 1
+      wait_time = 0
+      count = 0
+      current_message = message
+
+      while (providers_for_priority = providers(priority)).present?
+
+        providers_for_priority.each do |hash|
+          if count.positive?
+            current_message = current_message.dup
+            current_message.provider = hash[:provider]
+            current_message.parent_message = message
+            current_message.save!
+          else
+            current_message.update(provider: hash[:provider])
+          end
+          TransportDeliveryJob.set(wait: wait_time).perform_later(hash[:provider].to_s, current_message)
+          count += 1
+          wait_time += hash[:timeout].seconds if hash[:timeout].positive?
+        end
+        # Per priority we add wait time - based on the timeout
+        priority += 1
+      end
+    end
+
+    def providers(priority = nil)
+      results = Nuntius.config.providers[kind].to_a
+      results = results.select { |provider| provider[:priority] == priority } if priority
       results
     end
 
-    def kind
-      :null
+    def self.class_from_name(name)
+      Nuntius.const_get("#{name}_transport".camelize)
     end
 
     private

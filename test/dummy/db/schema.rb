@@ -25,6 +25,8 @@ ActiveRecord::Schema.define(version: 20190125202436) do
 
   create_table "nuntius_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "template_id"
+    t.uuid "parent_message_id"
+    t.integer "refreshes", default: 0
     t.string "status", default: "draft"
     t.string "transport"
     t.string "provider"
@@ -37,6 +39,7 @@ ActiveRecord::Schema.define(version: 20190125202436) do
     t.text "text"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
     t.index ["template_id"], name: "index_nuntius_messages_on_template_id"
   end
 
@@ -57,6 +60,7 @@ ActiveRecord::Schema.define(version: 20190125202436) do
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
   end
 
+  add_foreign_key "nuntius_messages", "nuntius_messages", column: "parent_message_id"
   add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"
   add_foreign_key "nuntius_templates", "nuntius_templates", column: "layout_id"
 end

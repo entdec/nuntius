@@ -4,15 +4,14 @@ module Nuntius
   #
   # Nuntius will have messages in states:
   #   sending - we're working on it
-  #   sent - sent
-  #   failed - could not send
   #   delivered - have delivery confirmation
   #   undelivered - have confirmation of non-delivery
-  #   seen - when we have seen confirmation (with pixels etc)
-  #   unknown - unknow status
+  # Not all transports may provide all states
   class Message < ApplicationRecord
+    belongs_to :template, optional: true
+    belongs_to :parent_message, class_name: 'Message', optional: true
 
-    belongs_to :template
+    validates :transport, presence: true
 
     delegate :delivered?, to: :driver_message
 
@@ -32,12 +31,9 @@ module Nuntius
       status == 'undelivered'
     end
 
-    private
-
-    # Not sure if we need these ...
-
-    def driver_class
-      Nuntius.const_get("#{driver}_driver".camelize)
+    # Removes only draft child messages
+    def cleanup!
+      Nuntius::Message.where(status: 'draft').where(parent_message: self).delete_all
     end
   end
 end

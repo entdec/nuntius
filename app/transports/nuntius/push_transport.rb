@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Nuntius
-  class SmsTransport < BaseTransport
+  class PushTransport < BaseTransport
   end
 end

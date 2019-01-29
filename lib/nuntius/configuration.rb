@@ -25,7 +25,7 @@ module Nuntius
       @admin_mount_point ||= '/scribo'
     end
 
-    def provider(provider, transport:, priority: 1, timeout: nil, settings: {})
+    def provider(provider, transport:, priority: 1, timeout: 0, settings: {})
       if @transports.include? transport
         @providers[transport.to_sym] ||= []
         @providers[transport.to_sym].push(provider: provider, priority: priority, timeout: timeout, settings: settings)

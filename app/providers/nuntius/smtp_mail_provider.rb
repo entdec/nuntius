@@ -3,8 +3,8 @@
 require 'mail'
 
 module Nuntius
-  class SmtpProvider < BaseProvider
-    protocol :mail
+  class SmtpMailProvider < BaseProvider
+    transport :mail
 
     setting_reader :from_header, required: true, description: 'From header (example: Nuntius Messenger <nuntius@entdec.com>)'
     setting_reader :host, required: true, description: 'Host (example: smtp.soverin.net)'
@@ -12,7 +12,7 @@ module Nuntius
     setting_reader :username, required: true, description: 'Username (nuntius@entdec.com)'
     setting_reader :password, required: true, description: 'Password'
 
-    def send(to)
+    def deliver(to)
       mail = Mail.new(from: from_header)
       mail.delivery_method :smtp,
                            address: host,

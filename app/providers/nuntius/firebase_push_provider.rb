@@ -4,9 +4,9 @@ require 'fcm'
 
 module Nuntius
   class FirebaseProvider < BaseProvider
-    protocol :push
+    transport :push
 
-    def send(to, text)
+    def deliver(to, text)
       body = "#{environment_string}#{tpl(:text, obj, context)}"
 
       # See https://console.firebase.google.com/project/<project>/settings/cloudmessaging

@@ -13,12 +13,12 @@ module Nuntius
     def self.setting_reader(name, required: false, description: '')
       @all_settings ||= []
       @all_settings.push(name: name, required: required, description: description)
-      define_method(name) { settings[name] }
+      define_method(name) { required ? settings.fetch(name) : settings.dig(name) }
     end
 
-    def self.protocol(protocol=nil)
-      @protocol = protocol if protocol
-      @protocol
+    def self.transport(transport=nil)
+      @transport = transport if transport
+      @transport
     end
 
     def self.states(mapping=nil)
@@ -26,12 +26,20 @@ module Nuntius
       @states
     end
 
-    def send
+    def self.class_from_name(name, transport)
+      Nuntius.const_get("#{name}_#{transport}_provider".camelize)
+    end
+
+    def deliver
+      # Not implemented
+    end
+
+    def refresh
       # Not implemented
     end
 
     def name
-      self.class.name.demodulize.underscore.gsub(/_provider$/, '').to_sym
+      self.class.name.demodulize.underscore.gsub(/_#{self.class.transport}_provider$/, '').to_sym
     end
 
     private
@@ -41,7 +49,7 @@ module Nuntius
     end
 
     def settings
-      @settings ||= Nuntius.config.providers[self.class.protocol].to_a.find { |d| d[:provider] == name }[:settings]
+      @settings ||= Nuntius.config.providers[self.class.transport].to_a.find { |d| d[:provider] == name }[:settings]
     end
   end
 end

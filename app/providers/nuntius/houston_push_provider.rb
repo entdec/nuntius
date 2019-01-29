@@ -4,14 +4,13 @@ require 'houston'
 
 module Nuntius
   class HoustonProvider < BaseProvider
-    protocol :push
+    transport :push
 
     # html, text, attachments
 
-    def send(to, text)
+    def deliver(to, text)
       apn = Rails.env.production? ? Houston::Client.production : Houston::Client.development
       apn.certificate = ios_config['certificate'] + "\n" + ios_config['key']
-      # See https://console.firebase.google.com/project/<project>/settings/cloudmessaging
 
       body = "#{environment_string}#{tpl(:text, obj, context)}"
 

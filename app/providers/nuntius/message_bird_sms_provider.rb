@@ -4,8 +4,8 @@ require 'messagebird'
 
 module Nuntius
   # Send SMS messages using messagebird.com
-  class MessageBirdProvider < BaseProvider
-    protocol :sms
+  class MessageBirdSmsProvider < BaseProvider
+    transport :sms
 
     setting_reader :auth_token, required: true, description: 'Authentication token'
     setting_reader :from, required: true, description: "Phone-number or name (say: 'Nuntius') to send the message from"
@@ -13,8 +13,8 @@ module Nuntius
     # Messagebird statusses: scheduled, sent, buffered, delivered, expired, and delivery_failed.
     states %w[expired delivery_failed] => 'undelivered', 'delivered' => 'delivered'
 
-    def send(message)
-      response = client.message_create(message.from, message.to, message.text)
+    def deliver(message)
+      response = client.message_create(message.from || from, message.to, message.text)
       message.provider_id = response.id
       message.status = translated_status(response.recipients['items'].first.status)
       message
