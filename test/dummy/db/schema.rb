@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20190125202436) do
   enable_extension "pgcrypto"
   enable_extension "uuid-ossp"
 
-  create_table "accounts", force: :cascade do |t|
+  create_table "accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20190125202436) do
   create_table "nuntius_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "template_id"
     t.string "status", default: "draft"
-    t.string "protocol"
+    t.string "transport"
     t.string "provider"
     t.string "provider_id"
     t.string "request_id"
@@ -43,7 +43,7 @@ ActiveRecord::Schema.define(version: 20190125202436) do
   create_table "nuntius_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "klass"
     t.string "event"
-    t.string "protocol"
+    t.string "transport"
     t.string "description"
     t.jsonb "metadata", default: {}, null: false
     t.uuid "layout_id"

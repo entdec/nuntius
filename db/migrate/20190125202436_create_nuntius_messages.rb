@@ -6,7 +6,7 @@ class CreateNuntiusMessages < ActiveRecord::Migration[5.1]
       t.references :template, index: true, type: :uuid, foreign_key: { to_table: :nuntius_templates }
 
       t.string :status, default: 'draft'
-      t.string :protocol
+      t.string :transport
       t.string :provider
       t.string :provider_id
 

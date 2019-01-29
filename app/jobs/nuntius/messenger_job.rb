@@ -7,8 +7,10 @@ module Nuntius
     # queue_as :message
 
     def perform(obj, event, params = {})
-      klass = "#{Nuntius::BaseMessenger.class_name_for(obj)}Messenger".constantize
-      klass.new(obj, event, params).call
+      name = "#{Nuntius::BaseMessenger.class_name_for(obj)}Messenger"
+      templates = name.constantize.new(obj, event, params).call
+
+      Nuntius::BaseMessenger.dispatch(templates) if templates
     end
   end
 end

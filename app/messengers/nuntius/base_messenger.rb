@@ -20,6 +20,14 @@ module Nuntius
       Template.where(klass: class_name_for(@object), event: @event)
     end
 
+    # Turns the templates in messages, and dispatches the messages to transports
+    def self.dispatch(filtered_templates)
+      filtered_templates.each do |template|
+        msg = template.new_message
+
+      end
+    end
+
     def self.liquid_variable_name_for(obj)
       if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
         obj.first.class.name.demodulize.pluralize

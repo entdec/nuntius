@@ -5,7 +5,7 @@ class CreateNuntiusTemplates < ActiveRecord::Migration[5.1]
     create_table :nuntius_templates, id: :uuid do |t|
       t.string :klass
       t.string :event
-      t.string :protocol
+      t.string :transport
 
       t.string :description
       t.jsonb :metadata, null: false, default: {}
