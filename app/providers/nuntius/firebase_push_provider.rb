@@ -3,20 +3,24 @@
 require 'fcm'
 
 module Nuntius
-  class FirebaseProvider < BaseProvider
+  class FirebasePushProvider < BaseProvider
     transport :push
 
-    def deliver(to, text)
-      body = "#{environment_string}#{tpl(:text, obj, context)}"
+    setting_reader :server_key, required: true, description: 'Server key for the project, see Firebase console'
 
-      # See https://console.firebase.google.com/project/<project>/settings/cloudmessaging
-      fcm = FCM.new(android_config['server_key'])
+    def deliver(message)
+      fcm = FCM.new(server_key)
 
-      if android_devices.present?
-        options = { data: { body: body } }
-        response = fcm.send(android_devices, options)
-        raise "FCM said: #{response[:status_code]} / #{response[:response]}" if response[:status_code] != 200 || response[:response] != 'success'
-      end
+      options = { data: { body: message.text } }
+      response = fcm.send([message.to], options)
+
+      message.status = if response[:status_code] != 200 || response[:response] != 'success'
+                         'undelivered'
+                       else
+                         'sending'
+                       end
+
+      message
     end
 
   end
