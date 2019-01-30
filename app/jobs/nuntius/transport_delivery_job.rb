@@ -2,7 +2,7 @@
 
 require 'pp'
 
-# Initializes the appropriate Messenger class and calls the event method
+# This job will be called only once for each provider sent out to deliver the job
 module Nuntius
   class TransportDeliveryJob < ApplicationJob
     # TODO: add this as configuration
@@ -14,11 +14,16 @@ module Nuntius
 
       provider = BaseProvider.class_from_name(provider_name, message.transport).new
 
-      unless message.draft?
+      if message.provider != provider_name
+        original_message = message
         message = message.dup
-        message.state = 'draft'
+        message.parent_message = original_message
+        message.status = 'draft'
+        message.provider_id = ''
       end
       message.provider = provider_name
+      message.save!
+
       message = provider.deliver(message)
       message.save! unless message.draft?
 

@@ -9,25 +9,14 @@ module Nuntius
     def deliver(message)
       priority = 1
       wait_time = 0
-      count = 0
-      current_message = message
-
       while (providers_for_priority = providers(priority)).present?
-
+        time_out = 0
         providers_for_priority.each do |hash|
-          if count.positive?
-            current_message = current_message.dup
-            current_message.provider = hash[:provider]
-            current_message.parent_message = message
-            current_message.save!
-          else
-            current_message.update(provider: hash[:provider])
-          end
-          TransportDeliveryJob.set(wait: wait_time).perform_later(hash[:provider].to_s, current_message)
-          count += 1
-          wait_time += hash[:timeout].seconds if hash[:timeout].positive?
+          message.update(provider: hash[:provider].to_s) if message.provider.blank?
+          Nuntius::TransportDeliveryJob.set(wait: wait_time).perform_later(hash[:provider].to_s, message)
+          time_out += hash[:timeout].seconds if hash[:timeout].positive?
         end
-        # Per priority we add wait time - based on the timeout
+        wait_time += time_out
         priority += 1
       end
     end
