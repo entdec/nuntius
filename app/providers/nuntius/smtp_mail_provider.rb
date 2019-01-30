@@ -12,7 +12,7 @@ module Nuntius
     setting_reader :username, required: true, description: 'Username (nuntius@entdec.com)'
     setting_reader :password, required: true, description: 'Password'
 
-    def deliver(to)
+    def deliver(message)
       mail = Mail.new(from: from_header)
       mail.delivery_method :smtp,
                            address: host,
@@ -20,17 +20,17 @@ module Nuntius
                            user_name: username,
                            password: password
 
-      mail.to = remove_plus_notations(to).join(',')
-      mail.subject = "#{environment_string}#{tpl(:subject, obj, context)}"
+      mail.to = message.to
+      mail.subject = message.subject
       mail.part content_type: 'multipart/alternative' do |p|
         p.html_part = Mail::Part.new(
-          body: tpl(:text, obj, context),
+          body: message.text,
           content_type: 'text/plain',
           charset: 'UTF-8'
         )
-        if html.present?
+        if message.html.present?
           p.text_part = Mail::Part.new(
-            body: html_body(config, subj, obj, context),
+            body: message.html,
             content_type: 'text/html',
             charset: 'UTF-8'
           )
@@ -40,19 +40,20 @@ module Nuntius
       # attachments: [
       #   { file_name: 'test', content_type: 'text/plain', content: 'binary data', file_path: '.../tmp/filetosend.ext', auto_zip: false }
       # ]
-      opts.fetch(:attachments, []).each do |attachment|
-        attach_file_to_mail(mail, message_instance, attachment)
-      end
-
-      # passed as parameters
-      opts.fetch(:attachment_urls, []).each do |attachment_url|
-        attach_file_to_mail(mail, message_instance, file_url: attachment_url)
-      end
-
-      # saved on the message itself
-      tpl(:attachment_urls, obj, context).split(/[\n,\s]+/).compact.each do |attachment_url|
-        attach_file_to_mail(mail, message_instance, file_url: attachment_url)
-      end
+      # opts.fetch(:attachments, []).each do |attachment|
+      #   attach_file_to_mail(mail, message_instance, attachment)
+      # end
+      #
+      # # passed as parameters
+      # opts.fetch(:attachment_urls, []).each do |attachment_url|
+      #   attach_file_to_mail(mail, message_instance, file_url: attachment_url)
+      # end
+      #
+      # # saved on the message itself
+      # tpl(:attachment_urls, obj, context).split(/[\n,\s]+/).compact.each do |attachment_url|
+      #   attach_file_to_mail(mail, message_instance, file_url: attachment_url)
+      # end
+      #
 
       mail.deliver!
     end
