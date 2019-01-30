@@ -3,25 +3,31 @@
 require 'houston'
 
 module Nuntius
-  class HoustonProvider < BaseProvider
+  class HoustonPushProvider < BaseProvider
     transport :push
 
-    # html, text, attachments
+    setting_reader :certificate, required: true, description: 'The contents of a valid APNS push certificate in .pem format'
+    setting_reader :passphrase, required: false, description: 'If the APNS certificate is protected by a passphrase, provide this variable to use when decrypting it.'
+    setting_reader :environment, required: false, default: :production, description: 'Development or production, defaults to production'
 
-    def deliver(to, text)
-      apn = Rails.env.production? ? Houston::Client.production : Houston::Client.development
-      apn.certificate = ios_config['certificate'] + "\n" + ios_config['key']
+    def deliver(message)
+      return message if message.to.size != 64
 
-      body = "#{environment_string}#{tpl(:text, obj, context)}"
+      apn = environment.to_sym == :development ? Houston::Client.development : Houston::Client.production
+      apn.certificate = certificate
+      apn.passphrase = passphrase
 
-      to.uniq!
-      to.each do |token|
-        notification = Houston::Notification.new(device: token)
-        notification.alert = body
-        notification.badge = 0
-        notification.sound = 'default'
-        apn.push(notification)
-      end
+      notification = Houston::Notification.new(device: message.to, alert: message.text, sound: 'default')
+      apn.push(notification)
+
+      binding.pry
+
+      message.status = if notification.sent?
+                         'sending'
+                       elsif !notification.valid? || notification.error
+                         'undelivered'
+                       end
+      message
     end
 
   end
