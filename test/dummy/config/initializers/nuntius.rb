@@ -10,8 +10,8 @@ Nuntius.setup do |config|
 
   config.provider :smtp, transport: :mail
 
-  config.provider :houston, transport: :push
-  config.provider :firebase, transport: :push
+  config.provider :houston, transport: :push, settings: { certificate: File.read('/Users/tdegrunt/Development/incubator/certomate/data/localexpress-apns.pem') }
+  config.provider :firebase, transport: :push, settings: { server_key: 'AAAAhfDlrck:APA91bE7HwqfTkhVfaeMdXiSoeRZdlcIfidVyPfOibVhoTJeoOCiMRxn2E9dGf0PxK_eu7_dUmyVYkFoS8UyIrVujBf6OototKahqGTm_cVAz8lkYnsIGcvrpRYmpk3MkBsV1y3_f73W' }
 
   config.provider :message_bird, transport: :sms, priority: 1, timeout: 20, settings: { from: 'Soverin', auth_token: 'live_qrV8ZwTAgnqQ6soTZBddZMtjK' }
   config.provider :twilio, transport: :sms, priority: 2, settings: { sid: 'AC92bf1782ac7790aa62d13f2135a887aa', auth_token: '811738b3a314daa224ce55ca400a97c2', from: '+14153736696' }

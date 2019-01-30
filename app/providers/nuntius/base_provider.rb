@@ -10,18 +10,18 @@ module Nuntius
       @all_settings ||= []
     end
 
-    def self.setting_reader(name, required: false, description: '')
+    def self.setting_reader(name, required: false, default: nil, description: '')
       @all_settings ||= []
-      @all_settings.push(name: name, required: required, description: description)
-      define_method(name) { required ? settings.fetch(name) : settings.dig(name) }
+      @all_settings.push(name: name, required: required, default: default, description: description)
+      define_method(name) { required ? settings.fetch(name) : settings.dig(name) || default }
     end
 
-    def self.transport(transport=nil)
+    def self.transport(transport = nil)
       @transport = transport if transport
       @transport
     end
 
-    def self.states(mapping=nil)
+    def self.states(mapping = nil)
       @states = mapping if mapping
       @states
     end
@@ -30,12 +30,14 @@ module Nuntius
       Nuntius.const_get("#{name}_#{transport}_provider".camelize)
     end
 
-    def deliver
-      # Not implemented
+    # Override this in implementations
+    def deliver(message)
+      message
     end
 
-    def refresh
-      # Not implemented
+    # Override this in implementations
+    def refresh(message)
+      message
     end
 
     def name
