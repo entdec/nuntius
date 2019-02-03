@@ -6,9 +6,17 @@ module Nuntius
   class HoustonPushProvider < BaseProvider
     transport :push
 
-    setting_reader :certificate, required: true, description: 'The contents of a valid APNS push certificate in .pem format'
-    setting_reader :passphrase, required: false, description: 'If the APNS certificate is protected by a passphrase, provide this variable to use when decrypting it.'
-    setting_reader :environment, required: false, default: :production, description: 'Development or production, defaults to production'
+    setting_reader :certificate,
+                   required: true,
+                   description: 'The contents of a valid APNS push certificate in .pem format'
+    setting_reader :passphrase,
+                   required: false,
+                   description: 'If the APNS certificate is protected by a passphrase, ' +
+                                'provide this variable to use when decrypting it.'
+    setting_reader :environment,
+                   required: false,
+                   default: :production,
+                   description: 'Development or production, defaults to production'
 
     def deliver(message)
       return message if message.to.size != 64
@@ -17,7 +25,8 @@ module Nuntius
       apn.certificate = certificate
       apn.passphrase = passphrase
 
-      notification = Houston::Notification.new(device: message.to, alert: message.text, sound: 'default')
+      notification = Houston::Notification.new((message.payload || {}).merge(device: message.to,
+                                                                             alert: message.text, sound: 'default'))
       apn.push(notification)
 
       message.status = if notification.sent?

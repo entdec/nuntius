@@ -11,7 +11,7 @@ module Nuntius
     def deliver(message)
       fcm = FCM.new(server_key)
 
-      options = { data: { body: message.text } }
+      options = (message.payload || {}).merge(data: { body: message.text })
       response = fcm.send([message.to], options)
 
       message.status = if response[:status_code] != 200 || response[:response] != 'success'
