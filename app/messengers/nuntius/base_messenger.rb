@@ -15,11 +15,6 @@ module Nuntius
       send(@event.to_sym, @object, @params)
     end
 
-    # Returns the relevant templates for the object / event combination
-    def templates
-      Template.where(klass: class_name_for(@object), event: @event)
-    end
-
     # Turns the templates in messages, and dispatches the messages to transports
     def dispatch(filtered_templates)
       filtered_templates.each do |template|
@@ -46,6 +41,11 @@ module Nuntius
     end
 
     private
+
+    # Returns the relevant templates for the object / event combination
+    def templates
+      Template.where(klass: class_name_for(@object), event: @event)
+    end
 
     def liquid_context
       (@params || {}).merge(liquid_variable_name_for(@object) => @object,
