@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'liquid'
+require 'liquor'
 
 require 'nuntius/engine'
 require 'nuntius/configuration'
