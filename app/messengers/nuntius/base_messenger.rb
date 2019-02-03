@@ -10,7 +10,7 @@ module Nuntius
       @params = params
     end
 
-    # Calls the event method on the messenger
+    # Calls the event method on the messenger, which should return templates
     def call
       send(@event.to_sym, @object, @params)
     end
@@ -21,9 +21,9 @@ module Nuntius
     end
 
     # Turns the templates in messages, and dispatches the messages to transports
-    def self.dispatch(filtered_templates)
+    def dispatch(filtered_templates)
       filtered_templates.each do |template|
-        msg = template.new_message
+        msg = template.new_message(liquid_context)
         transport = BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg)
       end
@@ -31,9 +31,9 @@ module Nuntius
 
     def self.liquid_variable_name_for(obj)
       if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
-        obj.first.class.name.demodulize.pluralize
+        obj.first.class.name.demodulize.pluralize.underscore
       else
-        obj.class.name.demodulize
+        obj.class.name.demodulize.underscore
       end
     end
 
@@ -43,6 +43,13 @@ module Nuntius
       else
         obj.class.name.demodulize
       end
+    end
+
+    private
+
+    def liquid_context
+      (@params || {}).merge(liquid_variable_name_for(@object) => @object,
+                            'event' => @event)
     end
   end
 end
