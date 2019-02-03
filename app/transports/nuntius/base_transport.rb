@@ -9,6 +9,7 @@ module Nuntius
     def deliver(message)
       priority = 1
       wait_time = 0
+      message.update(transport: kind.to_s) if message.transport.blank?
       while (providers_for_priority = providers(priority)).present?
         time_out = 0
         providers_for_priority.each do |hash|
