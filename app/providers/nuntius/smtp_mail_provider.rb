@@ -18,7 +18,8 @@ module Nuntius
                            address: host,
                            port: port,
                            user_name: username,
-                           password: password
+                           password: password,
+                           return_response: true
 
       mail.to = message.to
       mail.subject = message.subject
@@ -55,7 +56,16 @@ module Nuntius
       # end
       #
 
-      mail.deliver!
+      response = mail.deliver!
+
+      message.provider_id = mail.message_id
+      message.status = 'undelivered'
+      if response.success?
+        message.provider_id = response.string.split.last
+        message.status = 'sending' if response.success?
+      end
+
+      message
     end
 
     private
