@@ -10,6 +10,7 @@ module Nuntius
   class Message < ApplicationRecord
     belongs_to :template, optional: true
     belongs_to :parent_message, class_name: 'Message', optional: true
+    belongs_to :nuntiable, polymorphic: true
 
     validates :transport, presence: true
 
