@@ -8,9 +8,10 @@ module Nuntius
 
     def perform(obj, event, params = {})
       name = "#{Nuntius::BaseMessenger.class_name_for(obj)}Messenger"
-      templates = name.constantize.new(obj, event, params).call
 
-      Nuntius::BaseMessenger.dispatch(templates) if templates
+      messenger = name.constantize.new(obj, event, params)
+      templates = messenger.call
+      messenger.dispatch(templates) if templates
     end
   end
 end
