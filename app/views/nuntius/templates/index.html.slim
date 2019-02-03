@@ -1,0 +1,17 @@
+table.table
+  thead
+    tr
+      th Description
+      th Transport
+      th Klass
+      th Event
+  tbody
+    - for template in @templates
+      tr
+        td = link_to template.description, edit_template_path(template)
+        td = template.transport
+        td = template.klass
+        td = template.event
+
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.add'), new_template_path, class: 'btn btn-primary')

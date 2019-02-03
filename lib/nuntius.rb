@@ -4,6 +4,7 @@ require 'liquor'
 
 require 'nuntius/engine'
 require 'nuntius/configuration'
+require 'nuntius/active_record_helpers'
 
 module Nuntius
   # Configuration

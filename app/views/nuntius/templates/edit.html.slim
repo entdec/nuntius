@@ -1,0 +1,12 @@
+= simple_form_for(@template, url: @template.new_record? ? templates_path : template_path, html: {multipart: true}) do |f|
+  = f.input :klass, collection: Nuntius.config.classes, label_method: :name, value_method: :name, selected: @template.klass
+  = f.input :description
+  = f.input :transport, collection: Nuntius.config.transports
+  = f.input :event
+  = f.input :from
+  = f.input :to
+  = f.input :subject
+  = f.input :html
+  = f.input :text
+  = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
+  = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }

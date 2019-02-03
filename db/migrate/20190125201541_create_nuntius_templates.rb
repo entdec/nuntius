@@ -15,8 +15,9 @@ class CreateNuntiusTemplates < ActiveRecord::Migration[5.1]
       t.string :from
       t.string :to
       t.string :subject
-      t.text :html
-      t.text :text
+      t.text   :html
+      t.text   :text
+      t.jsonb  :payload
 
       t.timestamps
     end

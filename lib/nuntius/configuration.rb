@@ -6,11 +6,13 @@ module Nuntius
 
     attr_reader :transports
     attr_reader :providers
+    attr_reader :classes
 
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
+      @classes = []
       @transports = []
       @providers = {}
     end
@@ -22,7 +24,7 @@ module Nuntius
 
     # admin_mount_point [String].
     def admin_mount_point
-      @admin_mount_point ||= '/scribo'
+      @admin_mount_point ||= '/nuntius'
     end
 
     def provider(provider, transport:, priority: 1, timeout: 0, settings: {})

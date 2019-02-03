@@ -5,6 +5,7 @@ class CreateNuntiusMessages < ActiveRecord::Migration[5.1]
     create_table :nuntius_messages, id: :uuid do |t|
       t.references :template, index: true, type: :uuid, foreign_key: { to_table: :nuntius_templates }
       t.references :parent_message, index: true, type: :uuid, foreign_key: { to_table: :nuntius_messages }
+      t.references :nuntiable, polymorphic: true, index: true, type: :uuid
 
       t.integer :refreshes, default: 0
 
