@@ -12,3 +12,7 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
+
+git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.git" }
+
+gem 'liquor', entdec: 'components/liquor', tag: '0.1.1'
