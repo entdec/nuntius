@@ -20,8 +20,6 @@ module Nuntius
       notification = Houston::Notification.new(device: message.to, alert: message.text, sound: 'default')
       apn.push(notification)
 
-      binding.pry
-
       message.status = if notification.sent?
                          'sending'
                        elsif !notification.valid? || notification.error
