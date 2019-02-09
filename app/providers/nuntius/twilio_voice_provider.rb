@@ -1,0 +1,68 @@
+# frozen_string_literal: true
+
+require 'twilio-ruby'
+
+module Nuntius
+  # Send Voice call messages using twilio.com
+  class TwilioVoiceProvider < BaseProvider
+    transport :voice
+
+    setting_reader :auth_token, required: true, description: 'Authentication token'
+    setting_reader :sid, required: true, description: 'Application SID, see Twilio console'
+    setting_reader :from, required: true, description: "Phone-number or name (example: 'Nuntius') to send the message from"
+
+    # Twilio statusses: queued, failed, sent, delivered, or undelivered
+    states %w[failed undelivered] => 'undelivered', %w[delivered completed] => 'delivered'
+
+    HOST = 'https://01abade9.ngrok.io'
+
+    def deliver(message)
+      # Need hostname here too
+      response = client.calls.create(from: message.from || from, to: message.to, method: 'POST', url: Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: HOST))
+      message.provider_id = response.sid
+      message.status = translated_status(response.status)
+      message
+    end
+
+    def refresh(message)
+      response = client.calls(message.provider_id).fetch
+      message.provider_id = response.sid
+      message.status = translated_status(response.status)
+      message
+    end
+
+    def callback(message, params)
+      refresh(message).save
+
+      twiml = script_for_path(message, "/#{params[:path]}", params)
+
+      if twiml
+        [200, { 'Content-Type' => 'application/xml' }, [twiml[:body]]]
+      else
+        [404, { 'Content-Type' => 'text/html; charset=utf-8' }, ['Not found']]
+      end
+    end
+
+    private
+
+    def client
+      @client ||= Twilio::REST::Client.new(sid, auth_token)
+    end
+
+    def script_for_path(message, path = '/', params)
+      scripts = message.text.split("\n\n")
+
+      scripts = scripts.map do |script|
+        preamble = Preamble.parse(script)
+        payload = preamble.metadata ? payload = preamble.content : script
+        payload = payload.gsub('{{url}}', Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: HOST))
+
+        metadata = preamble.metadata || { path: '/' }
+
+        { headers: metadata.with_indifferent_access, body: payload }
+      end
+
+      scripts.find { |s| s[:headers][:path] == path }
+    end
+  end
+end
