@@ -1,4 +1,10 @@
 Nuntius::Engine.routes.draw do
-  resources :templates
-  resources :messages
+
+  get 'callbacks/:message_id(/*path)', to: 'callbacks#create', as: :callback
+  post 'callbacks/:message_id(/*path)', to: 'callbacks#create'
+
+  namespace :admin do
+    resources :templates
+    resources :messages
+  end
 end
