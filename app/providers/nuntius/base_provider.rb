@@ -28,6 +28,8 @@ module Nuntius
 
     def self.class_from_name(name, transport)
       Nuntius.const_get("#{name}_#{transport}_provider".camelize)
+    rescue
+      nil
     end
 
     # Override this in implementations
@@ -40,6 +42,11 @@ module Nuntius
       message
     end
 
+    # Override this in implementation
+    def callback(message, params)
+      [404, { 'Content-Type' => 'text/html; charset=utf-8' }, ['Not found']]
+    end
+
     def name
       self.class.name.demodulize.underscore.gsub(/_#{self.class.transport}_provider$/, '').to_sym
     end
@@ -47,7 +54,7 @@ module Nuntius
     private
 
     def translated_status(status)
-      self.class.states.find { |key| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sending'
+      self.class.states.find { |key, _value| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sending'
     end
 
     def settings
