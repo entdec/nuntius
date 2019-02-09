@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'pp'
-
 # This job will be called only once for each provider sent out to deliver the job
 module Nuntius
   class TransportDeliveryJob < ApplicationJob
@@ -12,7 +10,7 @@ module Nuntius
       return if message.delivered?
       return if message.parent_message&.delivered?
 
-      provider = BaseProvider.class_from_name(provider_name, message.transport).new
+      provider = Nuntius::BaseProvider.class_from_name(provider_name, message.transport).new
 
       if message.provider != provider_name
         original_message = message
@@ -31,7 +29,7 @@ module Nuntius
       if message.delivered?
         message.cleanup!
       else
-        TransportRefreshJob.set(wait: 5).perform_later(provider_name, message)
+        Nuntius::TransportRefreshJob.set(wait: 5).perform_later(provider_name, message)
       end
     end
   end
