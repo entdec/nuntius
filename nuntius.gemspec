@@ -17,15 +17,15 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
   s.add_dependency 'liquor', '~> 0.1'
-  s.add_dependency "rails", "~> 5.2"
   s.add_dependency 'pg'
+  s.add_dependency "rails", "~> 5.2"
 
   s.add_dependency 'fcm'
   s.add_dependency 'houston'
   s.add_dependency 'mail', '~> 2.6'
+  s.add_dependency 'messagebird-rest'
   s.add_dependency 'parse-cron'
   s.add_dependency 'twilio-ruby', '~> 5.6'
-  s.add_dependency 'messagebird-rest'
 
   s.add_dependency 'inky-rb'
   s.add_dependency 'premailer'
