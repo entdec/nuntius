@@ -7,7 +7,6 @@ require 'nuntius/configuration'
 require 'nuntius/active_record_helpers'
 
 module Nuntius
-  # Configuration
   class Error < StandardError; end
 
   class << self
