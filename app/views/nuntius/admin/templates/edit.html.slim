@@ -1,5 +1,5 @@
-= simple_form_for(@template, url: @template.new_record? ? templates_path : template_path, html: {multipart: true}) do |f|
-  = f.input :klass, collection: Nuntius.config.classes, label_method: :name, value_method: :name, selected: @template.klass
+= simple_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
+  = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
   = f.input :description
   = f.input :transport, collection: Nuntius.config.transports
   = f.input :event
