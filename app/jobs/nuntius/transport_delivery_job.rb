@@ -3,8 +3,7 @@
 # This job will be called only once for each provider sent out to deliver the job
 module Nuntius
   class TransportDeliveryJob < ApplicationJob
-    # TODO: add this as configuration
-    # queue_as :message
+    queue_as Nuntius.config.jobs_queue_name
 
     def perform(provider_name, message)
       return if message.delivered?
