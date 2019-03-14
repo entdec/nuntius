@@ -40,6 +40,22 @@ module Nuntius
       end
     end
 
+    def self.messenger_for_class(name)
+      messenger_name_for_class(name).safe_constantize
+    end
+
+    def self.messenger_name_for_class(name)
+      "#{name}Messenger"
+    end
+
+    def self.messenger_for_obj(obj)
+      messenger_name_for_obj(obj).safe_constantize
+    end
+
+    def self.messenger_name_for_obj(obj)
+      "#{Nuntius::BaseMessenger.class_name_for(obj)}Messenger"
+    end
+
     private
 
     # Returns the relevant templates for the object / event combination
