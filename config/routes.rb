@@ -7,4 +7,5 @@ Nuntius::Engine.routes.draw do
     resources :templates
     resources :messages
   end
+  root to: 'admin/templates#index'
 end
