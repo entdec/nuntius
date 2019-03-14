@@ -6,15 +6,17 @@ module Nuntius
 
     attr_reader :transports
     attr_reader :providers
-    attr_reader :classes
+    attr_accessor :nuntiable_class_names
+    attr_reader :jobs_queue_name
 
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
-      @classes = []
+      @nuntiable_class_names = []
       @transports = []
       @providers = {}
+      @jobs_queue_name = :message
     end
 
     # logger [Object].
