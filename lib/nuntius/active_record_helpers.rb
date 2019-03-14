@@ -6,7 +6,9 @@ module ActiveRecordHelpers
   class_methods do
     def nuntiable
       has_many :messages, as: :nuntiable, class_name: 'Nuntius::Message'
-      Nuntius.config.classes << self unless Nuntius.config.classes.include? self
+      Nuntius.config.nuntiable_class_names << self.name unless Nuntius.config.nuntiable_class_names.include? self.name
+
+      raise "Nuntius Messenger missing for class #{self.name}, please create a #{Nuntius::BaseMessenger.messenger_name_for_class(self.name)}" unless Nuntius::BaseMessenger.messenger_for_class(self.name)
     end
   end
 end
