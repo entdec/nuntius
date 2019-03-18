@@ -7,6 +7,7 @@ module Nuntius
   class TwilioVoiceProvider < BaseProvider
     transport :voice
 
+    setting_reader :host, required: true, description: 'Host'
     setting_reader :auth_token, required: true, description: 'Authentication token'
     setting_reader :sid, required: true, description: 'Application SID, see Twilio console'
     setting_reader :from, required: true, description: "Phone-number or name (example: 'Nuntius') to send the message from"
@@ -14,25 +15,23 @@ module Nuntius
     # Twilio statusses: queued, failed, sent, delivered, or undelivered
     states %w[failed undelivered] => 'undelivered', %w[delivered completed] => 'delivered'
 
-    HOST = 'https://01abade9.ngrok.io'
-
-    def deliver(message)
+    def deliver
       # Need hostname here too
-      response = client.calls.create(from: message.from || from, to: message.to, method: 'POST', url: Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: HOST))
+      response = client.calls.create(from: message.from || from, to: message.to, method: 'POST', url: Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: host))
       message.provider_id = response.sid
       message.status = translated_status(response.status)
       message
     end
 
-    def refresh(message)
+    def refresh
       response = client.calls(message.provider_id).fetch
       message.provider_id = response.sid
       message.status = translated_status(response.status)
       message
     end
 
-    def callback(message, params)
-      refresh(message).save
+    def callback(params)
+      refresh.save
 
       twiml = script_for_path(message, "/#{params[:path]}", params)
 

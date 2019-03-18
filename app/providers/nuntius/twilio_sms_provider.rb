@@ -14,14 +14,14 @@ module Nuntius
     # Twilio statusses: queued, failed, sent, delivered, or undelivered
     states %w[failed undelivered] => 'undelivered', 'delivered' => 'delivered'
 
-    def deliver(message)
+    def deliver
       response = client.messages.create(from: message.from || from, to: message.to, body: message.text)
       message.provider_id = response.sid
       message.status = translated_status(response.status)
       message
     end
 
-    def refresh(message)
+    def refresh
       response = client.messages(message.provider_id).fetch
       message.provider_id = response.sid
       message.status = translated_status(response.status)

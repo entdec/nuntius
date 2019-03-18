@@ -2,8 +2,10 @@
 
 module Nuntius
   class BaseProvider
-    def initialize(settings = nil)
-      @settings = settings
+    attr_reader :message
+
+    def initialize(message = nil)
+      @message = message
     end
 
     def self.all_settings
@@ -33,13 +35,13 @@ module Nuntius
     end
 
     # Override this in implementations
-    def deliver(message)
-      message
+    def deliver
+      @message
     end
 
     # Override this in implementations
-    def refresh(message)
-      message
+    def refresh
+      @message
     end
 
     # Override this in implementation
@@ -58,7 +60,13 @@ module Nuntius
     end
 
     def settings
-      @settings ||= Nuntius.config.providers[self.class.transport].to_a.find { |d| d[:provider] == name }[:settings]
+      return @settings if @settings
+
+      @settings = Nuntius.config.providers[self.class.transport].to_a.find { |d| d[:provider] == name }[:settings]
+      if @settings.is_a?(Proc)
+        @settings = instance_exec(@message.nuntiable, &@settings)
+      end
+      @settings
     end
   end
 end

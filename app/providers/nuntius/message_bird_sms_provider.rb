@@ -13,14 +13,14 @@ module Nuntius
     # Messagebird statusses: scheduled, sent, buffered, delivered, expired, and delivery_failed.
     states %w[expired delivery_failed] => 'undelivered', 'delivered' => 'delivered'
 
-    def deliver(message)
+    def deliver
       response = client.message_create(message.from || from, message.to, message.text)
       message.provider_id = response.id
       message.status = translated_status(response.recipients['items'].first.status)
       message
     end
 
-    def refresh(message)
+    def refresh
       response = client.message(message.provider_id)
       message.provider_id = response.id
       message.status = translated_status(response.recipients['items'].first.status)

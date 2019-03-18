@@ -18,7 +18,7 @@ module Nuntius
                    default: :production,
                    description: 'Development or production, defaults to production'
 
-    def deliver(message)
+    def deliver
       return message if message.to.size != 64
 
       apn = environment.to_sym == :development ? Houston::Client.development : Houston::Client.production

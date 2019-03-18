@@ -8,7 +8,7 @@ module Nuntius
 
     setting_reader :server_key, required: true, description: 'Server key for the project, see Firebase console'
 
-    def deliver(message)
+    def deliver
       fcm = FCM.new(server_key)
 
       options = (message.payload || {}).merge(data: { body: message.text })

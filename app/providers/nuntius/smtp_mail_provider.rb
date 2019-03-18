@@ -12,7 +12,7 @@ module Nuntius
     setting_reader :username, required: true, description: 'Username (nuntius@entdec.com)'
     setting_reader :password, required: true, description: 'Password'
 
-    def deliver(message)
+    def deliver
       mail = Mail.new(from: from_header)
       mail.delivery_method :smtp,
                            address: host,
