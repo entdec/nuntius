@@ -1,0 +1,14 @@
+{
+  "name": "nuntius",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@code.entropydecelerator.com:components/nuntius.git",
+  "author": "Tom de Grunt <tom@degrunt.nl>",
+  "license": "MIT",
+  "dependencies": {
+    "@rails/webpacker": "^4.0.2"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.2.1"
+  }
+}

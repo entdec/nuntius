@@ -7,6 +7,8 @@ require 'nuntius/configuration'
 require 'nuntius/active_record_helpers'
 
 module Nuntius
+  ROOT_PATH = Pathname.new(File.join(__dir__, ".."))
+
   class Error < StandardError; end
 
   class << self
@@ -29,5 +31,13 @@ module Nuntius
 
       self
     end
+
+    # Webpacker
+   # def webpacker
+   #    @webpacker ||= ::Webpacker::Instance.new(
+   #      root_path: ROOT_PATH,
+   #      config_path: ROOT_PATH.join("config/webpacker.yml")
+   #    )
+   #  end
   end
 end

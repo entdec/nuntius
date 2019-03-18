@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'liquor', '~> 0.1'
   s.add_dependency 'pg'
   s.add_dependency "rails", ">= 5.2"
+  s.add_dependency 'webpacker', '>= 4'
 
   s.add_dependency 'fcm'
   s.add_dependency 'houston'
