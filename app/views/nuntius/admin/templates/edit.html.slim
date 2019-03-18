@@ -1,12 +1,16 @@
-= simple_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
-  = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
-  = f.input :description
-  = f.input :transport, collection: Nuntius.config.transports
-  = f.input :event
-  = f.input :from
-  = f.input :to
-  = f.input :subject
-  = f.input :html
-  = f.input :text
-  = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
-  = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
+- present(@template, TemplatePresenter) do |template|
+  = simple_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
+    = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
+    = f.input :description
+    = f.input :transport, collection: Nuntius.config.transports
+    = f.input :event, collection: template.all_events
+    = f.input :from
+    = f.input :to
+    = f.input :subject
+    = f.input :html
+    = f.input :text
+    = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
+    = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
+
+javascript:
+  $("#template_event").chained("#template_klass");
