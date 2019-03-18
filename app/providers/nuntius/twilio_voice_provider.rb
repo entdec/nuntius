@@ -17,7 +17,7 @@ module Nuntius
 
     def deliver
       # Need hostname here too
-      response = client.calls.create(from: message.from || from, to: message.to, method: 'POST', url: Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: host))
+      response = client.calls.create(from: message.from || from, to: message.to, method: 'POST', url: callback_url)
       message.provider_id = response.sid
       message.status = translated_status(response.status)
       message
@@ -54,7 +54,7 @@ module Nuntius
       scripts = scripts.map do |script|
         preamble = Preamble.parse(script)
         payload = preamble.metadata ? payload = preamble.content : script
-        payload = payload.gsub('{{url}}', Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: host))
+        payload = payload.gsub('{{url}}', callback_url)
 
         metadata = preamble.metadata || { path: '/' }
 
@@ -62,6 +62,10 @@ module Nuntius
       end
 
       scripts.find { |s| s[:headers][:path] == path }
+    end
+
+    def callback_url
+      Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: host)
     end
   end
 end
