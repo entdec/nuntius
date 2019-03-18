@@ -22,6 +22,15 @@ module Nuntius
         flash_and_redirect @template.save, admin_templates_url, 'Template created successfully', 'There were problems creating the template'
       end
 
+      def edit
+        @template = Template.find(params[:id])
+      end
+
+      def update
+        @template = Template.find(params[:id])
+        flash_and_redirect @template.update(template_params), admin_templates_url, 'Template updated successfully', 'There were problems updating the template'
+      end
+
       private
 
       def template_params

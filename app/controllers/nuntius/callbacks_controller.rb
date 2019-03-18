@@ -11,7 +11,7 @@ module Nuntius
 
     def create
       message = Nuntius::Message.find(params[:message_id])
-      response = message.nuntius_provider.callback(message, params)
+      response = message.nuntius_provider(message).callback(params)
 
       render body: response[2].first,
              content_type: response[1]['Content-Type'],

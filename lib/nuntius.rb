@@ -22,7 +22,7 @@ module Nuntius
     def message(event)
       return unless event
 
-      Nuntius::MessengerJob.perform_later(@obj, event, @params)
+      Nuntius::MessengerJob.perform_later(@obj, event.to_s, @params)
     end
 
     def with(obj, params = {})

@@ -9,8 +9,6 @@ module Nuntius
       return if message.delivered?
       return if message.parent_message&.delivered?
 
-      provider = Nuntius::BaseProvider.class_from_name(provider_name, message.transport).new
-
       if message.provider != provider_name
         original_message = message
         message = message.dup
@@ -21,7 +19,8 @@ module Nuntius
       message.provider = provider_name
       message.save!
 
-      message = provider.deliver(message)
+      provider = Nuntius::BaseProvider.class_from_name(provider_name, message.transport).new(message)
+      message = provider.deliver
       message.save! unless message.draft?
 
       # First refresh check is after 5 seconds
