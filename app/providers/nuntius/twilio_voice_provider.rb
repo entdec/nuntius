@@ -7,7 +7,7 @@ module Nuntius
   class TwilioVoiceProvider < BaseProvider
     transport :voice
 
-    setting_reader :host, required: true, description: 'Host'
+    setting_reader :host, required: true, description: 'Host or base-url for the application'
     setting_reader :auth_token, required: true, description: 'Authentication token'
     setting_reader :sid, required: true, description: 'Application SID, see Twilio console'
     setting_reader :from, required: true, description: "Phone-number or name (example: 'Nuntius') to send the message from"
