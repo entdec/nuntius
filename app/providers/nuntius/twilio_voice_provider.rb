@@ -54,7 +54,7 @@ module Nuntius
       scripts = scripts.map do |script|
         preamble = Preamble.parse(script)
         payload = preamble.metadata ? payload = preamble.content : script
-        payload = payload.gsub('{{url}}', Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: HOST))
+        payload = payload.gsub('{{url}}', Nuntius::Engine.routes.url_helpers.callback_url(message.id, host: host))
 
         metadata = preamble.metadata || { path: '/' }
 
