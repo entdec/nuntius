@@ -14,8 +14,6 @@ module Nuntius
 
     validates :transport, presence: true
 
-    delegate :delivered?, to: :driver_message
-
     def draft?
       status == 'draft'
     end
@@ -37,7 +35,7 @@ module Nuntius
       Nuntius::Message.where(status: 'draft').where(parent_message: self).delete_all
     end
 
-    def nuntius_provider
+    def nuntius_provider(message)
       klass = Nuntius::BaseProvider.class_from_name(provider, transport)
       klass ||= Nuntius::BaseProvider
       klass.new
