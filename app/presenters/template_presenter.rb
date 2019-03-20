@@ -8,6 +8,6 @@ class TemplatePresenter < ApplicationPresenter
         events << [m, m, { class: class_name }]
       end
     end
-    events
+    events.sort_by {|event| event.first}
   end
 end
