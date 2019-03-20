@@ -45,7 +45,7 @@ module Nuntius
     end
 
     # Override this in implementation
-    def callback(message, params)
+    def callback(params)
       [404, { 'Content-Type' => 'text/html; charset=utf-8' }, ['Not found']]
     end
 
