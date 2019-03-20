@@ -7,18 +7,24 @@ module Nuntius
 
     delegate :liquid_variable_name_for, :class_name_for, to: :class
 
+    define_callbacks :template_selection, :action, terminator: 'result == false'
+
     attr_reader :templates
 
     def initialize(object, event, params = {})
       @object = object
       @event = event
       @params = params
-      select_templates
     end
 
     # Calls the event method on the messenger, which should return templates
     def call
-      send(@event.to_sym, @object, @params)
+      run_callbacks(:template_selection) do
+        select_templates
+      end
+      run_callbacks(:action) do
+        send(@event.to_sym, @object, @params)
+      end
     end
 
     # Turns the templates in messages, and dispatches the messages to transports
