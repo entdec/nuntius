@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
 module Nuntius
+  # Messengers select templates, can manipulate them and
   class BaseMessenger
     include ActiveSupport::Callbacks
 
     delegate :liquid_variable_name_for, :class_name_for, to: :class
 
-    define_callbacks :dispatch
-    # set_callback :transition, :after
+    attr_reader :templates
 
     def initialize(object, event, params = {})
       @object = object
       @event = event
       @params = params
+      select_templates
     end
 
     # Calls the event method on the messenger, which should return templates
@@ -30,6 +31,20 @@ module Nuntius
     end
 
     class << self
+
+      #
+      # Convenience method which adds all state-machine events to the messenger class as actions
+      #
+      def use_state_machine_events
+        klass = name.demodulize.gsub(/Messenger$/,'').classify.constantize
+        return unless klass.respond_to?(:state_machine)
+
+        events = klass.state_machine.events.map(&:name)
+        events.each do |name|
+          define_method(name) {}
+        end
+      end
+
       def liquid_variable_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
           obj.first.class.name.demodulize.pluralize.underscore
@@ -66,8 +81,9 @@ module Nuntius
     private
 
     # Returns the relevant templates for the object / event combination
-    def templates
-      Template.where(klass: class_name_for(@object), event: @event)
+    def select_templates
+      return @templates if @templates
+      @templates = Template.where(klass: class_name_for(@object), event: @event)
     end
 
     def liquid_context
