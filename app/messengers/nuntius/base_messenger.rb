@@ -37,20 +37,6 @@ module Nuntius
     end
 
     class << self
-
-      #
-      # Convenience method which adds all state-machine events to the messenger class as actions
-      #
-      def use_state_machine_events
-        klass = name.demodulize.gsub(/Messenger$/,'').classify.constantize
-        return unless klass.respond_to?(:state_machine)
-
-        events = klass.state_machine.events.map(&:name)
-        events.each do |name|
-          define_method(name) {}
-        end
-      end
-
       def liquid_variable_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
           obj.first.class.name.demodulize.pluralize.underscore
