@@ -9,6 +9,7 @@
     = f.input :subject
     = f.input :html
     = f.input :text
+    = f.input :metadata, as: :code_mirror, input_html: { value: YAML.dump(f.object.metadata), data: { lang: 'application/yaml', height: '80px' } }
     = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
     = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
 
