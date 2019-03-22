@@ -9,6 +9,8 @@ module Nuntius
       return unless obj
 
       messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event, params)
+      return unless messenger.respond_to? event.to_sym
+
       messenger.call
       templates = messenger.templates
       messenger.dispatch(templates) if templates.present?
