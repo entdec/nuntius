@@ -3,6 +3,18 @@ Short description and motivation.
 
 ## Usage
 
+Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
+```ruby
+ Nuntius.with(shipment).message(event.to_s)
+```
+
+another, more direct way of using Nuntius is by just instantiating a message:
+```ruby
+ Nuntius::Message.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text', nuntiable: channel).deliver_as(:mail)
+```
+
+Here we still need a nuntiable object, in case provider settings can differ from object to object.
+
 ## Transports
 
 ### Mail
