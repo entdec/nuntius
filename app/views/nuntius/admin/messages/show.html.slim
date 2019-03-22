@@ -1,0 +1,27 @@
+table.table
+  thead
+    tr
+      th Name
+      th Value
+  tbody
+    tr
+      td State
+      td = @message.status
+    tr
+      td Refreshes
+      td = @message.refreshes
+    tr
+      td To
+      td = @message.to
+    tr
+      td Transport
+      td = @message.transport
+    tr
+      td Provider
+      td = @message.provider
+    tr
+      td Provider ID
+      td = @message.provider_id
+    tr
+      td Request ID
+      td = @message.request_id
