@@ -40,5 +40,13 @@ module Nuntius
       klass ||= Nuntius::BaseProvider
       klass.new
     end
+
+    #
+    # Convenience method to easily send messages without having a template
+    #
+    def deliver_as(transport)
+      klass = BaseTransport.class_from_name(transport).new
+      klass.deliver(self)
+    end
   end
 end
