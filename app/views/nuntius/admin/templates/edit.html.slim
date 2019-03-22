@@ -1,14 +1,17 @@
 - present(@template, TemplatePresenter) do |template|
   = simple_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
-    = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
     = f.input :description
+    .row
+      .col-sm-6
+        = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
+      .col-sm-6
+        = f.input :event, collection: template.all_events
     = f.input :transport, collection: Nuntius.config.transports
-    = f.input :event, collection: template.all_events
     = f.input :from
     = f.input :to
-    = f.input :subject
-    = f.input :html
-    = f.input :text
+    = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
+    = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
+    = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     = f.input :metadata, as: :code_mirror, input_html: { value: YAML.dump(f.object.metadata), data: { lang: 'application/yaml', height: '80px' } }
     = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
     = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
