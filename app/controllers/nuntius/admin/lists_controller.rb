@@ -19,7 +19,7 @@ module Nuntius
 
       def create
         @list = List.new(list_params)
-        flash_and_redirect @list.save, admin_lists_url, 'List created successfully', 'There were problems creating the list'
+        respond @list.save
       end
 
       def show
@@ -32,7 +32,7 @@ module Nuntius
 
       def update
         @list = List.find(params[:id])
-        flash_and_redirect @list.update(list_params), admin_lists_url, 'List updated successfully', 'There were problems updating the list'
+        respond @list.update(list_params)
       end
 
       private

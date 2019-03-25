@@ -19,7 +19,7 @@ module Nuntius
 
       def create
         @template = Template.new(template_params)
-        flash_and_redirect @template.save, admin_templates_url, 'Template created successfully', 'There were problems creating the template'
+        respond @template.save
       end
 
       def edit
@@ -28,7 +28,7 @@ module Nuntius
 
       def update
         @template = Template.find(params[:id])
-        flash_and_redirect @template.update(template_params), admin_templates_url, 'Template updated successfully', 'There were problems updating the template'
+        respond @template.update(template_params)
       end
 
       private
