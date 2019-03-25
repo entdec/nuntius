@@ -1,0 +1,8 @@
+= simple_form_for(@subscriber, url: @subscriber.new_record? ? admin_list_subscribers_path(@list) : admin_list_subscriber_path(@list, @subscriber), html: {multipart: true}) do |f|
+  = f.input :first_name
+  = f.input :last_name
+  = f.input :phone_number
+  = f.input :email
+
+  = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
+  = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }

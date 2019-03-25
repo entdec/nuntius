@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_01_202436) do
+ActiveRecord::Schema.define(version: 2019_03_22_121338) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -19,6 +19,26 @@ ActiveRecord::Schema.define(version: 2019_03_01_202436) do
 
   create_table "accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "nuntius_campaigns", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "transport", default: "mail"
+    t.uuid "list_id"
+    t.string "from"
+    t.string "subject"
+    t.text "text"
+    t.text "html"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
+  end
+
+  create_table "nuntius_lists", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.integer "subscribers_count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -46,6 +66,18 @@ ActiveRecord::Schema.define(version: 2019_03_01_202436) do
     t.index ["template_id"], name: "index_nuntius_messages_on_template_id"
   end
 
+  create_table "nuntius_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "list_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "email"
+    t.string "phone_number"
+    t.string "tags"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["list_id"], name: "index_nuntius_subscribers_on_list_id"
+  end
+
   create_table "nuntius_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "klass"
     t.string "event"
@@ -64,7 +96,9 @@ ActiveRecord::Schema.define(version: 2019_03_01_202436) do
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
   end
 
+  add_foreign_key "nuntius_campaigns", "nuntius_lists", column: "list_id"
   add_foreign_key "nuntius_messages", "nuntius_messages", column: "parent_message_id"
   add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"
+  add_foreign_key "nuntius_subscribers", "nuntius_lists", column: "list_id"
   add_foreign_key "nuntius_templates", "nuntius_templates", column: "layout_id"
 end

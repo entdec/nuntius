@@ -1,6 +1,11 @@
 en:
   nuntius:
+    flash:
+      error: There were problems saving the %{model}
+      notice: The %{model} was saving successfully
     breadcrumbs:
       admin:
+        campaigns: Campaigns
         messages: Messages
+        lists: Lists
         templates: Templates

@@ -1,0 +1,15 @@
+table.table
+  thead
+    tr
+      th Name
+      th Transport
+      th List
+  tbody
+    - for campaign in @campaigns
+      tr
+        td = link_to campaign.name, edit_admin_campaign_path(campaign)
+        td = campaign.transport
+        td = campaign.list.name
+
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.add'), new_admin_campaign_path, class: 'btn btn-primary')

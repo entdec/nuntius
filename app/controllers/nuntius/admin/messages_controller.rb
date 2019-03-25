@@ -4,7 +4,7 @@ require_dependency 'nuntius/application_admin_controller'
 
 module Nuntius
   module Admin
-    class Admin::MessagesController < ApplicationAdminController
+    class MessagesController < ApplicationAdminController
       add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.messages'), :admin_messages_path
 
       def index

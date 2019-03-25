@@ -4,8 +4,12 @@ Nuntius::Engine.routes.draw do
   post 'callbacks/:message_id(/*path)', to: 'callbacks#create'
 
   namespace :admin do
-    resources :templates
+    resources :campaigns
+    resources :lists do
+      resources :subscribers, controller: 'lists/subscribers'
+    end
     resources :messages
+    resources :templates
   end
   root to: 'admin/templates#index'
 end
