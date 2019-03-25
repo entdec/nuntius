@@ -38,7 +38,7 @@ module Nuntius
     def nuntius_provider(message)
       klass = Nuntius::BaseProvider.class_from_name(provider, transport)
       klass ||= Nuntius::BaseProvider
-      klass.new
+      klass.new(message)
     end
 
     #

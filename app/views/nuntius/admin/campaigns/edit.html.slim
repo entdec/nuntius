@@ -1,7 +1,11 @@
 = simple_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
   = f.input :name
   = f.input :transport, collection: Nuntius.config.transports
-  = f.input :list, collection: @lists
+  = f.association :list, collection: @lists
+  = f.input :from
+  = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
+  = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
+  = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
 
   = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
   = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }

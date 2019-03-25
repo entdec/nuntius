@@ -25,9 +25,7 @@ module Nuntius
         redirect_to :edit_admin_campaign
       end
 
-      def edit
-        @lists = List.all
-      end
+      def edit; end
 
       def update
         respond @campaign.update(campaign_params)
@@ -36,17 +34,15 @@ module Nuntius
       private
 
       def set_objects
-        @campaign = if params[:id]
-                     Campaign.find(params[:id])
-                   else
-                     params[:campaign] ? Campaign.new(campaign_params) : Campaign.new
-                   end
+        @campaign = params[:id] ? Campaign.find(params[:id]) : Campaign.new(campaign_params)
+        @lists = List.all
       end
 
       def campaign_params
-        params.require(:campaign).permit(:name)
-      end
+        return unless params[:campaign]
 
+        params.require(:campaign).permit(:name, :tranport, :list_id, :from, :subject, :text, :html)
+      end
     end
   end
 end

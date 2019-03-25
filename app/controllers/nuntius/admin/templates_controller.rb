@@ -26,6 +26,10 @@ module Nuntius
         @template = Template.find(params[:id])
       end
 
+      def show
+        redirect_to :edit_admin_template
+      end
+
       def update
         @template = Template.find(params[:id])
         respond @template.update(template_params)
