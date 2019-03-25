@@ -49,13 +49,12 @@ module Nuntius
     end
 
     def script_for_path(message, path = '/', params)
-      scripts = message.text.split("\n\n")
+      scripts = message.text.delete("\r").split("\n\n")
 
       scripts = scripts.map do |script|
         preamble = Preamble.parse(script)
         payload = preamble.metadata ? payload = preamble.content : script
         payload = payload.gsub('{{url}}', callback_url)
-
         metadata = preamble.metadata || { path: '/' }
 
         { headers: metadata.with_indifferent_access, body: payload }
