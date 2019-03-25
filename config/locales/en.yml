@@ -2,7 +2,7 @@ en:
   nuntius:
     flash:
       error: There were problems saving the %{model}
-      notice: The %{model} was saving successfully
+      notice: The %{model} was saved successfully
     breadcrumbs:
       admin:
         campaigns: Campaigns
