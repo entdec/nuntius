@@ -14,16 +14,16 @@ module Respond
     human_model_name = model ? model.model_name.human.downcase : Nuntius.const_get(self.class.name.demodulize.gsub(/Controller$/, '').singularize).model_name.human.downcase
     if result
       if params[:commit] == 'continue'
-        flash.now[:notice] = notice || I18n.t('nuntius.flash.notice', model: human_model_name)
+        flash.now[:notice] = (notice || I18n.t('nuntius.flash.notice', model: human_model_name))
       else
         if path
-          redirect_to(path, notice: notice || I18n.t('nuntius.flash.notice', model: human_model_name)) && return
+          redirect_to(path, notice: (notice || I18n.t('nuntius.flash.notice', model: human_model_name))) && return
         else
-          redirect_to(action: 'index', notice: notice || I18n.t('nuntius.flash.notice', model: human_model_name)) && return
+          redirect_to(action: 'index', notice: (notice || I18n.t('nuntius.flash.notice', model: human_model_name))) && return
         end
       end
     else
-      flash.now[:error] = error || I18n.t('nuntius.flash.error', model: human_model_name)
+      flash.now[:error] = (error || I18n.t('nuntius.flash.error', model: human_model_name))
     end
     render action
   end
