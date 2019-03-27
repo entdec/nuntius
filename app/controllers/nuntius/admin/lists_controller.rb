@@ -9,7 +9,7 @@ module Nuntius
       add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path
 
       def index
-        @lists = List.all
+        @lists = List.visible
       end
 
       def new
@@ -27,11 +27,11 @@ module Nuntius
       end
 
       def edit
-        @list = List.find(params[:id])
+        @list = List.visible.find(params[:id])
       end
 
       def update
-        @list = List.find(params[:id])
+        @list = List.visible.find(params[:id])
         respond @list.update(list_params)
       end
 

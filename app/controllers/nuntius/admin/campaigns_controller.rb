@@ -10,7 +10,7 @@ module Nuntius
       add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.campaigns'), :admin_campaigns_path
 
       def index
-        @campaigns = Campaign.all
+        @campaigns = Campaign.visible
       end
 
       def new
@@ -34,8 +34,8 @@ module Nuntius
       private
 
       def set_objects
-        @campaign = params[:id] ? Campaign.find(params[:id]) : Campaign.new(campaign_params)
-        @lists = List.all
+        @campaign = params[:id] ? Campaign.visible.find(params[:id]) : Campaign.new(campaign_params)
+        @lists = List.visible
       end
 
       def campaign_params

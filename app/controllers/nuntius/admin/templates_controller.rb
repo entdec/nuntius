@@ -9,7 +9,7 @@ module Nuntius
       add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path
 
       def index
-        @templates = Template.all
+        @templates = Template.visible
       end
 
       def new
@@ -23,7 +23,7 @@ module Nuntius
       end
 
       def edit
-        @template = Template.find(params[:id])
+        @template = Template.visible.find(params[:id])
       end
 
       def show
@@ -31,7 +31,7 @@ module Nuntius
       end
 
       def update
-        @template = Template.find(params[:id])
+        @template = Template.visible.find(params[:id])
         respond @template.update(template_params)
       end
 

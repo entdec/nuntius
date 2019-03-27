@@ -9,8 +9,8 @@ module Nuntius
     attr_accessor :nuntiable_class_names
     attr_reader :jobs_queue_name
 
-    attr_accessor :user_scope
-    attr_accessor :add_user_metadata
+    attr_accessor :visible_scope
+    attr_accessor :add_metadata
 
     def initialize
       @logger = Logger.new(STDOUT)
@@ -20,6 +20,8 @@ module Nuntius
       @transports = []
       @providers = {}
       @jobs_queue_name = :message
+      @visible_scope = -> { all }
+      @add_metadata = -> {}
     end
 
     # logger [Object].
