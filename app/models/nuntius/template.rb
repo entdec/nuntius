@@ -6,7 +6,7 @@ module Nuntius
   class Template < ApplicationRecord
     include MetadataScoped
 
-    belongs_to :layout, class_name: 'Template', optional: true
+    belongs_to :layout, optional: true
 
     scope :metadata, lambda { |name, value|
       where('metadata->>:name = :value', name: name, value: value)

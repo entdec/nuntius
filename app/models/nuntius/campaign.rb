@@ -7,6 +7,7 @@ module Nuntius
     include MetadataScoped
 
     belongs_to :list
+    belongs_to :layout, optional: true
 
     def deliver
       t = BaseTransport.class_from_name(transport).new
@@ -14,7 +15,7 @@ module Nuntius
     end
 
     def new_message(assigns = {})
-      message = Nuntius::Message.new(transport: transport, nuntiable: Channel.current)
+      message = Nuntius::Message.new(transport: transport, campaign: self)
 
       message.from = render(:from, assigns)
 
