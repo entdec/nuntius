@@ -9,6 +9,15 @@ module Nuntius
         end
       end
     end
+
+    initializer "active_storage.attached" do
+      config.after_initialize do
+        ActiveSupport.on_load(:active_record) do
+          Nuntius::Layout.include(ActiveStorageHelpers)
+        end
+      end
+    end
+
     #
     # initializer "webpacker.proxy" do |app|
     #   insert_middleware = begin

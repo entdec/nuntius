@@ -9,6 +9,9 @@ module Nuntius
     attr_accessor :nuntiable_class_names
     attr_reader :jobs_queue_name
 
+    attr_accessor :user_scope
+    attr_accessor :add_user_metadata
+
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO

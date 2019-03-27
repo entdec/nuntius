@@ -5,6 +5,7 @@ require 'liquor'
 require 'nuntius/engine'
 require 'nuntius/configuration'
 require 'nuntius/active_record_helpers'
+require 'nuntius/active_storage_helpers'
 
 module Nuntius
   ROOT_PATH = Pathname.new(File.join(__dir__, ".."))

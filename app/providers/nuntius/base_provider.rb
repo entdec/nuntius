@@ -64,7 +64,7 @@ module Nuntius
 
       @settings = Nuntius.config.providers[self.class.transport].to_a.find { |d| d[:provider] == name }[:settings]
       if @settings.is_a?(Proc)
-        @settings = instance_exec(@message.nuntiable, &@settings)
+        @settings = instance_exec(@message, &@settings)
       end
       @settings
     end

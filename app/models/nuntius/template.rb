@@ -11,8 +11,8 @@ module Nuntius
 
       message.to = render(:to, assigns)
       message.subject = render(:subject, assigns)
-      message.html = render(:html, assigns, layout: layout&.html)
-      message.text = render(:text, assigns, layout: layout&.text)
+      message.html = render(:html, assigns, layout: layout&.data)
+      message.text = render(:text, assigns, layout: layout&.data)
 
       message
     end
