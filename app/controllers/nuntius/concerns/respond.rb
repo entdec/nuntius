@@ -16,10 +16,11 @@ module Respond
       if params[:commit] == 'continue'
         flash.now[:notice] = (notice || I18n.t('nuntius.flash.notice', model: human_model_name))
       else
+        flash[:notice] = notice || I18n.t('nuntius.flash.notice', model: human_model_name)
         if path
-          redirect_to(path, notice: (notice || I18n.t('nuntius.flash.notice', model: human_model_name))) && return
+          redirect_to(path) && return
         else
-          redirect_to(action: 'index', notice: (notice || I18n.t('nuntius.flash.notice', model: human_model_name))) && return
+          redirect_to(action: 'index') && return
         end
       end
     else
