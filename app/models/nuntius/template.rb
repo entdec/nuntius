@@ -1,5 +1,11 @@
+# frozen_string_literal: true
+
+require_relative 'concerns/metadata_scoped'
+
 module Nuntius
   class Template < ApplicationRecord
+    include MetadataScoped
+
     belongs_to :layout, class_name: 'Template', optional: true
 
     scope :metadata, lambda { |name, value|
