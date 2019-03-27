@@ -31,6 +31,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'inky-rb'
   s.add_dependency 'premailer'
 
+  s.add_dependency 'state_machines-activerecord'
+
   s.add_development_dependency 'pry', '~> 0.11'
   s.add_development_dependency 'rubocop', '~> 0.49'
 end

@@ -9,13 +9,21 @@ module Nuntius
     belongs_to :list
     belongs_to :layout, optional: true
 
+    state_machine initial: :draft do
+      after_transition any => any, do: :do_after_transition
+
+      event :publish do
+        transition draft: :sending
+      end
+    end
+
     def deliver
       t = BaseTransport.class_from_name(transport).new
       t.deliver(new_message)
     end
 
     def new_message(assigns = {})
-      message = Nuntius::Message.new(transport: transport, campaign: self)
+      message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: self)
 
       message.from = render(:from, assigns)
 
@@ -41,5 +49,14 @@ module Nuntius
     def render(attr, assigns, options = {})
       ::Liquor.render(send(attr), { assigns: assigns.merge('campaign' => self) }.merge(options))
     end
+
+    private
+
+    def do_after_transition(transition)
+      if transition.event == :publish
+        deliver
+      end
+    end
+
   end
 end

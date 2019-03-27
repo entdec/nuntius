@@ -3,6 +3,7 @@
 require 'inky'
 require 'liquor'
 require 'premailer'
+require 'state_machines-activerecord'
 
 require 'nuntius/engine'
 require 'nuntius/configuration'

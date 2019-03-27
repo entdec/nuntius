@@ -31,12 +31,17 @@ module Nuntius
         respond @campaign.update(campaign_params)
       end
 
+      def publish
+        @campaign.publish!
+      end
+
       private
 
       def set_objects
         @campaign = params[:id] ? Campaign.visible.find(params[:id]) : Campaign.new(campaign_params)
         @lists = List.visible
         @layouts = Nuntius::Layout.visible
+        @messages = Nuntius::Message.where(nuntiable: @campaign)
       end
 
       def campaign_params
