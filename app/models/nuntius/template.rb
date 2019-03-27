@@ -26,8 +26,7 @@ module Nuntius
     private
 
     def render(attr, assigns, options = {})
-      ::Liquor.render(send(attr),
-                    assigns: assigns.merge('template' => self).merge(options))
+      ::Liquor.render(send(attr), { assigns: assigns.merge('template' => self) }.merge(options))
     end
   end
 end

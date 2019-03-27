@@ -39,8 +39,7 @@ module Nuntius
     end
 
     def render(attr, assigns, options = {})
-      ::Liquor.render(send(attr),
-                      assigns: assigns.merge('campaign' => self).merge(options))
+      ::Liquor.render(send(attr), { assigns: assigns.merge('campaign' => self) }.merge(options))
     end
   end
 end
