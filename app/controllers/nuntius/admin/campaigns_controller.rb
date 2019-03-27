@@ -36,12 +36,13 @@ module Nuntius
       def set_objects
         @campaign = params[:id] ? Campaign.visible.find(params[:id]) : Campaign.new(campaign_params)
         @lists = List.visible
+        @layouts = Nuntius::Layout.visible
       end
 
       def campaign_params
         return unless params[:campaign]
 
-        params.require(:campaign).permit(:name, :tranport, :list_id, :from, :subject, :text, :html)
+        params.require(:campaign).permit(:name, :tranport, :layout_id, :list_id, :from, :subject, :text, :html)
       end
     end
   end

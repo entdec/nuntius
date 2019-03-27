@@ -1,6 +1,7 @@
 = simple_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
   = f.input :name
   = f.input :transport, collection: Nuntius.config.transports
+  = f.association :layout, collection: @layouts
   = f.association :list, collection: @lists
   = f.input :from
   = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }

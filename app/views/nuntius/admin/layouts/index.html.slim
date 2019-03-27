@@ -1,0 +1,12 @@
+table.table
+  thead
+    tr
+      th Name
+  tbody
+    - for layout in @layouts
+      tr
+        td = link_to layout.name, edit_admin_layout_path(layout)
+
+
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.add'), new_admin_layout_path, class: 'btn btn-primary')

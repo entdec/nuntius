@@ -7,5 +7,6 @@ en:
       admin:
         campaigns: Campaigns
         messages: Messages
+        layouts: Layouts
         lists: Lists
         templates: Templates
