@@ -7,6 +7,8 @@ module Nuntius
     include MetadataScoped
 
     belongs_to :list
+    accepts_nested_attributes_for :list, reject_if: :all_blank
+
     belongs_to :layout, optional: true
 
     state_machine initial: :draft do

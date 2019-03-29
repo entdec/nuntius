@@ -15,7 +15,7 @@ table.table
         td = message.provider
         td
           - if message.template
-            link_to message.template&.description, edit_admin_template_path(message.template)
+            = link_to message.template&.description, edit_admin_template_path(message.template)
 
-        td = link_to message.nuntiable_type, url_for(message.nuntiable)
+        td = "#{message.nuntiable_type} #{message.nuntiable_id}"
         td = message.status
