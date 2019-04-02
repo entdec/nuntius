@@ -17,7 +17,7 @@ module Nuntius
       @params = params
     end
 
-    # Calls the event method on the messenger, which should return templates
+    # Calls the event method on the messenger
     def call
       run_callbacks(:template_selection) do
         select_templates
@@ -79,8 +79,12 @@ module Nuntius
     end
 
     def liquid_context
-      (@params || {}).merge(liquid_variable_name_for(@object) => @object,
-                            'event' => @event)
+      assigns = @params || {}
+      instance_variables.reject { |i| %w[@params @object @templates].include? i.to_s }.each do |i|
+        assigns[i.to_s[1..-1]] = instance_variable_get(i)
+      end
+
+      assigns.merge(liquid_variable_name_for(@object) => @object)
     end
   end
 end
