@@ -10,6 +10,7 @@ module Nuntius
     accepts_nested_attributes_for :list, reject_if: :all_blank
 
     belongs_to :layout, optional: true
+    has_many :messages, class_name: 'Nuntius::Message'
 
     state_machine initial: :draft do
       after_transition any => any, do: :do_after_transition
@@ -55,9 +56,7 @@ module Nuntius
     private
 
     def do_after_transition(transition)
-      if transition.event == :publish
-        deliver
-      end
+      deliver if transition.event == :publish
     end
 
   end
