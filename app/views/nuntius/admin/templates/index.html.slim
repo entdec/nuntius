@@ -5,6 +5,7 @@ table.table
       th Transport
       th Klass
       th Event
+      th # Messages
   tbody
     - for template in @templates
       tr
@@ -12,6 +13,7 @@ table.table
         td = template.transport
         td = template.klass
         td = template.event
+        td = template.messages.count
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.add'), new_admin_template_path, class: 'btn btn-primary')

@@ -7,6 +7,7 @@ module Nuntius
     include MetadataScoped
 
     belongs_to :layout, optional: true
+    has_many :messages, class_name: 'Nuntius::Message'
 
     scope :metadata, lambda { |name, value|
       where('metadata->>:name = :value', name: name, value: value)

@@ -7,7 +7,8 @@ table.table
     - for list in @lists
       tr
         td = link_to list.name, edit_admin_list_path(list)
-        td = list.subscribers_count || '-'
+        / FIXME: Use counter cache here, sadly can't get it to work
+        td = list.subscribers.count || '-'
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.add'), new_admin_list_path, class: 'btn btn-primary')
