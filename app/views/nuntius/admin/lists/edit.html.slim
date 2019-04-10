@@ -9,7 +9,7 @@
   - if @list.persisted?
     =< link_to(t('nuntius.context_menu.add_subscriber'), new_admin_list_subscriber_path(@list), class: 'btn btn-primary')
 
-    - if @list.subscribers.present?
+- if @list.subscribers.present?
   table.table
     thead
       tr
