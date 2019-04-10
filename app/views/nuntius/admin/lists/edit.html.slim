@@ -6,9 +6,10 @@
     = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
 
 - content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.add_subscriber'), new_admin_list_subscriber_path(@list), class: 'btn btn-primary')
+  - if @list.persisted?
+    =< link_to(t('nuntius.context_menu.add_subscriber'), new_admin_list_subscriber_path(@list), class: 'btn btn-primary')
 
-- if @list.subscribers
+    - if @list.subscribers.present?
   table.table
     thead
       tr

@@ -37,14 +37,11 @@ module Nuntius
 
       private
 
-      def set_objects
-
-      end
+      def set_objects; end
 
       def list_params
         params.require(:list).permit(:name)
       end
-
     end
   end
 end
