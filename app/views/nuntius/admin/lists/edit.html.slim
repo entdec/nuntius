@@ -2,7 +2,8 @@
   = f.input :name
 
   = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
-  = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
+  - if @list.persisted?
+    = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.add_subscriber'), new_admin_list_subscriber_path(@list), class: 'btn btn-primary')

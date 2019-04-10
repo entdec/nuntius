@@ -5,4 +5,5 @@
   = f.input :email
 
   = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
-  = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
+  - if @subscriber.persisted?
+    = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }

@@ -19,7 +19,7 @@ module Nuntius
 
         def create
           @subscriber = @list.subscribers.new(subscriber_params)
-          flash_and_redirect @subscriber.save, admin_list_url(@list), 'Subscriber created successfully', 'There were problems creating the subscriber'
+          respond @subscriber.save, path: admin_list_url(@list)
         end
 
         def edit
@@ -28,7 +28,7 @@ module Nuntius
 
         def update
           @subscriber = @list.subscribers.find(params[:id])
-          flash_and_redirect @subscriber.update(subscriber_params), admin_list_subscribers_url(@list), 'Subscriber updated successfully', 'There were problems updating the subscriber'
+          respond @subscriber.update(subscriber_params), path: admin_list_url(@list)
         end
 
         private

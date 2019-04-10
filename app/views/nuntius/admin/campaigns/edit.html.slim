@@ -9,7 +9,8 @@
     = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
     = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
-    = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
+    - if @campaign.persisted?
+      = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
 - else
   h1 = @campaign.name
 
