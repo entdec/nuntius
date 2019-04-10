@@ -31,14 +31,14 @@ You can try voices here: https://www.twilio.com/console/voice/twiml/text-to-spee
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Say language="nl-NL">
-        Hallo, dit is een bericht van Soverin!
+        Hallo, dit is een bericht van Boxture!
         <break strength="x-weak" time="100ms"/>
         <p>We geven je zo je wachtwoord-herstel-code, dus pak een pen en schrijf mee.</p>
     </Say>
-    <Gather input="dtmf" numDigits="1" action="{{url}}/code">
+    <Gather input="dtmf" numDigits="1" action="{%raw%}{{url}}{%endraw%}/code">
        <Say language="nl-NL">Druk een toets om verder te gaan.</Say>
     </Gather>
-    <Redirect>{{url}}/code</Redirect>
+    <Redirect>{%raw%}{{url}}{%endraw%}/code</Redirect>
 </Response>
 
 ---
@@ -55,6 +55,6 @@ path: /code
       Druk een toets om te herhalen, of hang op.
      </Say>
   </Gather>
-  <Redirect>{{url}}/code</Redirect>
+  <Redirect>{%raw%}{{url}}{%endraw%}/code</Redirect>
 </Response>
 ```
