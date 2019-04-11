@@ -11,6 +11,7 @@ module Nuntius
 
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message'
+    validates :name, presence: true
 
     state_machine initial: :draft do
       after_transition any => any, do: :do_after_transition
