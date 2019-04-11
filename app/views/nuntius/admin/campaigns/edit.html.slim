@@ -1,13 +1,16 @@
 - if @campaign.draft?
   = simple_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
     = f.input :name
-    = f.input :transport, collection: Nuntius.config.transports
+    = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {class: 'transport'}
     = f.association :layout, collection: @layouts
     = f.association :list, collection: @lists
     = f.input :from
-    = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
-    = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
-    = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
+    .for-transport.mail
+      = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' }}
+    .for-transport.mail
+      = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
+    .for-transport.mail.push.sms.voice
+      = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
     - if @campaign.persisted?
       = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
@@ -28,3 +31,12 @@
 - if @campaign.persisted? && @campaign.draft?
   - content_for :context_menu do
     =< link_to(t('nuntius.context_menu.campaign.publish'), publish_admin_campaign_path(@campaign), class: 'btn btn-warning')
+
+javascript:
+
+  $('.transport').change(function(e){
+    var transport = $(this).val();
+    $('.for-transport').hide();
+    $('.for-transport.'+transport).show();
+  })
+  $('.transport').change();
