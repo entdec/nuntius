@@ -1,0 +1,75 @@
+// @import 'basics/index';
+@charset "utf-8";
+@import "bulma/utilities/_all";
+@import "bulma/base/_all";
+@import "bulma/elements/_all";
+@import "bulma/components/_all";
+@import "bulma/grid/_all";
+@import "bulma/layout/_all";
+
+@import 'basics/variables';
+@import 'controllers/card';
+@import 'controllers/context_menu';
+@import 'controllers/master_detail';
+@import 'controllers/table';
+@import 'controllers/tabs';
+@import 'controllers/theme';
+
+body {
+  color: map-get($text-color, light);
+  background-color: map-get($background-page, light);
+
+  &.dark {
+    color: map-get($text-color, dark);
+    background-color: map-get($background-page, dark);
+  }
+}
+
+// Hack, in the demo they use a space before the label text, gross?!
+.control label input.checkbox {
+  margin-right: 8px;
+}
+
+.field.select,
+label.select,
+select.select {
+  height: inherit !important;
+  &:after {
+    content: inherit !important;
+  }
+}
+
+.select {
+  display: block;
+}
+
+nav > ul {
+  margin-left: 0 !important;
+}
+
+.container.left {
+  margin-left: 1em;
+}
+
+aside {
+  background: #fff;
+  height: 100%;
+}
+.menu {
+
+  .menu-list{
+    line-height: 1;
+
+    li > a + ul {
+      border-left: $menu-list-border-left;
+      margin: 0.5em;
+      display: none;
+    }
+    li > a.is-active + ul {
+      display: block;
+    }
+  }
+}
+span.icon {
+  margin-right: 0.2em;
+}
