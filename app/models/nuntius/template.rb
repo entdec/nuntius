@@ -9,6 +9,8 @@ module Nuntius
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message'
 
+    validates :description, presence: true
+
     scope :metadata, lambda { |name, value|
       where('metadata->>:name = :value', name: name, value: value)
     }

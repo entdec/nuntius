@@ -1,5 +1,6 @@
 - present(@template, TemplatePresenter) do |template|
   = simple_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
+    = f.input :enabled
     = f.input :description
     .row
       .col-sm-6
@@ -25,7 +26,6 @@ javascript:
   $("#template_event").chained("#template_klass");
 
   $('.transport').change(function(e){
-    console.log('change')
     var transport = $(this).val();
     $('.for-transport').hide();
     $('.for-transport.'+transport).show();

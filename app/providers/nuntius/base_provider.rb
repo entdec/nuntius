@@ -8,30 +8,32 @@ module Nuntius
       @message = message
     end
 
-    def self.all_settings
-      @all_settings ||= []
-    end
+    class << self
+      def all_settings
+        @all_settings ||= []
+      end
 
-    def self.setting_reader(name, required: false, default: nil, description: '')
-      @all_settings ||= []
-      @all_settings.push(name: name, required: required, default: default, description: description)
-      define_method(name) { required ? settings.fetch(name) : settings.dig(name) || default }
-    end
+      def setting_reader(name, required: false, default: nil, description: '')
+        @all_settings ||= []
+        @all_settings.push(name: name, required: required, default: default, description: description)
+        define_method(name) { required ? settings.fetch(name) : settings.dig(name) || default }
+      end
 
-    def self.transport(transport = nil)
-      @transport = transport if transport
-      @transport
-    end
+      def transport(transport = nil)
+        @transport = transport if transport
+        @transport
+      end
 
-    def self.states(mapping = nil)
-      @states = mapping if mapping
-      @states
-    end
+      def states(mapping = nil)
+        @states = mapping if mapping
+        @states
+      end
 
-    def self.class_from_name(name, transport)
-      Nuntius.const_get("#{name}_#{transport}_provider".camelize)
-    rescue
-      nil
+      def class_from_name(name, transport)
+        Nuntius.const_get("#{name}_#{transport}_provider".camelize)
+      rescue StandardError
+        nil
+      end
     end
 
     # Override this in implementations
@@ -45,7 +47,7 @@ module Nuntius
     end
 
     # Override this in implementation
-    def callback(params)
+    def callback(_params)
       [404, { 'Content-Type' => 'text/html; charset=utf-8' }, ['Not found']]
     end
 
@@ -63,9 +65,7 @@ module Nuntius
       return @settings if @settings
 
       @settings = Nuntius.config.providers[self.class.transport].to_a.find { |d| d[:provider] == name }[:settings]
-      if @settings.is_a?(Proc)
-        @settings = instance_exec(@message, &@settings)
-      end
+      @settings = instance_exec(@message, &@settings) if @settings.is_a?(Proc)
       @settings
     end
   end

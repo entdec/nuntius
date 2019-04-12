@@ -38,7 +38,7 @@ module Nuntius
       private
 
       def template_params
-        params.require(:template).permit(:klass, :event, :transport, :description, :metadata, :from, :to, :subject, :html, :text, :payload).tap do |w|
+        params.require(:template).permit(:enabled, :klass, :event, :transport, :description, :metadata, :from, :to, :subject, :html, :text, :payload).tap do |w|
           w[:metadata] = YAML.safe_load(params[:template][:metadata])
         end
       end

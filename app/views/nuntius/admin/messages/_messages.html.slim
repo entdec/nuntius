@@ -1,0 +1,23 @@
+table.table.table-condensed.table-hover
+  thead
+    tr
+      th Description
+      th Actions
+      th Sent
+      th Status
+      th Support id
+      th Feedback
+      th Feedback information
+  tbody
+  - for mi in messages do
+    tr
+      td= mi.template&.description || mi.campaign&.name
+      td
+        - if mi.template
+          = link_to(nuntius.edit_admin_template_path(mi.template), title: 'Configure')
+            .i.fa.fa-cog
+      td= ln(mi.created_at, Time.zone, :long)
+      td= mi.status&.humanize
+      td= mi.request_id&.split('-')&.first
+      td -
+      td -
