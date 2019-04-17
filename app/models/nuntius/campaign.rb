@@ -23,25 +23,25 @@ module Nuntius
 
     def deliver
       t = BaseTransport.class_from_name(transport).new
-      t.deliver(new_message)
+      list.subscribers.each do |subscriber|
+        t.deliver(new_message(subscriber))
+      end
     end
 
-    def new_message(assigns = {})
-      message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: self)
-
+    def new_message(subscriber, assigns = {})
+      if subscriber.nuntiable
+        name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
+        assigns[name] = subscriber.nuntiable
+      end
+      message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: subscriber.nuntiable)
       message.from = render(:from, assigns)
-
-      all_recipients = list.subscribers.map do |subscriber|
-        if transport == 'mail'
-          %("#{subscriber.first_name} #{subscriber.last_name}" <#{subscriber.email}>)
-        elsif transport == 'sms'
-          subscriber.phone_number
-        elsif transport == 'voice'
-          subscriber.phone_number
-        end
-      end.join(',')
-
-      message.to = all_recipients
+      message.to = if transport == 'mail'
+                     %("#{subscriber.first_name} #{subscriber.last_name}" <#{subscriber.email}>)
+                   elsif transport == 'sms'
+                     subscriber.phone_number
+                   elsif transport == 'voice'
+                     subscriber.phone_number
+                   end
 
       message.subject = render(:subject, assigns)
       message.html = render(:html, assigns, layout: layout&.data)
@@ -59,6 +59,5 @@ module Nuntius
     def do_after_transition(transition)
       deliver if transition.event == :publish
     end
-
   end
 end

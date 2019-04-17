@@ -10,7 +10,7 @@ module Nuntius
       add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.campaigns'), :admin_campaigns_path
 
       def index
-        @campaigns = Campaign.visible
+        @campaigns = Campaign.visible.order(created_at: :desc)
       end
 
       def new

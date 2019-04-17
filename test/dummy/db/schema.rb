@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_17_125153) do
+ActiveRecord::Schema.define(version: 2019_04_17_144554) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -90,7 +90,10 @@ ActiveRecord::Schema.define(version: 2019_04_17_125153) do
     t.string "tags"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "nuntiable_type"
+    t.uuid "nuntiable_id"
     t.index ["list_id"], name: "index_nuntius_subscribers_on_list_id"
+    t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_subscribers_on_nuntiable_type_and_nuntiable_id"
   end
 
   create_table "nuntius_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

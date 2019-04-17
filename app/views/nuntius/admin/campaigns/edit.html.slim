@@ -8,7 +8,9 @@
     .for-transport.mail
       = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' }}
     .for-transport.mail
-      = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
+      = f.input :html, as: :hidden
+      trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
+
     .for-transport.mail.push.sms.voice
       = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
