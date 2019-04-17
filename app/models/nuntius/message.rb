@@ -15,8 +15,8 @@ module Nuntius
 
     validates :transport, presence: true
 
-    def draft?
-      status == 'draft'
+    def pending?
+      status == 'pending'
     end
 
     def sending?
@@ -31,9 +31,9 @@ module Nuntius
       status == 'undelivered'
     end
 
-    # Removes only draft child messages
+    # Removes only pending child messages
     def cleanup!
-      Nuntius::Message.where(status: 'draft').where(parent_message: self).delete_all
+      Nuntius::Message.where(status: 'pending').where(parent_message: self).delete_all
     end
 
     def nuntius_provider(message)

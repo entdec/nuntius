@@ -12,7 +12,7 @@ module Nuntius
       message = provider.refresh
       # FIXME: This may need to be more atomic
       message.refreshes += 1
-      message.save! unless message.draft?
+      message.save! unless message.pending?
 
       if message.delivered?
         message.cleanup!

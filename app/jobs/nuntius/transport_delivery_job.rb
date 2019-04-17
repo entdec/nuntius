@@ -13,7 +13,7 @@ module Nuntius
         original_message = message
         message = message.dup
         message.parent_message = original_message
-        message.status = 'draft'
+        message.status = 'pending'
         message.provider_id = ''
       end
       message.provider = provider_name
@@ -21,7 +21,7 @@ module Nuntius
 
       provider = Nuntius::BaseProvider.class_from_name(provider_name, message.transport).new(message)
       message = provider.deliver
-      message.save! unless message.draft?
+      message.save! unless message.pending?
 
       # First refresh check is after 5 seconds
       if message.delivered?
