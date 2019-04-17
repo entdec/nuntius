@@ -15,7 +15,8 @@
     - if @campaign.persisted?
       = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
 - else
-  h1 = @campaign.name
+  h2 = @campaign.name
+  p We're sending this campaign, you can no longer make any changes. This is the audience we're sending it to:
 
   table.table
     thead
@@ -30,7 +31,7 @@
 
 - if @campaign.persisted? && @campaign.draft?
   - content_for :context_menu do
-    =< link_to(t('nuntius.context_menu.campaign.publish'), publish_admin_campaign_path(@campaign), class: 'btn btn-warning')
+    =< link_to(t('nuntius.context_menu.campaign.send'), publish_admin_campaign_path(@campaign), class: 'btn btn-warning')
 
 javascript:
 

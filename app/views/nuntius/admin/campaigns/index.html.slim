@@ -3,12 +3,14 @@ table.table
     tr
       th Name
       th Transport
+      th State
       th List
   tbody
     - for campaign in @campaigns
       tr
         td = link_to campaign.name, edit_admin_campaign_path(campaign)
         td = campaign.transport
+        td = campaign.state
         td = campaign.list.name
 
 - content_for :context_menu do
