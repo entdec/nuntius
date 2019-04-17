@@ -13,7 +13,11 @@ module Nuntius
     setting_reader :password, required: true, description: 'Password'
 
     def deliver
-      mail = Mail.new(from: from_header)
+      mail = if message.from
+               Mail.new(sender: from_header, from: message.from)
+             else
+               Mail.new(from: message.from)
+             end
       mail.delivery_method :smtp,
                            address: host,
                            port: port,
@@ -55,7 +59,6 @@ module Nuntius
       #   attach_file_to_mail(mail, message_instance, file_url: attachment_url)
       # end
       #
-
       response = mail.deliver!
 
       message.provider_id = mail.message_id
@@ -115,6 +118,5 @@ module Nuntius
       message_instance.feedback = { type: 'Warning', info: "Could not attach #{attachment[:file_name]} (#{attachment[:file_url] || attachment[:file_path]}) #{e.message}" }
       Rails.logger.error "Message: Could not attach #{attachment[:file_name]} #{e.message}"
     end
-
   end
 end
