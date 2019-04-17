@@ -14,6 +14,7 @@ Nuntius::Engine.routes.draw do
       resources :subscribers, controller: 'lists/subscribers'
     end
     resources :messages
+    resources :layouts
     resources :templates
   end
   root to: 'admin/templates#index'
