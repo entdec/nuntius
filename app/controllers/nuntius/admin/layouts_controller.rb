@@ -42,7 +42,6 @@ module Nuntius
           w[:metadata] = YAML.safe_load(params[:layout][:metadata])
         end
       end
-
     end
   end
 end
