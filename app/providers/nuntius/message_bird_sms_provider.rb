@@ -14,7 +14,7 @@ module Nuntius
     states %w[expired delivery_failed] => 'undelivered', 'delivered' => 'delivered'
 
     def deliver
-      response = client.message_create(message.from || from, message.to, message.text)
+      response = client.message_create(message.from.present? ? message.from : from, message.to, message.text)
       message.provider_id = response.id
       message.status = translated_status(response.recipients['items'].first.status)
       message

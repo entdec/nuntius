@@ -15,7 +15,7 @@ module Nuntius
     states %w[failed undelivered] => 'undelivered', 'delivered' => 'delivered'
 
     def deliver
-      response = client.messages.create(from: message.from || from, to: message.to, body: message.text)
+      response = client.messages.create(from: message.from.present? ? message.from : from, to: message.to, body: message.text)
       message.provider_id = response.sid
       message.status = translated_status(response.status)
       message

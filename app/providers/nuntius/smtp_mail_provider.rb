@@ -13,10 +13,10 @@ module Nuntius
     setting_reader :password, required: true, description: 'Password'
 
     def deliver
-      mail = if message.from
+      mail = if message.from.present?
                Mail.new(sender: from_header, from: message.from)
              else
-               Mail.new(from: message.from)
+               Mail.new(from: from_header)
              end
       mail.delivery_method :smtp,
                            address: host,
