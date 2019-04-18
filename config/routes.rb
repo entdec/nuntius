@@ -18,5 +18,5 @@ Nuntius::Engine.routes.draw do
     resources :layouts
     resources :templates
   end
-  root to: 'admin/templates#index'
+  root to: 'dashboard#show'
 end

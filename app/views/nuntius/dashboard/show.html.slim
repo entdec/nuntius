@@ -1,0 +1,36 @@
+.row
+  .col-12
+    = reportlet(:'nuntius/daily_messages_per_template', parameters: {})
+
+.row
+  .col-12
+    h1 Messages
+    table.table
+      thead
+        tr
+          th ID
+          th Transport
+          th Provider
+          th Template/Campaign
+          th Nuntiable
+          th Status
+      tbody
+        - for message in @messages
+          tr
+            td = link_to message.id, admin_message_path(message)
+            td = message.transport
+            td = message.provider
+            td
+              - if message.campaign
+                = link_to message.campaign&.name, edit_admin_campaign_path(message.campaign)
+              - if message.template
+                = link_to message.template&.description, edit_admin_template_path(message.template)
+
+            td = "#{message.nuntiable_type} #{message.nuntiable_id}"
+            td = message.status
+
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'btn')
+  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'btn')
+  =< link_to(t('nuntius.context_menu.messages'), admin_messages_path, class: 'btn')
+  =< link_to(t('nuntius.context_menu.campaings'), admin_campaigns_path, class: 'btn')

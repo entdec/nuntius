@@ -5,6 +5,7 @@ en:
       notice: The %{model} was saved successfully
     breadcrumbs:
       nuntius: Nuntius
+      dashboard: Dashboard
       admin:
         campaigns: Campaigns
         messages: Messages

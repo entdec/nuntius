@@ -14,4 +14,5 @@ table.table
         td = campaign.list.name
 
 - content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.lists'), admin_lists_path, class: 'btn')
   =< link_to(t('nuntius.context_menu.add'), new_admin_campaign_path, class: 'btn btn-primary')
