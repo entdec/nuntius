@@ -8,7 +8,10 @@ module Nuntius
       add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.messages'), :admin_messages_path
 
       def index
-        @messages = Message.all
+        @messages = Message.all.order(created_at: :desc)
+        if params[:template_id]
+          @messages = @messages.where(template_id: params[:template_id])
+        end
       end
 
       def show
