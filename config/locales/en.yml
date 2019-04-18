@@ -4,6 +4,7 @@ en:
       error: There were problems saving the %{model}
       notice: The %{model} was saved successfully
     breadcrumbs:
+      nuntius: Nuntius
       admin:
         campaigns: Campaigns
         messages: Messages

@@ -4,7 +4,7 @@ table.table
       th ID
       th Transport
       th Provider
-      th Template
+      th Template/Campaign
       th Nuntiable
       th Status
   tbody
@@ -14,6 +14,8 @@ table.table
         td = message.transport
         td = message.provider
         td
+          - if message.campaign
+            = link_to message.campaign&.name, edit_admin_campaign_path(message.campaign)
           - if message.template
             = link_to message.template&.description, edit_admin_template_path(message.template)
 
