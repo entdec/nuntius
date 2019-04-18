@@ -42,6 +42,9 @@ module Nuntius
         end
       end
 
+      # TODO: attachments - use active_storage
+      # Attachments will be stored using active_storage on the message
+
       # attachments: [
       #   { file_name: 'test', content_type: 'text/plain', content: 'binary data', file_path: '.../tmp/filetosend.ext', auto_zip: false }
       # ]
