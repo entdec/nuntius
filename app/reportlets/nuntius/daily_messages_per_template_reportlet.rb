@@ -12,7 +12,7 @@ module Nuntius
 
       matrix = all_templates.map do |template|
         template_ymd_totals = ymds.map { |ymd| ymd_template_id(ymd, template, :count) }
-        [Nuntius::Template.find(template).name] + template_ymd_totals
+        [Nuntius::Template.find(template).description] + template_ymd_totals
       end
 
       data += matrix

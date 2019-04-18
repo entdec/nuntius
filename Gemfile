@@ -16,3 +16,4 @@ gemspec
 git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.git" }
 
 gem 'liquor', entdec: 'components/liquor', tag: '0.1.1'
+gem 'trado', entdec: 'components/trado', branch: :master
