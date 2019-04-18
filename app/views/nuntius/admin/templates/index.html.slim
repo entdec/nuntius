@@ -11,11 +11,12 @@ table.table
     - for template in @templates
       tr
         td = link_to template.description, edit_admin_template_path(template)
-        td = template.enabled
+        td
+          i.fas class="#{template.enabled ? 'fa-check' : 'fa-times'}"
         td = template.transport
         td = template.klass
         td = template.event
-        td = template.messages.count
+        td = link_to template.messages.count, admin_messages_path(template_id: template.id)
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.add'), new_admin_template_path, class: 'btn btn-primary')
