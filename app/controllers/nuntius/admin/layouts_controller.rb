@@ -6,7 +6,7 @@ module Nuntius
   module Admin
     class LayoutsController < ApplicationAdminController
 
-      add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.layouts'), :admin_layouts_path
+      add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.layouts'), :admin_layouts_path) if defined? add_breadcrumb
 
       def index
         @layouts = Nuntius::Layout.visible

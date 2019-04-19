@@ -40,8 +40,8 @@ module Nuntius
         def set_objects
           @list = List.find(params[:list_id])
 
-          add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path
-          add_breadcrumb(@list.name, edit_admin_list_path(@list))
+          add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path) if defined? add_breadcrumb
+          add_breadcrumb(@list.name, edit_admin_list_path(@list)) if defined? add_breadcrumb
           # add_breadcrumb I18n.t('nuntuis.breadcrumbs.admin.subscribers'), admin_list_subscribers_path(@subscriber)
         end
 

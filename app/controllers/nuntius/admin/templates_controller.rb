@@ -6,7 +6,7 @@ module Nuntius
   module Admin
     class TemplatesController < ApplicationAdminController
 
-      add_breadcrumb I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path
+      add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path) if defined? add_breadcrumb
 
       def index
         @templates = Template.visible
