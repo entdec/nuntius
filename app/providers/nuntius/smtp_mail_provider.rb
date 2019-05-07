@@ -89,20 +89,6 @@ module Nuntius
       Nuntius::Engine.routes.url_helpers.message_url(message.id, host: webmail_banner_host)
     end
 
-    def html_body(config, subj, obj, context = {})
-      if config['new_style']
-
-        assigns = { subj => obj, 'message' => self, 'id' => obj.try(:id) }.merge(context).stringify_keys
-        registers = {}
-        result = render_with_liquid(self, :html, assigns, registers)
-
-        output = Inky::Core.new.release_the_kraken(result)
-        Premailer.new(output, with_html_string: true).to_inline_css
-      else
-        tpl(:html, obj, context)
-      end
-    end
-
     def attach_file_to_mail(mail, message_instance, attachment)
       if attachment[:file_url].present?
         attachment[:file_name] ||= attachment[:file_url].split('/').last
