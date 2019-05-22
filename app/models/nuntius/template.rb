@@ -18,7 +18,7 @@ module Nuntius
     }
 
     def new_message(object, assigns)
-      message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object)
+      message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object, metadata: metadata)
 
       message.to = render(:to, assigns)
       message.subject = render(:subject, assigns)

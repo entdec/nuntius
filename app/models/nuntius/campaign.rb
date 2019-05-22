@@ -33,7 +33,7 @@ module Nuntius
         name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
         assigns[name] = subscriber.nuntiable
       end
-      message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: subscriber.nuntiable)
+      message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: subscriber.nuntiable, metadata: metadata)
       message.from = render(:from, assigns)
       message.to = if transport == 'mail'
                      %("#{subscriber.first_name} #{subscriber.last_name}" <#{subscriber.email}>)

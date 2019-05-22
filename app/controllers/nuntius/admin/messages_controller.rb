@@ -8,14 +8,14 @@ module Nuntius
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.messages'), :admin_messages_path) if defined? add_breadcrumb
 
       def index
-        @messages = Message.order(created_at: :desc)
+        @messages = Message.visible.order(created_at: :desc)
         if params[:template_id]
           @messages = @messages.where(template_id: params[:template_id])
         end
       end
 
       def show
-        @message = Message.find(params[:id])
+        @message = Message.visible.find(params[:id])
         add_breadcrumb(@message.id, admin_message_path(@message)) if defined? add_breadcrumb
       end
 
