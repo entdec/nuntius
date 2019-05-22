@@ -2,6 +2,12 @@
 
 module Nuntius
   class ApplicationReportlet < Trado::Reportlet
+    attr_reader :template_ids
+
+    def initialize(params)
+      @template_ids = params[:template_ids]
+    end
+
     private
 
     def ymds(for_display = false)

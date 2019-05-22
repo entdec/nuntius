@@ -11,11 +11,18 @@ module Nuntius
       data = [[''] + ymds(true)]
 
       matrix = all_templates.map do |template|
-        template_ymd_totals = ymds.map { |ymd| ymd_template_id(ymd, template, :count) }
-        [Nuntius::Template.find(template).description] + template_ymd_totals
+        tmpl = Nuntius::Template.find(template)
+        if tmpl
+          template_ymd_totals = ymds.map { |ymd| ymd_template_id(ymd, template, :count) }
+          [tmpl.description] + template_ymd_totals
+        end
       end
 
-      data += matrix
+      if matrix.present?
+        data += matrix
+      else
+        data = []
+      end
       data
     end
 
@@ -30,7 +37,7 @@ module Nuntius
         Arel.star.count
       )
 
-      select_manager = select_manager.where(messages[:template_id].not_eq(nil))
+      select_manager = select_manager.where(messages[:template_id].in(template_ids))
       select_manager = select_manager.where(messages[:created_at].between(14.days.ago..Time.now))
 
       select_manager = select_manager.group(:template_id, :ymd)

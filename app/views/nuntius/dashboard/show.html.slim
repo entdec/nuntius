@@ -1,6 +1,6 @@
 .row
   .col-12
-    = reportlet(:'nuntius/daily_messages_per_template', parameters: {})
+    = reportlet(:'nuntius/daily_messages_per_template', parameters: {template_ids: @templates.map(&:id)})
 
 .row
   .col-12
