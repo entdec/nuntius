@@ -75,7 +75,8 @@ module Nuntius
     # Returns the relevant templates for the object / event combination
     def select_templates
       return @templates if @templates
-      @templates = Template.unscoped.where(klass: class_name_for(@object), event: @event)
+
+      @templates = Template.unscoped.where(klass: class_name_for(@object), event: @event).where(enabled: true)
     end
 
     def liquid_context
