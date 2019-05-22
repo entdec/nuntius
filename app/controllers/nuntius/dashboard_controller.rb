@@ -7,7 +7,8 @@ module Nuntius
     add_breadcrumb(I18n.t('nuntius.breadcrumbs.dashboard'), :root_path) if defined? add_breadcrumb
 
     def show
-      @messages = Nuntius::Message.order(created_at: :desc).limit(10)
+      @templates = Nuntius::Template.visible.all
+      @messages = Nuntius::Message.where(template: @templates).order(created_at: :desc).limit(10)
     end
   end
 end
