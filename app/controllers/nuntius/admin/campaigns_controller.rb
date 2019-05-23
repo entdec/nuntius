@@ -32,8 +32,12 @@ module Nuntius
       end
 
       def publish
-        @campaign.publish! if @campaign.can_publish?
-        redirect_to :edit_admin_campaign
+        if @campaign.update(campaign_params)
+          @campaign.publish! if @campaign.can_publish?
+          redirect_to :edit_admin_campaign
+        else
+          render :edit
+        end
       end
 
       private
