@@ -30,7 +30,7 @@ module Nuntius
       def update
         saved = @campaign.update(campaign_params)
 
-        if saved && params[:commit] == 'continue'
+        if saved && params[:commit] == 'send'
           @campaign.publish! if @campaign.can_publish?
           redirect_to :edit_admin_campaign
         else
