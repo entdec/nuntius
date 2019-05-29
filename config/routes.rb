@@ -5,11 +5,7 @@ Nuntius::Engine.routes.draw do
 
   resources :messages
   namespace :admin do
-    resources :campaigns do
-      member do
-        get 'publish'
-      end
-    end
+    resources :campaigns
     resources :layouts
     resources :lists do
       resources :subscribers, controller: 'lists/subscribers'

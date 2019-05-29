@@ -28,15 +28,13 @@ module Nuntius
       def edit; end
 
       def update
-        respond @campaign.update(campaign_params)
-      end
+        saved = @campaign.update(campaign_params)
 
-      def publish
-        if @campaign.update(campaign_params)
+        if saved && params[:commit] == 'continue'
           @campaign.publish! if @campaign.can_publish?
           redirect_to :edit_admin_campaign
         else
-          render :edit
+          respond saved
         end
       end
 
