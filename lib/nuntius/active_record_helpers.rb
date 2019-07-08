@@ -15,10 +15,10 @@ module ActiveRecordHelpers
 
       messenger = Nuntius::BaseMessenger.messenger_for_class(name)
 
-      events = if respond_to?(:state_machine)
-                 state_machine.events.map(&:name)
-               elsif respond_to?(:aasm)
+      events = if respond_to?(:aasm)
                  aasm.events.map(&:name)
+               elsif respond_to?(:state_machine)
+                 state_machine.events.map(&:name)
                else
                  []
                end
