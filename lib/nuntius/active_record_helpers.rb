@@ -11,12 +11,19 @@ module ActiveRecordHelpers
 
       raise "Nuntius Messenger missing for class #{name}, please create a #{Nuntius::BaseMessenger.messenger_name_for_class(name)}" unless Nuntius::BaseMessenger.messenger_for_class(name)
 
-      return if use_state_machine == false || !respond_to?(:state_machine)
+      return if use_state_machine == false
 
       messenger = Nuntius::BaseMessenger.messenger_for_class(name)
 
+      events = if respond_to?(:state_machine)
+                 state_machine.events.map(&:name)
+               elsif respond_to(:aasm)
+                 aasm.events.map(&:name)
+               else
+                 []
+               end
+
       # add all state-machine events to the messenger class as actions
-      events = state_machine.events.map(&:name)
       events.each do |name|
         messenger.send(:define_method, name) { |object, params = {}| }
       end
