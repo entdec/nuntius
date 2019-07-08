@@ -17,7 +17,7 @@ module ActiveRecordHelpers
 
       events = if respond_to?(:state_machine)
                  state_machine.events.map(&:name)
-               elsif respond_to(:aasm)
+               elsif respond_to?(:aasm)
                  aasm.events.map(&:name)
                else
                  []
