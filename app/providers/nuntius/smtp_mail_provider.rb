@@ -92,8 +92,10 @@ module Nuntius
     def attach_file_to_mail(mail, message_instance, attachment)
       if attachment[:file_url].present?
         attachment[:file_name] ||= attachment[:file_url].split('/').last
-        attachment[:content_type] ||= MIME::Types.type_for(attachment[:file_name]).first&.content_type
-        attachment[:content] = open(attachment[:file_url]) # rubocop:disable Security/Open
+
+        response = HTTPClient.new.get(attachment[:file_url], follow_redirect: true)
+        attachment[:content_type] ||= response.content_type || MIME::Types.type_for(attachment[:file_name]).first&.content_type
+        attachment[:content] = response.body
       end
 
       if attachment[:file_path].present?
