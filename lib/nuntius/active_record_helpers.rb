@@ -15,16 +15,16 @@ module ActiveRecordHelpers
 
       messenger = Nuntius::BaseMessenger.messenger_for_class(name)
 
-      events = if respond_to?(:aasm)
+      nuntiable_events = if respond_to?(:aasm)
                  aasm.events.map(&:name)
-               elsif respond_to?(:state_machine)
+               elsif respond_to?(:state_paths)
                  state_machine.events.map(&:name)
                else
                  []
                end
 
       # add all state-machine events to the messenger class as actions
-      events.each do |name|
+      nuntiable_events.each do |name|
         messenger.send(:define_method, name) { |object, params = {}| }
       end
     end
