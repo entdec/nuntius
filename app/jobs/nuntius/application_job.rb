@@ -1,5 +1,5 @@
 module Nuntius
-  class ApplicationJob < ::ApplicationJob
+  class ApplicationJob < ActiveJob::Base
     retry_on ActiveJob::DeserializationError
     retry_on ActiveRecord::Deadlocked
   end
