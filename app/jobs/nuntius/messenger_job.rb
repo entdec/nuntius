@@ -3,8 +3,6 @@
 # Initializes the appropriate Messenger class and calls the event method
 module Nuntius
   class MessengerJob < ApplicationJob
-    queue_as Nuntius.config.jobs_queue_name
-
     def perform(obj, event, params = {})
       return unless obj
 

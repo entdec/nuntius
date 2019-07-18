@@ -3,8 +3,6 @@
 # Initializes the appropriate Messenger class and calls the event method
 module Nuntius
   class TransportRefreshJob < ApplicationJob
-    queue_as Nuntius.config.jobs_queue_name
-
     def perform(provider_name, message)
       return if message.delivered? || message.refreshes >= 3
 

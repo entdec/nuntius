@@ -7,7 +7,7 @@ module Nuntius
     attr_reader :transports
     attr_reader :providers
     attr_accessor :nuntiable_class_names
-    attr_reader :jobs_queue_name
+    attr_accessor :jobs_queue_name
 
     attr_accessor :visible_scope
     attr_accessor :add_metadata
