@@ -49,7 +49,7 @@ module Nuntius
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
           obj.first.class.name.demodulize
         else
-          obj.class.name.demodulize
+          obj.class.name
         end
       end
 
