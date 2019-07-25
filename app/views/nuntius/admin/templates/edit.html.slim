@@ -13,6 +13,8 @@
     .for-transport.mail
       = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     .for-transport.mail
+      = f.association :layout, collection: @layouts
+    .for-transport.mail
       = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
     .for-transport.mail.push.sms.voice
       = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
