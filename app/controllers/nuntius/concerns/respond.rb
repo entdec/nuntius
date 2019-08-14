@@ -10,7 +10,7 @@ module Respond
   # @param action [Symbol] What to render
   # @param model [Object] What model to use for generating the notice/error flashes
   #
-  def respond(result, path: path, notice: nil, error: nil, action: :edit, model: nil)
+  def respond(result, path: nil, notice: nil, error: nil, action: :edit, model: nil)
     human_model_name = model ? model.model_name.human.downcase : Nuntius.const_get(self.class.name.demodulize.gsub(/Controller$/, '').singularize).model_name.human.downcase
     if result
       if params[:commit] == 'continue'
