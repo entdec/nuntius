@@ -1,23 +1,25 @@
 {
   "name": "nuntius",
   "version": "1.0.0",
-  "description": "",
+  "main": "frontend/dist/nuntius.js",
+  "repository": "git@code.entropydecelerator.com:components/nuntius.git",
+  "author": "Tom de Grunt <tom@degrunt.nl>",
+  "license": "MIT",
   "files": [
-    "frontend/dist/nuntius.js",
-    "frontend/dist/scss"
+    "frontend/dist"
   ],
   "scripts": {
     "build": "webpack -p --config webpack.config.js --color",
     "watch": "webpack -w --config webpack.config.js --color"
   },
-  "main": "frontend/dist/nuntius.js",
   "browserslist": "> 1%",
-  "author": "Tom de Grunt",
-  "license": "MIT",
   "dependencies": {
-    "stimulus": "^1.1.0"
+    "element-closest": "^3.0.1",
+    "stimulus": "^1.1.0",
+    "trix": "^1.2.0"
   },
   "devDependencies": {
+    "@gitlab/svgs": "^1.68.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
@@ -32,8 +34,13 @@
     "css-loader": "^0.28.9",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^2.0.0",
-    "node-sass": "^4.7.2",
-    "sass-loader": "^6.0.6",
-    "webpack": "^3.10.0"
+    "mini-css-extract-plugin": "^0.8.0",
+    "node-sass": "^4.12.0",
+    "postcss-custom-properties": "^8.0.9",
+    "sass-loader": "^7.3.1",
+    "style-loader": "^1.0.0",
+    "url-loader": "^2.1.0",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7"
   }
 }

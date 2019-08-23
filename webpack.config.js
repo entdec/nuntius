@@ -1,9 +1,10 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './frontend/src/nuntius.js',
+  entry: './frontend/src/javascript/nuntius.js',
   output: {
     path: __dirname + '/frontend/dist',
     filename: 'nuntius.js',
@@ -11,13 +12,10 @@ module.exports = {
     libraryTarget: 'umd'
   },
   plugins: [
-    // Dont compile or process the SCSS, let the user take care of that!
-    new CopyWebpackPlugin(
-      [
-        { from: 'frontend/src/**/*.scss', to: 'scss', transformPath (targetPath, absolutePath) { return targetPath.replace('frontend/src/', ''); } },
-      ], { copyUnmodified: true }
-    ),
-    new CleanWebpackPlugin(['frontend/dist'],  {})
+    // new CleanWebpackPlugin(['frontend/dist'],  {}),
+    new MiniCssExtractPlugin({
+      filename: 'nuntius.css'
+    }),
   ],
   module: {
     rules: [
@@ -33,13 +31,29 @@ module.exports = {
         }
       },
       {
-        test: /\.(|ttf|eot|svg|woff2?)(\?[\s\S]+)?$/,
-        use: 'file-loader',
+        test: /\.(png|jp(e*)g|svg)$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 8000, // Convert images < 8kb to base64 strings
+            // name: 'images/[hash]-[name].[ext]'
+          }
+        }]
       },
+      {
+        test: /\.(sass|scss|css)$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          'css-loader?sourceMap=false',
+          'sass-loader?sourceMap=false'
+        ]
+      }
     ]
   },
   resolve: {
     modules: [path.resolve('./node_modules'), path.resolve('./src')],
     extensions: ['.json', '.js']
   }
-}
+};
