@@ -15,7 +15,8 @@
     .for-transport.mail
       = f.association :layout, collection: @layouts
     .for-transport.mail
-      = f.input :html, as: :code_mirror, input_html: { data: { lang: 'text/html', height: '80px' } }
+      = f.input :html, as: :hidden
+      trix-editor input="template_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
     .for-transport.mail.push.sms.voice
       = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     = f.input :metadata, as: :code_mirror, input_html: { value: YAML.dump(f.object.metadata), data: { lang: 'application/yaml', height: '80px' } }
