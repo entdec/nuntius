@@ -42,7 +42,7 @@ module Nuntius
 
       def set_objects
         @campaign = params[:id] ? Campaign.visible.find(params[:id]) : Campaign.new(campaign_params)
-        @lists = List.visible
+        @lists = Nuntius::List.visible
         @layouts = Nuntius::Layout.visible
         @messages = Nuntius::Message.where(campaign: @campaign)
       end
