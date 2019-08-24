@@ -5,11 +5,11 @@ module Nuntius
     # We split per email address, to allow easy resends
     def deliver(message)
 
-      # Possibly we could create message.text using: Nokogiri::HTML(t.html.gsub('<br>',"\r\n")).text
-      if message.html.present?
-        message.html = Inky::Core.new.release_the_kraken(message.html)
-        message.html = Premailer.new(message.html, with_html_string: true).to_inline_css
-      end
+      message.html = Inky::Core.new.release_the_kraken(message.html)
+
+      premailer = Premailer.new(message.html, with_html_string: true)
+      message.html = premailer.to_inline_css
+      message.text = premailer.to_plain_text
 
       message.request_id = SecureRandom.uuid
       message.to.split(',').each do |to|
