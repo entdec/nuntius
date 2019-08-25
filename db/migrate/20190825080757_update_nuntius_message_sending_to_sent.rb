@@ -1,8 +1,8 @@
 class UpdateNuntiusMessageSendingToSent < ActiveRecord::Migration[5.2]
   def up
-    Nuntius::Message.where(state: 'sending').update_all(state: 'sent')
+    Nuntius::Message.where(status: 'sending').update_all(status: 'sent')
   end
   def down
-    Nuntius::Message.where(state: 'sent').update_all(state: 'sending')
+    Nuntius::Message.where(status: 'sent').update_all(status: 'sending')
   end
 end
