@@ -17,7 +17,7 @@ module Nuntius
       message.status = if response[:status_code] != 200 || response[:response] != 'success'
                          'undelivered'
                        else
-                         'sending'
+                         'sent'
                        end
 
       message

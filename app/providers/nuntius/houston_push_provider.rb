@@ -30,7 +30,7 @@ module Nuntius
       apn.push(notification)
 
       message.status = if notification.sent?
-                         'sending'
+                         'sent'
                        elsif !notification.valid? || notification.error
                          'undelivered'
                        end

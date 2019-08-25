@@ -19,6 +19,9 @@ module Nuntius
       event :publish do
         transition draft: :sending
       end
+      event :sent do
+        transition sending: :sent
+      end
     end
 
     def deliver

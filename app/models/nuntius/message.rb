@@ -3,7 +3,8 @@ module Nuntius
   #
   #
   # Nuntius will have messages in states:
-  #   sending - we're working on it
+  #   pending - nothing done yet
+  #   sent - we've sent it on to the provider
   #   delivered - have delivery confirmation
   #   undelivered - have confirmation of non-delivery
   # Not all transports may provide all states
@@ -21,8 +22,8 @@ module Nuntius
       status == 'pending'
     end
 
-    def sending?
-      status == 'sending'
+    def sent?
+      status == 'sent'
     end
 
     def delivered?

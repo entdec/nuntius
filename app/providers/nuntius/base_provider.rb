@@ -58,7 +58,7 @@ module Nuntius
     private
 
     def translated_status(status)
-      self.class.states.find { |key, _value| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sending'
+      self.class.states.find { |key, _value| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sent'
     end
 
     def settings
