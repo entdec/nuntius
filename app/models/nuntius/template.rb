@@ -17,7 +17,7 @@ module Nuntius
       where('metadata->>:name = :value', name: name, value: value)
     }
 
-    def new_message(object, assigns)
+    def new_message(object, assigns = {})
       message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object, metadata: metadata)
 
       message.to = render(:to, assigns)
