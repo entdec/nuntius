@@ -68,6 +68,16 @@ module Nuntius
       def messenger_name_for_obj(obj)
         "#{Nuntius::BaseMessenger.class_name_for(obj)}Messenger"
       end
+
+      def locale(locale = nil)
+        @locale = locale if locale
+        @locale
+      end
+
+      def template_scope(template_scope = nil)
+        @template_scope = template_scope if template_scope
+        @template_scope
+      end
     end
 
     private
@@ -77,11 +87,17 @@ module Nuntius
       return @templates if @templates
 
       @templates = Template.unscoped.where(klass: class_name_for(@object), event: @event).where(enabled: true)
+
+      # See if we need to do something additional
+      template_scope_proc = self.class.template_scope
+      @templates = @templates.instance_exec(@object, &template_scope_proc) if template_scope_proc
+
+      @templates
     end
 
     def liquid_context
       assigns = @params || {}
-      instance_variables.reject { |i| %w[@params @object @templates].include? i.to_s }.each do |i|
+      instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope].include? i.to_s }.each do |i|
         assigns[i.to_s[1..-1]] = instance_variable_get(i)
       end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_17_144554) do
+ActiveRecord::Schema.define(version: 2019_08_25_080757) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -75,6 +75,8 @@ ActiveRecord::Schema.define(version: 2019_04_17_144554) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "campaign_id"
+    t.jsonb "payload"
+    t.jsonb "metadata", default: {}
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
     t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
