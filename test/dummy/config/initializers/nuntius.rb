@@ -13,7 +13,7 @@ Nuntius.setup do |config|
     { from_header: '"Local Express" <do_not_reply@localexpress.nl>', host: 'email-smtp.eu-west-1.amazonaws.com', port: 587, username: 'AKIAIIA7EIIM25OFDEUA', password: 'AgJjPlUKEdMuyIuJ2LshcuvSygCXpTEe6VV/bVwEhZV+' }
   }
 
-  config.provider :houston, transport: :push, settings: { certificate: File.read('/Users/tdegrunt/Development/incubator/certomate/data/localexpress-apns.pem') }
+  config.provider :houston, transport: :push, settings: { certificate: '' }
   config.provider :firebase, transport: :push, settings: { server_key: 'AAAAhfDlrck:APA91bE7HwqfTkhVfaeMdXiSoeRZdlcIfidVyPfOibVhoTJeoOCiMRxn2E9dGf0PxK_eu7_dUmyVYkFoS8UyIrVujBf6OototKahqGTm_cVAz8lkYnsIGcvrpRYmpk3MkBsV1y3_f73W' }
 
   config.provider :message_bird, transport: :sms, priority: 1, timeout: 20, settings: { from: 'Soverin', auth_token: 'live_qrV8ZwTAgnqQ6soTZBddZMtjK' }
