@@ -48,7 +48,6 @@ module Nuntius
 
       message.subject = render(:subject, assigns)
       message.html = render(:html, assigns, layout: layout&.data)
-      message.text = render(:text, assigns, layout: layout&.data)
 
       message
     end
@@ -62,7 +61,9 @@ module Nuntius
     private
 
     def render(attr, assigns, options = {})
-      ::Liquor.render(send(attr), { assigns: assigns.merge('campaign' => self) }.merge(options))
+      I18n.with_locale(:nl) do
+        ::Liquor.render(send(attr), { assigns: assigns.merge('campaign' => self) }.merge(options))
+      end
     end
 
     def do_after_transition(transition)
