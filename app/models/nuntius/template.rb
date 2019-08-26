@@ -20,10 +20,13 @@ module Nuntius
     def new_message(object, assigns = {})
       message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object, metadata: metadata)
 
-      message.to = render(:to, assigns)
-      message.subject = render(:subject, assigns)
-      message.html = render(:html, assigns, layout: layout&.data)
-      message.text = render(:text, assigns)
+      locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
+      locale = instance_exec(object, &locale_proc) if locale_proc
+
+      message.to = render(:to, assigns, locale)
+      message.subject = render(:subject, assigns, locale)
+      message.html = render(:html, assigns, locale, layout: layout&.data)
+      message.text = render(:text, assigns, locale)
 
       message
     end
@@ -38,8 +41,10 @@ module Nuntius
 
     private
 
-    def render(attr, assigns, options = {})
-      ::Liquor.render(send(attr), { assigns: assigns.merge('template' => self) }.merge(options))
+    def render(attr, assigns, locale, options = {})
+      I18n.with_locale(locale) do
+        ::Liquor.render(send(attr), assigns: assigns.merge(options), registers: { 'template' => self })
+      end
     end
   end
 end
