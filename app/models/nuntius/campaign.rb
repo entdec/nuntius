@@ -53,11 +53,17 @@ module Nuntius
       message
     end
 
-    def render(attr, assigns, options = {})
-      ::Liquor.render(send(attr), { assigns: assigns.merge('campaign' => self) }.merge(options))
+    def translation_scope
+      scope = %w[nuntius]
+      scope << layout.name.underscore.tr(' ', '_') if layout
+      scope.join('.')
     end
 
     private
+
+    def render(attr, assigns, options = {})
+      ::Liquor.render(send(attr), { assigns: assigns.merge('campaign' => self) }.merge(options))
+    end
 
     def do_after_transition(transition)
       deliver if transition.event == :publish

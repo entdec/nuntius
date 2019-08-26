@@ -28,6 +28,14 @@ module Nuntius
       message
     end
 
+    def translation_scope
+      scope = %w[nuntius]
+      scope << layout.name.underscore.tr(' ', '_') if layout
+      scope << klass.underscore.tr('/', '_')
+      scope << event
+      scope.join('.')
+    end
+
     private
 
     def render(attr, assigns, options = {})
