@@ -13,8 +13,20 @@ module Nuntius
 
     validates :description, presence: true
 
-    scope :metadata, lambda { |name, value|
+    scope :metadata_blank, lambda { |name|
+      where('metadata->>:name IS NULL', name: name)
+    }
+
+    scope :metadata_blank_or_eql, lambda { |name, value|
+      where('metadata->>:name IS NULL OR metadata->>:name = :value', name: name, value: value)
+    }
+
+    scope :metadata_eql, lambda { |name, value|
       where('metadata->>:name = :value', name: name, value: value)
+    }
+
+    scope :metadata_in, lambda { |name, value|
+      where('metadata->>:name IN (:value)', name: name, value: value)
     }
 
     def new_message(object, assigns = {})
