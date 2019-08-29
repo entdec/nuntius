@@ -11,6 +11,7 @@ module Nuntius
 
     attr_accessor :visible_scope
     attr_accessor :add_metadata
+    attr_accessor :metadata_fields
 
     def initialize
       @logger = Logger.new(STDOUT)
@@ -22,6 +23,7 @@ module Nuntius
       @jobs_queue_name = :message
       @visible_scope = -> { all }
       @add_metadata = -> {}
+      @metadata_fields = {}
     end
 
     # logger [Object].
