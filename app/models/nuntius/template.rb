@@ -9,6 +9,8 @@ module Nuntius
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message'
 
+    LIQUID_TAGS = /{%(?:(?!%}).)*%}|{{(?:(?!}}).)*}}/.freeze
+
     # TODO: attachments - also templates could have attachments
 
     validates :description, presence: true
@@ -53,6 +55,15 @@ module Nuntius
       scope << klass.underscore.tr('/', '_')
       scope << event
       scope.join('.')
+    end
+
+    # Trix correctly escapes the HTML, but for liquid this is not what we need.
+    # This replaces html-entities within the liquid tags ({%...%} and {{...}})
+    def html=(html)
+      html_unescaped_liquid = html.gsub(LIQUID_TAGS) do |m|
+        CGI.unescape_html(m)
+      end
+      write_attribute :html, html_unescaped_liquid if html
     end
 
     private
