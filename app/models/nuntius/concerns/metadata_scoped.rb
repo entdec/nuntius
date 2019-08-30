@@ -13,7 +13,7 @@ module Nuntius::MetadataScoped
   def add_metadata
     self.metadata ||= {}
     Nuntius.config.metadata_fields.each do |field, data|
-      metadata[field] ||= instance_exec(data[:current])
+      metadata[field] ||= instance_exec(data[:current]) if data[:current]
     end
     instance_exec(&Nuntius.config.add_metadata)
   end
