@@ -39,7 +39,7 @@ module Nuntius
     def nuntiable_events_from_state_machine
       if klass.respond_to?(:aasm)
         klass.aasm.events.map(&:name)
-      elsif klass.respond_to?(:state_paths)
+      elsif klass.respond_to?(:state_machine) && klass.state_machine.respond_to?(:events)
         klass.state_machine.events.map(&:name)
       else
         []
