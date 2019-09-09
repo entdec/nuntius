@@ -44,4 +44,10 @@ module Nuntius
    #    )
    #  end
   end
+
+
+  # Include helpers
+  ActiveSupport.on_load(:active_record) do
+    include ActiveRecordHelpers
+  end
 end
