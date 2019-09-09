@@ -1,20 +1,24 @@
 # frozen_string_literal: true
 
-module Nuntius::MetadataScoped
-  extend ActiveSupport::Concern
+module Nuntius
+  module Concerns
+    module MetadataScoped
+      extend ActiveSupport::Concern
 
-  included do
-    scope :visible, -> { instance_exec(&Nuntius.config.visible_scope) }
-    before_save :add_metadata
-  end
+      included do
+        scope :visible, -> { instance_exec(&Nuntius.config.visible_scope) }
+        before_save :add_metadata
+      end
 
-  private
+      private
 
-  def add_metadata
-    self.metadata ||= {}
-    Nuntius.config.metadata_fields.each do |field, data|
-      metadata[field] ||= instance_exec(data[:current]) if data[:current]
+      def add_metadata
+        self.metadata ||= {}
+        Nuntius.config.metadata_fields.each do |field, data|
+          metadata[field] ||= instance_exec(data[:current]) if data[:current]
+        end
+        instance_exec(&Nuntius.config.add_metadata)
+      end
     end
-    instance_exec(&Nuntius.config.add_metadata)
   end
 end

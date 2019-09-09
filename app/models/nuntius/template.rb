@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'concerns/metadata_scoped'
-
 module Nuntius
   class Template < ApplicationRecord
-    include MetadataScoped
+    include Concerns::MetadataScoped
 
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message'
