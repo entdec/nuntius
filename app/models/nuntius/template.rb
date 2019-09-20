@@ -68,7 +68,7 @@ module Nuntius
 
     def render(attr, assigns, locale, options = {})
       I18n.with_locale(locale) do
-        ::Liquor.render(send(attr), { assigns: assigns, registers: { 'template' => self } }.merge(options))
+        ::Liquor.render(send(attr), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options))
       end
     end
   end
