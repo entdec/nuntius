@@ -6,7 +6,7 @@ module Nuntius
     def perform(provider_name, message)
       return if message.delivered? || message.refreshes >= 3
 
-      provider = BaseProvider.class_from_name(provider_name, message.transport).new(message)
+      provider = Nuntius::BaseProvider.class_from_name(provider_name, message.transport).new(message)
       message = provider.refresh
       # FIXME: This may need to be more atomic
       message.refreshes += 1
@@ -15,7 +15,7 @@ module Nuntius
       if message.delivered?
         message.cleanup!
       else
-        TransportRefreshJob.set(wait: message.refreshes + 5).perform_later(provider_name, message)
+        Nuntius::TransportRefreshJob.set(wait: message.refreshes + 5).perform_later(provider_name, message)
       end
     end
   end

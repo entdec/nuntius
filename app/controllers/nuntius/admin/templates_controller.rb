@@ -10,21 +10,21 @@ module Nuntius
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path) if defined? add_breadcrumb
 
       def index
-        @templates = Template.visible
+        @templates = Nuntius::Template.visible
       end
 
       def new
-        @template = Template.new
+        @template = Nuntius::Template.new
         render :edit
       end
 
       def create
-        @template = Template.new(template_params)
+        @template = Nuntius::Template.new(template_params)
         respond @template.save
       end
 
       def edit
-        @template = Template.visible.find(params[:id])
+        @template = Nuntius::Template.visible.find(params[:id])
       end
 
       def show
@@ -32,7 +32,7 @@ module Nuntius
       end
 
       def update
-        @template = Template.visible.find(params[:id])
+        @template = Nuntius::Template.visible.find(params[:id])
         respond @template.update(template_params)
       end
 
