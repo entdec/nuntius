@@ -14,11 +14,15 @@ module Nuntius
 
       def add_metadata
         self.metadata ||= {}
-        Nuntius.config.metadata_fields.each do |field, data|
-          metadata[field] ||= instance_exec(data[:current]) if data[:current]
+        unless Nuntius.config.metadata_fields.empty?
+          Nuntius.config.metadata_fields.each do |field, data|
+            if data[:current]
+              current = data[:current]
+              metadata[field] ||= instance_exec(&current)
+            end
+          end
         end
-        instance_exec(&Nuntius.config.add_metadata)
-      end
+        instance_exec(&Nuntius.config.add_metadata)      end
     end
   end
 end
