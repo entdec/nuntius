@@ -3,6 +3,8 @@ Nuntius::Engine.routes.draw do
   get 'callbacks/:message_id(/*path)', to: 'callbacks#create', as: :callback
   post 'callbacks/:message_id(/*path)', to: 'callbacks#create'
 
+  post 'feedback/awssns' => 'feedback#awssns'
+
   resources :messages
   namespace :admin do
     resources :campaigns
