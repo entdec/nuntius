@@ -7,7 +7,7 @@ module Nuntius
 
     delegate :liquid_variable_name_for, :class_name_for, to: :class
 
-    define_callbacks :template_selection, :action, terminator: 'result == false'
+    define_callbacks :action, terminator: ->(target, result_lambda) { result_lambda.call == false }
 
     attr_reader :templates
 
@@ -19,9 +19,7 @@ module Nuntius
 
     # Calls the event method on the messenger
     def call
-      run_callbacks(:template_selection) do
-        select_templates
-      end
+      select_templates
       run_callbacks(:action) do
         send(@event.to_sym, @object, @params)
       end

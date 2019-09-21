@@ -22,7 +22,8 @@ module Nuntius
             end
           end
         end
-        instance_exec(&Nuntius.config.add_metadata)      end
+        instance_exec(&Nuntius.config.add_metadata)
+      end
     end
   end
 end

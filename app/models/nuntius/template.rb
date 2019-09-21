@@ -25,6 +25,12 @@ module Nuntius
       where('metadata->>:name IS NULL OR metadata->>:name = :value', name: name, value: value)
     }
 
+    scope :metadata_eql_or_blank_exclusive, lambda { |name, value|
+      result = where('metadata->>:name = :value', name: name, value: value)
+      result = where('metadata->>:name IS NULL', name: name) if result.none?
+      result
+    }
+
     scope :metadata_in, lambda { |name, value|
       where('metadata->>:name IN (:value)', name: name, value: value)
     }
