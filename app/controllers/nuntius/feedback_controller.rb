@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_dependency 'nuntius/application_controller'
-require 'curb'
+require 'httpclient'
 
 module Nuntius
   class FeedbackController < ApplicationController
@@ -12,7 +12,7 @@ module Nuntius
     def awssns
       body = JSON.parse(request.body.read)
       if body['Type'] == 'SubscriptionConfirmation'
-        Curl::Easy.perform(body['SubscribeURL'])
+        HTTPClient.get(body['SubscribeURL'])
       else
         notification = JSON.parse(body['Message'])
         Nuntius::AWSSNSProcessorService.new(notification).call
