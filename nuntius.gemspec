@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'inky-rb'
   s.add_dependency 'premailer'
+  s.add_dependency 'curb', '~> 0.9'
 
   s.add_dependency 'state_machines-activerecord'
 

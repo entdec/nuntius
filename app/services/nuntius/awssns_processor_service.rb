@@ -18,14 +18,14 @@ module Nuntius
 
     def perform
       unless message_id
-        Rails.logger.warn("SNS / SES message could not determine message id: #{@notification}")
+        Nuntius.config.logger.warn("SNS / SES message could not determine message id: #{@notification}")
         return false
       end
       unless message
-        Rails.logger.warn("SNS / SES message for unknown message with message id: #{message_id}")
+        Nuntius.config.logger.warn("SNS / SES message for unknown message with message id: #{message_id}")
         return false
       end
-      Rails.logger.info("SNS /SES updating message #{message.id} for #{@type}")
+      Nuntius.config.logger.info("SNS /SES updating message #{message.id} for #{@type}")
 
       case @type
       when 'Delivery'
