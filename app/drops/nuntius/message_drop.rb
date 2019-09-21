@@ -7,6 +7,5 @@ module Nuntius
     def base_url
       Nuntius::Engine.routes.url_helpers.message_url(@object.id, host: host)
     end
-
   end
 end

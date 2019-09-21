@@ -3,6 +3,7 @@ module Nuntius
     attr_accessor :admin_authentication_module
     attr_accessor :base_controller
     attr_writer   :logger
+    attr_writer   :host
 
     attr_reader :transports
     attr_reader :providers
@@ -29,6 +30,10 @@ module Nuntius
     # logger [Object].
     def logger
       @logger.is_a?(Proc) ? instance_exec(&@logger) : @logger
+    end
+
+    def host(message)
+      @host.is_a?(Proc) ? instance_exec(message, &@host) : @host
     end
 
     # admin_mount_point [String].

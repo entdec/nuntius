@@ -23,7 +23,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'fcm'
   s.add_dependency 'houston'
-  s.add_dependency 'nokogiri', '~> 1.10'
   s.add_dependency 'mail', '~> 2.6'
   s.add_dependency 'messagebird-rest'
   s.add_dependency 'parse-cron'

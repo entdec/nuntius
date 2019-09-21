@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'mail'
-require 'nokogiri'
 
 module Nuntius
   class SmtpMailProvider < BaseProvider
@@ -12,9 +11,6 @@ module Nuntius
     setting_reader :port, required: true, description: 'Port (example: 578)'
     setting_reader :username, required: true, description: 'Username (nuntius@entdec.com)'
     setting_reader :password, required: true, description: 'Password'
-
-    setting_reader :webmail_banner_host, required: false, description: 'Host or base-url for the application'
-    setting_reader :webmail_banner_html, required: false, description: 'Webmail banner'
 
     def deliver
       mail = if message.from.present?
@@ -32,18 +28,14 @@ module Nuntius
       mail.to = message.to
       mail.subject = message.subject
       mail.part content_type: 'multipart/alternative' do |p|
-        p.html_part = Mail::Part.new(
+        p.text_part = Mail::Part.new(
           body: message.text,
           content_type: 'text/plain',
           charset: 'UTF-8'
         )
         if message.html.present?
-          doc = Nokogiri::HTML(message.html)
-          doc.css('nuntius-webmail-banner').each do |wmb|
-            wmb.replace(::Liquor.render(webmail_banner_html, { assigns: { 'message_url' => message_url(message) } }))
-          end
-          message.html = doc.to_html
-          p.text_part = Mail::Part.new(
+          message.html = message.html.gsub("%7B&gt;message_url&lt;%7D", message_url(message))
+          p.html_part = Mail::Part.new(
             body: message.html,
             content_type: 'text/html',
             charset: 'UTF-8'
@@ -86,7 +78,7 @@ module Nuntius
     private
 
     def message_url(message)
-      Nuntius::Engine.routes.url_helpers.message_url(message.id, host: webmail_banner_host)
+      Nuntius::Engine.routes.url_helpers.message_url(message.id, host: Nuntius.config.host(message))
     end
 
     def attach_file_to_mail(mail, message_instance, attachment)
