@@ -42,20 +42,20 @@ module Nuntius
     private
 
     def process_delivery
-      message.state = :delivered
-      message.feedback = { 'type': 'delivery', 'info': @notification['delivery'] }
+      message.status = :delivered
+      # message.feedback = { 'type': 'delivery', 'info': @notification['delivery'] }
       message.save!
     end
 
     def process_bounce
-      message.state = :bounced
-      message.feedback = { 'type': 'bounce', 'info': @notification['bounce'] }
+      message.status = :bounced
+      # message.feedback = { 'type': 'bounce', 'info': @notification['bounce'] }
       message.save!
     end
 
     def process_complaint
-      message.state = :complaint
-      message.feedback = { 'type': 'complaint', 'info': @notification['complaint'] }
+      message.status = :complaint
+      # message.feedback = { 'type': 'complaint', 'info': @notification['complaint'] }
       message.save!
     end
 
