@@ -76,7 +76,7 @@ module Nuntius
       message.provider_id = mail.message_id
       message.status = 'undelivered'
       if response.success?
-        message.provider_id = response.string.split.last
+        # message.provider_id = response.string.split.last
         message.status = 'sent' if response.success?
       end
 
