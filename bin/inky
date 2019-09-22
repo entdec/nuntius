@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require 'inky'
+
+puts Inky::Core.new.release_the_kraken(File.read(ARGV[0]))
