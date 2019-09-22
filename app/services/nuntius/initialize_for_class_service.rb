@@ -53,6 +53,8 @@ module Nuntius
     # add all known events to the messenger class as actions
     def create_events
       nuntiable_events.each do |event_name|
+        next if messenger.method_defined?(event_name)
+
         messenger.send(:define_method, event_name) { |object, params = {}| }
       end
     end
