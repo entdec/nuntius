@@ -9,12 +9,13 @@ module Nuntius
 
     define_callbacks :action, terminator: ->(target, result_lambda) { result_lambda.call == false }
 
-    attr_reader :templates
+    attr_reader :templates, :attachments
 
     def initialize(object, event, params = {})
       @object = object
       @event = event
       @params = params
+      @attachments = []
     end
 
     # Calls the event method on the messenger
@@ -29,9 +30,54 @@ module Nuntius
     def dispatch(filtered_templates)
       filtered_templates.each do |template|
         msg = template.new_message(@object, liquid_context)
+
+        # Needed because the message is not saved yet
+        msg.future_attachments = attachments
+
         transport = BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg)
       end
+    end
+
+    # Attaches a file to the message
+    #
+    # @param url [String] Attachment url, can be file::// protocol too
+    # @param auto_zip [true, false] Whether to auto-zip, off by default
+    def attach(url, auto_zip: false)
+      @attachments ||= []
+
+      attachment = {}
+      uri = URI.parse(url)
+      if uri.scheme == 'file'
+        attachment[:io] = File.open(uri.path)
+      else
+        client = HTTPClient.new
+        response = client.get(url, follow_redirect: true)
+        attachment[:content_type] = response.content_type
+        if response.body.is_a? String
+          attachment[:io] = StringIO.new(response.body)
+        else
+          # Assume IO object
+          attachment[:io] = response.body
+        end
+      end
+
+      attachment[:filename] ||= uri.path.split('/').last
+      attachment[:io] = attachment[:content].read if attachment[:content].respond_to?(:read)
+
+      if auto_zip && attachment[:io].size > 1024 * 1024
+        zip_stream = Zip::OutputStream.write_buffer do |zio|
+          zio.put_next_entry attachment[:file_name]
+          zio.write attachment[:content].read
+        end
+        attachment[:mime_type] = 'application/zip'
+        attachment[:io] = zip_stream
+      end
+
+      @attachments << attachment
+      @attachments
+    rescue StandardError => e
+      Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
     end
 
     class << self

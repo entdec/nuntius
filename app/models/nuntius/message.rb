@@ -18,6 +18,21 @@ module Nuntius
 
     validates :transport, presence: true
 
+    attr_accessor :future_attachments
+    after_save do |message|
+      if future_attachments
+        future_attachments.each do |attachment|
+          message.attachments.attach(attachment)
+        end
+      end
+    end
+
+    begin
+      has_many_attached :attachments
+    rescue NoMethodError
+      # Weird loading sequence error, is fixed by the lib/nuntius/helpers
+    end
+
     def pending?
       status == 'pending'
     end
