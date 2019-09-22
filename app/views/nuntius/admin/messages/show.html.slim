@@ -1,35 +1,55 @@
-table.table
-  thead
-    tr
-      th Name
-      th Value
-  tbody
-    tr
-      td State
-      td = @message.status
-    tr
-      td Refreshes
-      td = @message.refreshes
-    tr
-      td To
-      td = @message.to
-    tr
-      td Transport
-      td = @message.transport
-    tr
-      td Provider
-      td = @message.provider
-    tr
-      td Provider ID
-      td = @message.provider_id
-    tr
-      td Request ID
-      td = @message.request_id
-    tr
-      td Created at
-      td
-        = time_ago_in_words(@message.created_at)
-        = " (#{I18n.l(@message.created_at, format: :short)})"
+.row
+  .col-sm-6
+    table.table
+      thead
+        tr
+          th Name
+          th Value
+      tbody
+        tr
+          td State
+          td = @message.status
+        tr
+          td Transport
+          td = @message.transport
+        tr
+          td Provider
+          td = @message.provider
+        tr
+          td Provider ID
+          td = @message.provider_id
+        tr
+          td Request ID
+          td = @message.request_id
+        tr
+          td Refreshes
+          td = @message.refreshes
+        tr
+          td Created at
+          td
+            = time_ago_in_words(@message.created_at)
+            = " (#{I18n.l(@message.created_at, format: :short)})"
 
-- if @message.transport == 'mail' && @message.html.present?
-  iframe src=message_path(@message.id) style="width: 100%; height: 600px; border: 0px;"
+  .col-sm-6
+    table.table
+      thead
+        tr
+          th Name
+          th Value
+      tbody
+        tr
+          td To
+          td = @message.to
+
+        - if @message.transport == 'mail'
+          tr
+            td Subject
+            td = @message.subject
+
+        - if @message.transport == 'sms'
+          tr
+            td Text
+            td = @message.text
+
+    - if @message.transport == 'mail' && @message.html.present?
+      iframe src=message_path(@message.id) style="width: 100%; height: 600px; border: 0px;"

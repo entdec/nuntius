@@ -4,7 +4,7 @@ table.table
       th ID
       th Transport
       th Provider
-      th Template/Campaign
+      th Origin
       th Nuntiable
       th Status
   tbody
@@ -19,5 +19,5 @@ table.table
           - if message.template
             = link_to message.template&.description, edit_admin_template_path(message.template)
 
-        td = "#{message.nuntiable_type} #{message.nuntiable_id}"
+        td = link_to "#{message.nuntiable_type} [#{message.nuntiable}]", (url_for(message.nuntiable) rescue '#')
         td = message.status
