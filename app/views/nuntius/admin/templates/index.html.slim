@@ -7,6 +7,7 @@ table.table
       th Klass
       th Event
       th # Messages
+      th
   tbody
     - for template in @templates
       tr
@@ -17,6 +18,7 @@ table.table
         td = template.klass
         td = template.event
         td = link_to template.messages.count, admin_messages_path(template_id: template.id)
+        td = link_to(content_tag(:i, nil, class: 'fa fa-trash'), admin_template_path(template), data: { confirm: 'Are you sure you want to delete the template?', method: :delete }, class: 'btn btn-xs btn-danger')
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.messages'), admin_messages_path, class: 'btn')

@@ -36,6 +36,11 @@ module Nuntius
         respond @template.update(template_params)
       end
 
+      def destroy
+        @template = Nuntius::Template.visible.find(params[:id])
+        respond @template.destroy, notice: 'The template was deleted', error: 'There were problems deleting the template'
+      end
+
       private
 
       def set_objects
