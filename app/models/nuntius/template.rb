@@ -45,7 +45,7 @@ module Nuntius
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
 
-      message.to = render(:to, assigns, locale)
+      message.to = render(:to, assigns, locale).split(',').reject(&:empty?).join(',')
       message.subject = render(:subject, assigns, locale)
       message.html = render(:html, assigns, locale, layout: layout&.data)
       message.text = render(:text, assigns, locale)
