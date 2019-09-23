@@ -34,11 +34,12 @@ module Nuntius
         # Needed because the message is not saved yet
         msg.future_attachments = attachments
 
-        transport = BaseTransport.class_from_name(template.transport).new
+        transport = Nuntius::BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg)
       end
     end
 
+    #
     # Attaches a file to the message
     #
     # @param url [String] Attachment url, can be file::// protocol too
@@ -81,6 +82,13 @@ module Nuntius
     end
 
     class << self
+      #
+      # Returns the variable name used in the liquid context
+      #
+      # @param [Object] obj Any object with a backing drop
+      #
+      # @return [String] underscored, lowercase string
+      #
       def liquid_variable_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
           obj.first.class.name.demodulize.pluralize.underscore
