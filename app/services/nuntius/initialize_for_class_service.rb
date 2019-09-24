@@ -2,6 +2,16 @@
 
 require 'query_constructor'
 module Nuntius
+
+  module AutoMessageWithNuntius
+    extend ActiveSupport::Concern
+    included do
+      after_commit do |resource_state_transition|
+        Nuntius.with(resource_state_transition.resource).message(event.to_s)
+      end
+    end
+  end
+
   class InitializeForClassService < ApplicationService
     attr_reader :klass, :name, :options
 
@@ -17,6 +27,11 @@ module Nuntius
       add_to_config
       create_events
       override_devise if options[:override_devise]
+
+      assoc = klass.reflect_on_all_associations.find{ |a| a.name == :resource_state_transitions }
+      if options[:use_state_machine] && assoc
+        assoc.klass.send(:include, AutoMessageWithNuntius)
+      end
     end
 
     private
