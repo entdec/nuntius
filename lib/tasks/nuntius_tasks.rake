@@ -2,7 +2,7 @@
 
 desc 'Release a new version'
 task :release do
-  version_file = './lib/importo/version.rb'
+  version_file = './lib/nuntius/version.rb'
   File.open(version_file, 'w') do |file|
     file.puts <<~EOVERSION
       # frozen_string_literal: true
@@ -18,7 +18,7 @@ task :release do
   load version_file
   puts "Updated version to #{Nuntius::VERSION}"
 
-  `git commit lib/importo/version.rb -m "Version #{Nuntius::VERSION}"`
+  `git commit lib/nuntius/version.rb -m "Version #{Nuntius::VERSION}"`
   `git push`
   `git tag #{Nuntius::VERSION}`
   `git push --tags`
