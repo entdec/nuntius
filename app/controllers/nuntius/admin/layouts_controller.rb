@@ -32,7 +32,7 @@ module Nuntius
 
       def update
         @layout = Nuntius::Layout.visible.find(params[:id])
-        respond @layout.update(layout_params)
+        respond @layout.update(layout_params), action: :edit
       end
 
       private

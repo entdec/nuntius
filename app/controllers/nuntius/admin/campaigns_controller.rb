@@ -34,7 +34,7 @@ module Nuntius
           @campaign.publish! if @campaign.can_publish?
           redirect_to :edit_admin_campaign
         else
-          respond saved
+          respond saved, action: :edit
         end
       end
 

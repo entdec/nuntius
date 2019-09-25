@@ -33,7 +33,7 @@ module Nuntius
 
       def update
         @template = Nuntius::Template.visible.find(params[:id])
-        respond @template.update(template_params)
+        respond @template.update(template_params), action: :edit
       end
 
       def destroy

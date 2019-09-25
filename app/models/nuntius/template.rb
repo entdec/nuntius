@@ -5,7 +5,7 @@ module Nuntius
     include Concerns::MetadataScoped
 
     belongs_to :layout, optional: true
-    has_many :messages, class_name: 'Nuntius::Message'
+    has_many :messages, class_name: 'Nuntius::Message', dependent: :nullify
 
     LIQUID_TAGS = /{%(?:(?!%}).)*%}|{{(?:(?!}}).)*}}/.freeze
 

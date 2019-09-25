@@ -32,7 +32,7 @@ module Nuntius
 
       def update
         @list = Nuntius::List.visible.find(params[:id])
-        respond @list.update(list_params)
+        respond @list.update(list_params), action: :edit
       end
 
       private
