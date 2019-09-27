@@ -37,7 +37,10 @@ module Nuntius
     private
 
     def override_devise
-      klass.send(:define_method, :send_devise_notification) { |notification, *params| Nuntius.with(self, devise: params).message(notification.to_s) }
+      klass.send(:define_method, :send_devise_notification) do |notification, *devise_params|
+        # All notifications have either a token as the first param, or nothing
+        Nuntius.with(self, token: devise_params.first).message(notification)
+      end
     end
 
     def add_to_config

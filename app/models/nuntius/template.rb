@@ -9,8 +9,6 @@ module Nuntius
 
     LIQUID_TAGS = /{%(?:(?!%}).)*%}|{{(?:(?!}}).)*}}/.freeze
 
-    # TODO: attachments - also templates could have attachments
-
     validates :description, presence: true
 
     scope :metadata_blank, lambda { |name|
@@ -49,6 +47,7 @@ module Nuntius
       message.subject = render(:subject, assigns, locale)
       message.html = render(:html, assigns, locale, layout: layout&.data)
       message.text = render(:text, assigns, locale)
+      message.payload = render(:payload, assigns, locale)
 
       message
     end
@@ -74,7 +73,11 @@ module Nuntius
 
     def render(attr, assigns, locale, options = {})
       I18n.with_locale(locale) do
-        ::Liquor.render(send(attr), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options))
+        if attr == :payload
+          YAML.load(::Liquor.render(YAML.dump(send(attr)), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options)))
+        else
+          ::Liquor.render(send(attr), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options))
+        end
       end
     end
   end

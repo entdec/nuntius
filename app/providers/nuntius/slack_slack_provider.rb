@@ -11,9 +11,20 @@ module Nuntius
     def deliver
       client = Slack::Web::Client.new(key: api_key)
 
-      response = client.chat_postMessage(channel: message[:to], text: message.text, as_user: true)
+      message.attachments.each do |attachment|
+        client.files_upload(
+          channels: message[:to],
+          as_user: true,
+          username: message[:from],
+          file: Faraday::UploadIO.new(StringIO.new(attachment.download), attachment.content_type),
+          filename: attachment.filename.to_s
+        )
+      end
 
-      message.status = if response["ok"]
+      args = (message.payload || {}).merge(channel: message[:to], text: message.text, as_user: true, username: message[:from])
+      response = client.chat_postMessage(args.deep_symbolize_keys)
+
+      message.status = if response['ok']
                          'sent'
                        else
                          'undelivered'
@@ -21,6 +32,5 @@ module Nuntius
 
       message
     end
-
   end
 end
