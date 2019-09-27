@@ -11,7 +11,7 @@ require 'nuntius/active_record_helpers'
 require 'nuntius/active_storage_helpers'
 
 module Nuntius
-  ROOT_PATH = Pathname.new(File.join(__dir__, ".."))
+  ROOT_PATH = Pathname.new(File.join(__dir__, '..'))
 
   class Error < StandardError; end
 
@@ -36,7 +36,6 @@ module Nuntius
       self
     end
   end
-
 
   # Include helpers
   ActiveSupport.on_load(:active_record) do

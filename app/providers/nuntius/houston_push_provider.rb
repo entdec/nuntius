@@ -11,7 +11,7 @@ module Nuntius
                    description: 'The contents of a valid APNS push certificate in .pem format'
     setting_reader :passphrase,
                    required: false,
-                   description: 'If the APNS certificate is protected by a passphrase, ' +
+                   description: 'If the APNS certificate is protected by a passphrase, ' \
                                 'provide this variable to use when decrypting it.'
     setting_reader :environment,
                    required: false,
@@ -36,6 +36,5 @@ module Nuntius
                        end
       message
     end
-
   end
 end

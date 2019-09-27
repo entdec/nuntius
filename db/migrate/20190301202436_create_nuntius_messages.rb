@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateNuntiusMessages < ActiveRecord::Migration[5.1]
   def change
     enable_extension 'uuid-ossp'

@@ -1,24 +1,26 @@
-$:.push File.expand_path("../lib", __FILE__)
+# frozen_string_literal: true
+
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 
 # Maintain your gem's version:
-require "nuntius/version"
+require 'nuntius/version'
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "nuntius"
+  s.name        = 'nuntius'
   s.version     = Nuntius::VERSION
-  s.authors     = ["Tom de Grunt"]
-  s.email       = ["tom@degrunt.nl"]
+  s.authors     = ['Tom de Grunt']
+  s.email       = ['tom@degrunt.nl']
   s.homepage    = 'https://code.entropydecelerator.com/components/nuntius'
   s.summary     = 'Messaging and notification for Ruby on Rails'
   s.description = 'Messages are defined in templates editable by users.'
-  s.license     = "MIT"
+  s.license     = 'MIT'
 
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   s.add_dependency 'liquor', '~> 0.5'
   s.add_dependency 'pg'
-  s.add_dependency "rails", ">= 5.2"
+  s.add_dependency 'rails', '>= 5.2'
   s.add_dependency 'webpacker', '>= 4'
 
   s.add_dependency 'fcm'
@@ -28,9 +30,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'parse-cron'
   s.add_dependency 'twilio-ruby', '~> 5.6'
 
+  s.add_dependency 'httpclient', '~> 2.8'
   s.add_dependency 'inky-rb'
   s.add_dependency 'premailer'
-  s.add_dependency 'httpclient', '~> 2.8'
   s.add_dependency 'rubyzip', '~> 1.2'
 
   s.add_dependency 'state_machines-activerecord'

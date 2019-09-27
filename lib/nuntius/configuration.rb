@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nuntius
   class Configuration
     attr_accessor :admin_authentication_module

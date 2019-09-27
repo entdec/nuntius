@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateNuntiusCampaigns < ActiveRecord::Migration[5.2]
   def change
     create_table :nuntius_campaigns, id: :uuid do |t|

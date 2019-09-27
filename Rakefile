@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 begin
   require 'bundler/setup'
 rescue LoadError
@@ -14,13 +16,10 @@ RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
-APP_RAKEFILE = File.expand_path("../test/dummy/Rakefile", __FILE__)
+APP_RAKEFILE = File.expand_path('test/dummy/Rakefile', __dir__)
 load 'rails/tasks/engine.rake'
 
-
 load 'rails/tasks/statistics.rake'
-
-
 
 require 'bundler/gem_tasks'
 
@@ -32,21 +31,20 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = false
 end
 
-
 task default: :test
 
 namespace :nuntius do
   namespace :webpacker do
-    desc "Install deps with yarn"
+    desc 'Install deps with yarn'
     task :yarn_install do
-      Dir.chdir(File.join(__dir__, "../..")) do
-        system "yarn install --no-progress --production"
+      Dir.chdir(File.join(__dir__, '../..')) do
+        system 'yarn install --no-progress --production'
       end
     end
 
-    desc "Compile JavaScript packs using webpack for production with digests"
-    task compile: [:yarn_install, :environment] do
-      Webpacker.with_node_env("production") do
+    desc 'Compile JavaScript packs using webpack for production with digests'
+    task compile: %i[yarn_install environment] do
+      Webpacker.with_node_env('production') do
         if Nuntius.webpacker.commands.compile
           # Successful compilation!
         else

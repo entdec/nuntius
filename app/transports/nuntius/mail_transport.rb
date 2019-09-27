@@ -4,7 +4,6 @@ module Nuntius
   class MailTransport < BaseTransport
     # We split per email address, to allow easy resends
     def deliver(message)
-
       message.html = Inky::Core.new.release_the_kraken(message.html)
 
       premailer = Premailer.new(message.html, with_html_string: true)

@@ -48,7 +48,7 @@ module Nuntius
       @client ||= Twilio::REST::Client.new(sid, auth_token)
     end
 
-    def script_for_path(message, path = '/', params)
+    def script_for_path(message, path = '/', _params)
       scripts = message.text.delete("\r").split("\n\n")
 
       scripts = scripts.map do |script|

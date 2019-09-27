@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 # Declare your gem's dependencies in nuntius.gemspec.
@@ -16,7 +18,7 @@ gemspec
 git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.git" }
 
 gem 'liquor', entdec: 'components/liquor', tag: '0.5.0'
-gem 'trado', entdec: 'components/trado', branch: :master
 gem 'pry'
+gem 'trado', entdec: 'components/trado', branch: :master
 
-gem "irb", "~> 1.0"
+gem 'irb', '~> 1.0'

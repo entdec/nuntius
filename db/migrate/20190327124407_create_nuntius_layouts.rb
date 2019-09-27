@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateNuntiusLayouts < ActiveRecord::Migration[5.2]
   def up
     create_table :nuntius_layouts, id: :uuid do |t|

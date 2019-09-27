@@ -7,7 +7,7 @@ module Nuntius
 
     delegate :liquid_variable_name_for, :class_name_for, to: :class
 
-    define_callbacks :action, terminator: ->(target, result_lambda) { result_lambda.call == false }
+    define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
     attr_reader :templates, :attachments
 
@@ -55,12 +55,12 @@ module Nuntius
         client = HTTPClient.new
         response = client.get(url, follow_redirect: true)
         attachment[:content_type] = response.content_type
-        if response.body.is_a? String
-          attachment[:io] = StringIO.new(response.body)
-        else
-          # Assume IO object
-          attachment[:io] = response.body
-        end
+        attachment[:io] = if response.body.is_a? String
+                            StringIO.new(response.body)
+                          else
+                            # Assume IO object
+                            response.body
+                          end
       end
 
       attachment[:filename] ||= uri.path.split('/').last

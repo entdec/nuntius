@@ -9,7 +9,7 @@ Nuntius.setup do |config|
   config.transport :sms
   config.transport :voice
 
-  config.provider :smtp, transport: :mail, settings: ->(_obj) {
+  config.provider :smtp, transport: :mail, settings: lambda { |_obj|
     { from_header: '"Local Express" <do_not_reply@localexpress.nl>', host: 'email-smtp.eu-west-1.amazonaws.com', port: 587, username: 'AKIAIIA7EIIM25OFDEUA', password: 'AgJjPlUKEdMuyIuJ2LshcuvSygCXpTEe6VV/bVwEhZV+' }
   }
 

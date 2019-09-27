@@ -22,6 +22,5 @@ module Nuntius
 
       message
     end
-
   end
 end

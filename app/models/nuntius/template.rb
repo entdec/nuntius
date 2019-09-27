@@ -74,7 +74,7 @@ module Nuntius
     def render(attr, assigns, locale, options = {})
       I18n.with_locale(locale) do
         if attr == :payload
-          YAML.load(::Liquor.render(YAML.dump(send(attr)), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options)))
+          YAML.safe_load(::Liquor.render(YAML.dump(send(attr)), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options)))
         else
           ::Liquor.render(send(attr), { assigns: assigns.merge('template' => self), registers: { 'template' => self } }.merge(options))
         end

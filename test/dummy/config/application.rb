@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require_relative 'boot'
 
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
-require "nuntius"
+require 'nuntius'
 
 module Dummy
   class Application < Rails::Application
@@ -16,4 +18,3 @@ module Dummy
     config.active_job.queue_adapter = :inline
   end
 end
-

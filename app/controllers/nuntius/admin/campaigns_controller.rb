@@ -5,7 +5,6 @@ require_dependency 'nuntius/application_admin_controller'
 module Nuntius
   module Admin
     class CampaignsController < ApplicationAdminController
-
       before_action :set_objects, except: [:index]
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.campaigns'), :admin_campaigns_path) if defined? add_breadcrumb
 

@@ -1,5 +1,6 @@
-Nuntius::Engine.routes.draw do
+# frozen_string_literal: true
 
+Nuntius::Engine.routes.draw do
   get 'callbacks/:message_id(/*path)', to: 'callbacks#create', as: :callback
   post 'callbacks/:message_id(/*path)', to: 'callbacks#create'
 

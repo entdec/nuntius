@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Nuntius
   class ApplicationRunner
     def call
@@ -26,9 +27,9 @@ module Nuntius
 
     def rescued(name)
       yield
-    rescue StandardError => exception
-      log(:error, "Exception processing (#{name}): #{exception.message}")
-      log(:error, exception.backtrace.join("\n"))
+    rescue StandardError => e
+      log(:error, "Exception processing (#{name}): #{e.message}")
+      log(:error, e.backtrace.join("\n"))
     end
 
     def per_channel

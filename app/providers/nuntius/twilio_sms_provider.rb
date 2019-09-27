@@ -33,6 +33,5 @@ module Nuntius
     def client
       @client ||= Twilio::REST::Client.new(sid, auth_token)
     end
-
   end
 end

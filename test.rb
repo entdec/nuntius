@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # status_mapping = { %w(failed undelivered) => 'failed', 'delivered' => 'delivered'}
 #
 # puts status_mapping
@@ -8,7 +10,7 @@ require 'pp'
 
 # m = Nuntius::Message.create(to: 'cgLW7RRyqhQ:APA91bHAKexgybHs8ndIFI-OqkB0KjLOJOt_HV3fULF4v2erXT9QiuOstDbf0gHWwgcyKAM1KYuonYdpvokUo2UGVyVxIhoBZRljQZgdSOVmhEdII4zJDgIlPcqvZd_C0NhIJhcxLZOL', text: "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} - test", transport: 'push')
 
-m = Nuntius::Message.create(to: 'tom@degrunt.nl', html: '<b>Hoi</b>',  text: "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} - test", transport: 'mail')
+m = Nuntius::Message.create(to: 'tom@degrunt.nl', html: '<b>Hoi</b>', text: "#{Time.now.strftime('%Y-%m-%d %H:%M:%S')} - test", transport: 'mail')
 
 # t = Nuntius::TwilioSmsProvider.new()
 # t = Nuntius::TwilioSmsProvider.new()

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Nuntius
   class TimestampBasedMessagesRunner < ApplicationRunner
     def perform

@@ -10,7 +10,7 @@ module Nuntius
 
     private
 
-    def ymds(for_display = false)
+    def ymds(_for_display = false)
       weeks = results.map { |r| r['ymd'] }.uniq.sort_by { |w| Date.strptime(w, '%F') }
       weeks
     end

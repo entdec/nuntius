@@ -5,7 +5,6 @@ require_dependency 'nuntius/application_admin_controller'
 module Nuntius
   module Admin
     class ListsController < ApplicationAdminController
-
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path) if defined? add_breadcrumb
 
       def index

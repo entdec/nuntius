@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nuntius
   class Engine < ::Rails::Engine
     isolate_namespace Nuntius
@@ -10,7 +12,7 @@ module Nuntius
       end
     end
 
-    initializer "active_storage.attached" do
+    initializer 'active_storage.attached' do
       config.after_initialize do
         ActiveSupport.on_load(:active_record) do
           Nuntius::Message.include(ActiveStorageHelpers)

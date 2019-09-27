@@ -2,7 +2,6 @@
 
 require 'query_constructor'
 module Nuntius
-
   module AutoMessageWithNuntius
     extend ActiveSupport::Concern
     included do
@@ -28,7 +27,7 @@ module Nuntius
       create_events
       override_devise if options[:override_devise]
 
-      assoc = klass.reflect_on_all_associations.find{ |a| a.name == :resource_state_transitions }
+      assoc = klass.reflect_on_all_associations.find { |a| a.name == :resource_state_transitions }
       if options[:use_state_machine] && assoc
         assoc.klass.send(:include, AutoMessageWithNuntius)
       end

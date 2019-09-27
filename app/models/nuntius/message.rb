@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nuntius
   # Stores individual messages to individual recipients
   #
@@ -20,10 +22,8 @@ module Nuntius
 
     attr_accessor :future_attachments
     after_save do |message|
-      if future_attachments
-        future_attachments.each do |attachment|
-          message.attachments.attach(attachment)
-        end
+      future_attachments&.each do |attachment|
+        message.attachments.attach(attachment)
       end
     end
 
