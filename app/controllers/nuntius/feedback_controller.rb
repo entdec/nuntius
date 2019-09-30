@@ -15,7 +15,7 @@ module Nuntius
         HTTPClient.get(body['SubscribeURL'])
       else
         notification = JSON.parse(body['Message'])
-        Nuntius::AWSSNSProcessorService.new(notification).call
+        Nuntius::AwssnsProcessorService.new(notification).call
       end
       head :ok
     end

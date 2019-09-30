@@ -10,7 +10,7 @@
 #
 #
 module Nuntius
-  class AWSSNSProcessorService < ApplicationService
+  class AwssnsProcessorService < ApplicationService
     def initialize(notification)
       @notification = notification
       @type         = @notification['notificationType']
