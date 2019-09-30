@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'messagebird-rest'
   s.add_dependency 'parse-cron'
   s.add_dependency 'twilio-ruby', '~> 5.6'
+  s.add_dependency 'slack-ruby-client'
 
   s.add_dependency 'httpclient', '~> 2.8'
   s.add_dependency 'inky-rb'
