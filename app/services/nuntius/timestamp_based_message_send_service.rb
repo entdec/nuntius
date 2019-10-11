@@ -32,9 +32,11 @@ module Nuntius
 
       base_scope.each do |item|
         Message.transaction do
-          @message.process_with_object(item, {})
-        rescue StandardError => e
-          Rails.logger.error "Exception during processing for #{item}: #{e}"
+          begin
+            @message.process_with_object(item, {})
+          rescue StandardError => e
+            Rails.logger.error "Exception during processing for #{item}: #{e}"
+          end
         end
       end
     end
