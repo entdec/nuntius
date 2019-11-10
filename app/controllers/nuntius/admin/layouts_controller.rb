@@ -8,7 +8,7 @@ module Nuntius
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.layouts'), :admin_layouts_path) if defined? add_breadcrumb
 
       def index
-        @layouts = Nuntius::Layout.visible
+        @layouts = Nuntius::Layout.visible.order(:name)
       end
 
       def new

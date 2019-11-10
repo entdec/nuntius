@@ -2,6 +2,7 @@ table.table
   thead
     tr
       th Description
+      th Metadata
       th Enabled
       th Transport
       th Klass
@@ -12,6 +13,7 @@ table.table
     - for template in @templates
       tr
         td = link_to template.description, edit_admin_template_path(template)
+        td = Nuntius.config.metadata_humanize(template.metadata)
         td
           i.fas class="#{template.enabled ? 'fa-check' : 'fa-times'}"
         td = template.transport

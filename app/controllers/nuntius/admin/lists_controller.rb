@@ -8,7 +8,7 @@ module Nuntius
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path) if defined? add_breadcrumb
 
       def index
-        @lists = Nuntius::List.visible
+        @lists = Nuntius::List.visible.order(:name)
       end
 
       def new

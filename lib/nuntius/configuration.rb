@@ -6,6 +6,7 @@ module Nuntius
     attr_accessor :base_controller
     attr_writer   :logger
     attr_writer   :host
+    attr_writer   :metadata_humanize
 
     attr_reader :transports
     attr_reader :providers
@@ -27,6 +28,7 @@ module Nuntius
       @visible_scope = -> { all }
       @add_metadata = -> {}
       @metadata_fields = {}
+      @metadata_humanize = -> {}
     end
 
     # logger [Object].
@@ -36,6 +38,11 @@ module Nuntius
 
     def host(message)
       @host.is_a?(Proc) ? instance_exec(message, &@host) : @host
+    end
+
+    # Make the part that is important for visible readable for humans
+    def metadata_humanize(metadata)
+      @metadata_humanize.is_a?(Proc) ? instance_exec(metadata, &@metadata_humanize) : @metadata_humanize
     end
 
     # admin_mount_point [String].

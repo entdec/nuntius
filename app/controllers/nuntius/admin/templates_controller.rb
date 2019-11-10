@@ -9,7 +9,7 @@ module Nuntius
       add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path) if defined? add_breadcrumb
 
       def index
-        @templates = Nuntius::Template.visible
+        @templates = Nuntius::Template.visible.order(:description)
       end
 
       def new

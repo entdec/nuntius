@@ -2,6 +2,7 @@ table.table
   thead
     tr
       th Name
+      th Metadata
       th Transport
       th State
       th List
@@ -9,6 +10,7 @@ table.table
     - for campaign in @campaigns
       tr
         td = link_to campaign.name, edit_admin_campaign_path(campaign)
+        td = Nuntius.config.metadata_humanize(campaign.metadata)
         td = campaign.transport
         td = campaign.state
         td = campaign.list.name

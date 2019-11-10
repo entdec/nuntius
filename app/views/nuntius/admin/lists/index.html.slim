@@ -2,11 +2,13 @@ table.table
   thead
     tr
       th Name
+      th Metadata
       th #Subscribers
   tbody
     - for list in @lists
       tr
         td = link_to list.name, edit_admin_list_path(list)
+        td = Nuntius.config.metadata_humanize(list.metadata)
         / FIXME: Use counter cache here, sadly can't get it to work
         td = list.subscribers.count || '-'
 
