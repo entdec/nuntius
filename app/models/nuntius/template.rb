@@ -37,6 +37,12 @@ module Nuntius
       where('metadata->>:name IS NULL OR metadata->>:name IN (:value)', name: name, value: value)
     }
 
+    scope :metadata_in_or_blank_exclusive, lambda { |name, value|
+      result = where('metadata->>:name IN (:value)', name: name, value: value)
+      result = where('metadata->>:name IS NULL', name: name) if result.none?
+      result
+    }
+
     def new_message(object, assigns = {})
       message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object, metadata: metadata)
 
