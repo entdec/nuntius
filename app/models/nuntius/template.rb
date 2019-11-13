@@ -43,6 +43,20 @@ module Nuntius
       result
     }
 
+    scope :contains, lambda { |name, value|
+      where('(metadata->>:name)::jsonb ? :value', name: name, value: value)
+    }
+
+    scope :contains_or_blank, lambda { |name, value|
+      where('(metadata->>:name)::jsonb ? :value OR metadata->>:name IS NULL', name: name, value: value)
+    }
+
+    scope :contains_or_blank_exclusive, lambda { |name, value|
+      result = where('(metadata->>:name)::jsonb ? :value', name: name, value: value)
+      result = where('metadata->>:name IS NULL', name: name) if result.none?
+      result
+    }
+
     def new_message(object, assigns = {})
       message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object, metadata: metadata)
 
