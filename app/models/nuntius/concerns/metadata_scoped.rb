@@ -18,7 +18,7 @@ module Nuntius
           Nuntius.config.metadata_fields.each do |field, data|
             if data[:current]
               current = data[:current]
-              metadata[field] ||= instance_exec(&current)
+              metadata[field.to_s] ||= instance_exec(&current)
             end
           end
         end
