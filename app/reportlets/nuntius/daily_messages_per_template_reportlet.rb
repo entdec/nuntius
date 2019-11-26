@@ -14,7 +14,7 @@ module Nuntius
         tmpl = Nuntius::Template.find(template)
         if tmpl
           template_ymd_totals = ymds.map { |ymd| ymd_template_id(ymd, template, :count) }
-          [tmpl.description] + template_ymd_totals
+          [h.link_to(tmpl.description, Nuntius::Engine.routes.url_helpers.edit_admin_template_path(tmpl))] + template_ymd_totals
         end
       end
 
@@ -38,7 +38,7 @@ module Nuntius
       )
 
       select_manager = select_manager.where(messages[:template_id].in(template_ids))
-      select_manager = select_manager.where(messages[:created_at].between(14.days.ago..Time.now))
+      select_manager = select_manager.where(messages[:created_at].between(60.days.ago..Time.now))
 
       select_manager = select_manager.group(:template_id, :ymd)
       select_manager = select_manager.order(:template_id, :ymd)
