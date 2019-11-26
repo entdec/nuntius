@@ -20,6 +20,6 @@ git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.
 gem 'action_table', entdec: 'components/action_table', tag: '0.2.6'
 gem 'liquor', entdec: 'components/liquor', tag: '0.5.21'
 gem 'pry'
-gem 'trado', entdec: 'components/trado', branch: :master
+gem 'trado', entdec: 'components/trado', tag: '0.1.12'
 
 gem 'irb', '~> 1.0'
