@@ -13,7 +13,10 @@ table.table.table-condensed.table-hover
     tr
       td= mi.template&.description || mi.campaign&.name
       td
+        = link_to(nuntius.admin_message_path(mi), target: '_blank', title: 'View', onclick: "window.open(this.href, '#{ mi.template&.description}','left=100,top=100,width=900,height=500,toolbar=0'); return false;")
+          .i.fa.fa-eye
         - if mi.template
+          | &nbsp;
           = link_to(nuntius.edit_admin_template_path(mi.template), title: 'Configure')
             .i.fa.fa-cog
       td= ln(mi.created_at, Time.zone, :long)
