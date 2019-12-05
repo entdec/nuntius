@@ -9,7 +9,7 @@ module Nuntius
 
     define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
-    attr_reader :templates, :attachments
+    attr_reader :templates, :attachments, :event, :object, :params
 
     def initialize(object, event, params = {})
       @object = object
