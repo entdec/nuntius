@@ -29,6 +29,7 @@ module Nuntius
     # Turns the templates in messages, and dispatches the messages to transports
     def dispatch(filtered_templates)
       filtered_templates.each do |template|
+        template.layout = override_layout(template.layout)
         msg = template.new_message(@object, liquid_context)
 
         # Needed because the message is not saved yet
@@ -79,6 +80,11 @@ module Nuntius
       @attachments
     rescue StandardError => e
       Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
+    end
+
+    # Allow messengers to override the selected layout
+    def override_layout(selected_layout)
+      selected_layout
     end
 
     class << self
