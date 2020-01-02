@@ -38,7 +38,7 @@ module Nuntius
       )
 
       select_manager = select_manager.where(messages[:template_id].in(template_ids))
-      select_manager = select_manager.where(messages[:created_at].between(60.days.ago..Time.now))
+      select_manager = select_manager.where(messages[:created_at].between(7.days.ago..Time.now))
 
       select_manager = select_manager.group(:template_id, :ymd)
       select_manager = select_manager.order(:template_id, :ymd)
