@@ -9,16 +9,7 @@
   - if @list.persisted?
     =< link_to(t('nuntius.context_menu.add_subscriber'), new_admin_list_subscriber_path(@list), class: 'btn btn-primary')
 
+br
 - if @list.subscribers.present?
-  table.table
-    thead
-      tr
-        th Name
-        th Email
-        th Phonenumber
-    tbody
-    - for subscriber in @list.subscribers
-      tr
-        td = link_to subscriber.name, edit_admin_list_subscriber_path(@list, subscriber)
-        td = subscriber.email
-        td = subscriber.phone_number
+  = ui_table '/action_table/nuntius_subscribers', :nuntius_subscribers, parameters: { list_id: @list.id }
+

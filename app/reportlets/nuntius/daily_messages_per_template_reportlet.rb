@@ -13,7 +13,7 @@ module Nuntius
       matrix = all_templates.map do |template|
         tmpl = Nuntius::Template.find(template)
         if tmpl
-          template_ymd_totals = ymds.map { |ymd| ymd_template_id(ymd, template, :count) }
+          template_ymd_totals = ymds.map { |ymd| h.link_to(ymd_template_id(ymd, template, :count), Nuntius::Engine.routes.url_helpers.admin_messages_path(template_id: template)) }
           [h.link_to(tmpl.description, Nuntius::Engine.routes.url_helpers.edit_admin_template_path(tmpl))] + template_ymd_totals
         end
       end

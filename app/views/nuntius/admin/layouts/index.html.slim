@@ -1,13 +1,4 @@
-table.table
-  thead
-    tr
-      th Name
-      th Metadata
-  tbody
-    - for layout in @layouts
-      tr
-        td = link_to layout.name, edit_admin_layout_path(layout)
-        td = Nuntius.config.metadata_humanize(layout.metadata)
+= ui_table '/action_table/nuntius_layouts', :nuntius_layouts
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.add'), new_admin_layout_path, class: 'btn btn-primary')

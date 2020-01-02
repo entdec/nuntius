@@ -1,26 +1,4 @@
-table.table
-  thead
-    tr
-      th Description
-      th Metadata
-      th Enabled
-      th Transport
-      th Klass
-      th Event
-      th # Messages
-      th
-  tbody
-    - for template in @templates
-      tr
-        td = link_to template.description, edit_admin_template_path(template)
-        td = Nuntius.config.metadata_humanize(template.metadata)
-        td
-          i.fas class="#{template.enabled ? 'fa-check' : 'fa-times'}"
-        td = template.transport
-        td = template.klass
-        td = template.event
-        td = link_to template.messages.count, admin_messages_path(template_id: template.id)
-        td = link_to(content_tag(:i, nil, class: 'fa fa-trash'), admin_template_path(template), data: { confirm: 'Are you sure you want to delete the template?', method: :delete }, class: 'btn btn-xs btn-danger')
+= ui_table '/action_table/nuntius_templates', :nuntius_templates
 
 - content_for :context_menu do
   =< link_to(t('nuntius.context_menu.messages'), admin_messages_path, class: 'btn')
