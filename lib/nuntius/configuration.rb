@@ -28,7 +28,7 @@ module Nuntius
       @visible_scope = -> { all }
       @add_metadata = -> {}
       @metadata_fields = {}
-      @metadata_humanize = -> {}
+      @metadata_humanize = ->(data) { data.inspect }
     end
 
     # logger [Object].
