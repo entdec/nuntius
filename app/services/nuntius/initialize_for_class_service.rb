@@ -12,6 +12,8 @@ module Nuntius
   end
 
   class InitializeForClassService < ApplicationService
+    transaction false
+
     attr_reader :klass, :name, :options
 
     def initialize(klass, options = {})

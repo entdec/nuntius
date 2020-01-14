@@ -1,17 +1,22 @@
 # frozen_string_literal: true
 
 module Nuntius
+# frozen_string_literal: true
+
   class ApplicationService
+    include ActiveSupport::Callbacks
     attr_reader :raise_on_error
+
+    define_callbacks :perform
+
     # Main point of entry for services
     def call(raise_on_error = nil)
       @raise_on_error = raise_on_error unless raise_on_error.nil?
-      result = nil
-      ApplicationRecord.transaction do
-        result = perform
-        raise_if_needed(result)
+      if self.class.transaction
+        ApplicationRecord.transaction { exec }
+      else
+        exec
       end
-      result
     end
 
     def call!
@@ -20,6 +25,15 @@ module Nuntius
     end
 
     private
+
+    def exec
+      result = nil
+      run_callbacks :perform do
+        result = perform
+      end
+      raise_if_needed(result)
+      result
+    end
 
     def raise_on_error?
       @raise_on_error
@@ -30,12 +44,8 @@ module Nuntius
       return unless result.respond_to?(:invalid?) && result.invalid?
 
       errors = result.errors.full_messages.join(', ')
-      request_log "raising: #{errors}"
-      # request_log "Failing record: #{result.try(:attributes)}" rescue nil
-      # request_log "origin: #{result.origin.attributes}" rescue nil
-      # request_log "destination: #{result.destination.attributes)}" rescue nil
       log :error, "raising: #{errors}"
-      raise BoxtureError, errors
+      raise StandardError, errors
     end
 
     def log(level, message)
@@ -44,6 +54,13 @@ module Nuntius
 
     def request_log(message)
       Praesens.request_log("#{self.class.name}: #{message}")
+    end
+
+    class << self
+      def transaction(value = nil)
+        @transaction = value unless value.nil?
+        @transaction.nil? || @transaction == true
+      end
     end
   end
 end
