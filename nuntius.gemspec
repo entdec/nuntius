@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'httpclient', '~> 2.8'
   s.add_dependency 'inky-rb'
   s.add_dependency 'premailer'
-  s.add_dependency 'rubyzip', '~> 1.2'
+  s.add_dependency 'rubyzip', '> 1.1'
 
   s.add_dependency 'state_machines-activerecord'
 
