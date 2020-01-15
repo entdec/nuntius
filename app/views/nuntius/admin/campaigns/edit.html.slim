@@ -1,5 +1,5 @@
 - if @campaign.draft?
-  = simple_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
+  = ui_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
     = f.input :name
     .row
       .col-sm-4
@@ -17,9 +17,7 @@
 
     .for-transport.push.sms.voice
       = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
-    = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
     - if @campaign.persisted?
-      = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
       = f.button :button, 'Send', name: 'commit', value: 'send', data: { disable_with: 'Sending' }
 - else
   h2 = @campaign.name

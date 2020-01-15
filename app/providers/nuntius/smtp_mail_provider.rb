@@ -43,8 +43,10 @@ module Nuntius
         end
       end
 
-      message.attachments.each do |attachment|
-        mail.attachments[attachment.filename.to_s] = { mime_type: attachment.content_type, content: attachment.download }
+      if defined?(Attachment)
+        message&.attachments&.each do |attachment|
+          mail.attachments[attachment.filename.to_s] = { mime_type: attachment.content_type, content: attachment.download }
+        end
       end
 
       response = mail.deliver!
