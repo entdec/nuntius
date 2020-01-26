@@ -13,8 +13,7 @@
     .for-transport.mail
       = f.input :subject, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
       = f.association :layout, collection: @layouts
-      = f.input :html, as: :hidden
-      trix-editor input="template_html" style="background-color: #fff; margin-bottom: 20px;"
+      = f.input :html, as: :text, input_html: { data: { controller: 'editor', target: "editor.textarea", 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
     .for-transport.push.sms.voice.slack
       = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
     .for-transport.push.slack

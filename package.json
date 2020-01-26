@@ -14,10 +14,10 @@
   },
   "browserslist": "> 1%",
   "dependencies": {
+    "codemirror": "^5.48.4",
+    "codemirror-liquid": "git+ssh://git@code.entropydecelerator.com/components/codemirror-liquid",
     "element-closest": "^3.0.1",
-    "stimulus": "^1.1.0",
-    "codemirror": "^5.30.0",
-    "trix": "^1.2.0"
+    "stimulus": "^1.1.0"
   },
   "devDependencies": {
     "@gitlab/svgs": "^1.68.0",

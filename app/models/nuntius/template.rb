@@ -10,6 +10,11 @@ module Nuntius
     LIQUID_TAGS = /{%(?:(?!%}).)*%}|{{(?:(?!}}).)*}}/.freeze
 
     validates :description, presence: true
+    validates :from, liquid: true
+    validates :to, liquid: true
+    validates :subject, liquid: true
+    validates :html, liquid: true
+    validates :text, liquid: true
 
     scope :metadata_blank, lambda { |name|
       where('metadata->>:name IS NULL', name: name)

@@ -2,8 +2,6 @@ import "../style/nuntius.scss";
 
 import { definitionsFromContext } from "stimulus/webpack-helpers";
 import { Application } from "stimulus";
-import "trix";
-import "trix/dist/trix.css";
 
 export class Nuntius {
   static start(application) {
