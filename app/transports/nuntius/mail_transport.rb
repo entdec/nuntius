@@ -12,6 +12,7 @@ module Nuntius
 
       message.request_id = SecureRandom.uuid
       message.to.split(',').each do |to|
+        # FIXME: Sadly this also duplicates the attachments
         new_message = message.dup
         new_message.to = to
         super(new_message)
