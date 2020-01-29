@@ -23,7 +23,7 @@ module Nuntius
     attr_accessor :future_attachments
     after_save do |message|
       future_attachments&.each do |attachment|
-        # IO needs te be rewinded, otherwise the next recipient will not receive attachments
+        # Rewind IO, just to be sure
         attachment[:io].rewind
         message.attachments.attach(attachment)
       end
