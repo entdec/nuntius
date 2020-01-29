@@ -14,6 +14,14 @@
           tr
             td Subject
             td = @message.subject
+          tr
+            td Attachments
+            td
+              - @message.attachments.each do |attachment|
+                = link_to(main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename) do
+                  i.far.fa-paperclip
+                  span=attachment.filename
+                br
 
         - if @message.transport == 'sms'
           tr
