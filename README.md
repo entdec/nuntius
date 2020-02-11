@@ -1,5 +1,5 @@
 # Nuntius
-Short description and motivation.
+Messaging and notification for Ruby on Rails
 
 ## Usage
 
