@@ -3,9 +3,9 @@
 one:
   name: MyString
   data: MyText
-  metadata: 
+  metadata: {}
 
 two:
   name: MyString
   data: MyText
-  metadata: 
+  metadata: {}

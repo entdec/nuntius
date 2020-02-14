@@ -39,7 +39,9 @@ class QueryConstructor
       @scope = @scope.where(Liquid::Template.parse(@query['wheres'].map { |qi| "(#{qi})" }.join(' AND ')).render(@context.merge(@object.class.name.underscore => @object)))
     end
     @scope = @scope.includes(includes) if includes.present?
-    @scope = @scope.order(Liquid::Template.parse(@query['order'].join(',')).render(@context.merge(@object.class.name.underscore => @object))) if @query['order'].present?
+    if @query['order'].present?
+      @scope = @scope.order(Liquid::Template.parse(@query['order'].join(',')).render(@context.merge(@object.class.name.underscore => @object)))
+    end
 
     Rails.logger.info "QueryConstructor - SQL query: #{@scope.to_sql}"
     @scope

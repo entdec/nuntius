@@ -1,17 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  list: one
-  email: MyString
-  first_name: MyString
-  last_name: MyString
-  phone_number: MyString
-  tags: MyString
+romeo:
+  list: valentines
+  email: romeo@example.com
+  first_name: Romeo
+  last_name: Montague
+  phone_number: +1
+  tags: romeo
 
-two:
-  list: two
-  email: MyString
-  first_name: MyString
-  last_name: MyString
-  phone_number: MyString
-  tags: MyString
+blitzer:
+  list: helpers
+  email: blitzer@example.com
+  first_name: Blitzer
+  last_name: Reindeer
+  phone_number: +1
+  tags: reindeer

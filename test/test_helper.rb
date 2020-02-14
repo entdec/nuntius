@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'mail'
+
 # Configure Rails Environment
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../test/dummy/config/environment.rb', __dir__)
@@ -18,3 +20,9 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.file_fixture_path = ActiveSupport::TestCase.fixture_path + '/files'
   ActiveSupport::TestCase.fixtures :all
 end
+
+Mail.defaults do
+  delivery_method :test
+end
+
+Rails.application.routes.default_url_options[:host] = 'localhost:3000'

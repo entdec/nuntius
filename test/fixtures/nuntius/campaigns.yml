@@ -1,17 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  list: one
-  from: MyString
-  subject: MyString
-  text: MyText
-  html: MyText
+valentines_day:
+  name: Valentines day 2020
+  list: valentines
+  from: valentine@example.com
+  subject: Happy Valentines day 2020
+  text: Valentines day 2020!
+  html: Valentines day 2020!
 
-two:
-  name: MyString
-  list: two
-  from: MyString
-  subject: MyString
-  text: MyText
-  html: MyText
+xmas:
+  name: Marry XMAS 2020
+  list: helpers
+  from: santa@example.com
+  subject: Marry XMAS 2020
+  text: Marry XMAS 2020
+  html: Marry XMAS 2020

@@ -16,7 +16,7 @@
       trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
 
     .for-transport.push.sms.voice
-      = f.input :text, as: :code_mirror, input_html: { data: { lang: 'text/plain', height: '80px' } }
+      = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
     - if @campaign.persisted?
       = f.button :button, 'Send', name: 'commit', value: 'send', data: { disable_with: 'Sending' }
 - else

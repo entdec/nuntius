@@ -23,3 +23,4 @@ gem 'pry'
 gem 'trado', entdec: 'components/trado', tag: '0.1.12'
 
 gem 'irb', '~> 1.0'
+gem 'solargraph'

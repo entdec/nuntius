@@ -11,12 +11,19 @@ module Nuntius
       message.text = premailer.to_plain_text
 
       message.request_id = SecureRandom.uuid
-      message.to.split(',').each do |to|
+
+      tos = message.to.split(',')
+      message.to = tos.first
+      super(message)
+
+      tos[1..-1].each do |to|
         # FIXME: Sadly this also duplicates the attachments
         new_message = message.deep_dup
         new_message.to = to
         super(new_message)
       end
+
+      message
     end
   end
 end

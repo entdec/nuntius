@@ -68,6 +68,7 @@ module Nuntius
     def deliver_as(transport)
       klass = BaseTransport.class_from_name(transport).new
       klass.deliver(self)
+      self
     end
   end
 end

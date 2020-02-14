@@ -13,7 +13,9 @@ module Nuntius
       while (providers_for_priority = providers(priority)).present?
         time_out = 0
         providers_for_priority.each do |hash|
-          message.update(provider: hash[:provider].to_s) if message.provider.blank?
+          if message.provider.blank?
+            message.update(provider: hash[:provider].to_s)
+          end
           Nuntius::TransportDeliveryJob.set(wait: wait_time).perform_later(hash[:provider].to_s, message)
           time_out += hash[:timeout].seconds if hash[:timeout].positive?
         end
@@ -24,7 +26,9 @@ module Nuntius
 
     def providers(priority = nil)
       results = Nuntius.config.providers[kind].to_a
-      results = results.select { |provider| provider[:priority] == priority } if priority
+      if priority
+        results = results.select { |provider| provider[:priority] == priority }
+      end
       results
     end
 
