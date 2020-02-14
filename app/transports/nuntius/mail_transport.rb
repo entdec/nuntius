@@ -20,6 +20,7 @@ module Nuntius
         # FIXME: Sadly this also duplicates the attachments
         new_message = message.deep_dup
         new_message.to = to
+        new_message.transport = nil
         super(new_message)
       end
 
