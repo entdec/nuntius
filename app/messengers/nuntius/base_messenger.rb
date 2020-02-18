@@ -65,7 +65,9 @@ module Nuntius
       end
 
       attachment[:filename] ||= uri.path.split('/').last
-      attachment[:io] = attachment[:content].read if attachment[:content].respond_to?(:read)
+      if attachment[:content].respond_to?(:read)
+        attachment[:io] = attachment[:content].read
+      end
 
       if auto_zip && attachment[:io].size > 1024 * 1024
         zip_stream = Zip::OutputStream.write_buffer do |zio|
@@ -148,7 +150,9 @@ module Nuntius
 
       # See if we need to do something additional
       template_scope_proc = self.class.template_scope
-      @templates = @templates.instance_exec(@object, &template_scope_proc) if template_scope_proc
+      if template_scope_proc
+        @templates = @templates.instance_exec(@object, &template_scope_proc)
+      end
 
       @templates
     end

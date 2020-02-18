@@ -9,7 +9,7 @@ module Nuntius
     setting_reader :api_key, required: true, description: 'API key for the Slack workspace'
 
     def deliver
-      client = Slack::Web::Client.new(key: api_key)
+      client = Slack::Web::Client.new(token: api_key)
 
       message.attachments.each do |attachment|
         client.files_upload(
