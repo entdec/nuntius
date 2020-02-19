@@ -147,6 +147,7 @@ module Nuntius
       return @templates if @templates
 
       @templates = Template.unscoped.where(klass: class_name_for(@object), event: @event).where(enabled: true)
+      @templates = @templates.instance_exec(@object, &Nuntius.config.default_template_scope)
 
       # See if we need to do something additional
       template_scope_proc = self.class.template_scope

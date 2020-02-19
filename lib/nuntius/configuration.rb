@@ -16,6 +16,7 @@ module Nuntius
     attr_accessor :visible_scope
     attr_accessor :add_metadata
     attr_accessor :metadata_fields
+    attr_accessor :default_template_scope
 
     def initialize
       @logger = Logger.new(STDOUT)
@@ -29,6 +30,7 @@ module Nuntius
       @add_metadata = -> {}
       @metadata_fields = {}
       @metadata_humanize = ->(data) { data.inspect }
+      @default_template_scope = ->(_object) { all }
     end
 
     # logger [Object].
