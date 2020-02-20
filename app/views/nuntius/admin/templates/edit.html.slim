@@ -17,7 +17,7 @@
     .for-transport.push.sms.voice.slack
       = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
     .for-transport.push.slack
-      = f.input :payload, as: :editor, input_html: { value: YAML.dump(f.object.payload), data: { 'editor-mode': 'application/yaml', height: '80px' } }
+      = f.input :payload, as: :editor, input_html: { data: { 'editor-mode': 'application/yaml', height: '80px' } }
     = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
 
 javascript:

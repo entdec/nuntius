@@ -6,7 +6,9 @@ module Nuntius
   module Admin
     class TemplatesController < ApplicationAdminController
       before_action :set_objects, except: [:index]
-      add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path) if defined? add_breadcrumb
+      if defined? add_breadcrumb
+        add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.templates'), :admin_templates_path)
+      end
 
       def index
         @templates = Nuntius::Template.visible.order(:description)
@@ -47,9 +49,8 @@ module Nuntius
       end
 
       def template_params
-        params.require(:template).permit(:enabled, :klass, :event, :transport, :description, :metadata, :from, :to, :subject, :layout_id, :html, :text, :payload).tap do |w|
+        params.require(:template).permit(:enabled, :klass, :event, :transport, :description, :metadata, :payload, :from, :to, :subject, :layout_id, :html, :text, :payload).tap do |w|
           w[:metadata] = YAML.safe_load(params[:template][:metadata])
-          w[:payload] = YAML.safe_load(params[:template][:payload])
         end
       end
     end
