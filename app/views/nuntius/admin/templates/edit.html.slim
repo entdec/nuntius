@@ -6,7 +6,7 @@
       .col-sm-6
         = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
       .col-sm-6
-        = f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chained-input', 'chained-input-to': '#template_klass' } }
+        = f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chain', 'chain-to': '#template_klass' } }
     = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { class: 'transport' }
     = f.input :from
     = f.input :to
