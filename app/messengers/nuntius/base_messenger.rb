@@ -16,6 +16,9 @@ module Nuntius
       @event = event
       @params = params
       @attachments = []
+
+      # Allow attachments to be passed directly
+      params.fetch(:attachment_urls, []).each { |url| attach(url) }
     end
 
     # Calls the event method on the messenger
@@ -30,13 +33,13 @@ module Nuntius
     def dispatch(filtered_templates)
       filtered_templates.each do |template|
         template.layout = override_layout(template.layout)
-        msg = template.new_message(@object, liquid_context)
+        msg = template.new_message(@object, liquid_context, params)
 
         # Needed because the message is not saved yet
         msg.future_attachments = attachments
 
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
-        transport.deliver(msg)
+        transport.deliver(msg) if msg.to.present?
       end
     end
 
