@@ -5,7 +5,7 @@ module Nuntius
   class BaseMessenger
     include ActiveSupport::Callbacks
 
-    delegate :liquid_variable_name_for, :class_name_for, to: :class
+    delegate :liquid_variable_name_for, :class_name_for, :event_name_for, to: :class
 
     define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
@@ -100,6 +100,8 @@ module Nuntius
       def liquid_variable_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
           obj.first.class.name.demodulize.pluralize.underscore
+        elsif obj.is_a?(Hash)
+          obj.keys.first.to_s
         else
           obj.class.name.demodulize.underscore
         end
@@ -108,8 +110,18 @@ module Nuntius
       def class_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
           obj.first.class.name.demodulize
+        elsif obj.is_a?(Hash)
+          'Custom'
         else
           obj.class.name
+        end
+      end
+
+      def event_name_for(obj, event)
+        if obj.is_a?(Hash)
+          "#{obj.keys.first}##{event}"
+        else
+          event
         end
       end
 
@@ -122,6 +134,8 @@ module Nuntius
       end
 
       def messenger_for_obj(obj)
+        return Nuntius::CustomMessenger if obj.is_a? Hash
+
         messenger_name_for_obj(obj).safe_constantize
       end
 
@@ -146,7 +160,7 @@ module Nuntius
     def select_templates
       return @templates if @templates
 
-      @templates = Template.unscoped.where(klass: class_name_for(@object), event: @event).where(enabled: true)
+      @templates = Template.unscoped.where(klass: class_name_for(@object), event: event_name_for(@object, @event)).where(enabled: true)
       @templates = @templates.instance_exec(@object, &Nuntius.config.default_template_scope)
 
       # See if we need to do something additional
@@ -164,7 +178,8 @@ module Nuntius
         assigns[i.to_s[1..-1]] = instance_variable_get(i)
       end
 
-      assigns.merge(liquid_variable_name_for(@object) => @object)
+      context = { liquid_variable_name_for(@object) => (@object.is_a?(Hash) ? @object[@object.keys.first].deep_stringify_keys : @object) }
+      assigns.merge(context)
     end
   end
 end

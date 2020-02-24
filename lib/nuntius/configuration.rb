@@ -18,6 +18,8 @@ module Nuntius
     attr_accessor :metadata_fields
     attr_accessor :default_template_scope
 
+    attr_accessor :allow_custom_events
+
     def initialize
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
@@ -31,6 +33,7 @@ module Nuntius
       @metadata_fields = {}
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
+      @allow_custom_events = false
     end
 
     # logger [Object].

@@ -5,8 +5,10 @@
     .row
       .col-sm-6
         = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
-      .col-sm-6
+      .col-sm-6.klass.select
         = f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chain', 'chain-to': '#template_klass' } }
+      .col-sm-6.klass.custom
+        = f.input :event, input_html: { placeholder: 'scope#event' }
     = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { class: 'transport' }
     = f.input :from
     = f.input :to
@@ -21,6 +23,16 @@
     = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
 
 javascript:
+  document.querySelector('#template_klass').addEventListener('change', function(e) {
+    if(e.srcElement.value == 'Custom') {
+      document.querySelector('.klass.select').style.display = 'none';
+      document.querySelector('.klass.custom').style.display = '';
+    } else {
+      document.querySelector('.klass.custom').style.display = 'none';
+      document.querySelector('.klass.select').style.display = '';
+    }
+  });
+
   $('.transport').change(function(e){
     var transport = $(this).val();
     $('.for-transport').hide();

@@ -16,6 +16,9 @@ module Nuntius
     validates :html, liquid: true
     validates :text, liquid: true
 
+    validates :event, presence: true
+    validates :event, format: { with: /.+#.+/ }, if: ->(t) { t.klass == 'Custom' }
+
     scope :metadata_blank, lambda { |name|
       where('metadata->>:name IS NULL', name: name)
     }
@@ -63,7 +66,8 @@ module Nuntius
     }
 
     def new_message(object, assigns = {})
-      message = Nuntius::Message.new(template: self, transport: transport, nuntiable: object, metadata: metadata)
+      message = Nuntius::Message.new(template: self, transport: transport, metadata: metadata)
+      message.nuntiable = object unless object.is_a? Hash
 
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
