@@ -4,3 +4,18 @@ Content-Type: application/json
 {"Called":"+31641085630","ToState":"","CallerCountry":"US","Direction":"outbound-api","CallerState":"CA","ToZip":"","CallSid":"CAffe5a23e923aea2d405d97c9c0a7b501","To":"+31641085630","CallerZip":"94105","ToCountry":"NL","ApiVersion":"2010-04-01","CalledZip":"","CalledCity":"","CallStatus":"in-progress","From":"+14153736696","AccountSid":"AC92bf1782ac7790aa62d13f2135a887aa","CalledCountry":"NL","CallerCity":"SAN FRANCISCO","Caller":"+14153736696","FromCountry":"US","ToCity":"","FromCity":"SAN FRANCISCO","CalledState":"","FromZip":"94105","FromState":"CA","message_id":"d7836f0c-10de-47bb-aaaa-2407873aecbe"}
 
 ###
+
+POST https://vorto.dev/nuntius/api/events
+Content-Type: application/json
+
+{
+    "scope": "skepr",
+    "event": "shipped",
+    "locale": "de",
+    "context": {
+        "to": "tom@boxture.com",
+        "smurrefluts": "arentoiesrantinrt",
+        "name": "Foo",
+        "moo": "Cow"
+    }
+}

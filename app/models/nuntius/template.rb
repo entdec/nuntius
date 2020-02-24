@@ -65,12 +65,13 @@ module Nuntius
       result
     }
 
-    def new_message(object, assigns = {})
+    def new_message(object, assigns = {}, params = {})
       message = Nuntius::Message.new(template: self, transport: transport, metadata: metadata)
       message.nuntiable = object unless object.is_a? Hash
 
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
+      locale = params[:locale].to_sym if params[:locale]
 
       message.to = render(:to, assigns, locale).split(',').reject(&:empty?).join(',')
       message.subject = render(:subject, assigns, locale)

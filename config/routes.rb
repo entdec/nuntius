@@ -7,6 +7,12 @@ Nuntius::Engine.routes.draw do
   post 'feedback/awssns' => 'feedback#awssns'
 
   resources :messages
+  resources :campaigns
+
+  namespace :api do
+    resources :events
+  end
+
   namespace :admin do
     resources :campaigns
     resources :layouts
