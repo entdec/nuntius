@@ -9,6 +9,7 @@ require 'nuntius/engine'
 require 'nuntius/configuration'
 require 'nuntius/active_record_helpers'
 require 'nuntius/active_storage_helpers'
+require 'nuntius/i18n_store'
 
 module Nuntius
   ROOT_PATH = Pathname.new(File.join(__dir__, '..'))
@@ -21,6 +22,10 @@ module Nuntius
     def setup
       @config = Configuration.new
       yield config
+    end
+
+    def i18n_store
+      @i18n_store ||= Nuntius::I18nStore.new
     end
 
     def message(event)

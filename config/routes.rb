@@ -15,6 +15,7 @@ Nuntius::Engine.routes.draw do
     end
     resources :messages
     resources :layouts
+    resources :locales
     resources :templates
   end
   root to: 'dashboard#show'

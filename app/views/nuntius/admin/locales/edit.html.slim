@@ -1,0 +1,5 @@
+= ui_form_for(@locale, url: @locale.new_record? ? admin_locales_path : admin_locale_path) do |f|
+  = f.input :key
+  = f.input :data, as: :editor, input_html: { value: YAML.dump(f.object.data), data: { 'editor-mode': 'application/yaml', height: '200px' } }
+  = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
+

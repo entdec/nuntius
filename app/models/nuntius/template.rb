@@ -82,10 +82,12 @@ module Nuntius
     end
 
     def translation_scope
-      scope = %w[nuntius]
+      scope = %w[]
       scope << layout.name.underscore.tr(' ', '_') if layout
       scope << klass.underscore.tr('/', '_')
       scope << event
+      scope << transport
+      scope << description.underscore.gsub(/[^a-z]+/, '_') if description
       scope.join('.')
     end
 
