@@ -8,6 +8,7 @@ Nuntius.setup do |config|
   config.transport :push
   config.transport :sms
   config.transport :voice
+  config.allow_custom_events = true
 
   config.provider :smtp, transport: :mail, settings: lambda { |_obj|
     { from_header: '"Local Express" <do_not_reply@localexpress.nl>', host: 'email-smtp.eu-west-1.amazonaws.com', port: 587, username: '', password: '' }

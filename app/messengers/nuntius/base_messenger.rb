@@ -48,14 +48,14 @@ module Nuntius
     #
     # @param url [String] Attachment url, can be file::// protocol too
     # @param auto_zip [true, false] Whether to auto-zip, off by default
-    def attach(url, auto_zip: false)
-      @attachments ||= []
-
+    def attach(url, options = {})
       attachment = {}
-      uri = URI.parse(url)
-      if uri.scheme == 'file'
+
+      uri = url && URI.parse(url)
+
+      if uri&.scheme == 'file'
         attachment[:io] = File.open(uri.path)
-      else
+      elsif uri
         client = HTTPClient.new
         response = client.get(url, follow_redirect: true)
         attachment[:content_type] = response.content_type
@@ -65,24 +65,34 @@ module Nuntius
                             # Assume IO object
                             response.body
                           end
+      elsif options[:content].respond_to?(:read)
+        attachment[:content_type] = options[:content_type]
+        attachment[:io] = options[:content]
+      else
+        raise 'Cannot add attachment without url or content'
       end
 
-      attachment[:filename] ||= uri.path.split('/').last
-      if attachment[:content].respond_to?(:read)
-        attachment[:io] = attachment[:content].read
-      end
+      # Set the filename
+      attachment[:filename] = options[:filename] || uri.path.split('/').last || 'attachment'
 
-      if auto_zip && attachment[:io].size > 1024 * 1024
+      # (Try to) add file extension if it is missing
+      file_extension = File.extname(attachment[:filename]).delete('.')
+      attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}" if file_extension.blank? && attachment[:content_type]
+
+      # Fix content type if file extension known but content type blank
+      attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s if file_extension
+
+      if options[:auto_zip] && attachment[:io].size > 1024 * 1024
         zip_stream = Zip::OutputStream.write_buffer do |zio|
           zio.put_next_entry attachment[:file_name]
-          zio.write attachment[:content].read
+          zio.write attachment[:io].read
         end
-        attachment[:mime_type] = 'application/zip'
+        attachment[:content_type] = 'application/zip'
         attachment[:io] = zip_stream
       end
 
       @attachments << attachment
-      @attachments
+      attachment
     rescue StandardError => e
       Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
     end

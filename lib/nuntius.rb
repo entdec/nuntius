@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'inky'
+require 'httpclient'
 require 'liquor'
 require 'premailer'
 require 'state_machines-activerecord'
