@@ -2,7 +2,7 @@
 
 module Nuntius
   class Campaign < ApplicationRecord
-    include MetadataScoped
+    include Nuntius::Concerns::MetadataScoped
 
     belongs_to :list
     accepts_nested_attributes_for :list, reject_if: :all_blank

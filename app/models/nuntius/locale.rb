@@ -2,6 +2,6 @@
 
 module Nuntius
   class Locale < ApplicationRecord
-    include MetadataScoped
+    include Nuntius::Concerns::MetadataScoped
   end
 end
