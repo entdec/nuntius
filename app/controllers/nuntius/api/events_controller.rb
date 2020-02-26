@@ -3,7 +3,7 @@
 require_dependency 'nuntius/application_controller'
 
 module Nuntius
-  class Api::EventsController < ActionController::Base
+  class Api::EventsController < ApplicationController
     skip_before_action :verify_authenticity_token
 
     layout false
