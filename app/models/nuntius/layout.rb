@@ -2,7 +2,7 @@
 
 module Nuntius
   class Layout < ApplicationRecord
-    include Concerns::MetadataScoped
+    include MetadataScoped
 
     # TODO: Attachments - use active-storage
     # This is to ensure layouts can have pictures etc

@@ -2,7 +2,7 @@
 
 module Nuntius
   class Template < ApplicationRecord
-    include Concerns::MetadataScoped
+    include MetadataScoped
 
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message', dependent: :nullify

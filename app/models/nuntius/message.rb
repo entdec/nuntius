@@ -11,7 +11,7 @@ module Nuntius
   #   undelivered - have confirmation of non-delivery
   # Not all transports may provide all states
   class Message < ApplicationRecord
-    include Concerns::MetadataScoped
+    include MetadataScoped
 
     belongs_to :campaign, optional: true
     belongs_to :template, optional: true
