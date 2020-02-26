@@ -6,15 +6,17 @@ Content-Type: application/json
 ###
 
 POST https://vorto.dev/nuntius/api/events
+Authorization: Basic dfe6296d272e46978df6c90622e3ba78 -
 Content-Type: application/json
 
 {
-    "scope": "skepr",
+    "scope": "wms",
     "event": "shipped",
-    "locale": "de",
+    "locale": "en",
     "context": {
         "to": "tom@boxture.com",
-        "smurrefluts": "arentoiesrantinrt",
+        "customer_ref": "SBL1234567",
+        "consignee_name": "Sander Helsloot",
         "name": "Foo",
         "moo": "Cow"
     }
