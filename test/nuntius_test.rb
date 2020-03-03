@@ -28,6 +28,12 @@ class Nuntius::Test < ActiveSupport::TestCase
       assert_equal 'image/png', attachment[:content_type]
     end
 
+    VCR.use_cassette('boxture_logo_with_content_disposition', match_requests_on: [:body]) do
+      attachment = messenger.attach(url: "https://www.boxture.com/assets/images/logo.png", filename: 'box.png')
+      assert_equal 'box.png', attachment[:filename]
+      assert_equal 'image/png', attachment[:content_type]
+    end
+
     attachment = messenger.attach(content: StringIO.new('test'), filename: 'test.pdf')
     assert_equal 'test.pdf', attachment[:filename]
     assert_equal 'application/pdf', attachment[:content_type]
