@@ -23,19 +23,21 @@
     = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
 
 javascript:
-  document.querySelector('#template_klass').addEventListener('change', function(e) {
-    if(e.srcElement.value == 'Custom') {
-      document.querySelector('.klass.select').style.display = 'none';
-      document.querySelector('.klass.custom').style.display = '';
-    } else {
-      document.querySelector('.klass.custom').style.display = 'none';
-      document.querySelector('.klass.select').style.display = '';
-    }
-  });
+    (function () {
+        function setKlassInputs() {
+            var isCustom = document.querySelector('#template_klass').value == 'Custom';
 
-  $('.transport').change(function(e){
-    var transport = $(this).val();
-    $('.for-transport').hide();
-    $('.for-transport.'+transport).show();
-  })
-  $('.transport').change();
+            document.querySelector('.klass.select').style.display = isCustom ? 'none' : '';
+            document.querySelector('.klass.custom').style.display = isCustom ? '' : 'none';
+        }
+
+        document.querySelector('#template_klass').addEventListener('change', setKlassInputs);
+        setKlassInputs();
+
+        $('.transport').change(function (e) {
+            var transport = $(this).val();
+            $('.for-transport').hide();
+            $('.for-transport.' + transport).show();
+        })
+        $('.transport').change();
+    })();

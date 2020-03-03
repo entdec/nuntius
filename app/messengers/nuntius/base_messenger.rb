@@ -18,7 +18,7 @@ module Nuntius
       @attachments = []
 
       # Allow attachments to be passed directly
-      params.fetch(:attachment_urls, []).each { |url| attach(url) }
+      params.fetch(:attachments, []).each { |att| attach(att) }
     end
 
     # Calls the event method on the messenger
@@ -43,21 +43,20 @@ module Nuntius
       end
     end
 
-    #
     # Attaches a file to the message
-    #
-    # @param url [String] Attachment url, can be file::// protocol too
-    # @param auto_zip [true, false] Whether to auto-zip, off by default
-    def attach(url, options = {})
+    def attach(options = {})
       attachment = {}
 
-      uri = url && URI.parse(url)
+      uri = options[:url] && URI.parse(options[:url])
 
       if uri&.scheme == 'file'
         attachment[:io] = File.open(uri.path)
       elsif uri
         client = HTTPClient.new
-        response = client.get(url, follow_redirect: true)
+        client.ssl_config.set_default_paths unless Gem.win_platform?
+        response = client.get(options[:url], follow_redirect: true)
+        content_disposition = response.headers['Content-Disposition'] || ''
+        options[:filename] ||= content_disposition[/filename="([^"]+)"/, 1]
         attachment[:content_type] = response.content_type
         attachment[:io] = if response.body.is_a? String
                             StringIO.new(response.body)

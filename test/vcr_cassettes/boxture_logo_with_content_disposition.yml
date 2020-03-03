@@ -1,0 +1,67 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.boxture.com/assets/images/logo.png
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - HTTPClient/1.0 (2.8.3, ruby 2.6.5 (2019-10-01))
+      Accept:
+      - "*/*"
+      Date:
+      - Tue, 03 Mar 2020 10:41:52 GMT
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Tue, 03 Mar 2020 10:41:53 GMT
+      Content-Type:
+      - image/png
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Etag:
+      - W/"a05ba3c6d50618a48545f38affcb2111"
+      Content-Disposition:
+      - inline; filename="boxture_logo.png"
+      Content-Transfer-Encoding:
+      - binary
+      Cache-Control:
+      - public
+      Vary:
+      - Origin
+      X-Request-Id:
+      - b7f415d4-c309-43ae-8f64-e25f9040c5d9
+      X-Runtime:
+      - '0.034441'
+      Alternate-Protocol:
+      - 443:npn-spdy/2
+      Strict-Transport-Security:
+      - max-age=31536000; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Referrer-Policy:
+      - same-origin
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAJ6ElEQVR42sVaCVRU1xlGBdMYm5pzYlPT5ZiatCb09MTjSTS2GsEltbjgMiqbmli1xt20FTEmo+CCZbVGBbSaioqcpEaNGgQcEBxQRsQEVBhhWMIyCMy+vjfz9/5v3gwzMMt7g6Zzzsd7zLvv3u+7/3L/++YFBAzwAwCDCIYQBOGRQ3tHW7w34P/1IYMPJgj0cG04wSiCV1jg+XAPbQOxrx+OuFA4GKZOdSEO05b9hg6Nfp8OiTpKhUQXmUKipObQKDkVGqVA4Dl+h9ewDbbFe1z6IH1i30+X/PjVQb0DCobToZExhGAeFRqpIUcwh0RyBntPHvYBM2OeczfGkyMeEDAIBIIh9nNLaNRfTaERtX1IW02hURYuwLbOYrAv7BP7dliDPR84eZY4fswhMRMI6XIHcSQUEkGZbaR4WcDtvaRvHMPd2AMmT2ZoMyFOOwYPjaT7EAJz2Eowz1nlG7NX2to7LED6YoUwY5CxBizCZeZDIw/bZ52ZtT4uwAy8JQFoyXdguS/1CbqyGqjN8X2tYmX7Zv43kGD3W4QQerOBOSTqNEO+13/duAMR8NkpsJgpsFgsnEBfLHDrWswY7Dj6kIgzAfa44CrCeXFpXrPliHlatEunHrPKyliw9Ci5CyirBOzbY3yw4ynfXZLhEMElsIUgYnJ8ul68KbO1EKSxOyymadGcgpQuKucuoLoOzPNWew1yYnmLkZx3/1Gw1Z6dvJLPAAmTg1NU4rfT9WV0mk4MmU15lnv7EsA0zXeepz5OBovewE2ErAXM0Vu99meyiUBXohunLJrkdZ0QOi3nqVpxOZJP1d6k8HikUwQ1QqFvEYvWAV0j5SagswuotTt9Too9sLunCG4TaoPt1YBH10nWlK5J05dBmq7MQmBFAYh/KW5ARVoiGGdEe7fC4WxuAvR6oLYlclkzrOhKhpAIaPnDwvVuXcleTBEXGpaquVnLkNbepO3k7TjacR0kqUTEdC8ilm4Ei1rrWwBNgy75GKhmfQC6mcvRXby4UiSNrtQ1RVB3ZcKs5/tZwV5VJnUVxfTOvit5hyWUJVC9exeYPImYEQN0fgknK4hqGiHhfAmknM6HrIzzcCk+EyTr4qFr7ho3tVOURT81AqTvhK9kBQT2S5vJyht5zr7vCYdJTFTt3+MSEziDLYs3QulHB+BSQQVoOawJhSojhNerHFggVYDgYTdE1Mhh27VKyE4/C5Vrd0HP7FWOWGifvLDAEQvI3b4JiW+59lqa7qbGRtKzBezIaimA2riPQT3rfahdvg0ysi7AxhsPYPGDxxApU0GdwexTwD2d2UWAO0R/2w5x30jgi8QTFvnC9dATEqEpfeu9YPvmCP8waSmxo2Al6z5WX+TtwHUi/XI+LL3f2W/g44/1PgV0mCifApzxwZ1m6/GDOVAUtuxDVkCQwwIHOguzbO7je/adkaCqhJjmjn6DrW/WQLvJuxtpKRqiZGrOAubXKy0L6npg0ZVbJ3F1dt7CDkrqFpXwFXBIVw5fGe5DtroJhG1a2N6qha0tGlhHyK8lKNWYvArQ0xbYQNrxEYDHWbceiQnn3lQqEomGJyuKpXwFFJtkQFtozuVDXxiJgPg2HS8B8xvUEHa3sT4sdt8LDgFVVVU/T1WXdvAVcIHMvnkAAswERzr1vAXM/rZVviL1yGiHAIlEMiZNU9rDV8BnxIUUtN5vATRBbreBt4A51W2K1SfOjHUIKC4ufs0fAQixqdlvAfa1QNDAX8DyQ5nBDgGXLl36VbKqRO6PgHOG70BNG/0WUKE1kXVDzS8Gqlo6l8QfGOMQEBsb+0JyT5HUHwGYieqpbr8FSA0UrGjkJ+DPFbL6SfNjfupczz2T2FFY6o8AxBVjrd8Cusw0rGnS8Eqj74nvlxPOw5wLucAE2eUT/grI0ks8BrOJpEoDbUuZZgLKzWL2YTMPAY+UMD3vVjbhHMRwZ0uJQbEVp9ezdZCVTzmBOKgrg0pzm1sBYp0akuVaOCjXQyYpL052GSCHZJ7zCiNcVhohi3y3tIGTC1nDG9TWebVdMCn7wkfsStxbSiw7tnNcivqmimsx1xdfGKrBYOlfwJUaW+EvrS39CC0gWNiAs8q1FiL+L9PA7Hvfq3//j4SJ7AIc6FxOD9/bcvU6l3La7T6BBHM7pe4nAC2zW3kXFsu6eRVufTHvkZLC48zCymLC9ScuWwF7HGzMP7qB7If9ciPEdWM9szg5C6g2y7E/2NpZhz7spwCllcy+de7DxzAh4xy6T6DQ+dG+fUv58lu/++X+tvw6T1tKXzilr+oXzA/NjxnrJGluQXST3D8BDUoa0+efxA+kI8a+ObrvQwjnTf2PNlw7HEf2xZCu528FJPqAzLizgEdkjTisu8Vc395VQ/xewVeAY/YnZpz7FDlOFbn5YcVJ0ajdsq8l/sbClySYnQU0UQo4qr/NXEvRlsPq1ma/fH9G4Z1Kwu0XSFCQmzvE21O5Z8KTNocf6C4yMTs0nq6Es/2Y7n0q0UqpyDpR4biOAb2IsxUUNGaesKpm0xtbPxEgt/EZkiAujxZHrP0qZU+ysgTSDeVWEtic02o6QRkp8OzBLKc0cFx/x3E9RVsGa9sbuaZN69z7cph4JDsRObl1HXcPdwW2J8Evbyk5djpFxYiw8BFxRn8PNGyB10Pr4KS+0uX6HtUdH2mVIW/BRWvy2Ss5yCUAOXH9VZONBzTVK38Tn7jIWgJIyU1zXZkbqB5GgJo2wH/0d/u1Wdcu8+o2SH7KlwVfEw6/Ri4e/d7TJxeYG54hGLOpMPNMUk8xI4IJbK3YZ3a6aqxjtpsqDwISlJWwpLHLJddjwCJ5dJvJZy/jzL+KHKaKRIF+/UojFDFPv1DE6FU5+xP3t+cbGT9n4sK7EAxmrFL/a6hhLNL3eir5bn17gzNxKwoJu9tkfPvQ5wdwzAGRd3an4ODgoeiHM/6+PGJH1TkJWgMzlF2ILT74rBllTGJIUEqohY0kz5NFau6DTpheIJG8umpzFOPzZEzebuM1sHOFKAKfBLy+4vP43Z8+PF/3z+4iYC1icy8dBnuZd5A2ve3LYJWsDmbeqK6bcPDf8aTvN3CMYGHu0ICn8RrCaklGEOtSPxs2csS4yIwdcdtunyre2/KNEq2CKzgzwzbruMD21E/MtElS3IB93+cpYyuyi+ccTIgLGjlyHPbJKc8/CWuwQp4leIngt28KpodFZ32yc9P1jJztd8+W73p0Qbq36Wr7vra8LgSe766/KI2ryinHNtgW7yH3jmX7eJYh/rRfNegbGyLboodinmeJYOC9/uKoF8ePC3nn3SnhM2Yi8By/w2tsm5fYe4KwD+EP+bKHO4vgxqKmpmZobm7uUFYQWgfff/gxi+fY74KwDe6k8J4n8brN/wB7ntY0vVtqHwAAAABJRU5ErkJggg==
+    http_version: 
+  recorded_at: Tue, 03 Mar 2020 10:41:53 GMT
+recorded_with: VCR 4.0.0

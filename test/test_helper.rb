@@ -25,4 +25,16 @@ Mail.defaults do
   delivery_method :test
 end
 
+require 'webmock/minitest'
+require 'vcr'
+
+WebMock.allow_net_connect!
+
+VCR.configure do |config|
+  config.cassette_library_dir = 'test/vcr_cassettes'
+  config.hook_into :webmock
+  config.default_cassette_options = { record: :new_episodes, match_requests_on: [:host] }
+  # config.allow_http_connections_when_no_cassette = true
+end
+
 Rails.application.routes.default_url_options[:host] = 'localhost:3000'
