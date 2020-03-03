@@ -24,3 +24,8 @@ gem 'trado', entdec: 'components/trado', tag: '0.1.12'
 
 gem 'irb', '~> 1.0'
 gem 'solargraph'
+
+group :test do
+  gem 'vcr', '~> 4.0', require: false
+  gem 'webmock', '~> 3.3', require: false
+end
