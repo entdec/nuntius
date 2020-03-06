@@ -12,19 +12,23 @@ module Nuntius
 
       message.request_id = SecureRandom.uuid
 
-      tos = message.to.split(',')
+      tos = message.to.split(/[\s;,]+/)
+
+      messages = []
       message.to = tos.first
-      super(message)
+      messages << message
 
       tos[1..-1].each do |to|
         # FIXME: Sadly this also duplicates the attachments
         new_message = message.deep_dup
         new_message.to = to
-        new_message.transport = nil
-        super(new_message)
+
+        messages << new_message
       end
 
-      message
+      messages.each { |m| super(m) }
+
+      messages.first
     end
   end
 end
