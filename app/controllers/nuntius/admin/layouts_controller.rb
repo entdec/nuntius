@@ -34,6 +34,11 @@ module Nuntius
         respond @layout.update(layout_params), action: :edit
       end
 
+      def destroy
+        @layout = Nuntius::Layout.visible.find(params[:id])
+        respond @layout.destroy, notice: 'The layout was deleted', error: 'There were problems deleting the layout'
+      end
+
       private
 
       def layout_params
