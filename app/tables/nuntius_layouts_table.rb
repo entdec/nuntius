@@ -8,7 +8,7 @@ class NuntiusLayoutsTable < ActionTable::ActionTable
 
   column :actions, title: '', sortable: false do |layout|
     content_tag(:span, class: 'btn-group btn-group-xs') do
-      concat link_to(content_tag(:i, nil, class: 'fa fa-trash'), nuntius.admin_layout_url(layout), data: { confirm: 'Are you sure?', method: :delete }, class: 'btn btn-danger')
+      concat link_to(content_tag(:i, nil, class: 'fa fa-trash'), nuntius.admin_layout_url(layout), data: { confirm: 'Are you sure you want to delete the layout?', method: :delete }, class: 'btn btn-xs btn-danger')
     end
   end
 
