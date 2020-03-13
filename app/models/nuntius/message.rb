@@ -26,8 +26,9 @@ module Nuntius
       future_attachments&.each do |attachment|
         # Rewind IO, just to be sure
         attachment[:io].rewind if attachment.key?(:io)
-
-        message.attachments.attach(attachment)
+        message.attachments.attach(io: attachment[:io],
+                                   filename: attachment[:filename],
+                                   content_type: attachment[:content_type])
       end
     end
 

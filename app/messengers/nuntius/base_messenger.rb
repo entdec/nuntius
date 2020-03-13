@@ -76,10 +76,14 @@ module Nuntius
 
       # (Try to) add file extension if it is missing
       file_extension = File.extname(attachment[:filename]).delete('.')
-      attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}" if file_extension.blank? && attachment[:content_type]
+      if file_extension.blank? && attachment[:content_type]
+        attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}"
+      end
 
       # Fix content type if file extension known but content type blank
-      attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s if file_extension
+      if file_extension
+        attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s
+      end
 
       if options[:auto_zip] && attachment[:io].size > 1024 * 1024
         zip_stream = Zip::OutputStream.write_buffer do |zio|
