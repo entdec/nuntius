@@ -23,7 +23,7 @@ module Nuntius
     attr_accessor :future_attachments
 
     after_save do |message|
-      future_attachments&.each do |attachment|
+      while (attachment = future_attachments&.pop)
         # Rewind IO, just to be sure
         attachment[:io].rewind if attachment.key?(:io)
         message.attachments.attach(io: attachment[:io],
