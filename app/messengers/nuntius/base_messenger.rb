@@ -108,9 +108,9 @@ module Nuntius
         return
       end
 
-      attachment[:io].rewind
-
       @attachments = @attachments.map do |to_store|
+        to_store[:io].rewind
+
         attachment = Nuntius::Attachment.new
         attachment.content.attach(io: to_store[:io],
                                   filename: to_store[:filename],
