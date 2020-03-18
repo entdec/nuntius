@@ -56,7 +56,7 @@ module Nuntius
 
     # Removes only pending child messages
     def cleanup!
-      Nuntius::Message.where(status: 'pending').where(parent_message: self).delete_all
+      Nuntius::Message.where(status: 'pending').where(parent_message: self).destroy_all
     end
 
     def nuntius_provider(message)
