@@ -13,7 +13,7 @@ module Nuntius
   class Message < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
 
-    has_and_belongs_to_many :attachments, :class_name => 'Attachment'
+    has_and_belongs_to_many :attachments, class_name: 'Attachment'
 
     belongs_to :campaign, optional: true
     belongs_to :template, optional: true

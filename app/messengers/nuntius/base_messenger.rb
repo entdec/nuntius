@@ -31,12 +31,12 @@ module Nuntius
 
     # Turns the templates in messages, and dispatches the messages to transports
     def dispatch(filtered_templates)
-      store_attachments
+      stored_attachments = store_attachments
 
       filtered_templates.each do |template|
         template.layout = override_layout(template.layout)
         msg = template.new_message(@object, liquid_context, params)
-        msg.attachments = attachments
+        msg.attachments = stored_attachments
 
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg) if msg.to.present?
@@ -108,7 +108,7 @@ module Nuntius
         return
       end
 
-      @attachments = @attachments.map do |to_store|
+      @attachments.map do |to_store|
         to_store[:io].rewind
 
         attachment = Nuntius::Attachment.new
