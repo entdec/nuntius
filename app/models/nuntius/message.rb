@@ -22,6 +22,8 @@ module Nuntius
 
     validates :transport, presence: true
 
+    after_destroy :cleanup_attachments
+
     # Weird loading sequence error, is fixed by the lib/nuntius/helpers
     # begin
     #   has_many_attached :attachments
@@ -47,6 +49,12 @@ module Nuntius
     # Removes only pending child messages
     def cleanup!
       Nuntius::Message.where(status: 'pending').where(parent_message: self).destroy_all
+    end
+
+    def cleanup_attachments
+      attachments.each do |attachment|
+        attachment.destroy if attachment.messages.blank?
+      end
     end
 
     def nuntius_provider(message)
