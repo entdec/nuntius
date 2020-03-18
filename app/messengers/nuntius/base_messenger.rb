@@ -31,12 +31,12 @@ module Nuntius
 
     # Turns the templates in messages, and dispatches the messages to transports
     def dispatch(filtered_templates)
+      store_attachments
+
       filtered_templates.each do |template|
         template.layout = override_layout(template.layout)
         msg = template.new_message(@object, liquid_context, params)
-
-        # Needed because the message is not saved yet
-        msg.future_attachments = attachments
+        msg.attachments = attachments
 
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg) if msg.to.present?
@@ -98,6 +98,26 @@ module Nuntius
       attachment
     rescue StandardError => e
       Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
+    end
+
+    def store_attachments
+      return if @attachments.blank?
+
+      unless Nuntius.active_storage_enabled?
+        Nuntius.config.logger.error 'ActiveStorage is not enabled, this is required to use attachments with Nuntius.'
+        return
+      end
+
+      attachment[:io].rewind
+
+      @attachments = @attachments.map do |to_store|
+        attachment = Nuntius::Attachment.new
+        attachment.content.attach(io: to_store[:io],
+                                  filename: to_store[:filename],
+                                  content_type: to_store[:content_type])
+
+        attachment
+      end
     end
 
     # Allow messengers to override the selected layout
