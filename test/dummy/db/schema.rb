@@ -29,10 +29,10 @@ ActiveRecord::Schema.define(version: 2020_03_18_095339) do
   end
 
   create_table "nuntius_attachments_messages", id: false, force: :cascade do |t|
-    t.bigint "nuntius_messsages_id"
-    t.bigint "nuntius_attachments_id"
-    t.index ["nuntius_attachments_id"], name: "index_nuntius_attachments_messages_on_nuntius_attachments_id"
-    t.index ["nuntius_messsages_id"], name: "index_nuntius_attachments_messages_on_nuntius_messsages_id"
+    t.uuid "message_id"
+    t.uuid "attachment_id"
+    t.index ["attachment_id"], name: "index_nuntius_attachments_messages_on_attachment_id"
+    t.index ["message_id"], name: "index_nuntius_attachments_messages_on_message_id"
   end
 
   create_table "nuntius_campaigns", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -137,6 +137,8 @@ ActiveRecord::Schema.define(version: 2020_03_18_095339) do
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
   end
 
+  add_foreign_key "nuntius_attachments_messages", "nuntius_attachments", column: "attachment_id"
+  add_foreign_key "nuntius_attachments_messages", "nuntius_messages", column: "message_id"
   add_foreign_key "nuntius_campaigns", "nuntius_layouts", column: "layout_id"
   add_foreign_key "nuntius_campaigns", "nuntius_lists", column: "list_id"
   add_foreign_key "nuntius_messages", "nuntius_campaigns", column: "campaign_id"
