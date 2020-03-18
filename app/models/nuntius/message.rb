@@ -22,18 +22,6 @@ module Nuntius
 
     validates :transport, presence: true
 
-    attr_accessor :future_attachments
-
-    after_save do |message|
-      while (attachment = future_attachments&.pop)
-        # Rewind IO, just to be sure
-        attachment[:io].rewind if attachment.key?(:io)
-        message.attachments.attach(io: attachment[:io],
-                                   filename: attachment[:filename],
-                                   content_type: attachment[:content_type])
-      end
-    end
-
     # Weird loading sequence error, is fixed by the lib/nuntius/helpers
     # begin
     #   has_many_attached :attachments
