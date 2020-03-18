@@ -3,6 +3,6 @@
 module Nuntius::ActiveStorageHelpers
   extend ActiveSupport::Concern
   included do
-    has_many_attached :attachments
+    has_one_attached :content
   end
 end
