@@ -41,6 +41,10 @@ module Nuntius
 
       self
     end
+
+    def active_storage_enabled?
+      defined?(ActiveStorage::Attachment)
+    end
   end
 
   # Include helpers
