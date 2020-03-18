@@ -1,4 +1,4 @@
-class CreateNuntiusAttachments < ActiveRecord::Migration[6.0]
+class CreateNuntiusAttachments < ActiveRecord::Migration[5.2]
   def change
     create_table :nuntius_attachments, id: :uuid do |t|
       t.timestamps
