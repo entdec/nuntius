@@ -1,11 +1,43 @@
 # Nuntius
-Messaging and notification for Ruby on Rails
+Nuntius offers messaging and notifications for Ruby on Rails. 
+
+## Setup
+Add Nuntius to your Gemfile, run bundle install and add an initializer (config/initializers/nuntius.rb)
+
+```ruby
+Nuntius.setup do
+  # Have Nuntius log to the Rails.logger
+  config.logger = Rails.logger
+
+  # Allow custom events (default = false)
+  # Enable this option to allow use of Nuntius with a Hash 
+  config.allow_custom_events = true
+ 
+  # Enable e-mail
+  config.transport :mail
+  # Enable push notifications
+  config.transport :push 
+  # Enable SMS
+  config.transport :sms
+  # Enable voice
+  config.transport :voice
+  # Enable Slack
+  config.transport :slack
+
+  # ... to be explained further
+end
+```
 
 ## Usage
 
 Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
 ```ruby
  Nuntius.with(shipment).message(event.to_s)
+```
+
+When custom events are enabled you can also do the following"
+```ruby
+ Nuntius.with( { whs: { to: 'tom@boxture.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ]).message('shipped')
 ```
 
 another, more direct way of using Nuntius is by just instantiating a message:
