@@ -22,7 +22,7 @@ module Nuntius
 
     validates :transport, presence: true
 
-    after_destroy :cleanup_attachments
+    before_destroy :cleanup_attachments
 
     # Weird loading sequence error, is fixed by the lib/nuntius/helpers
     # begin
@@ -53,7 +53,7 @@ module Nuntius
 
     def cleanup_attachments
       attachments.each do |attachment|
-        attachment.destroy if attachment.messages.blank?
+        attachment.destroy if attachment.messages.where.not(id: id).blank?
       end
     end
 
