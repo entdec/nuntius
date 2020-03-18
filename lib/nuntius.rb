@@ -43,7 +43,7 @@ module Nuntius
     end
 
     def active_storage_enabled?
-      defined?(ActiveStorage::Attachment)
+      ActiveRecord::Base.connection.table_exists? "active_storage_attachments"
     end
   end
 
