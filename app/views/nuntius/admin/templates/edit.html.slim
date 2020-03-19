@@ -1,43 +1,63 @@
+
 - present(@template, TemplatePresenter) do |template|
   = ui_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
-    = f.input :enabled
-    = f.input :description
-    .row
-      .col-sm-6
-        = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
-      .col-sm-6.klass.select
-        = f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chain', 'chain-to': '#template_klass' } }
-      .col-sm-6.klass.custom
-        = f.input :event, input_html: { placeholder: 'scope#event' }
-    = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { class: 'transport' }
-    = f.input :from
-    = f.input :to
-    .for-transport.mail
-      = f.input :subject, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
-      = f.association :layout, collection: @layouts
-      = f.input :html, as: :editor, input_html: { data: { 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
-    .for-transport.push.sms.voice.slack
-      = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
-    .for-transport.push.slack
-      = f.input :payload, as: :editor, input_html: { data: { 'editor-mode': 'application/yaml', height: '80px' } }
-    = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
+    - ui_tab :edit
+      = f.input :enabled
+      = f.input :description
+      .row
+        .col-sm-6= f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
+        .col-sm-6.klass.select= f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chained-input', 'chained-input-to': '#template_klass' } }
+        .col-sm-6.klass.custom= f.input :event, input_html: { placeholder: 'scope#event' }
+      = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { class: 'transport' }
+      = f.input :from
+      = f.input :to
+      .for-transport.mail
+        = f.input :subject, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
+        = f.association :layout, collection: @layouts
+        = f.input :html, as: :editor, input_html: { data: { 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
+      .for-transport.push.sms.voice.slack
+        = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
+      .for-transport.push.slack
+        = f.input :payload, as: :editor, input_html: { data: { 'editor-mode': 'application/yaml', height: '80px' } }
+      = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
+    - if @template.messages.size.positive?
+      = ui_table_tab :nuntius_messages, title: "#{@template.messages.size} messages", parameters: { template_id: @template.id }
+
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'ui-button')
 
 javascript:
-    (function () {
-        function setKlassInputs() {
-            var isCustom = document.querySelector('#template_klass').value == 'Custom';
+  (function () {
+    function setKlassInputs() {
+      if (document.querySelector('#template_klass').value == 'Custom') {
+        input = document.querySelector('.klass.select');
+        input.style.display = 'none'
+        $(input).find('select').prop("disabled", true)
 
-            document.querySelector('.klass.select').style.display = isCustom ? 'none' : '';
-            document.querySelector('.klass.custom').style.display = isCustom ? '' : 'none';
-        }
+        input = document.querySelector('.klass.custom');
+        input.style.display = ''
+        $(input).find('input').prop("disabled", false)
+      } else {
+        input = document.querySelector('.klass.custom');
+        input.style.display = 'none'
+        $(input).prop("disabled", true)
+        $(input).find('input').prop("disabled", true)
 
-        document.querySelector('#template_klass').addEventListener('change', setKlassInputs);
-        setKlassInputs();
+        input = document.querySelector('.klass.select');
+        input.style.display = ''
+        $(input).prop("disabled", false)
+        $(input).find('select').prop("disabled", false)
+      }
+    }
 
-        $('.transport').change(function (e) {
-            var transport = $(this).val();
-            $('.for-transport').hide();
-            $('.for-transport.' + transport).show();
-        })
-        $('.transport').change();
-    })();
+    document.querySelector('#template_klass').addEventListener('change', setKlassInputs);
+    setKlassInputs();
+
+    $('.transport').change(function (e) {
+      var transport = $(this).val();
+      $('.for-transport').hide();
+      $('.for-transport.' + transport).show();
+    })
+    $('.transport').change();
+  })();

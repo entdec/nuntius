@@ -1,1 +1,4 @@
-= ui_table '/action_table/nuntius_locales', :nuntius_locales
+= ui_table :nuntius_locales
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.add'), new_admin_locale_path, class: 'ui-button primary')

@@ -1,9 +1,10 @@
 .row
   .col-12
     = reportlet(:'nuntius/daily_messages_per_template', parameters: {template_ids: @templates.map(&:id)})
-= ui_table '/action_table/nuntius_messages', :nuntius_messages
+= ui_table :nuntius_messages
 
 - content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'btn')
-  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'btn')
-  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'btn')
+  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.locales'), admin_locales_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'ui-button')

@@ -101,7 +101,7 @@ module Nuntius
     end
 
     def store_attachments
-      return if @attachments.blank?
+      return [] if @attachments.blank?
 
       unless Nuntius.active_storage_enabled?
         Nuntius.config.logger.error 'ActiveStorage is not enabled, this is required to use attachments with Nuntius.'

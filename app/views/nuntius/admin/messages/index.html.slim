@@ -1,7 +1,8 @@
-= ui_table '/action_table/nuntius_messages', :nuntius_messages, parameters: {template_id: params[:template_id]}
+= ui_table :nuntius_messages, parameters: {template_id: params[:template_id]}
 
 - content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'btn')
-  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'btn')
-  =< link_to(t('nuntius.context_menu.messages'), admin_messages_path, class: 'btn')
-  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'btn')
+  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.locales'), admin_locales_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'ui-button')

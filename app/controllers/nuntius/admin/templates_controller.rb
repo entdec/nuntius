@@ -21,7 +21,7 @@ module Nuntius
 
       def create
         @template = Nuntius::Template.new(template_params)
-        respond @template.save
+        respond @template.save, action: :edit
       end
 
       def edit

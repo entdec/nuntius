@@ -19,6 +19,7 @@
       = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
     - if @campaign.persisted?
       = f.button :button, 'Send', name: 'commit', value: 'send', data: { disable_with: 'Sending' }
+
 - else
   h2 = @campaign.name
   p We're sending this campaign, you can no longer make any changes. This is the audience we're sending it to:
@@ -34,8 +35,11 @@
           td = link_to message.status, admin_message_path(message)
           td = message.to
 
-javascript:
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
+  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'ui-button')
 
+javascript:
   $('.transport').change(function(e){
     var transport = $(this).val();
     $('.for-transport').hide();

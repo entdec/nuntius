@@ -3,3 +3,5 @@
   = f.input :data, as: :editor, input_html: { value: YAML.dump(f.object.data), data: { 'editor-mode': 'application/yaml', height: '200px' } }
   = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
 
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')

@@ -4,6 +4,9 @@
   = f.input :phone_number
   = f.input :email
 
-  = f.button :button, 'Save', name: 'commit', value: 'save', class: 'btn-primary', data: { disable_with: 'Save' }
+  = f.button :button, 'Save', name: 'commit', value: 'save', class: 'ui-button primary', data: { disable_with: 'Save' }
   - if @subscriber.persisted?
     = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
+
+- content_for :context_menu do
+  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
