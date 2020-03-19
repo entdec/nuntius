@@ -13,6 +13,8 @@ module Nuntius
   class Message < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
 
+    has_and_belongs_to_many :attachments, class_name: 'Attachment'
+
     belongs_to :campaign, optional: true
     belongs_to :template, optional: true
     belongs_to :parent_message, class_name: 'Message', optional: true
@@ -20,17 +22,7 @@ module Nuntius
 
     validates :transport, presence: true
 
-    attr_accessor :future_attachments
-
-    after_save do |message|
-      while (attachment = future_attachments&.pop)
-        # Rewind IO, just to be sure
-        attachment[:io].rewind if attachment.key?(:io)
-        message.attachments.attach(io: attachment[:io],
-                                   filename: attachment[:filename],
-                                   content_type: attachment[:content_type])
-      end
-    end
+    before_destroy :cleanup_attachments
 
     # Weird loading sequence error, is fixed by the lib/nuntius/helpers
     # begin
@@ -56,7 +48,13 @@ module Nuntius
 
     # Removes only pending child messages
     def cleanup!
-      Nuntius::Message.where(status: 'pending').where(parent_message: self).delete_all
+      Nuntius::Message.where(status: 'pending').where(parent_message: self).destroy_all
+    end
+
+    def cleanup_attachments
+      attachments.each do |attachment|
+        attachment.destroy if attachment.messages.where.not(id: id).blank?
+      end
     end
 
     def nuntius_provider(message)

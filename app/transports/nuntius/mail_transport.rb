@@ -22,6 +22,7 @@ module Nuntius
         # FIXME: Sadly this also duplicates the attachments
         new_message = message.deep_dup
         new_message.to = to
+        new_message.attachments = message.attachments if message.attachments.present?
 
         messages << new_message
       end

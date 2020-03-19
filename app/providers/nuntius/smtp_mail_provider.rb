@@ -48,10 +48,8 @@ module Nuntius
         end
       end
 
-      if defined?(ActiveStorage::Attachment)
-        message&.attachments&.each do |attachment|
-          mail.attachments[attachment.filename.to_s] = { mime_type: attachment.content_type, content: attachment.download }
-        end
+      message.attachments.each do |attachment|
+        mail.attachments[attachment.filename.to_s] = { mime_type: attachment.content_type, content: attachment.download }
       end
 
       response = mail.deliver!
