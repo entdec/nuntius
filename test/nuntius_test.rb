@@ -34,4 +34,10 @@ class Nuntius::Test < ActiveSupport::TestCase
     assert_equal 'test.pdf', attachment[:filename]
     assert_equal 'application/pdf', attachment[:content_type]
   end
+
+  test 'messenger for superclass' do
+    assert_nothing_raised do
+      Nuntius.with(StiChild.create).message(:created)
+    end
+  end
 end

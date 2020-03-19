@@ -135,11 +135,19 @@ module Nuntius
       #
       def liquid_variable_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
-          obj.first.class.name.demodulize.pluralize.underscore
+          if obj.respond_to?(:base_class)
+            obj.first.class.base_class.name.demodulize.pluralize.underscore
+          else
+            obj.first.class.name.demodulize.pluralize.underscore
+          end
         elsif obj.is_a?(Hash)
           obj.keys.first.to_s
         else
-          obj.class.name.demodulize.underscore
+          if obj.respond_to?(:base_class)
+            obj.class.base_class.name.demodulize.underscore
+          else
+            obj.class.name.demodulize.underscore
+          end
         end
       end
 
@@ -148,6 +156,8 @@ module Nuntius
           obj.first.class.name.demodulize
         elsif obj.is_a?(Hash)
           'Custom'
+        elsif obj.is_a?(Class)
+          obj.name.demodulize
         else
           obj.class.name
         end
@@ -172,11 +182,19 @@ module Nuntius
       def messenger_for_obj(obj)
         return Nuntius::CustomMessenger if obj.is_a? Hash
 
-        messenger_name_for_obj(obj).safe_constantize
+        klass = messenger_name_for_obj(obj).safe_constantize
+
+        # Lets check 2 levels above to see if a messager exists for a possible super class (think STI)
+        klass ||= messenger_name_for_obj(obj.class.superclass).safe_constantize
+        klass ||= messenger_name_for_obj(obj.class.superclass.superclass).safe_constantize
+
+        raise Nuntius::MissingMessengerException.new(self), "messenger missing for #{obj.class.name}" unless klass
+
+        klass
       end
 
       def messenger_name_for_obj(obj)
-        "#{Nuntius::BaseMessenger.class_name_for(obj)}Messenger"
+        "#{class_name_for(obj)}Messenger"
       end
 
       def locale(locale = nil)
