@@ -40,4 +40,11 @@ class Nuntius::Test < ActiveSupport::TestCase
       Nuntius.with(StiChild.create).message(:created)
     end
   end
+
+  test 'check liquid variable names' do
+    assert_equal 'sti_bases', StiBaseMessenger.liquid_variable_name_for([StiChild.new])
+    assert_equal 'sti_base', StiBaseMessenger.liquid_variable_name_for(StiChild.new)
+    assert_equal 'accounts', StiBaseMessenger.liquid_variable_name_for([Account.new])
+    assert_equal 'account', StiBaseMessenger.liquid_variable_name_for(Account.new)
+  end
 end

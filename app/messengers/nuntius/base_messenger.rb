@@ -135,7 +135,7 @@ module Nuntius
       #
       def liquid_variable_name_for(obj)
         if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
-          if obj.respond_to?(:base_class)
+          if obj.first.class.respond_to?(:base_class)
             obj.first.class.base_class.name.demodulize.pluralize.underscore
           else
             obj.first.class.name.demodulize.pluralize.underscore
@@ -143,7 +143,7 @@ module Nuntius
         elsif obj.is_a?(Hash)
           obj.keys.first.to_s
         else
-          if obj.respond_to?(:base_class)
+          if obj.class.respond_to?(:base_class)
             obj.class.base_class.name.demodulize.underscore
           else
             obj.class.name.demodulize.underscore
