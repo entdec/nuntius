@@ -35,6 +35,10 @@ class NuntiusMessagesTable < ActionTable::ActionTable
       @filtered_scope = @filtered_scope.where(template_id: params[:template_id])
     end
 
+    if params[:nuntiable_id]
+      @filtered_scope = @filtered_scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type])
+    end
+
     if params[:query].present?
       @filtered_scope = @filtered_scope.where("concat_ws(' ', to, subject) ILIKE :query", query: "%#{params[:query]}%")
     end
