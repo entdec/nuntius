@@ -3,6 +3,9 @@ en:
     flash:
       error: There were problems saving the %{model}
       notice: The %{model} was saved successfully
+    context_menu:
+      root: Root
+      resend: Resend
     breadcrumbs:
       nuntius: Nuntius
       dashboard: Dashboard

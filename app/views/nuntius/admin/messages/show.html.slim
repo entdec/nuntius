@@ -1,3 +1,7 @@
+- content_for :context_menu do
+  =< button_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
+  =< button_to(t('nuntius.context_menu.resend'), resend_admin_message_path(@message), class: 'ui-button')
+
 = ui_tabs(:message, title: @message.template&.description)
   - ui_tab(:preview)
     table.table
@@ -69,5 +73,3 @@
           td
             = time_ago_in_words(@message.created_at)
             = " (#{I18n.l(@message.created_at, format: :short)})"
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')

@@ -19,7 +19,11 @@ Nuntius::Engine.routes.draw do
     resources :lists do
       resources :subscribers, controller: 'lists/subscribers'
     end
-    resources :messages
+    resources :messages do
+      member do
+        post 'resend', action: 'resend'
+      end
+    end
     resources :layouts
     resources :locales
     resources :templates
