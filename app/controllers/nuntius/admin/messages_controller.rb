@@ -21,6 +21,7 @@ module Nuntius
 
       def resend
         @message = Nuntius::Message.visible.find(params[:id])
+        @message.resend
         render :show
       end
     end
