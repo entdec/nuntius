@@ -4,8 +4,8 @@
 module Nuntius
   class TransportDeliveryJob < ApplicationJob
     def perform(provider_name, message)
-      return if message.delivered?
-      return if message.parent_message&.delivered?
+      return if message.delivered_or_blocked?
+      return if message.parent_message&.delivered_or_blocked?
 
       if message.provider != provider_name
         original_message = message
@@ -22,7 +22,7 @@ module Nuntius
       message.save! unless message.pending?
 
       # First refresh check is after 5 seconds
-      if message.delivered?
+      if message.delivered_or_blocked?
         message.cleanup!
       else
         Nuntius::TransportRefreshJob.set(wait: 5).perform_later(provider_name, message)

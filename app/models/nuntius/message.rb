@@ -38,8 +38,16 @@ module Nuntius
       status == 'sent'
     end
 
+    def blocked?
+      status == 'blocked'
+    end
+
     def delivered?
       status == 'delivered'
+    end
+
+    def delivered_or_blocked?
+      delivered? || blocked?
     end
 
     def undelivered?

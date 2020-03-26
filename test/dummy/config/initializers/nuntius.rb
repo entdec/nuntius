@@ -11,7 +11,7 @@ Nuntius.setup do |config|
   config.allow_custom_events = true
 
   config.provider :smtp, transport: :mail, settings: lambda { |_obj|
-    { from_header: '"Local Express" <do_not_reply@localexpress.nl>', host: 'email-smtp.eu-west-1.amazonaws.com', port: 587, username: '', password: '' }
+    { from_header: '"Local Express" <do_not_reply@localexpress.nl>', host: 'email-smtp.eu-west-1.amazonaws.com', port: 587, username: '', password: '', allow_list: ['example.com', 'mark@boxture.com'] }
   }
 
   config.provider :houston, transport: :push, settings: { certificate: '' }

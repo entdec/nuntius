@@ -11,8 +11,18 @@ module Nuntius
     setting_reader :port, required: true, description: 'Port (example: 578)'
     setting_reader :username, required: true, description: 'Username (nuntius@entdec.com)'
     setting_reader :password, required: true, description: 'Password'
+    setting_reader :allow_list, required: false, default: [], description: 'Allow list (example: [boxture.com, tom@degrunt.net])'
 
     def deliver
+      if settings[:allow_list].present?
+        mail_to          = Mail::Address.new(message.to.downcase)
+        allow_list_match = settings[:allow_list].map(&:downcase).detect do |allow|
+          allow == (allow.include?('@') ? mail_to.to_s : mail_to.domain)
+        end
+
+        return block unless allow_list_match.present?
+      end
+
       mail = if message.from.present?
                Mail.new(sender: from_header, from: message.from)
              else
@@ -58,6 +68,11 @@ module Nuntius
       message.status = 'undelivered'
       message.status = 'sent' if Rails.env.test? ? true : response.success?
 
+      message
+    end
+
+    def block
+      message.status = 'blocked'
       message
     end
 
