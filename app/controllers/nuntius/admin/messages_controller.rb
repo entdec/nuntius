@@ -18,6 +18,12 @@ module Nuntius
         @message = Nuntius::Message.visible.find(params[:id])
         add_breadcrumb(@message.id, admin_message_path(@message)) if defined? add_breadcrumb
       end
+
+      def resend
+        @message = Nuntius::Message.visible.find(params[:id])
+        @message.resend
+        render :show
+      end
     end
   end
 end

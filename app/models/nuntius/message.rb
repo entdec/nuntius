@@ -63,6 +63,13 @@ module Nuntius
       klass.new(message)
     end
 
+    def resend
+      return if pending?
+      return unless transport
+
+      deliver_as(transport)
+    end
+
     #
     # Convenience method to easily send messages without having a template
     #
