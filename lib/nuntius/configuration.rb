@@ -4,6 +4,7 @@ module Nuntius
   class Configuration
     attr_accessor :admin_authentication_module
     attr_accessor :base_controller
+    attr_accessor :layout, :admin_layout
     attr_writer   :logger
     attr_writer   :host
     attr_writer   :metadata_humanize
@@ -34,6 +35,8 @@ module Nuntius
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
       @allow_custom_events = false
+      @layout = 'application'
+      @admin_layout = 'application'
     end
 
     # logger [Object].
