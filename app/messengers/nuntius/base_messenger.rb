@@ -206,6 +206,13 @@ module Nuntius
         @template_scope = template_scope if template_scope
         @template_scope
       end
+
+      def timebased_scope(name, scope_proc = nil)
+        @timebased_scopes ||= {}
+        @timebased_scopes[name] = scope_proc if scope_proc.present?
+        define_method(name) { |object, params = {}| } unless respond_to?(name)
+        @timebased_scopes[name] || nil
+      end
     end
 
     private
