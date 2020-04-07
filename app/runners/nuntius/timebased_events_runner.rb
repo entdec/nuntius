@@ -17,6 +17,8 @@ module Nuntius
           timestamp = Time.parse("+#{interval}")
         end
 
+        # TODO: exclude all records that already have a message for the given template
+        # nuntiable_type, nuntiable_id and template_id
         messenger.public_send(template.event, timestamp).each do |object|
           Nuntius.with(object).event(template.event)
         end
