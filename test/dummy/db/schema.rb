@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_19_114444) do
+ActiveRecord::Schema.define(version: 2020_04_07_050646) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -134,6 +134,7 @@ ActiveRecord::Schema.define(version: 2020_03_19_114444) do
     t.datetime "updated_at", null: false
     t.uuid "layout_id"
     t.boolean "enabled", default: true
+    t.string "interval"
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
   end
 
