@@ -4,6 +4,7 @@ module Nuntius
   class Configuration
     attr_accessor :admin_authentication_module
     attr_accessor :base_controller
+    attr_accessor :base_runner
     attr_accessor :layout, :admin_layout
     attr_writer   :logger
     attr_writer   :host
@@ -25,6 +26,7 @@ module Nuntius
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
+      @base_runner = 'Nuntius::BasicApplicationRunner'
       @nuntiable_class_names = []
       @transports = []
       @providers = {}
