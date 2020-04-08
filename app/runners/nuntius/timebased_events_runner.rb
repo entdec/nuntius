@@ -18,6 +18,7 @@ module Nuntius
         end
 
         messenger.public_send(template.event, timestamp_operator, timestamp, template.metadata)
+          .where('created_at > ?', template.created_at)
           .where.not(id: Nuntius::Message.select(:nuntiable_id).where(template_id: template.id))
           .each do |object|
           Nuntius.with(object).event(template.event)
