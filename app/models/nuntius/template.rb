@@ -18,6 +18,7 @@ module Nuntius
 
     validates :event, presence: true
     validates :event, format: { with: /.+#.+/ }, if: ->(t) { t.klass == 'Custom' }
+    validates :interval, format: { with: /\A[1-9][0-9]*\s(day|hour|minute)s?\z/ }
 
     def new_message(object, assigns = {}, params = {})
       message = Nuntius::Message.new(template: self, transport: transport, metadata: metadata)
