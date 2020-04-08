@@ -212,9 +212,24 @@ module Nuntius
       end
 
       def timebased_scope(name, &scope_proc)
+        raise ArgumentError, "timebased_scope must start with before or after" unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
+
+        name = name.to_sym
         timebased_scopes[name] = scope_proc if scope_proc.present?
         define_method(name) { |object, params = {}| } unless respond_to?(name)
         timebased_scopes[name] || nil
+      end
+
+      def timebased_scope_for(template)
+        return [] unless timebased_scopes.include?(template.event.to_sym)
+
+        timebased_scope(template.event)
+          .call(template.interval_duration, template.metadata)
+          .where('created_at > ?', template.created_at)
+          .where.not(
+            id: Nuntius::Message.select(:nuntiable_id)
+                                .where(template_id: template.id)
+          )
       end
     end
 
