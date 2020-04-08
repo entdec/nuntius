@@ -56,6 +56,17 @@ module Nuntius
       write_attribute :html, html_unescaped_liquid if html
     end
 
+    def interval_duration
+      unless interval.blank?
+        number, type = interval.split(' ')
+        number = number.to_i
+
+        return number.public_send(type) if number.respond_to?(type)
+      end
+
+      0.seconds
+    end
+
     private
 
     def render(attr, assigns, locale, options = {})
