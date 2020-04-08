@@ -10,16 +10,16 @@ module Nuntius
         next unless %w[before after].detect { |s| event_name.start_with?(s) }
 
         if event_name.start_with?('before')
-          operator  = '<='
-          timestamp = Time.parse("-#{interval}")
+          timestamp_operator  = '<='
+          timestamp           = Time.parse("-#{interval}")
         elsif event_name.start_with?('after')
-          operator  = '>='
-          timestamp = Time.parse("+#{interval}")
+          timestamp_operator  = '>='
+          timestamp           = Time.parse("+#{interval}")
         end
 
-        # TODO: exclude all records that already have a message for the given template
-        # nuntiable_type, nuntiable_id and template_id
-        messenger.public_send(template.event, timestamp).each do |object|
+        messenger.public_send(template.event, timestamp_operator, timestamp, template.metadata)
+          .where.not(id: Nuntius::Message.select(:nuntiable_id).where(template_id: template.id))
+          .each do |object|
           Nuntius.with(object).event(template.event)
         end
       end
