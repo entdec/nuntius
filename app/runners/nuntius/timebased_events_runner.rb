@@ -5,23 +5,9 @@ module Nuntius
     def perform
       Nuntius::Template.where.not(interval: nil).each do |template|
         messenger = Nuntius::BaseMessenger.messenger_for_class(template.klass)
-        event_name = event.to_s
-        next unless messenger.timebased_scopes.include?(template.event)
-        next unless %w[before after].detect { |s| event_name.start_with?(s) }
 
-        if event_name.start_with?('before')
-          timestamp_operator  = '<='
-          timestamp           = Time.parse("-#{interval}")
-        elsif event_name.start_with?('after')
-          timestamp_operator  = '>='
-          timestamp           = Time.parse("+#{interval}")
-        end
-
-        messenger.public_send(template.event, timestamp_operator, timestamp, template.metadata)
-          .where('created_at > ?', template.created_at)
-          .where.not(id: Nuntius::Message.select(:nuntiable_id).where(template_id: template.id))
-          .each do |object|
-          Nuntius.with(object).event(template.event)
+        messenger.timebased_scope_for(template).each do |object|
+          Nuntius.with(object).message(template.event)
         end
       end
     end
