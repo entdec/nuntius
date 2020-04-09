@@ -121,8 +121,8 @@ following formats:
 * N week(s)
 * N month(s)
 
-To send timebased messages you need to execute Nuntius::TimebasedEventsRunner.call, you could do this
-in a cronjob every 5 minutes with "bundle exec rails runner Nuntius::TimebasedEventsRunner.call"
+To send timebased messages you need to execute Nuntius::TimestampBasedMessagesRunner.call, you could do this
+in a cronjob every 5 minutes with "bundle exec rails runner Nuntius::TimestampBasedMessagesRunner.call"
 
 ### Direct
 Another more direct way of using Nuntius is by just instantiating a message:
