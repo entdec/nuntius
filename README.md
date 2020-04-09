@@ -1,8 +1,10 @@
 # Nuntius
-Nuntius offers messaging and notifications for Ruby on Rails. 
+Nuntius offers messaging and notifications for ActiveRecord models in Ruby on Rails applications.
 
 ## Setup
-Add Nuntius to your Gemfile, run bundle install and add an initializer (config/initializers/nuntius.rb)
+Add Nuntius to your Gemfile and run bundle install to install it.
+
+Create an initializer (config/initializers/nuntius.rb) and configure as desired:
 
 ```ruby
 Nuntius.setup do
@@ -28,19 +30,102 @@ Nuntius.setup do
 end
 ```
 
-## Usage
+Mount the Rails engine in your routes.rb to enable Nuntius' maintenance pages:
 
-Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
 ```ruby
- Nuntius.with(shipment).message(event.to_s)
+Rails.application.routes.draw do
+  # your own routes ...
+  mount Nuntius::Engine, at: '/nuntius', as: 'nuntius' # change the path and aliases at your own discretion
+end
 ```
 
-When custom events are enabled you can also do the following"
+To enable you to send messages with Nuntius you need to make one or more ActiveRecord models nuntiable:
+
+```ruby
+class Car < ApplicationRecord
+  nuntiable
+end
+```
+
+Additionally you need to define an extension of the Nuntius::BaseMessenger for the same model with a matching name (in app/messengers):
+
+```ruby
+class CarMessenger < Nuntius::BaseMessenger
+  def your_event(car, params)
+    # your optional logic here
+  end
+end
+```
+
+If you are using the state\_machines-activemodel gem you can pass use\_state\_machine: true to the 
+nuntiable call, this will automatically define empty methods for these events on the model's 
+messenger class if they are not defined already.
+
+Additionally the use\_state\_machine option will add an after\_commit hook to the state machine
+to automatically trigger the event for the state transition.
+
+## Usage
+
+### With templates
+Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
+
+```ruby
+ Nuntius.with(car).message('your_event')
+```
+
+When custom events are enabled you can also do the following:
+
 ```ruby
  Nuntius.with( { whs: { to: 'tom@boxture.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ]).message('shipped')
 ```
 
-another, more direct way of using Nuntius is by just instantiating a message:
+For the above cases you need to define templates, this is done with the maintenace pages under
+/nuntius/admin/templates (/nuntius is whatever you have defined in your routes file).
+
+When Nuntius#message is called a message will be sent for every matching template. To allow you to 
+send different messages under different circumstances you can specify a template\_scope on the messenger
+class that uses the template's metadata in combination with the nuntiable object to determine whether
+or not the template should be used.
+
+### Timebased events
+If you want to send messages based on time intervals you can add such events to your messenger with the
+timebased\_scope class method like so:
+
+```ruby
+class CarMessenger < Nuntius::BaseMessenger
+  # time_range is a range, for a before scope the time_range the interval is added to the current
+  # time, the end of the range is 1 hour from the start.
+  timebased_scope :before_tuneup do |time_range, metadata|
+    cars = Car.where(tuneup_at: time_range)
+    cars = cars.where(color: metadata['color']) if metadata['color'].present?
+    cars
+  end
+  
+  # For an after scope the time_range the interval is taken from the current time, the end of the 
+  # range is 1 hour from its start.
+  timebased_scope :after_tuneup do |time_range, metadata|
+    cars = Car.where(tuneup_at: time_range)
+    cars = cars.where(color: metadata['color']) if metadata['color'].present?
+    cars
+  end
+end
+```
+
+This method also requires you to configure a template using the maintenance pages. When you choose
+a timebased scope as an event you will be prompted to enter an interval, you can enter anything in the
+following formats:
+
+* N minute(s)
+* N hour(s)
+* N day(s)
+* N week(s)
+* N month(s)
+
+To send timebased messages you need to execute Nuntius::TimebasedEventsRunner.call, you could do this
+in a cronjob every 5 minutes with "bundle exec rails runner Nuntius::TimebasedEventsRunner.call"
+
+### Direct
+Another more direct way of using Nuntius is by just instantiating a message:
 ```ruby
  Nuntius::Message.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text', nuntiable: channel).deliver_as(:mail)
 ```

@@ -18,6 +18,7 @@ module Nuntius
 
     validates :event, presence: true
     validates :event, format: { with: /.+#.+/ }, if: ->(t) { t.klass == 'Custom' }
+    validates :interval, format: { with: /\A[1-9][0-9]*\s(month|week|day|hour|minute)s?\z/ }
 
     def new_message(object, assigns = {}, params = {})
       message = Nuntius::Message.new(template: self, transport: transport, metadata: metadata)
@@ -53,6 +54,29 @@ module Nuntius
         CGI.unescape_html(m)
       end
       write_attribute :html, html_unescaped_liquid if html
+    end
+
+    def interval_duration
+      unless interval.blank?
+        number, type = interval.split(' ')
+        number = number.to_i
+
+        return number.public_send(type) if number.respond_to?(type)
+      end
+
+      0.seconds
+    end
+
+    def interval_time_range
+      return 0.seconds..0.seconds if interval.blank?
+
+      if event.start_with?('before')
+        start = interval_duration.after
+      else
+        start = interval_duration.ago
+      end
+
+      start..(start + 1.hour)
     end
 
     private

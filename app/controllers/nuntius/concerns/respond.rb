@@ -17,12 +17,12 @@ module Nuntius
 
         unless result
           flash.now[:error] = (error || I18n.t('nuntius.flash.error', model: human_model_name))
-          render action && return
+          render(action) && return
         end
 
         if params[:commit] == 'continue'
           flash.now[:notice] = (notice || I18n.t('nuntius.flash.notice', model: human_model_name))
-          render action && return
+          render(action) && return
         end
 
         flash[:notice] = notice || I18n.t('nuntius.flash.notice', model: human_model_name)
