@@ -67,6 +67,18 @@ module Nuntius
       0.seconds
     end
 
+    def interval_time_range
+      return 0.seconds..0.seconds if interval.blank?
+
+      if event.start_with?('before')
+        start = interval_duration.after
+      else
+        start = interval_duration.ago
+      end
+
+      start..(start + 1.hour)
+    end
+
     private
 
     def render(attr, assigns, locale, options = {})

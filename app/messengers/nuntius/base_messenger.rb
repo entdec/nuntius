@@ -224,7 +224,7 @@ module Nuntius
         return [] unless timebased_scopes.include?(template.event.to_sym)
 
         timebased_scope(template.event)
-          .call(template.interval_duration, template.metadata)
+          .call(template.interval_time_range, template.metadata)
           .where('created_at > ?', template.created_at)
           .where.not(
             id: Nuntius::Message.select(:nuntiable_id)
