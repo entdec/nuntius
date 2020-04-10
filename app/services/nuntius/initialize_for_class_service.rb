@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'query_constructor'
 module Nuntius
   module AutoMessageWithNuntius
     extend ActiveSupport::Concern
     included do
       after_commit do |resource_state_transition|
-        Nuntius.with(resource_state_transition.resource).message(event.to_s)
+        resource = resource_state_transition.resource
+        Nuntius.with(resource).message(event.to_s) if resource.nuntiable?
       end
     end
   end
