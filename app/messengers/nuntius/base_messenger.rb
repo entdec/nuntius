@@ -53,6 +53,7 @@ module Nuntius
         attachment[:io] = File.open(uri.path)
       elsif uri
         client = HTTPClient.new
+        client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
         client.ssl_config.set_default_paths unless Gem.win_platform?
         response = client.get(options[:url], follow_redirect: true)
         content_disposition = response.headers['Content-Disposition'] || ''
