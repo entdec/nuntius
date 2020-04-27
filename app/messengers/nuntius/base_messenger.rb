@@ -226,7 +226,7 @@ module Nuntius
 
         timebased_scope(template.event)
           .call(template.interval_time_range, template.metadata)
-          .where('created_at > ?', template.created_at)
+          .where("#{template.klass.constantize.table_name}.created_at > ?", template.created_at)
           .where.not(
             id: Nuntius::Message.select(:nuntiable_id)
                                 .where(template_id: template.id)
