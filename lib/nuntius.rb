@@ -11,6 +11,7 @@ require 'nuntius/configuration'
 require 'nuntius/active_record_helpers'
 require 'nuntius/active_storage_helpers'
 require 'nuntius/i18n_store'
+require 'nuntius/mail_allow_list'
 
 module Nuntius
   ROOT_PATH = Pathname.new(File.join(__dir__, '..'))
