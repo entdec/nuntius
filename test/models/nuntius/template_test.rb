@@ -32,12 +32,12 @@ module Nuntius
 
     test 'interval_time_range for after events' do
       t = Template.new(interval: '3 hours', event: 'after_the_fact')
-      assert_equal (3.hours.ago..4.hours.ago).inspect, t.interval_time_range.inspect
+      assert_equal (4.hours.ago..3.hours.ago).inspect, t.interval_time_range.inspect
     end
 
     test 'interval_time_range for before events' do
       t = Template.new(interval: '2 hours', event: 'before_the_fact')
-      assert_equal (2.hours.after..1.hour.after).inspect, t.interval_time_range.inspect
+      assert_equal (1.hours.after..2.hour.after).inspect, t.interval_time_range.inspect
     end
   end
 end

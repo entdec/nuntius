@@ -76,7 +76,7 @@ module Nuntius
         start = interval_duration.ago
       end
 
-      start..(start - 1.hour)
+      (start - 1.hour)..start
     end
 
     private
