@@ -19,8 +19,6 @@
         = f.input :subject, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
         = f.association :layout, collection: @layouts
         = f.input :html, as: :editor, input_html: { data: { 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
-        = f.input :html_inkyrb_processing
-        = f.input :html_premailer_processing
       .for-transport.push.sms.voice.slack
         = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
       .for-transport.push.slack
