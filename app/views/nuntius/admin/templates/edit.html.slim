@@ -4,7 +4,7 @@
     - ui_tab :edit
       = f.input :enabled
       = f.input :description
-      .event-inputs-wrapper data-controller='toggle' data-toggle-attr='data-timebased' 
+      .event-inputs-wrapper data-controller='toggle' data-toggle-attr='data-timebased'
         .row
           .col-sm-6= f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
           .col-sm-6.klass.select= f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chained-input', 'chained-input-to': '#template_klass', 'target': 'toggle.input' } }
@@ -19,6 +19,8 @@
         = f.input :subject, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
         = f.association :layout, collection: @layouts
         = f.input :html, as: :editor, input_html: { data: { 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
+        = f.input :html_inkyrb_processing
+        = f.input :html_premailer_processing
       .for-transport.push.sms.voice.slack
         = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
       .for-transport.push.slack
