@@ -27,7 +27,7 @@ module Nuntius
     end
 
     def i18n_store
-      @i18n_store ||= Nuntius::I18nStore.new
+      Nuntius::I18nStore.new
     end
 
     def message(event)
@@ -44,7 +44,7 @@ module Nuntius
     end
 
     def active_storage_enabled?
-      ActiveRecord::Base.connection.table_exists? "active_storage_attachments"
+      ActiveRecord::Base.connection.table_exists? 'active_storage_attachments'
     end
   end
 
