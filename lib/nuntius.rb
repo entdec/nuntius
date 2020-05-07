@@ -27,7 +27,7 @@ module Nuntius
     end
 
     def i18n_store
-      Nuntius::I18nStore.new
+      @i18n_store ||= Nuntius::I18nStore.new
     end
 
     def message(event)
