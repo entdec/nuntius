@@ -12,7 +12,6 @@ module Nuntius
 
     attr_reader :transports
     attr_reader :providers
-    attr_accessor :nuntiable_class_names
     attr_accessor :jobs_queue_name
 
     attr_accessor :visible_scope
@@ -27,6 +26,7 @@ module Nuntius
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
       @base_runner = 'Nuntius::BasicApplicationRunner'
+      @nuntiable_classes = []
       @nuntiable_class_names = []
       @transports = []
       @providers = {}
@@ -60,6 +60,30 @@ module Nuntius
       @admin_mount_point ||= '/nuntius'
     end
 
+    def add_nuntiable_class(klass)
+      @nuntiable_class_names = []
+      @nuntiable_classes << klass unless @nuntiable_classes.include?(klass)
+    end
+
+    def compile_nuntiable_class_names
+      names = []
+      names << 'Custom' if allow_custom_events
+
+      @nuntiable_classes.each do |klass|
+        names << klass.name
+        names += klass.descendants.map(&:name)
+      end
+
+      names
+      names.sort!
+    end
+
+    def nuntiable_class_names
+      return @nuntiable_class_names if @nuntiable_class_names.present?
+
+      compile_nuntiable_class_names!
+    end
+
     def provider(provider, transport:, priority: 1, timeout: 0, settings: {})
       if @transports.include? transport
         @providers[transport.to_sym] ||= []
@@ -71,6 +95,12 @@ module Nuntius
 
     def transport(transport)
       @transports.push(transport) if transport
+    end
+
+    private
+
+    def compile_nuntiable_class_names!
+      @nuntiable_class_names = compile_nuntiable_class_names
     end
   end
 end
