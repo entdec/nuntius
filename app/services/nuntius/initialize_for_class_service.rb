@@ -45,35 +45,15 @@ module Nuntius
     end
 
     def add_to_config
-      Nuntius.config.nuntiable_class_names << name unless Nuntius.config.nuntiable_class_names.include?(name)
-    end
-
-    def nuntiable_events
-      events = []
-      events += nuntiable_events_from_state_machine if options[:use_state_machine]
-      events += nuntiable_events_from_devise if options[:override_devise]
-      events
-    end
-
-    def nuntiable_events_from_state_machine
-      if klass.respond_to?(:aasm)
-        klass.aasm.events.map(&:name)
-      elsif klass.respond_to?(:state_machine) && klass.state_machine.respond_to?(:events)
-        klass.state_machine.events.map(&:name)
-      else
-        []
-      end
-    end
-
-    def nuntiable_events_from_devise
-      I18n.t('devise.mailer').keys.map(&:to_s)
+      Nuntius.config.add_nuntiable_class(klass)
     end
 
     # add all known events to the messenger class as actions
     def create_events
-      nuntiable_events.each do |event_name|
-        next if messenger.method_defined?(event_name)
-
+      Evento::Extractor.new(klass)
+                       .extract(state_machine: options[:use_state_machine], devise: options[:override_devise])
+                       .reject { |event_name| messenger.method_defined?(event_name) }
+                       .each do |event_name|
         messenger.send(:define_method, event_name) { |object, params = {}| }
       end
     end
