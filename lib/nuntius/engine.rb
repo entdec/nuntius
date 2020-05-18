@@ -20,12 +20,6 @@ module Nuntius
       end
     end
 
-    initializer :nuntius do
-      if Nuntius.config.allow_custom_events
-        Nuntius.config.nuntiable_class_names << 'Custom'
-      end
-    end
-
     #
     # initializer "webpacker.proxy" do |app|
     #   insert_middleware = begin
