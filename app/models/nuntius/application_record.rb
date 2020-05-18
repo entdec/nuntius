@@ -6,8 +6,6 @@ module Nuntius
   class ApplicationRecord < ActiveRecord::Base
     self.abstract_class = true
 
-    def to_liquid
-      "#{self.class.name}Drop".constantize.new(self)
-    end
+    include Liquor::ToLiquid
   end
 end
