@@ -5,7 +5,7 @@ module Nuntius
   class BaseMessenger
     include ActiveSupport::Callbacks
 
-    delegate :liquid_variable_name_for, :class_name_for, :event_name_for, to: :class
+    delegate :liquid_variable_name_for, :class_name_for, :class_names_for, :event_name_for, to: :class
 
     define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
@@ -135,21 +135,15 @@ module Nuntius
       # @return [String] underscored, lowercase string
       #
       def liquid_variable_name_for(obj)
-        if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
-          if obj.first.class.respond_to?(:base_class)
-            obj.first.class.base_class.name.demodulize.pluralize.underscore
-          else
-            obj.first.class.name.demodulize.pluralize.underscore
-          end
-        elsif obj.is_a?(Hash)
-          obj.keys.first.to_s
-        else
-          if obj.class.respond_to?(:base_class)
-            obj.class.base_class.name.demodulize.underscore
-          else
-            obj.class.name.demodulize.underscore
-          end
-        end
+        return obj.keys.first.to_s if obj.is_a?(Hash)
+
+        plural = obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
+        list   = plural ? obj : [obj]
+        klass  = list.first.class
+        klass  = klass.base_class if klass.respond_to?(:base_class)
+        name   = klass.name.demodulize
+        name   = name.pluralize if plural
+        name.underscore
       end
 
       def class_name_for(obj)
@@ -164,6 +158,16 @@ module Nuntius
         end
       end
 
+      def class_names_for(obj)
+        main_class_name = class_name_for(obj)
+
+        return [main_class_name] if !obj.class.respond_to?(:base_class?) || obj.class.base_class?
+
+        list = [main_class_name]
+        list << obj.class.base_class.name
+        list
+      end
+
       def event_name_for(obj, event)
         if obj.is_a?(Hash)
           "#{obj.keys.first}##{event}"
@@ -173,7 +177,10 @@ module Nuntius
       end
 
       def messenger_for_class(name)
-        messenger_name_for_class(name).safe_constantize
+        klass = messenger_name_for_class(name).safe_constantize
+        klass ||= messenger_for_class(name.constantize.superclass)
+        klass ||= messenger_for_class(name.constantize.superclass.superclass)
+        klass
       end
 
       def messenger_name_for_class(name)
@@ -240,7 +247,7 @@ module Nuntius
     def select_templates
       return @templates if @templates
 
-      @templates = Template.unscoped.where(klass: class_name_for(@object), event: event_name_for(@object, @event)).where(enabled: true)
+      @templates = Template.unscoped.where(klass: class_names_for(@object), event: event_name_for(@object, @event)).where(enabled: true)
       @templates = @templates.instance_exec(@object, &Nuntius.config.default_template_scope)
 
       # See if we need to do something additional
