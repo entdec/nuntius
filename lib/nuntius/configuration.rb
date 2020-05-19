@@ -65,18 +65,6 @@ module Nuntius
       @nuntiable_classes << klass unless @nuntiable_classes.include?(klass)
     end
 
-    def compile_nuntiable_class_names
-      names = []
-      names << 'Custom' if allow_custom_events
-
-      @nuntiable_classes.each do |klass|
-        names << klass.name
-        names += klass.descendants.map(&:name)
-      end
-
-      names.sort!
-    end
-
     def nuntiable_class_names
       return @nuntiable_class_names if @nuntiable_class_names.present?
 
@@ -97,6 +85,18 @@ module Nuntius
     end
 
     private
+
+    def compile_nuntiable_class_names
+      names = []
+      names << 'Custom' if allow_custom_events
+
+      @nuntiable_classes.each do |klass|
+        names << klass.name
+        names += klass.descendants.map(&:name)
+      end
+
+      names.sort!
+    end
 
     def compile_nuntiable_class_names!
       @nuntiable_class_names = compile_nuntiable_class_names
