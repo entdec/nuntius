@@ -74,7 +74,6 @@ module Nuntius
         names += klass.descendants.map(&:name)
       end
 
-      names
       names.sort!
     end
 
