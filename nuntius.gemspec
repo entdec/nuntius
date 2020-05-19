@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
+  s.add_dependency 'evento', '~> 0.1' # This is our own gem, you must add it to your project's Gemfile for this to work
   s.add_dependency 'liquor', '~> 0.5'
   s.add_dependency 'pg'
   s.add_dependency 'rails', '>= 5.2'
