@@ -62,7 +62,7 @@ module Nuntius
 
     def add_nuntiable_class(klass)
       @nuntiable_class_names = []
-      @nuntiable_classes << klass unless @nuntiable_classes.include?(klass)
+      @nuntiable_classes << klass.to_s unless @nuntiable_classes.include?(klass.to_s)
     end
 
     def nuntiable_class_names
@@ -90,7 +90,8 @@ module Nuntius
       names = []
       names << 'Custom' if allow_custom_events
 
-      @nuntiable_classes.each do |klass|
+      @nuntiable_classes.each do |klass_name|
+        klass = klass_name.constantize
         names << klass.name
         names += klass.descendants.map(&:name)
       end
