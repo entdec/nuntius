@@ -18,6 +18,7 @@ gemspec
 git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.git" }
 
 gem 'action_table', entdec: 'components/action_table', tag: '0.2.11'
+gem 'auxilium', entdec: 'components/auxilium', tag: '0.1.3'
 gem 'evento', entdec: 'components/evento', tag: '0.1.2'
 gem 'liquor', entdec: 'components/liquor', tag: '0.6.2'
 gem 'pry'
