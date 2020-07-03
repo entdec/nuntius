@@ -75,8 +75,8 @@ module Nuntius
       Nuntius::Locale.all
     end
 
-    def flat_hash(hash)
-      hash.reduce({}) do |a, (k, v)|
+    def flat_hash(hash = {})
+      (hash || {}).reduce({}) do |a, (k, v)|
         tmp = v.is_a?(Hash) ? flat_hash(v).map { |k2, v2| ["#{k}.#{k2}", v2] }.to_h : { k => v }
         a.merge(tmp)
       end
