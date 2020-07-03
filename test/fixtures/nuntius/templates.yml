@@ -17,3 +17,12 @@ sms:
   event: welcome
   text: Welcome to {{account.name}}!
   metadata: {}
+
+two_recipients_with_translations:
+  transport: mail
+  klass: Account
+  event: translationtest
+  to: "test@example.com,test2@example.com"
+  subject: "{{'.subject'|t}}"
+  html: "<b>{{'.greeting'|t}}</b>"
+  text: Hoi

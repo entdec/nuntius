@@ -1,0 +1,19 @@
+nl:
+  key: nl
+  data:
+    nl:
+      account:
+        translationtest:
+          mail:
+            subject: "Smurrefluts"
+            greeting: "Hoi"
+
+en:
+  key: en
+  data:
+    en:
+      account:
+        translationtest:
+          mail:
+            subject: "Qux"
+            greeting: "Hello"
