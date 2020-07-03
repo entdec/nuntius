@@ -22,8 +22,6 @@ module Nuntius
   end
 
   class I18nStore
-    attr_reader :template
-
     def initialize; end
 
     def keys
@@ -53,22 +51,29 @@ module Nuntius
 
     def with(template)
       with_custom_backend do
-        @template = template
+        self.template = template
         yield(template)
-        @template = nil
+        self.template = nil
       end
+    end
+
+    def template
+      Thread.current[:nuntius_i18n_store_template]
+    end
+
+    def template=(template)
+      Thread.current[:nuntius_i18n_store_template] = template
     end
 
     private
 
     def with_custom_backend
-      @old_backend = I18n.backend
+      Thread.current[:nuntius_i18n_store_old_backend] = I18n.backend
       I18n.backend = I18n::Backend::Chain.new(custom_i18n_backend, I18n.backend)
 
       yield
 
-      I18n.backend = @old_backend
-      @old_backend = nil
+      I18n.backend = Thread.current[:nuntius_i18n_store_old_backend]
     end
 
     def locales

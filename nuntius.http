@@ -19,7 +19,7 @@ Content-Type: application/json
         "consignee_name": "Sander Helsloot",
         "name": "Foo",
         "moo": "Cow"
-    }
+    },
     "attachments": [{
         "url": ""
     }]

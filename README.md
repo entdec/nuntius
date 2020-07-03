@@ -12,13 +12,13 @@ Nuntius.setup do
   config.logger = Rails.logger
 
   # Allow custom events (default = false)
-  # Enable this option to allow use of Nuntius with a Hash 
+  # Enable this option to allow use of Nuntius with a Hash
   config.allow_custom_events = true
- 
+
   # Enable e-mail
   config.transport :mail
   # Enable push notifications
-  config.transport :push 
+  config.transport :push
   # Enable SMS
   config.transport :sms
   # Enable voice
@@ -57,8 +57,8 @@ class CarMessenger < Nuntius::BaseMessenger
 end
 ```
 
-If you are using the state\_machines-activemodel gem you can pass use\_state\_machine: true to the 
-nuntiable call, this will automatically define empty methods for these events on the model's 
+If you are using the state\_machines-activemodel gem you can pass use\_state\_machine: true to the
+nuntiable call, this will automatically define empty methods for these events on the model's
 messenger class if they are not defined already.
 
 Additionally the use\_state\_machine option will add an after\_commit hook to the state machine
@@ -82,7 +82,7 @@ When custom events are enabled you can also do the following:
 For the above cases you need to define templates, this is done with the maintenace pages under
 /nuntius/admin/templates (/nuntius is whatever you have defined in your routes file).
 
-When Nuntius#message is called a message will be sent for every matching template. To allow you to 
+When Nuntius#message is called a message will be sent for every matching template. To allow you to
 send different messages under different circumstances you can specify a template\_scope on the messenger
 class that uses the template's metadata in combination with the nuntiable object to determine whether
 or not the template should be used.
@@ -100,8 +100,8 @@ class CarMessenger < Nuntius::BaseMessenger
     cars = cars.where(color: metadata['color']) if metadata['color'].present?
     cars
   end
-  
-  # For an after scope the time_range the interval is taken from the current time, the end of the 
+
+  # For an after scope the time_range the interval is taken from the current time, the end of the
   # range is 1 hour from its start.
   timebased_scope :after_tuneup do |time_range, metadata|
     cars = Car.where(tuneup_at: time_range)
@@ -179,4 +179,10 @@ path: /code
   </Gather>
   <Redirect>{%raw%}{{url}}{%endraw%}/code</Redirect>
 </Response>
+```
+
+## Testing
+
+```
+bundle exec sidekiq -C test/dummy/config/sidekiq.yml -r test/dummy
 ```
