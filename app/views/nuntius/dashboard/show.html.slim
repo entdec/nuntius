@@ -1,5 +1,5 @@
-.row
-  .col-12
+.ui-row
+  .ui-col-12
     = reportlet(:'nuntius/daily_messages_per_template', parameters: {template_ids: @templates.map(&:id)})
 = ui_table :nuntius_messages
 

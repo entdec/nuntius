@@ -1,12 +1,12 @@
 - if @campaign.draft?
   = ui_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
     = f.input :name
-    .row
-      .col-sm-4
+    .ui-row
+      .ui-col-sm-4
         = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {class: 'transport'}
-      .col-sm-4
+      .ui-col-sm-4
         = f.association :layout, collection: @layouts
-      .col-sm-4
+      .ui-col-sm-4
         = f.association :list, collection: @lists
     = f.input :from, hint: 'You can leave this blank, only fill this in if you want to override the default'
     .for-transport.mail
