@@ -25,7 +25,7 @@ module Nuntius
       if message.delivered_or_blocked?
         message.cleanup!
       else
-        Nuntius::TransportRefreshJob.set(wait: 5).perform_later(provider_name, message)
+        Nuntius::TransportRefreshJob.set(wait: 5).perform_later(provider_name, message) unless Rails.env.development?
       end
     end
   end

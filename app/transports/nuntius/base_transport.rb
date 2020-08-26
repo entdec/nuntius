@@ -16,7 +16,8 @@ module Nuntius
           if message.provider.blank?
             message.update(provider: hash[:provider].to_s)
           end
-          Nuntius::TransportDeliveryJob.set(wait: wait_time).perform_later(hash[:provider].to_s, message)
+
+          Nuntius::TransportDeliveryJob.set(wait: !Rails.env.development? && wait_time).perform_later(hash[:provider].to_s, message)
           time_out += hash[:timeout].seconds if hash[:timeout].positive?
         end
         wait_time += time_out
