@@ -28,6 +28,12 @@ module Nuntius
         resource = resource_state_transition.resource
         Nuntius.with(resource).message(event.to_s) if resource.nuntiable?
       end if options[:use_state_machine]
+
+      orchestrator.after_transaction_log_commit(:nuntius) do |transaction_log_entry|
+        record  = transaction_log_entry.transaction_loggable
+        event   = transaction_log_entry.event
+        Nuntius.with(record).message(event.to_s) if record.nuntiable? && event.present?
+      end
     end
 
     private
