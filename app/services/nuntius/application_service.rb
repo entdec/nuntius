@@ -13,7 +13,7 @@ module Nuntius
     def call(raise_on_error = nil)
       @raise_on_error = raise_on_error unless raise_on_error.nil?
       if self.class.transaction
-        ApplicationRecord.transaction { exec }
+        ApplicationRecord.transaction(requires_new: true) { exec }
       else
         exec
       end
