@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'parse-cron'
   s.add_dependency 'pg'
   s.add_dependency 'premailer'
-  s.add_dependency 'rails', '>= 5.2'
+  s.add_dependency 'rails', '>= 6'
   s.add_dependency 'rubyzip', '> 1.1'
   s.add_dependency 'slack-ruby-client'
   s.add_dependency 'state_machines-activerecord'
