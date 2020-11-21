@@ -1,6 +1,3 @@
-= ui_table :nuntius_campaigns
-
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.lists'), admin_lists_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.add'), new_admin_campaign_path, class: 'ui-button primary')
+= clg.card(menu: campaigns_context_menu, title: 'Campaigns') do |card|
+  - card.slot :footer
+  = clg.action_table(:nuntius_campaigns, options: { exportable: true })

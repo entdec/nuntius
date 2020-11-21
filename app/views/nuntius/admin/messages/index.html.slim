@@ -1,8 +1,5 @@
-= ui_table :nuntius_messages, parameters: {template_id: params[:template_id]}
-
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.locales'), admin_locales_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'ui-button')
+= clg.card(menu: messages_context_menu) do |card|
+  - card.slot :title
+    | Messages
+  - card.slot :footer
+  = clg.action_table(:nuntius_messages, options: { exportable: true }, url_params: {template_id: params[:template_id]})

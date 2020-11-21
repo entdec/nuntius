@@ -17,12 +17,12 @@ gemspec
 
 git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.git" }
 
-gem 'action_table', entdec: 'components/action_table', tag: '0.2.11'
-gem 'auxilium', entdec: 'components/auxilium', tag: '0.1.3'
+gem 'action_table', entdec: 'components/action_table', tag: '0.2.37'
+gem 'auxilium', entdec: 'components/auxilium', tag: '0.1.8'
 gem 'evento', entdec: 'components/evento', tag: '0.1.4'
-gem 'liquor', entdec: 'components/liquor', tag: '0.6.2'
+gem 'liquor', entdec: 'components/liquor', tag: '0.6.4'
 gem 'pry'
-gem 'trado', entdec: 'components/trado', tag: '0.1.12'
+gem 'trado', entdec: 'components/trado', tag: '0.1.16'
 
 gem 'irb', '~> 1.0'
 gem 'solargraph'
