@@ -37,13 +37,16 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/hint/show-hint.css";
 import "codemirror/addon/fold/foldgutter.css";
+
+import "codemirror/theme/monokai.css";
+
 /***
  * IDE - Editor controller
  *
  * Control codemirror
  */
 export default class extends Controller {
-  static targets = ["textarea", "file"];
+  static targets = ["textarea"];
 
   connect() {
     const self = this;
@@ -63,6 +66,10 @@ export default class extends Controller {
       matchTags: true,
       gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
     });
+    if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      this.editor.setOption('theme', 'monokai');
+    }
+
     this.editor.setSize('100%', this.data.get('height') || '100%');
 
     this.editor.on('change', function (editor, evt) {
