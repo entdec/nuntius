@@ -3,7 +3,7 @@
 require 'test_helper'
 
 module Nuntius
-  class ProcessInboundMessageServiceTest < ActiveSupport::TestCase
+  class DeliverInboundMessageServiceTest < ActiveSupport::TestCase
     test 'retrieves new mail' do
       inbound_message = Nuntius::InboundMessage.create!(transport: 'mail', provider: 'imap', provider_id: '1', digest: '1', status: 'pending')
       inbound_message.from = 'some@example.com'
@@ -11,7 +11,7 @@ module Nuntius
       inbound_message.text = 'Help!'
       inbound_message.save!
 
-      ProcessInboundMessageService.new(inbound_message).call
+      Nuntius::DeliverInboundMessageService.new(inbound_message).call
 
       inbound_message.reload
 

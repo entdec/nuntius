@@ -41,9 +41,7 @@ module Nuntius
         inbound_message.metadata = params
         inbound_message.save!
 
-        # TODO:
-        # - find right message box
-        # - call routed method
+        Nuntius::DeliverInboundMessageService.new(inbound_message).call
 
         twiml = Twilio::TwiML::MessagingResponse.new do |resp|
           resp.message body: 'The Robots are coming! Head for the hills!'

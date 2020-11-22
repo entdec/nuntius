@@ -4,14 +4,14 @@
 module Nuntius
   class RetrieveMailJob < ApplicationJob
     def perform
-      klasses = Nuntius::BaseMessageBox.for(transport: :mail)
+      klasses = Nuntius::BaseMessageBox.message_box_for(transport: :mail)
 
       klasses.each do |klass|
         RetrieveInboundMailService.new(klass.settings).call
       end
 
       Nuntius::InboundMessage.where(status: 'pending').each do |message|
-        ProcessInboundMessageJob.perform_later(message)
+        Nuntius::DeliverInboundMessageJob.perform_later(message)
       end
     end
   end

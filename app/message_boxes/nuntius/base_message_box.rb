@@ -27,18 +27,27 @@ module Nuntius
         @settings
       end
 
-      def descendants
-        ObjectSpace.each_object(Class).select { |k| k < self }
+      def deliver(message)
+        klasses = message_box_for(transport: message.transport.to_sym, provider: message.provider.to_sym)
+        klass, method = message_box_for_route(klasses, message.to)
+
+        klass.new(message).send(method) if method
       end
 
-      def for(transport: nil, provider: nil)
+      def message_box_for(transport: nil, provider: nil)
         result = descendants
         result = result.select { |message_box| message_box.transport == transport } if transport
         result = result.select { |message_box| message_box.provider == provider } if provider
         result
       end
 
-      def for_route(message_boxes, recipients)
+      private
+
+      def descendants
+        ObjectSpace.each_object(Class).select { |k| k < self }
+      end
+
+      def message_box_for_route(message_boxes, recipients)
         klass = message_boxes.find do |message_box|
           routes = (message_box.routes || {})
           routes.any? { |regexp, _method| [*recipients].any? { |recipient| regexp.match(recipient) } }
