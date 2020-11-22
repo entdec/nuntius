@@ -38,3 +38,130 @@ VCR.configure do |config|
 end
 
 Rails.application.routes.default_url_options[:host] = 'localhost:3000'
+
+class MockIMAPFetchData
+  attr_reader :attr, :number
+
+  def initialize(rfc822, number, flag)
+    @attr = { 'RFC822' => rfc822, 'FLAGS' => flag }
+    @number = number
+  end
+end
+
+class MockIMAP
+  @@connection = false
+  @@mailbox = nil
+  @@readonly = false
+  @@marked_for_deletion = []
+  @@default_examples = {
+    default: (0..19).map do |i|
+      MockIMAPFetchData.new("test#{i.to_s.rjust(2, '0')}", i, "DummyFlag#{i}")
+    end
+  }
+  @@default_examples['UTF-8'] = @@default_examples[:default].slice(0, 1)
+
+  def self.examples(charset = nil)
+    @@examples.fetch(charset || :default)
+  end
+
+  def initialize
+    @@examples = {
+      :default => @@default_examples[:default].dup,
+      'UTF-8' => @@default_examples['UTF-8'].dup
+    }
+  end
+
+  def login(_user, _password)
+    @@connection = true
+  end
+
+  def disconnect
+    @@connection = false
+  end
+
+  def select(mailbox)
+    @@mailbox = mailbox
+    @@readonly = false
+  end
+
+  def examine(mailbox)
+    select(mailbox)
+    @@readonly = true
+  end
+
+  def uid_search(_keys, charset = nil)
+    [*(0..self.class.examples(charset).size - 1)]
+  end
+
+  def uid_fetch(set, _attr)
+    [self.class.examples[set]]
+  end
+
+  def uid_store(set, attr, flags)
+    @@marked_for_deletion << set if attr == '+FLAGS' && flags.include?(Net::IMAP::DELETED)
+  end
+
+  def expunge
+    @@marked_for_deletion.reverse.each do |i| # start with highest index first
+      self.class.examples.delete_at(i)
+    end
+    @@marked_for_deletion = []
+  end
+
+  # test only
+  def self.mailbox
+    @@mailbox
+  end
+
+  # test only
+  def self.readonly?
+    @@readonly
+  end
+
+  def self.disconnected?
+    @@connection == false
+  end
+
+  def disconnected?
+    @@connection == false
+  end
+end
+
+require 'net/imap'
+class Net::IMAP
+  def self.new(*_args)
+    MockIMAP.new
+  end
+end
+
+class QuxMessageBox < Nuntius::BaseMessageBox
+  transport :mail
+  provider :imap
+
+  class << self
+    def hatseflats(wut = nil)
+      @hatseflats = wut if wut
+      @hatseflats
+    end
+  end
+
+  @hatseflats = nil
+
+  route /.+/ => :smurrefluts
+
+  def smurrefluts
+    QuxMessageBox.hatseflats('hatseflats')
+  end
+end
+
+class FooMessageBox < Nuntius::BaseMessageBox
+  transport :sms
+  provider :twilio
+
+  route /\+31.+/ => :dutchies
+end
+
+class BarMessageBox < Nuntius::BaseMessageBox
+  transport :mail
+  provider :imap
+end

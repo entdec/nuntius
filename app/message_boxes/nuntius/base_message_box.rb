@@ -39,7 +39,6 @@ module Nuntius
       end
 
       def for_route(message_boxes, recipients)
-        klass = nil
         klass = message_boxes.find do |message_box|
           routes = (message_box.routes || {})
           routes.any? { |regexp, _method| [*recipients].any? { |recipient| regexp.match(recipient) } }
@@ -48,6 +47,12 @@ module Nuntius
 
         [klass, method] if method
       end
+    end
+
+    attr_reader :message
+
+    def initialize(message)
+      @message = message
     end
   end
 end
