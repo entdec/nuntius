@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 Nuntius::Engine.routes.draw do
+  namespace :inbound_messages do
+    resource :twilio_inbound_smses
+  end
+
   get 'callbacks/:message_id(/*path)', to: 'callbacks#create', as: :callback
   post 'callbacks/:message_id(/*path)', to: 'callbacks#create'
 

@@ -73,9 +73,19 @@ ActiveRecord::Schema.define(version: 2020_11_21_185718) do
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
   end
 
-  create_table "nuntius_inbound_mails", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "state"
-    t.string "message_id"
+  create_table "nuntius_inbound_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "status", default: "pending"
+    t.string "transport"
+    t.string "provider"
+    t.string "provider_id"
+    t.string "from"
+    t.string "to"
+    t.string "cc"
+    t.string "subject"
+    t.text "html"
+    t.text "text"
+    t.jsonb "payload"
+    t.jsonb "metadata"
     t.string "digest"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
