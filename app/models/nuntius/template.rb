@@ -70,11 +70,11 @@ module Nuntius
     def interval_time_range
       return 0.seconds..0.seconds if interval.blank?
 
-      if event.start_with?('before')
-        start = interval_duration.after
-      else
-        start = interval_duration.ago
-      end
+      start = if event.start_with?('before')
+                interval_duration.after
+              else
+                interval_duration.ago
+              end
 
       (start - 1.hour)..start
     end

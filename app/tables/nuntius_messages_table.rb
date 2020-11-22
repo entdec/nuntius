@@ -8,14 +8,18 @@ class NuntiusMessagesTable < ActionTable::ActionTable
   column(:transport)
   column(:provider)
   column(:origin) do |message|
-    if message.campaign
-      link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign)
-    end
-    if message.template
-      link_to message.template&.description, nuntius.edit_admin_template_path(message.template)
+    link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign) if message.campaign
+    link_to message.template&.description, nuntius.edit_admin_template_path(message.template) if message.template
+  end
+  column(:subject) do |message|
+    if message.nuntiable
+      link_to "#{message.nuntiable_type} [#{message.nuntiable}]", begin
+        url_for(message.nuntiable)
+      rescue StandardError
+        '#'
+      end
     end
   end
-  column(:subject) { |message| link_to "#{message.nuntiable_type} [#{message.nuntiable}]", (url_for(message.nuntiable) rescue '#') if message.nuntiable }
   column(:status)
 
   initial_order :created_at, :desc
@@ -31,17 +35,11 @@ class NuntiusMessagesTable < ActionTable::ActionTable
   def filtered_scope
     @filtered_scope = scope
 
-    if params[:template_id]
-      @filtered_scope = @filtered_scope.where(template_id: params[:template_id])
-    end
+    @filtered_scope = @filtered_scope.where(template_id: params[:template_id]) if params[:template_id]
 
-    if params[:nuntiable_id]
-      @filtered_scope = @filtered_scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type])
-    end
+    @filtered_scope = @filtered_scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
 
-    if params[:query].present?
-      @filtered_scope = @filtered_scope.where("concat_ws(' ', to, subject) ILIKE :query", query: "%#{params[:query]}%")
-    end
+    @filtered_scope = @filtered_scope.where("concat_ws(' ', to, subject) ILIKE :query", query: "%#{params[:query]}%") if params[:query].present?
 
     @filtered_scope
   end

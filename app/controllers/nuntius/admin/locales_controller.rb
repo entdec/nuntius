@@ -5,10 +5,6 @@ require_dependency 'nuntius/application_admin_controller'
 module Nuntius
   module Admin
     class LocalesController < ApplicationAdminController
-      if defined? add_breadcrumb
-        add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.locales'), :admin_locales_path)
-      end
-
       def index
         @locales = Nuntius::Locale.visible.order(:key)
       end

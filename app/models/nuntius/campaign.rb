@@ -41,7 +41,7 @@ module Nuntius
 
       message.from = render(:from, assigns, locale)
       message.to = if transport == 'mail'
-                     %("#{subscriber.first_name} #{subscriber.last_name}" <#{subscriber.email}>)
+                     %["#{subscriber.first_name} #{subscriber.last_name}" <#{subscriber.email}>]
                    elsif transport == 'sms'
                      subscriber.phone_number
                    elsif transport == 'voice'

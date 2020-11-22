@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Nuntius
-# frozen_string_literal: true
-
   class ApplicationService
     include ActiveSupport::Callbacks
     attr_reader :raise_on_error

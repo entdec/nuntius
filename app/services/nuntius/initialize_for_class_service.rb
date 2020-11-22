@@ -7,6 +7,7 @@ module Nuntius
     attr_reader :klass, :name, :options
 
     def initialize(klass, options = {})
+      super()
       @klass = klass
       @name = klass.name
       @options = options
@@ -19,15 +20,19 @@ module Nuntius
       orchestrator = Evento::Orchestrator.new(klass)
       orchestrator.define_event_methods_on(messenger, state_machine: options[:use_state_machine], devise: options[:override_devise]) { |object, params = {}| }
 
-      orchestrator.override_devise_notification do |notification, *devise_params|
-        # All notifications have either a token as the first param, or nothing
-        Nuntius.with(self, token: devise_params.first).message(notification)
-      end if options[:override_devise]
+      if options[:override_devise]
+        orchestrator.override_devise_notification do |notification, *devise_params|
+          # All notifications have either a token as the first param, or nothing
+          Nuntius.with(self, token: devise_params.first).message(notification)
+        end
+      end
 
-      orchestrator.after_audit_trail_commit(:nuntius) do |resource_state_transition|
-        resource = resource_state_transition.resource
-        Nuntius.with(resource).message(event.to_s) if resource.nuntiable?
-      end if options[:use_state_machine]
+      if options[:use_state_machine]
+        orchestrator.after_audit_trail_commit(:nuntius) do |resource_state_transition|
+          resource = resource_state_transition.resource
+          Nuntius.with(resource).message(event.to_s) if resource.nuntiable?
+        end
+      end
 
       orchestrator.after_transaction_log_commit(:nuntius) do |transaction_log_entry|
         record  = transaction_log_entry.transaction_loggable

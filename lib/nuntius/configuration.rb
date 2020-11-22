@@ -2,24 +2,10 @@
 
 module Nuntius
   class Configuration
-    attr_accessor :admin_authentication_module
-    attr_accessor :base_controller
-    attr_accessor :base_runner
-    attr_accessor :layout, :admin_layout
-    attr_writer   :logger
-    attr_writer   :host
-    attr_writer   :metadata_humanize
+    attr_accessor :admin_authentication_module, :base_controller, :base_runner, :layout, :admin_layout, :jobs_queue_name, :visible_scope, :add_metadata, :metadata_fields, :default_template_scope, :allow_custom_events
+    attr_writer :logger, :host, :metadata_humanize
 
-    attr_reader :transports
-    attr_reader :providers
-    attr_accessor :jobs_queue_name
-
-    attr_accessor :visible_scope
-    attr_accessor :add_metadata
-    attr_accessor :metadata_fields
-    attr_accessor :default_template_scope
-
-    attr_accessor :allow_custom_events
+    attr_reader :transports, :providers
 
     def initialize
       @logger = Logger.new(STDOUT)

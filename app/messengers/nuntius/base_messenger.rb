@@ -77,14 +77,10 @@ module Nuntius
 
       # (Try to) add file extension if it is missing
       file_extension = File.extname(attachment[:filename]).delete('.')
-      if file_extension.blank? && attachment[:content_type]
-        attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}"
-      end
+      attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}" if file_extension.blank? && attachment[:content_type]
 
       # Fix content type if file extension known but content type blank
-      if file_extension
-        attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s
-      end
+      attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s if file_extension
 
       if options[:auto_zip] && attachment[:io].size > 1024 * 1024
         zip_stream = Zip::OutputStream.write_buffer do |zio|
@@ -220,7 +216,7 @@ module Nuntius
       end
 
       def timebased_scope(name, &scope_proc)
-        raise ArgumentError, "timebased_scope must start with before or after" unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
+        raise ArgumentError, 'timebased_scope must start with before or after' unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
 
         name = name.to_sym
         timebased_scopes[name] = scope_proc if scope_proc.present?
@@ -252,9 +248,7 @@ module Nuntius
 
       # See if we need to do something additional
       template_scope_proc = self.class.template_scope
-      if template_scope_proc
-        @templates = @templates.instance_exec(@object, &template_scope_proc)
-      end
+      @templates = @templates.instance_exec(@object, &template_scope_proc) if template_scope_proc
 
       @templates
     end

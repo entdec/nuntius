@@ -45,6 +45,6 @@ module Nuntius
           # add_breadcrumb I18n.t('nuntuis.breadcrumbs.admin.subscribers'), admin_list_subscribers_path(@subscriber)
         end
       end
-     end
+    end
   end
 end

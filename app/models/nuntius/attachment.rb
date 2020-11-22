@@ -4,6 +4,10 @@ module Nuntius
 
     delegate :download, :content_type, :filename, :signed_id, to: :content
 
-    has_one_attached :content rescue nil
+    begin
+      has_one_attached :content
+    rescue StandardError
+      nil
+    end
   end
 end
