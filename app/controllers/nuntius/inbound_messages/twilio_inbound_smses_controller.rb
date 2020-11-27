@@ -41,11 +41,11 @@ module Nuntius
         inbound_message.metadata = params
         inbound_message.save!
 
-        Nuntius::DeliverInboundMessageService.new(inbound_message).call
+        twiml = Nuntius::DeliverInboundMessageService.new(inbound_message).call
 
-        twiml = Twilio::TwiML::MessagingResponse.new do |resp|
-          resp.message body: 'The Robots are coming! Head for the hills!'
-        end
+        # twiml = Twilio::TwiML::MessagingResponse.new do |resp|
+        #   resp.message body: 'The Robots are coming! Head for the hills!'
+        # end
 
         render body: twiml.to_s,
                content_type: 'text/xml',

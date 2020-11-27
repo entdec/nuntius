@@ -22,7 +22,8 @@ module Nuntius
         @routes
       end
 
-      def connect(hash = {})
+      # Defines the settings
+      def settings(hash = {})
         @settings = hash if hash
         @settings
       end
