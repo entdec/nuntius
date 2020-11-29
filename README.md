@@ -129,6 +129,11 @@ Another more direct way of using Nuntius is by just instantiating a message:
 ```ruby
  Nuntius::Message.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text', nuntiable: channel).deliver_as(:mail)
 ```
+or
+```ruby
+user = User.find(1)
+user.messages.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text').deliver_as(:mail)
+```
 Here we still need a nuntiable object, in case provider settings can differ from object to object.
 
 You can also define custom events, which take a scope and an event name:
@@ -136,6 +141,9 @@ You can also define custom events, which take a scope and an event name:
 Nuntius.with(packing: {smurrefluts: 'hatseflats'}).message(:packed)
 ```
 The main key of the hash passed will also be the liquid variable.
+
+### Inbound
+Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
 
 ## Transports
 

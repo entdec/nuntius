@@ -9,7 +9,7 @@ module Nuntius
         Nuntius::RetrieveInboundMailService.new({}).call
       end
       last_message = Nuntius::InboundMessage.last
-      assert_equal 'pending', last_message.status
+      assert_equal 'delivered', last_message.status
       assert_equal 'mail', last_message.transport
       assert_equal 'imap', last_message.provider
       # assert last_message.provider_id

@@ -4,7 +4,7 @@
 module Nuntius
   class ProcessInboundMessageJob < ApplicationJob
     def perform(inbound_message)
-      ProcessInboundMessageService.new(inbound_message).call
+      Nuntius::DeliverInboundMessageService.new(inbound_message).call
     end
   end
 end

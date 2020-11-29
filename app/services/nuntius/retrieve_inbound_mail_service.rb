@@ -5,6 +5,7 @@ module Nuntius
     transaction true
 
     def initialize(settings)
+      super()
       @settings = settings
     end
 
@@ -24,13 +25,13 @@ module Nuntius
             # This never happens on the first round of fetching it.
             imap.store(uid, '+FLAGS', [Net::IMAP::DELETED])
             imap.expunge
-            Nuntius::ProcessInboundMailJob.set(wait: 2).perform_later(inbound_message, mail)
           end
         else
           si = StringIO.new
           si.write(message.to_s)
           si.rewind
           inbound_message.raw_message.attach(io: si, filename: message.message_id)
+          Nuntius::ProcessInboundMessageJob.perform_later(inbound_message)
         end
       end
     end
