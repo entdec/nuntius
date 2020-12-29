@@ -30,6 +30,8 @@ class NuntiusMessagesTable < ActionTable::ActionTable
 
   def scope
     @scope = Nuntius::Message.visible
+    @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
+    @scope
   end
 
   def filtered_scope
