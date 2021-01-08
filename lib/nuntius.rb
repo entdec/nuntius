@@ -50,6 +50,6 @@ module Nuntius
 
   # Include helpers
   ActiveSupport.on_load(:active_record) do
-    include ActiveRecordHelpers
+    include Nuntius::ActiveRecordHelpers
   end
 end

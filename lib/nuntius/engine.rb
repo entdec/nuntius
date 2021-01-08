@@ -15,7 +15,7 @@ module Nuntius
     initializer 'active_storage.attached' do
       config.after_initialize do
         ActiveSupport.on_load(:active_record) do
-          Nuntius::Attachment.include(ActiveStorageHelpers)
+          Nuntius::Attachment.include(Nuntius::ActiveStorageHelpers)
         end
       end
     end

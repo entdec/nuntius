@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ActiveRecordHelpers
+module Nuntius::ActiveRecordHelpers
   extend ActiveSupport::Concern
 
   included do
