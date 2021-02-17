@@ -18,7 +18,7 @@ module Nuntius
 
       add_to_config
       orchestrator = Evento::Orchestrator.new(klass)
-      orchestrator.define_event_methods_on(messenger, state_machine: options[:use_state_machine], devise: options[:override_devise]) { |object, params = {}| }
+      orchestrator.define_event_methods_on(messenger, state_machine: options[:use_state_machine], life_cycle: options[:life_cycle], devise: options[:override_devise]) { |object, params = {}| }
 
       if options[:override_devise]
         orchestrator.override_devise_notification do |notification, *devise_params|
@@ -38,6 +38,7 @@ module Nuntius
         record  = transaction_log_entry.transaction_loggable
         event   = transaction_log_entry.event
         Nuntius.with(record).message(event.to_s) if record.nuntiable? && event.present?
+        Nuntius.with(record).message('save') if %w[create update].include?(event) && record.nuntiable?
       end
     end
 
