@@ -4,11 +4,13 @@ class NuntiusTemplatesTable < ActionTable::ActionTable
   model Nuntius::Template
 
   column(:description)
-  column(:metadata) { |template| Nuntius.config.metadata_humanize(template.metadata) }
   column(:enabled, as: :boolean)
   column(:klass)
   column(:event)
   column(:"# messages") { |template| link_to template.messages.count, nuntius.admin_messages_path(template_id: template.id) }
+
+  column(:metadata) { |template| Nuntius.config.metadata_humanize(template.metadata) }
+  column(:created_at) { |flow| ln(flow.created_at) }
 
   column :actions, title: '', sortable: false do |template|
     content_tag(:span, class: 'btn-group btn-group-xs') do
