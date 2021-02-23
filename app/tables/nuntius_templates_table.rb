@@ -5,7 +5,7 @@ class NuntiusTemplatesTable < ActionTable::ActionTable
 
   column(:description)
   column(:metadata) { |template| Nuntius.config.metadata_humanize(template.metadata) }
-  column(:enabled) { |template| content_tag(:i, nil, class: template.enabled ? 'fa fa-check' : 'fa fa-times') }
+  column(:enabled, as: :boolean)
   column(:klass)
   column(:event)
   column(:"# messages") { |template| link_to template.messages.count, nuntius.admin_messages_path(template_id: template.id) }
