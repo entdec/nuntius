@@ -16,10 +16,4 @@ class NuntiusSubscribersTable < ActionTable::ActionTable
   def scope
     @scope = Nuntius::Subscriber.where(list_id: params[:list_id])
   end
-
-  def filtered_scope
-    @filtered_scope = scope
-
-    @filtered_scope
-  end
 end

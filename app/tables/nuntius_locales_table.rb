@@ -15,10 +15,4 @@ class NuntiusLocalesTable < ActionTable::ActionTable
   def scope
     @scope = Nuntius::Locale.visible
   end
-
-  def filtered_scope
-    @filtered_scope = scope
-
-    @filtered_scope
-  end
 end

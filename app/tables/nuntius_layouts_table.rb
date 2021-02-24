@@ -21,10 +21,4 @@ class NuntiusLayoutsTable < ActionTable::ActionTable
   def scope
     @scope = Nuntius::Layout.visible
   end
-
-  def filtered_scope
-    @filtered_scope = scope
-
-    @filtered_scope
-  end
 end

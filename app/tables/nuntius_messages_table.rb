@@ -31,18 +31,8 @@ class NuntiusMessagesTable < ActionTable::ActionTable
   def scope
     @scope = Nuntius::Message.visible
     @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
+    @scope = @scope.where(template_id: params[:template_id]) if params[:template_id]
+    @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
     @scope
-  end
-
-  def filtered_scope
-    @filtered_scope = scope
-
-    @filtered_scope = @filtered_scope.where(template_id: params[:template_id]) if params[:template_id]
-
-    @filtered_scope = @filtered_scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
-
-    @filtered_scope = @filtered_scope.where("concat_ws(' ', to, subject) ILIKE :query", query: "%#{params[:query]}%") if params[:query].present?
-
-    @filtered_scope
   end
 end
