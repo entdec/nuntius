@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
+  s.add_dependency 'apnotic', '1.6.1'
   s.add_dependency 'auxilium', '~> 0.2' # This is our own gem, you must add it to your project's Gemfile for this to work
   s.add_dependency 'aws-sdk-sns'
   s.add_dependency 'evento', '~> 0.1' # This is our own gem, you must add it to your project's Gemfile for this to work
