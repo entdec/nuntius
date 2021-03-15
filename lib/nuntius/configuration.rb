@@ -3,7 +3,7 @@
 module Nuntius
   class Configuration
     attr_accessor :admin_authentication_module, :base_controller, :base_runner, :layout, :admin_layout, :jobs_queue_name, :visible_scope, :add_metadata, :metadata_fields, :default_template_scope, :allow_custom_events
-    attr_writer :logger, :host, :metadata_humanize
+    attr_writer :logger, :host, :metadata_humanize, :default_params
 
     attr_reader :transports, :providers
 
@@ -68,6 +68,10 @@ module Nuntius
 
     def transport(transport)
       @transports.push(transport) if transport
+    end
+
+    def default_params(transaction_log_entry)
+      @default_params.is_a?(Proc) ? instance_exec(transaction_log_entry, &@default_params) : @default_params
     end
 
     private

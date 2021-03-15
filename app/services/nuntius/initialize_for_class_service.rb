@@ -37,8 +37,11 @@ module Nuntius
       orchestrator.after_transaction_log_commit(:nuntius) do |transaction_log_entry|
         record  = transaction_log_entry.transaction_loggable
         event   = transaction_log_entry.event
-        Nuntius.with(record).message(event.to_s) if record.nuntiable? && event.present?
-        Nuntius.with(record).message('save') if %w[create update].include?(event) && record.nuntiable?
+
+        params = Nuntius.config.default_params(transaction_log_entry)
+
+        Nuntius.with(record, params).message(event.to_s) if record.nuntiable? && event.present?
+        Nuntius.with(record, params).message('save') if %w[create update].include?(event) && record.nuntiable?
       end
     end
 
