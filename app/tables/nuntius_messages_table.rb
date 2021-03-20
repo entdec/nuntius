@@ -32,7 +32,6 @@ class NuntiusMessagesTable < ActionTable::ActionTable
     @scope = Nuntius::Message.visible
     @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
     @scope = @scope.where(template_id: params[:template_id]) if params[:template_id]
-    @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
     @scope
   end
 end
