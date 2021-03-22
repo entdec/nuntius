@@ -12,20 +12,20 @@ Nuntius.setup do |config|
 
   config.provider :smtp, transport: :mail, settings: lambda { |_message|
     {
-      from_header: 'admin@boxture.com',
-      host: 'smtp.soverin.net',
-      port: '587',
-      username: 'admin@boxture.com',
-      password: 'cgY3MxPvNPs8URAc',
-      allow_list: ['example.com', 'mark@boxture.com', 'tom@boxture.com']
+      from_header: '',
+      host: '',
+      port: '',
+      username: '',
+      password: '',
+      allow_list: ['example.com']
     }
   }
 
   config.provider :houston, transport: :push, settings: { certificate: '' }
-  config.provider :firebase, transport: :push, settings: { server_key: 'AAAAhfDlrck:APA91bE7HwqfTkhVfaeMdXiSoeRZdlcIfidVyPfOibVhoTJeoOCiMRxn2E9dGf0PxK_eu7_dUmyVYkFoS8UyIrVujBf6OototKahqGTm_cVAz8lkYnsIGcvrpRYmpk3MkBsV1y3_f73W' }
+  config.provider :firebase, transport: :push, settings: { server_key: '' }
 
-  config.provider :message_bird, transport: :sms, priority: 1, timeout: 20, settings: { from: 'Soverin', auth_token: 'live_qrV8ZwTAgnqQ6soTZBddZMtjK' }
-  config.provider :twilio, transport: :sms, priority: 2, settings: { sid: 'AC92bf1782ac7790aa62d13f2135a887aa', auth_token: '811738b3a314daa224ce55ca400a97c2', from: '+14153736696' }
+  config.provider :message_bird, transport: :sms, priority: 1, timeout: 20, settings: { from: 'Sovein', auth_token: '' }
+  config.provider :twilio, transport: :sms, priority: 2, settings: { sid: '', auth_token: '', from: '' }
 
-  config.provider :twilio, transport: :voice, settings: { sid: 'AC92bf1782ac7790aa62d13f2135a887aa', auth_token: '811738b3a314daa224ce55ca400a97c2', from: '+14153736696' }
+  config.provider :twilio, transport: :voice, settings: { sid: '', auth_token: '', from: '' }
 end
