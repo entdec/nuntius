@@ -10,7 +10,7 @@
   "browserslist": "> 1%",
   "peerDependencies": {
     "codemirror": "^5.48.4",
-    "codemirror-liquid": "git+ssh://git@code.entropydecelerator.com/components/codemirror-liquid",
+    "codemirror-liquid": "> 0",
     "element-closest": "^3.0.1",
     "stimulus": "^2"
   },
