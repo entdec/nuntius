@@ -1,19 +1,14 @@
 {
-  "name": "nuntius",
+  "name": "@components/nuntius",
   "version": "1.0.0",
-  "main": "frontend/dist/nuntius.js",
   "repository": "git@code.entropydecelerator.com:components/nuntius.git",
   "author": "Tom de Grunt <tom@degrunt.nl>",
   "license": "MIT",
   "files": [
-    "frontend/dist"
+    "./frontend/**/*"
   ],
-  "scripts": {
-    "build": "webpack -p --config webpack.config.js --color",
-    "watch": "webpack -w --config webpack.config.js --color"
-  },
   "browserslist": "> 1%",
-  "dependencies": {
+  "peerDependencies": {
     "codemirror": "^5.48.4",
     "codemirror-liquid": "git+ssh://git@code.entropydecelerator.com/components/codemirror-liquid",
     "element-closest": "^3.0.1",
