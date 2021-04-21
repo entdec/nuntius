@@ -1,9 +1,10 @@
-- content_for :context_menu do
-  =< button_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  =< button_to(t('nuntius.context_menu.resend'), resend_admin_message_path(@message), class: 'ui-button')
+= clg.card title: @message.template&.description do |card|
+  - card.slot :action
+    = button_to(t('nuntius.context_menu.root'), root_path, class: 'clg-button')
+  - card.slot :action
+    = button_to(t('nuntius.context_menu.resend'), resend_admin_message_path(@message), class: 'clg-button')
 
-= ui_tabs(:message, title: @message.template&.description)
-  - ui_tab(:preview)
+  - card.slot :tab, id: :preview, title: 'Preview'
     table.table
       thead
         tr
@@ -43,7 +44,7 @@
 
     - if @message.transport == 'mail' && @message.html.present?
       iframe src=message_path(@message.id) style="width: 100%; height: 600px; border: 0px;"
-  - ui_tab(:details)
+  - card.slot :tab, id: :details, title: 'Details'
     table.table
       thead
         tr
