@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'auxilium'
 require 'inky'
 require 'httpclient'
 require 'liquor'

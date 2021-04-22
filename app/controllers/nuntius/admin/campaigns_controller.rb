@@ -6,7 +6,6 @@ module Nuntius
   module Admin
     class CampaignsController < ApplicationAdminController
       before_action :set_objects, except: [:index]
-      add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.campaigns'), :admin_campaigns_path) if defined? add_breadcrumb
 
       def index
         @campaigns = Nuntius::Campaign.visible.order(created_at: :desc)
@@ -17,11 +16,12 @@ module Nuntius
       end
 
       def create
-        respond @campaign.save
+        @campaign.save
+        respond_with :admin, @campaign
       end
 
       def show
-        redirect_to :edit_admin_campaign
+        redirect_to :edit_admin_campaign, status: :see_other
       end
 
       def edit; end
@@ -31,9 +31,9 @@ module Nuntius
 
         if saved && params[:commit] == 'send'
           @campaign.publish! if @campaign.can_publish?
-          redirect_to :edit_admin_campaign
+          redirect_to :edit_admin_campaign, status: :see_other
         else
-          respond saved, action: :edit
+          respond_with :admin, @campaign
         end
       end
 

@@ -5,7 +5,6 @@ require_dependency 'nuntius/application_admin_controller'
 module Nuntius
   module Admin
     class ListsController < ApplicationAdminController
-      add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path) if defined? add_breadcrumb
 
       def index
         @lists = Nuntius::List.visible.order(:name)
@@ -18,11 +17,11 @@ module Nuntius
 
       def create
         @list = Nuntius::List.new(list_params)
-        respond @list.save
+        respond_with :admin, @list
       end
 
       def show
-        redirect_to :edit_admin_list
+        redirect_to :edit_admin_list, status: :see_other
       end
 
       def edit
@@ -31,7 +30,8 @@ module Nuntius
 
       def update
         @list = Nuntius::List.visible.find(params[:id])
-        respond @list.update(list_params), action: :edit
+        @list.update(list_params)
+        respond_with :admin, @list
       end
 
       private

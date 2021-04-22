@@ -18,7 +18,8 @@ module Nuntius
 
       def create
         @template = Nuntius::Template.new(template_params)
-        respond @template.save
+        @template.save
+        respond_with :admin, @template
       end
 
       def edit
@@ -26,17 +27,19 @@ module Nuntius
       end
 
       def show
-        redirect_to :edit_admin_template
+        redirect_to :edit_admin_template, status: :see_other
       end
 
       def update
         @template = Nuntius::Template.visible.find(params[:id])
-        respond @template.update(template_params), action: :edit
+        @template.update(template_params)
+        respond_with :admin, @template
       end
 
       def destroy
         @template = Nuntius::Template.visible.find(params[:id])
-        respond @template.destroy, notice: 'The template was deleted', error: 'There were problems deleting the template'
+        @template.destroy
+        respond_with @template
       end
 
       private

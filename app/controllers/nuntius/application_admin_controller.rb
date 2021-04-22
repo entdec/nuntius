@@ -4,7 +4,6 @@ require_dependency 'nuntius/application_controller'
 
 module Nuntius
   class ApplicationAdminController < ApplicationController
-    include Nuntius::Concerns::Respond
     include Nuntius.config.admin_authentication_module.constantize if Nuntius.config.admin_authentication_module
 
     layout Nuntius.config.admin_layout
