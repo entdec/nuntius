@@ -1,15 +1,15 @@
-= simple_form_for(@list, url: @list.new_record? ? admin_lists_path : admin_list_path, html: {multipart: true}) do |f|
-  = f.input :name
-
-  = f.button :button, 'Save', name: 'commit', value: 'save', class: 'ui-button primary', data: { disable_with: 'Save' }
-  - if @list.persisted?
-    = f.button :button, 'Continue', name: 'commit', value: 'continue', data: { disable_with: 'Continue' }
-
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  - if @list.persisted?
-    =< link_to(t('nuntius.context_menu.add_subscriber'), new_admin_list_subscriber_path(@list), class: 'ui-button primary')
+= clg.simple_form_for(@list, url: @list.new_record? ? admin_lists_path : admin_list_path, html: { multipart: true }) do |f|
+  = clg.card title: 'List' do |card|
+    - card.slot :action
+      = f.submit class: 'clg-button clg-button--primary'
+    - if @list.persisted?
+      - card.slot :action
+        = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
+    = clg.layout do |layout|
+      - layout.row
+        - layout.cell
+          = f.input :name
 
 br
 - if @list.subscribers.present?
-  = ui_table '/action_table/nuntius_subscribers', :nuntius_subscribers, parameters: { list_id: @list.id }
+  = clg.action_table nuntius_subscribers, url_params: { list_id: @list.id }

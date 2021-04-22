@@ -1,24 +1,31 @@
 - if @campaign.draft?
-  = ui_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: {multipart: true}) do |f|
-    = f.input :name
-    .ui-row
-      .ui-col-sm-4
-        = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {class: 'transport'}
-      .ui-col-sm-4
-        = f.association :layout, collection: @layouts
-      .ui-col-sm-4
-        = f.association :list, collection: @lists
-    = f.input :from, hint: 'You can leave this blank, only fill this in if you want to override the default'
-    .for-transport.mail
-      = f.input :subject
-    .for-transport.mail
-      = f.input :html, as: :hidden
-      trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
+  = clg.simple_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: { multipart: true }) do |f|
+    = clg.card title: 'Campaign' do |card|
+      - card.slot :action
+        = f.submit class: 'clg-button clg-button--primary'
+      - if @subscriber.persisted?
+        - card.slot :action
+          = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
+      = clg.layout do |layout|
+        - layout.row
+          - layout.cell
+            = f.input :name
+            .ui-row
+              .ui-col-sm-4
+                = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {class: 'transport'}
+              .ui-col-sm-4
+                = f.association :layout, collection: @layouts
+              .ui-col-sm-4
+                = f.association :list, collection: @lists
+            = f.input :from, hint: 'You can leave this blank, only fill this in if you want to override the default'
+            .for-transport.mail
+              = f.input :subject
+            .for-transport.mail
+              = f.input :html, as: :hidden
+              trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
 
-    .for-transport.push.sms.voice
-      = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
-    - if @campaign.persisted?
-      = f.button :button, 'Send', name: 'commit', value: 'send', data: { disable_with: 'Sending' }
+            .for-transport.push.sms.voice
+              = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
 
 - else
   h2 = @campaign.name
@@ -34,10 +41,6 @@
         tr
           td = link_to message.status, admin_message_path(message)
           td = message.to
-
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.campaigns'), admin_campaigns_path, class: 'ui-button')
 
 javascript:
   $('.transport').change(function(e){

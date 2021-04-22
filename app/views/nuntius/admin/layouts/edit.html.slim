@@ -1,10 +1,16 @@
-= ui_form_for(@layout, title: 'Layout', url: @layout.new_record? ? admin_layouts_path : admin_layout_path, html: {multipart: true}) do |f|
-  - ui_tab :edit
-    = f.input :name
-    = f.input :data, as: :editor, input_html: { data: { 'editor-mode': 'text/html', height: '400px' } }
-    = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
-  - if @layout.templates.size.positive?
-    = ui_table_tab :nuntius_templates, title: "#{@layout.templates.size} templates", parameters: { layout_id: @layout.id }
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.layouts'), admin_layouts_path, class: 'ui-button')
+= clg.simple_form_for(@layout, title: 'Layout', url: @layout.new_record? ? admin_layouts_path : admin_layout_path, html: {multipart: true}) do |f|
+  = clg.card title: 'Layout'
+    - card.slot :action
+      = f.submit class: 'clg-button clg-button--primary'
+    - if @layout.persisted?
+      - card.slot :action
+        = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
+    = clg.layout do |layout|
+      - layout.row
+        - layout.cell
+          - ui_tab :edit
+            = f.input :name
+            = f.input :data, as: :editor, input_html: { data: { 'editor-mode': 'text/html', height: '400px' } }
+            = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
+          - if @layout.templates.size.positive?
+            = ui_table_tab :nuntius_templates, title: "#{@layout.templates.size} templates", parameters: { layout_id: @layout.id }

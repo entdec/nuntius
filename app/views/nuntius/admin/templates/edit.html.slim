@@ -1,35 +1,42 @@
 
 - present(@template, TemplatePresenter) do |template|
-  = ui_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
-    - ui_tab :edit
-      = f.input :enabled
-      = f.input :description
-      .event-inputs-wrapper data-controller='toggle' data-toggle-attr='data-timebased'
-        .ui-row
-          .ui-col-sm-6= f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
-          .ui-col-sm-6.klass.select= f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chained-input', 'chained-input-to': '#template_klass', 'target': 'toggle.input' } }
-          .ui-col-sm-6.klass.custom= f.input :event, input_html: { placeholder: 'scope#event' }
-        div data-toggle-target='insertion'
-        template data-toggle-target='toggleable' data-toggle-value='true'
-          = f.input :interval
-      = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { class: 'transport' }
-      = f.input :from
-      = f.input :to
-      .for-transport.mail
-        = f.input :subject, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
-        = f.association :layout, collection: @layouts
-        = f.input :html, as: :editor, input_html: { data: { 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
-      .for-transport.push.sms.voice.slack
-        = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
-      .for-transport.push.slack
-        = f.input :payload, as: :editor, input_html: { data: { 'editor-mode': 'application/yaml', height: '80px' } }
-      = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
-    - if @template.messages.size.positive?
-      = ui_table_tab :nuntius_messages, title: "#{@template.messages.size} messages", parameters: { template_id: @template.id }
-
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
-  =< link_to(t('nuntius.context_menu.templates'), admin_templates_path, class: 'ui-button')
+  = clg.simple_form_for(@template, url: @template.new_record? ? admin_templates_path : admin_template_path, html: {multipart: true}) do |f|
+    = clg.card title: 'List' do |card|
+      - card.slot :action
+        = f.submit class: 'clg-button clg-button--primary'
+      - if @template.persisted?
+        - card.slot :action
+          = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
+      = clg.layout do |layout|
+        - layout.row
+          - layout.cell
+            - clg.tabbable_pane do |pane|
+              - pane.slot :tab, id: :edit, title: :edit
+                = f.input :enabled
+                = f.input :description
+                .event-inputs-wrapper data-controller='toggle' data-toggle-attr='data-timebased'
+                  .ui-row
+                    .ui-col-sm-6= f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
+                    .ui-col-sm-6.klass.select= f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chained-input', 'chained-input-to': '#template_klass', 'target': 'toggle.input' } }
+                    .ui-col-sm-6.klass.custom= f.input :event, input_html: { placeholder: 'scope#event' }
+                  div data-toggle-target='insertion'
+                  template data-toggle-target='toggleable' data-toggle-value='true'
+                    = f.input :interval
+                = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { class: 'transport' }
+                = f.input :from
+                = f.input :to
+                .for-transport.mail
+                  = f.input :subject, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
+                  = f.association :layout, collection: @layouts
+                  = f.input :html, as: :editor, input_html: { data: { 'editor-mode' => 'text/markdown', 'editor-height' => '200px' } }
+                .for-transport.push.sms.voice.slack
+                  = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
+                .for-transport.push.slack
+                  = f.input :payload, as: :editor, input_html: { data: { 'editor-mode': 'application/yaml', height: '80px' } }
+                = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
+              - if @template.messages.size.positive?
+                - pane.slot :tab, id: :nuntius_messages, title: "#{@template.messages.size} messages"
+                  = clg.action_table :nuntius_messages, url_params: { template_id: @template.id }
 
 javascript:
   (function () {
