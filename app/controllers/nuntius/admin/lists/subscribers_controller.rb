@@ -19,7 +19,8 @@ module Nuntius
 
         def create
           @subscriber = @list.subscribers.new(subscriber_params)
-          respond @subscriber.save, path: admin_list_url(@list)
+          @subscriber.save
+          respond_with @subscriber, collection_location: -> { admin_list_url(@list) }
         end
 
         def edit
@@ -28,7 +29,8 @@ module Nuntius
 
         def update
           @subscriber = @list.subscribers.find(params[:id])
-          respond @subscriber.update(subscriber_params), path: admin_list_url(@list)
+          @subscriber.update(subscriber_params)
+          respond_with @subscriber, collection_location: -> { admin_list_url(@list) }
         end
 
         private
@@ -39,10 +41,6 @@ module Nuntius
 
         def set_objects
           @list = List.find(params[:list_id])
-
-          add_breadcrumb(I18n.t('nuntius.breadcrumbs.admin.lists'), :admin_lists_path) if defined? add_breadcrumb
-          add_breadcrumb(@list.name, edit_admin_list_path(@list)) if defined? add_breadcrumb
-          # add_breadcrumb I18n.t('nuntuis.breadcrumbs.admin.subscribers'), admin_list_subscribers_path(@subscriber)
         end
       end
     end

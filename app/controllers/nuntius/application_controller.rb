@@ -2,8 +2,10 @@
 
 module Nuntius
   class ApplicationController < Nuntius.config.base_controller.constantize
+    self.responder = Auxilium::Responder
+    respond_to :html
+
     protect_from_forgery with: :exception
-    add_breadcrumb(I18n.t('nuntius.breadcrumbs.nuntius'), :root_url) if defined? add_breadcrumb
 
     layout Nuntius.config.layout
   end

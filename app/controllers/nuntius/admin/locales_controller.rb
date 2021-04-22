@@ -16,11 +16,12 @@ module Nuntius
 
       def create
         @locale = Nuntius::Locale.new(locale_params)
-        respond @locale.save
+        @locale.save
+        respond_with :admin, @locale
       end
 
       def show
-        redirect_to :edit_admin_locales
+        redirect_to :edit_admin_locales, status: :see_other
       end
 
       def edit
@@ -29,7 +30,8 @@ module Nuntius
 
       def update
         @locale = Nuntius::Locale.visible.find(params[:id])
-        respond @locale.update(locale_params), action: :edit
+        @locale.update(locale_params)
+        respond_with :admin, @locale
       end
 
       private
