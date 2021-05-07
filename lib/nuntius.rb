@@ -49,6 +49,7 @@ module Nuntius
 
     def event(event, obj, params = {})
       return unless event
+      return unless obj.nuntiable?
 
       Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
     end

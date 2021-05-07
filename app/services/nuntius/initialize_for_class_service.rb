@@ -23,14 +23,15 @@ module Nuntius
       if options[:override_devise]
         orchestrator.override_devise_notification do |notification, *devise_params|
           # All notifications have either a token as the first param, or nothing
-          Nuntius.with(self, token: devise_params.first).message(notification)
+          Nuntius.event(notification, self, { token: devise_params.first })
         end
       end
 
       if options[:use_state_machine]
         orchestrator.after_audit_trail_commit(:nuntius) do |resource_state_transition|
           resource = resource_state_transition.resource
-          Nuntius.with(resource).message(event.to_s) if resource.nuntiable?
+
+          Nuntius.event(event, resource)
         end
       end
 
@@ -40,8 +41,8 @@ module Nuntius
 
         params = Nuntius.config.default_params(transaction_log_entry)
 
-        Nuntius.with(record, params).message(event.to_s) if record.nuntiable? && event.present?
-        Nuntius.with(record, params).message('save') if %w[create update].include?(event) && record.nuntiable?
+        Nuntius.event(event, record, params)
+        Nuntius.event('save', record, params) if %w[create update].include?(event)
       end
     end
 
