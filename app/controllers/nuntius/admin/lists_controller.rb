@@ -16,7 +16,7 @@ module Nuntius
       end
 
       def create
-        @list = Nuntius::List.new(list_params)
+        @list = Nuntius::List.create(list_params)
         respond_with :admin, @list
       end
 
