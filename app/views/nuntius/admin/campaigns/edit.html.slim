@@ -3,7 +3,7 @@
     = clg.card title: 'Campaign' do |card|
       - card.slot :action
         = f.submit class: 'clg-button clg-button--primary'
-      - if @subscriber.persisted?
+      - if @campaign.persisted?
         - card.slot :action
           = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
       = clg.layout do |layout|
