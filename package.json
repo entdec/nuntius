@@ -1,1 +1,42 @@
-{"name":"@components/nuntius","version":"0.7.2","repository":"git@code.entropydecelerator.com:components/nuntius.git","author":"Tom de Grunt \u003ctom@degrunt.nl\u003e","license":"MIT","files":["./frontend/**/*"],"browserslist":"\u003e 1%","peerDependencies":{"codemirror":"^5.48.4","codemirror-liquid":"\u003e 0","element-closest":"^3.0.1","stimulus":"^2"},"devDependencies":{"@gitlab/svgs":"^1.68.0","babel-cli":"^6.26.0","babel-core":"^6.26.0","babel-loader":"^7.1.2","babel-plugin-add-module-exports":"^0.2.1","babel-plugin-syntax-dynamic-import":"^6.18.0","babel-plugin-transform-class-properties":"^6.24.1","babel-plugin-transform-object-rest-spread":"^6.26.0","babel-preset-env":"^1.6.1","babel-preset-es2015":"^6.24.1","clean-webpack-plugin":"^0.1.19","copy-webpack-plugin":"^4.6.0","css-loader":"^0.28.9","extract-text-webpack-plugin":"^3.0.2","file-loader":"^2.0.0","mini-css-extract-plugin":"^0.8.0","node-sass":"^4.12.0","postcss-custom-properties":"^8.0.9","sass-loader":"^7.3.1","style-loader":"^1.0.0","url-loader":"^2.1.0","webpack":"^4.39.2","webpack-cli":"^3.3.7"}}
+{
+  "name": "@components/nuntius",
+  "version": "0.7.3",
+  "repository": "git@code.entropydecelerator.com:components/nuntius.git",
+  "author": "Tom de Grunt <tom@degrunt.nl>",
+  "license": "MIT",
+  "files": [
+    "./frontend/**/*"
+  ],
+  "browserslist": "> 1%",
+  "peerDependencies": {
+    "codemirror": "^5.48.4",
+    "codemirror-liquid": "> 0",
+    "element-closest": "^3.0.1",
+    "stimulus": "^2"
+  },
+  "devDependencies": {
+    "@gitlab/svgs": "^1.68.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.6.0",
+    "css-loader": "^0.28.9",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^2.0.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "node-sass": "^4.12.0",
+    "postcss-custom-properties": "^8.0.9",
+    "sass-loader": "^7.3.1",
+    "style-loader": "^1.0.0",
+    "url-loader": "^2.1.0",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7"
+  }
+}
