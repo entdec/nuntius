@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'nuntiable'
+require_relative 'devise'
+require_relative 'state_machine'
+require_relative 'transactio'
+
 module Nuntius::ActiveRecordHelpers
   extend ActiveSupport::Concern
 
@@ -9,15 +14,15 @@ module Nuntius::ActiveRecordHelpers
 
   class_methods do
     def nuntiable(options = {})
-      has_many :messages, as: :nuntiable, class_name: 'Nuntius::Message'
-      Nuntius::InitializeForClassService.new(self, options).call
-      class_variable_set(:@@_is_nuntiable, true)
+      @_nuntius_nuntiable_options = options
+      include Nuntius::Nuntiable
+      include Nuntius::StateMachine if options[:state_machine]
+      include Nuntius::Devise if options[:override_devise]
+      include Nuntius::Transactio
     end
 
     def nuntiable?
-      return false unless class_variable_defined?(:@@_is_nuntiable)
-
-      class_variable_get(:@@_is_nuntiable)
+      included_modules.include?(Nuntius::Nuntiable)
     end
   end
 end
