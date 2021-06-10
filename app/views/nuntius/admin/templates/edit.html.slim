@@ -17,7 +17,7 @@
                 .event-inputs-wrapper data-controller='toggle' data-toggle-attr='data-timebased'
                   .ui-row
                     .ui-col-sm-6= f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass
-                    .ui-col-sm-6.klass.select= f.input :event, collection: template.all_events, include_blank: false, input_html: { data: { controller: 'chained-input', 'chained-input-to': '#template_klass', 'target': 'toggle.input' } }
+                    .ui-col-sm-6.klass.select= f.input :event, collection: template.all_events, include_blank: false, chain_to: 'template[klass]', input_html: { data: { 'target': 'toggle.input' } }
                     .ui-col-sm-6.klass.custom= f.input :event, input_html: { placeholder: 'scope#event' }
                   div data-toggle-target='insertion'
                   template data-toggle-target='toggleable' data-toggle-value='true'
