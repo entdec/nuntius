@@ -17,7 +17,7 @@ module Nuntius
 
       def create
         @campaign.save
-        respond_with :admin, @campaign
+        respond_with :admin, @campaign, action: :edit
       end
 
       def show

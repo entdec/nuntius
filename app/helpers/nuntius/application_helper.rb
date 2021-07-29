@@ -2,57 +2,57 @@
 
 module Nuntius
   module ApplicationHelper
-    def dashboard_context_menu
-      @dashboard_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :layouts, link: admin_layouts_path
-        menu.item :locales, link: admin_locales_path
-        menu.item :templates, link: admin_templates_path
-        menu.item :campaigns, link: admin_campaigns_path
+    def nuntius_dashboard_menu
+      Satis::Menus::Builder.build(:dashboard) do |m|
+        m.item :templates, link: nuntius.admin_templates_path, icon: 'fal fa-file'
+        m.item :layouts, link: nuntius.admin_layouts_path, icon: 'fal fa-table-layout'
+        m.item :locales, link: nuntius.admin_locales_path, icon: 'fal fa-language'
+        m.item :campaigns, link: nuntius.admin_campaigns_path, icon: 'fal fa-megaphone'
+        m.item :lists, link: nuntius.admin_lists_path, icon: 'fal fa-address-book'
       end
-      @dashboard_context_menu.for_context
     end
 
-    def templates_context_menu
-      @templates_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :new, link: new_admin_template_path
+    def nuntius_templates_menu
+      Satis::Menus::Builder.build(:templates) do |m|
+        m.item :new, link: nuntius.new_admin_template_path
       end
-      @templates_context_menu.for_context
     end
 
-    def messages_context_menu
-      @messages_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :new, link: new_admin_message_path
+    def nuntius_messages_menu
+      Satis::Menus::Builder.build(:messages) do |m|
+        m.item :new, link: nuntius.new_admin_message_path
       end
-      @messages_context_menu.for_context
     end
 
-    def layouts_context_menu
-      @layouts_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :new, link: new_admin_layout_path
+    def nuntius_layouts_menu
+      Satis::Menus::Builder.build(:layouts) do |m|
+        m.item :new, link: nuntius.new_admin_layout_path
       end
-      @layouts_context_menu.for_context
     end
 
-    def locales_context_menu
-      @locales_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :new, link: new_admin_locale_path
+    def nuntius_locales_menu
+      Satis::Menus::Builder.build(:locales) do |m|
+        m.item :new, link: nuntius.new_admin_locale_path
       end
-      @locales_context_menu.for_context
     end
 
-    def campaigns_context_menu
-      @campaigns_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :new, link: new_admin_campaign_path
-        menu.item :lists, link: admin_lists_path
+    def nuntius_campaigns_menu
+      Satis::Menus::Builder.build(:campaign) do |m|
+        m.item :new, link: nuntius.new_admin_campaign_path
+        m.item :lists, link: nuntius.admin_lists_path
       end
-      @campaigns_context_menu.for_context
     end
 
-    def lists_context_menu
-      @lists_context_menu ||= Electio::Menu.new(context: self) do |menu|
-        menu.item :new, link: new_admin_list_path
+    def nuntius_lists_menu
+      Satis::Menus::Builder.build(:lists) do |m|
+        m.item :new, link: nuntius.new_admin_list_path
       end
-      @lists_context_menu.for_context
+    end
+
+    def nuntius_list_menu
+      Satis::Menus::Builder.build(:lists) do |m|
+        m.item :new_subscriber, link: nuntius.new_admin_list_subscriber_path(@list)
+      end
     end
 
     def present(model, presenter_class = nil)

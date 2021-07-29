@@ -1,31 +1,37 @@
 - if @campaign.draft?
-  = clg.simple_form_for(@campaign, url: @campaign.new_record? ? admin_campaigns_path : admin_campaign_path, html: { multipart: true }) do |f|
-    = clg.card title: 'Campaign' do |card|
-      - card.slot :action
-        = f.submit class: 'clg-button clg-button--primary'
-      - if @campaign.persisted?
-        - card.slot :action
-          = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
-      = clg.layout do |layout|
-        - layout.row
-          - layout.cell
-            = f.input :name
-            .ui-row
-              .ui-col-sm-4
-                = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {class: 'transport'}
-              .ui-col-sm-4
-                = f.association :layout, collection: @layouts
-              .ui-col-sm-4
-                = f.association :list, collection: @lists
-            = f.input :from, hint: 'You can leave this blank, only fill this in if you want to override the default'
-            .for-transport.mail
-              = f.input :subject
-            .for-transport.mail
-              = f.input :html, as: :hidden
-              trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
+  = sts.form_for [:admin, @campaign] do |f|
+    = sts.card title: t('.campaign'), icon: 'fal fa-megaphone' do |card|
+      - card.action
+        = f.submit
 
-            .for-transport.push.sms.voice
-              = f.input :text, as: :editor, input_html: { data: { 'editor-mode': 'text/plain', height: '80px' } }
+      .grid.grid-cols-12.gap-4 data-controller="toggle"
+        .col-span-12
+          = f.input :name
+
+        .col-span-4
+          = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {data: { 'toggle-target' => 'input'}}
+        .col-span-4
+          = f.association :layout, collection: @layouts
+        .col-span-4
+          = f.association :list, collection: @lists
+
+        .col-span-12
+          = f.input :from, hint: 'You can leave this blank, only fill this in if you want to override the default'
+
+        .col-span-12
+          .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
+
+        template data-toggle-target='toggleable' data-toggle-value='mail'
+          .col-span-12
+            = f.input :subject
+          .col-span-12
+            = f.input :html, as: :hidden
+            trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
+
+        template data-toggle-target='toggleable' data-toggle-value='voice'
+          .col-span-12
+            = f.input :text, as: :editor, mode: 'text/plain'
+
 
 - else
   h2 = @campaign.name
@@ -41,11 +47,3 @@
         tr
           td = link_to message.status, admin_message_path(message)
           td = message.to
-
-javascript:
-  $('.transport').change(function(e){
-    var transport = $(this).val();
-    $('.for-transport').hide();
-    $('.for-transport.'+transport).show();
-  })
-  $('.transport').change();

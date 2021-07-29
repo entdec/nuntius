@@ -1,5 +1,2 @@
-= clg.card(menu: layouts_context_menu) do |card|
-  - card.slot :title
-    | Layouts
-  - card.slot :footer
-  = clg.action_table(:nuntius_layouts, options: { exportable: true }, url_params: {})
+= sts.card title: t('.layouts'), icon: 'fad fa-table-layout', content_padding: false, menu: nuntius_layouts_menu do |card|
+  = sts.table :nuntius_layouts

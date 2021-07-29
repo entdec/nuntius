@@ -19,7 +19,7 @@ module Nuntius
       def create
         @template = Nuntius::Template.new(template_params)
         @template.save
-        respond_with :admin, @template
+        respond_with :admin, @template, action: :edit
       end
 
       def edit
@@ -49,9 +49,7 @@ module Nuntius
       end
 
       def template_params
-        params.require(:template).permit(:enabled, :klass, :event, :interval, :transport, :description, :metadata, :payload, :from, :to, :subject, :layout_id, :html, :text, :payload).tap do |w|
-          w[:metadata] = YAML.safe_load(params[:template][:metadata])
-        end
+        params.require(:template).permit(:enabled, :klass, :event, :interval, :transport, :description, :metadata_yaml, :payload, :from, :to, :subject, :layout_id, :html, :text, :payload)
       end
     end
   end

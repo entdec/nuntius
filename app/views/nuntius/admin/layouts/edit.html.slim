@@ -1,16 +1,18 @@
-= clg.simple_form_for(@layout, title: 'Layout', url: @layout.new_record? ? admin_layouts_path : admin_layout_path, html: {multipart: true}) do |f|
-  = clg.card title: 'Layout'
-    - card.slot :action
-      = f.submit class: 'clg-button clg-button--primary'
-    - if @layout.persisted?
-      - card.slot :action
-        = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
-    = clg.layout do |layout|
-      - layout.row
-        - layout.cell
-          - ui_tab :edit
+= sts.form_for([:admin, @layout]) do |f|
+  = sts.card title: t('.layout'), icon: 'fal fa-table-layout' do |card|
+    - card.action
+      = f.submit
+
+    = sts.tabs do |tabs|
+      - tabs.tab :edit
+        .grid.grid-cols-12.gap-4
+          .col-span-12
             = f.input :name
-            = f.input :data, as: :editor, input_html: { data: { 'editor-mode': 'text/html', height: '400px' } }
-            = f.input :metadata, as: :editor, input_html: { value: YAML.dump(f.object.metadata), data: { 'editor-mode': 'application/yaml', height: '80px' } }
-          - if @layout.templates.size.positive?
-            = ui_table_tab :nuntius_templates, title: "#{@layout.templates.size} templates", parameters: { layout_id: @layout.id }
+          .col-span-12
+            = f.input :data, as: :editor, mode: 'text/html'
+          .col-span-12
+            = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+
+      - if @layout.templates.size.positive?
+        - tabs.tab :templates
+          = sts.table :nuntius_templates, parameters: { layout_id: @layout.id }

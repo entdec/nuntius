@@ -1,5 +1,2 @@
-= clg.card(menu: messages_context_menu) do |card|
-  - card.slot :title
-    | Messages
-  - card.slot :footer
-  = clg.action_table(:nuntius_messages, options: { exportable: true }, url_params: {template_id: params[:template_id]})
+= sts.card title: t('.messages'), icon: 'fad fa-envelope', content_padding: false, menu: nuntius_messages_menu do |card|
+  = sts.table :nuntius_messages, parameters: {template_id: params[:template_id]})

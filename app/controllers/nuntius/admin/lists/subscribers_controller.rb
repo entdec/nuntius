@@ -20,7 +20,8 @@ module Nuntius
         def create
           @subscriber = @list.subscribers.new(subscriber_params)
           @subscriber.save
-          respond_with @subscriber, collection_location: -> { admin_list_url(@list) }
+          # FIXME: This should redirect to list
+          respond_with :admin, :list, @subscriber, collection_location: -> { nuntius.admin_list_url(@list) }, location: -> { nuntius.admin_list_url(@list) }, status: :see_other
         end
 
         def edit
@@ -30,7 +31,8 @@ module Nuntius
         def update
           @subscriber = @list.subscribers.find(params[:id])
           @subscriber.update(subscriber_params)
-          respond_with @subscriber, collection_location: -> { admin_list_url(@list) }
+          # FIXME: This should redirect to list
+          respond_with :admin, :list, @subscriber, collection_location: -> { nuntius.admin_list_url(@list) }, location: -> { nuntius.admin_list_url(@list) }, status: :see_other
         end
 
         private

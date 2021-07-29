@@ -1,5 +1,2 @@
-= clg.card(menu: lists_context_menu) do |card|
-  - card.slot :title
-    | Lists
-  - card.slot :footer
-  = clg.action_table(:nuntius_lists, options: { exportable: true })
+= sts.card title: t('.lists'), icon: 'fad fa-address-book', content_padding: false, menu: nuntius_lists_menu do |card|
+  = sts.table :nuntius_lists

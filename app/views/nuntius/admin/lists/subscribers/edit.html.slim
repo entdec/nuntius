@@ -1,17 +1,14 @@
-= clg.simple_form_for(@subscriber, url: @subscriber.new_record? ? admin_list_subscribers_path(@list) : admin_list_subscriber_path(@list, @subscriber), html: {multipart: true}) do |f|
-  = clg.card title: 'Subscribers' do |card|
-    - card.slot :action
-      = f.submit class: 'clg-button clg-button--primary'
-    - if @subscriber.persisted?
-      - card.slot :action
-        = f.button :button, 'Continue', name: 'commit', value: 'continue', class: 'clg-button'
-    = clg.layout do |layout|
-      - layout.row
-        - layout.cell
-          = f.input :first_name
-          = f.input :last_name
-          = f.input :phone_number
-          = f.input :email
+= sts.form_for(@subscriber, url: @subscriber.new_record? ? admin_list_subscribers_path(@list) : admin_list_subscriber_path(@list, @subscriber), html: {multipart: true}) do |f|
+  = sts.card title: t('.subscribers'), icon: 'fad fa-address-card' do |card|
+    - card.action
+      = f.submit
 
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')
+    .grid.grid-cols-12.gap-4
+      .col-span-6
+        = f.input :first_name
+      .col-span-6
+        = f.input :last_name
+      .col-span-12
+        = f.input :phone_number
+      .col-span-12
+        = f.input :email

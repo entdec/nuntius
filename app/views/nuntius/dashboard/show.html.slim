@@ -1,9 +1,7 @@
-.ui-row
-  .ui-col-12
-    = reportlet(:'nuntius/daily_messages_per_template', parameters: {template_ids: @templates.map(&:id)})
+.grid.grid-cols-1.gap-4.sm:grid-cols-3
+  .col-span-3.sm:col-span-3
+    = reportlet(:'nuntius/daily_messages_per_template', parameters: { menu: :nuntius_dashboard_menu, template_ids: @templates.map(&:id)})
 
-= clg.card(menu: dashboard_context_menu) do |card|
-  - card.slot :title
-    | Messages
-  - card.slot :footer
-  = clg.action_table(:nuntius_messages, options: { exportable: true })
+  .col-span-3.sm:col-span-3
+    = sts.card title: t('.messages'), icon: 'fad fa-envelope', content_padding: false, menu: nuntius_dashboard_menu do |card|
+      = sts.table :nuntius_messages, parameters: {template_id: params[:template_id]}

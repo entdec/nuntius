@@ -3,6 +3,7 @@
 module Nuntius
   class Template < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
+    include Nuntius::Concerns::Yamlify
 
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message', dependent: :nullify
@@ -19,6 +20,8 @@ module Nuntius
     validates :event, presence: true
     validates :event, format: { with: /.+#.+/ }, if: ->(t) { t.klass == 'Custom' }
     validates :interval, format: { allow_blank: true, with: /\A[1-9][0-9]*\s(month|week|day|hour|minute)s?\z/ }
+
+    yamlify :metadata
 
     def new_message(object, assigns = {}, params = {})
       message = Nuntius::Message.new(template: self, transport: transport, metadata: metadata)

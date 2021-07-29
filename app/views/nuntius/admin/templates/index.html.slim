@@ -1,5 +1,2 @@
-= clg.card(menu: templates_context_menu) do |card|
-  - card.slot :title
-    | Templates
-  - card.slot :footer
-  = clg.action_table(:nuntius_templates, options: { exportable: true })
+= sts.card title: t('.templates'), icon: 'fad fa-language', content_padding: false, menu: nuntius_templates_menu do |card|
+  = sts.table :nuntius_templates

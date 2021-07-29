@@ -1,5 +1,2 @@
-= clg.card(menu: locales_context_menu) do |card|
-  - card.slot :title
-    | Locales
-  - card.slot :footer
-  = clg.action_table(:nuntius_locales, options: { exportable: true }, url_params: {})
+= sts.card title: t('.locales'), icon: 'fad fa-language', content_padding: false, menu: nuntius_locales_menu do |card|
+  = sts.table :nuntius_locales

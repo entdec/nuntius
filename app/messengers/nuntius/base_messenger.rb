@@ -174,8 +174,8 @@ module Nuntius
 
       def messenger_for_class(name)
         klass = messenger_name_for_class(name).safe_constantize
-        klass ||= messenger_for_class(name.constantize.superclass)
-        klass ||= messenger_for_class(name.constantize.superclass.superclass)
+        klass ||= messenger_name_for_class(name.safe_constantize.superclass).safe_constantize
+        klass ||= messenger_name_for_class(name.safe_constantize.superclass.superclass).safe_constantize
         klass
       end
 

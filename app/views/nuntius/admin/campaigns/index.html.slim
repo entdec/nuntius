@@ -1,3 +1,2 @@
-= clg.card(menu: campaigns_context_menu, title: 'Campaigns') do |card|
-  - card.slot :footer
-  = clg.action_table(:nuntius_campaigns, options: { exportable: true })
+= sts.card title: t('.campaigns'), icon: 'fad fa-megaphone', content_padding: false, menu: nuntius_campaigns_menu do |card|
+  = sts.table :nuntius_campaigns

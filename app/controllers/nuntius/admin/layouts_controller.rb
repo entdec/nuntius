@@ -5,7 +5,6 @@ require_dependency 'nuntius/application_admin_controller'
 module Nuntius
   module Admin
     class LayoutsController < ApplicationAdminController
-
       def index
         @layouts = Nuntius::Layout.visible.order(:name)
       end
@@ -44,9 +43,7 @@ module Nuntius
       private
 
       def layout_params
-        params.require(:layout).permit(:name, :data).tap do |w|
-          w[:metadata] = YAML.safe_load(params[:layout][:metadata])
-        end
+        params.require(:layout).permit(:name, :data, :metadata_yaml)
       end
     end
   end
