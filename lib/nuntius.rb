@@ -50,12 +50,20 @@ module Nuntius
     def event(event, obj, params = {})
       return unless event
       return unless obj.nuntiable?
+      return unless templates?(obj, event)
 
       Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
     end
 
     def active_storage_enabled?
       ActiveRecord::Base.connection.table_exists? 'active_storage_attachments'
+    end
+
+    def templates?(obj, event)
+      Nuntius::Template.where(klass: Nuntius::BaseMessenger.class_names_for(obj),
+                              event: Nuntius::BaseMessenger.event_name_for(
+                                obj, event
+                              )).where(enabled: true).count.positive?
     end
   end
 
