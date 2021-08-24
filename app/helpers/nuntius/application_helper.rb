@@ -51,7 +51,7 @@ module Nuntius
 
     def nuntius_list_menu
       Satis::Menus::Builder.build(:lists) do |m|
-        m.item :new_subscriber, link: nuntius.new_admin_list_subscriber_path(@list)
+        m.item :new_subscriber, link: nuntius.new_admin_list_subscriber_path(@list) if @list.persisted?
       end
     end
 
