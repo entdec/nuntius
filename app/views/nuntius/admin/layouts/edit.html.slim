@@ -9,9 +9,15 @@
           .col-span-12
             = f.input :name
           .col-span-12
-            = f.input :data, as: :editor, mode: 'text/html'
+            = f.input :data, as: :editor, mode: 'text/html', height: '400px'
+      - tabs.tab :metadata
+        .grid.grid-cols-12.gap-4
           .col-span-12
             = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+
+      - if @layout.persisted?
+        - tabs.tab :media
+          = render partial: 'nuntius/admin/layouts/attachments/index', locals: { attachments: @layout.attachments, upload_url: product_attachments_path(@layout) }
 
       - if @layout.templates.size.positive?
         - tabs.tab :templates

@@ -19,7 +19,9 @@ Nuntius::Engine.routes.draw do
 
   namespace :admin do
     resources :campaigns
-    resources :layouts
+    resources :layouts do
+      resources :attachments, controller: 'layouts/attachments'
+    end
     resources :lists do
       resources :subscribers, controller: 'lists/subscribers'
     end
