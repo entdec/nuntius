@@ -13,8 +13,6 @@ class AttachTag < LiquorTag
 
     message = context.registers['message']
 
-    binding.pry
-
     if argv1.is_a? String
       message.add_attachment({ url: argv1 })
     elsif argv1.instance_of?(ActiveStorageAttachedOneDrop)
