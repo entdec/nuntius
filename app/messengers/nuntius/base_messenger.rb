@@ -15,10 +15,7 @@ module Nuntius
       @object = object
       @event = event
       @params = params
-      @attachments = []
-
-      # Allow attachments to be passed directly
-      params.fetch(:attachments, []).each { |att| attach(att) }
+      @attachments = params.fetch(:attachments, [])
     end
 
     # Calls the event method on the messenger
@@ -31,89 +28,15 @@ module Nuntius
 
     # Turns the templates in messages, and dispatches the messages to transports
     def dispatch(filtered_templates)
-      stored_attachments = store_attachments
-
       filtered_templates.each do |template|
         template.layout = override_layout(template.layout)
         msg = template.new_message(@object, liquid_context, params)
-        msg.attachments = stored_attachments
+        @attachments.each do |attachment|
+          msg.add_attachment(attachment)
+        end
 
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg) if msg.to.present?
-      end
-    end
-
-    # Attaches a file to the message
-    def attach(options = {})
-      attachment = {}
-
-      uri = options[:url] && URI.parse(options[:url])
-
-      if uri&.scheme == 'file'
-        attachment[:io] = File.open(uri.path)
-      elsif uri
-        client = HTTPClient.new
-        client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        client.ssl_config.set_default_paths unless Gem.win_platform?
-        response = client.get(options[:url], follow_redirect: true)
-        content_disposition = response.headers['Content-Disposition'] || ''
-        options[:filename] ||= content_disposition[/filename="([^"]+)"/, 1]
-        attachment[:content_type] = response.content_type
-        attachment[:io] = if response.body.is_a? String
-                            StringIO.new(response.body)
-                          else
-                            # Assume IO object
-                            response.body
-                          end
-      elsif options[:content].respond_to?(:read)
-        attachment[:content_type] = options[:content_type]
-        attachment[:io] = options[:content]
-      else
-        raise 'Cannot add attachment without url or content'
-      end
-
-      # Set the filename
-      attachment[:filename] = options[:filename] || uri.path.split('/').last || 'attachment'
-
-      # (Try to) add file extension if it is missing
-      file_extension = File.extname(attachment[:filename]).delete('.')
-      attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}" if file_extension.blank? && attachment[:content_type]
-
-      # Fix content type if file extension known but content type blank
-      attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s if file_extension
-
-      if options[:auto_zip] && attachment[:io].size > 1024 * 1024
-        zip_stream = Zip::OutputStream.write_buffer do |zio|
-          zio.put_next_entry attachment[:file_name]
-          zio.write attachment[:io].read
-        end
-        attachment[:content_type] = 'application/zip'
-        attachment[:io] = zip_stream
-      end
-
-      @attachments << attachment
-      attachment
-    rescue StandardError => e
-      Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
-    end
-
-    def store_attachments
-      return [] if @attachments.blank?
-
-      unless Nuntius.active_storage_enabled?
-        Nuntius.config.logger.error 'ActiveStorage is not enabled, this is required to use attachments with Nuntius.'
-        return
-      end
-
-      @attachments.map do |to_store|
-        to_store[:io].rewind
-
-        attachment = Nuntius::Attachment.new
-        attachment.content.attach(io: to_store[:io],
-                                  filename: to_store[:filename],
-                                  content_type: to_store[:content_type])
-
-        attachment
       end
     end
 
