@@ -2,6 +2,6 @@
 
 module Nuntius
   class TemplateDrop < ApplicationDrop
-    delegate :id, :metadata, to: :@object
+    delegate :id, :metadata, :layout, to: :@object
   end
 end
