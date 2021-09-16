@@ -31,11 +31,13 @@ module Nuntius
       locale = instance_exec(object, &locale_proc) if locale_proc
       locale = params[:locale].to_sym if params[:locale]
 
-      message.to = render(:to, assigns, locale).split(',').reject(&:empty?).join(',')
-      message.subject = render(:subject, assigns, locale)
-      message.html = render(:html, assigns, locale, layout: layout&.data)
-      message.text = render(:text, assigns, locale)
-      message.payload = render(:payload, assigns, locale)
+      options = { registers: { 'template' => self, 'message' => message } }
+
+      message.to = render(:to, assigns, locale, options).split(',').reject(&:empty?).join(',')
+      message.subject = render(:subject, assigns, locale, options)
+      message.html = render(:html, assigns, locale, options.merge(layout: layout&.data))
+      message.text = render(:text, assigns, locale, options)
+      message.payload = render(:payload, assigns, locale, options)
 
       message
     end
