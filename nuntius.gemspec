@@ -26,8 +26,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'fcm'
   s.add_dependency 'houston'
   s.add_dependency 'httpclient', '~> 2.8'
+  s.add_dependency 'i18n', '= 1.8.5'
   s.add_dependency 'inky-rb'
-  s.add_dependency 'liquor', '~> 0.7.4' # This is our own gem, you must add it to your project's Gemfile for this to work
+  s.add_dependency 'liquor', '~> 1' # This is our own gem, you must add it to your project's Gemfile for this to work
   s.add_dependency 'mail', '~> 2.6'
   s.add_dependency 'messagebird-rest'
   s.add_dependency 'parse-cron'
@@ -39,7 +40,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'state_machines-activerecord'
   s.add_dependency 'twilio-ruby', '~> 5.6'
   s.add_dependency 'webpacker', '>= 4'
-  s.add_dependency 'i18n', '= 1.8.5'
 
   s.add_development_dependency 'pry', '~> 0.11'
   s.add_development_dependency 'rubocop', '~> 0.49'
