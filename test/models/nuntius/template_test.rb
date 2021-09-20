@@ -34,17 +34,17 @@ module Nuntius
 
     test 'interval_time_range for after events' do
       t = Template.new(interval: '3 hours', event: 'after_the_fact')
-      assert_equal (4.hours.ago..3.hours.ago).inspect, t.interval_time_range.inspect
+      assert_equal timerange(4.hours.ago..3.hours.ago), timerange(t.interval_time_range)
     end
 
     test 'interval_time_range for before events' do
       t = Template.new(interval: '2 hours', event: 'before_the_fact')
-      assert_equal (1.hours.after..2.hour.after).inspect, t.interval_time_range.inspect
+      assert_equal timerange(1.hours.after..2.hour.after), timerange(t.interval_time_range)
     end
 
     test 'delivering a mail to multiple recipients with translations should work' do
       perform_enqueued_jobs(only: [Nuntius::TransportDeliveryJob, Nuntius::MessengerJob]) do
-        Nuntius.with(accounts(:one), locale: 'nl').message(:translationtest)
+        Nuntius.event(:translationtest, accounts(:one), locale: 'nl')
       end
       assert_performed_jobs 3
 
@@ -68,6 +68,44 @@ module Nuntius
         assert_equal 'boxture_logo.png', attachment.content.filename.to_s
         assert_equal 'image/png', attachment.content.content_type
       end
+    end
+
+    test 'template with attachment from has one attachment' do
+      account = Account.create!(name: 'Test')
+
+      account.logo.attach(io: File.open(Rails.root.join('..', '..', 'test', 'fixtures', 'files', 'logo_blue@3x.png')), filename: 'logo_blue@3x.png', content_type: 'image/png')
+
+      t = Template.new(transport: 'mail', html: %[Hello {%attach account.logo%}])
+      m = t.new_message({}, { 'account' => account })
+      assert_equal "<p>Hello</p>\n", m.html
+      assert_equal 1, m.attachments.size
+
+      attachment = m.attachments.first
+
+      assert_equal 'logo_blue@3x.png', attachment.content.filename.to_s
+      assert_equal 'image/png', attachment.content.content_type
+    end
+
+    test 'template with attachment from has many attachment' do
+      account = Account.create!(name: 'Test')
+
+      account.attachments.attach(io: File.open(Rails.root.join('..', '..', 'test', 'fixtures', 'files', 'logo_blue@3x.png')), filename: 'logo_blue@3x.png', content_type: 'image/png')
+
+      t = Template.new(transport: 'mail', html: %[Hello {%assign atts = account.attachments | where: 'filename', 'logo_blue@3x.png'%}{%attach atts.first%}])
+      m = t.new_message({}, { 'account' => account })
+      assert_equal "<p>Hello</p>\n", m.html
+      assert_equal 1, m.attachments.size
+
+      attachment = m.attachments.first
+
+      assert_equal 'logo_blue@3x.png', attachment.content.filename.to_s
+      assert_equal 'image/png', attachment.content.content_type
+    end
+
+    private
+
+    def timerange(range)
+      [range.begin.iso8601, range.end.iso8601]
     end
   end
 end

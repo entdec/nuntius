@@ -7,6 +7,7 @@ module Nuntius
     include ActiveJob::TestHelper
 
     test 'delivering a message will persist it and queue it for delivery' do
+      Mail::TestMailer.deliveries.clear
       message = nuntius_messages(:one_recipient)
 
       perform_enqueued_jobs do
@@ -20,11 +21,11 @@ module Nuntius
         assert_equal 1, Mail::TestMailer.deliveries.length
         mail = Mail::TestMailer.deliveries.first
         assert_equal ['test@example.com'], mail.to
-        Mail::TestMailer.deliveries.clear
       end
     end
 
     test 'delivering a message that does not match the allow list will block it' do
+      Mail::TestMailer.deliveries.clear
       message = nuntius_messages(:blocked_recipient)
 
       perform_enqueued_jobs do
@@ -41,6 +42,8 @@ module Nuntius
     end
 
     test 'delivering a mail to two recipients will deliver separate messages' do
+      Mail::TestMailer.deliveries.clear
+
       message = nuntius_messages(:two_recipients)
 
       perform_enqueued_jobs(only: Nuntius::TransportDeliveryJob) do
@@ -53,10 +56,10 @@ module Nuntius
       assert_equal ['test@example.com'], mail.to
       mail = Mail::TestMailer.deliveries.last
       assert_equal ['test2@example.com'], mail.to
-      Mail::TestMailer.deliveries.clear
     end
 
     test 'delivering a mail to multiple recipients will deliver separate messages to allowed recipients' do
+      Mail::TestMailer.deliveries.clear
       message = nuntius_messages(:blocked_and_non_blocked_recipients)
 
       perform_enqueued_jobs(only: Nuntius::TransportDeliveryJob) do
@@ -65,11 +68,12 @@ module Nuntius
       assert_performed_jobs 3
 
       assert_equal 2, Mail::TestMailer.deliveries.length
-      mail = Mail::TestMailer.deliveries.first
+
+      mail = Mail::TestMailer.deliveries.find { |m| m.to == 'mark@boxture.com' }
       assert_equal ['mark@boxture.com'], mail.to
-      mail = Mail::TestMailer.deliveries.last
+
+      mail = Mail::TestMailer.deliveries.find { |m| m.to == 'test@example.com' }
       assert_equal ['test@example.com'], mail.to
-      Mail::TestMailer.deliveries.clear
     end
   end
 end

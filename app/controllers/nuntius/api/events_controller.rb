@@ -10,7 +10,7 @@ module Nuntius
 
     def create
       nuntius_params = params.except(:scope, :event, :context, :controller, :action).permit!.to_h
-      Nuntius.with({ params[:scope] => params[:context].permit!.to_h }, nuntius_params).message(params[:event])
+      Nuntius.event(params[:event], { params[:scope] => params[:context].permit!.to_h }, nuntius_params)
     end
   end
 end

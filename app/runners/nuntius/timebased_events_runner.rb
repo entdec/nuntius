@@ -7,7 +7,7 @@ module Nuntius
         messenger = Nuntius::BaseMessenger.messenger_for_class(template.klass)
 
         messenger.timebased_scope_for(template).each do |object|
-          Nuntius.with(object).message(template.event)
+          Nuntius.event(template.event, object)
         end
       end
     end

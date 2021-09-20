@@ -12,7 +12,7 @@ Nuntius.setup do |config|
 
   config.provider :smtp, transport: :mail, settings: lambda { |_message|
     {
-      from_header: '',
+      from_header: 'Example <example@example.com>',
       host: '',
       port: '',
       username: '',

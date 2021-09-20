@@ -32,21 +32,6 @@ module Nuntius
       @i18n_store ||= Nuntius::I18nStore.new
     end
 
-    def message(event)
-      return unless event
-
-      Nuntius::MessengerJob.perform_later(@obj, event.to_s, @params)
-    end
-    deprecate message: 'please use event instead', deprecator: Nuntius::Deprecator.new
-
-    def with(obj, params = {})
-      @obj = obj
-      @params = params
-
-      self
-    end
-    deprecate with: 'please use event instead', deprecator: Nuntius::Deprecator.new
-
     def event(event, obj, params = {})
       return unless event
       return unless obj.nuntiable?

@@ -1,7 +1,9 @@
 # Nuntius
+
 Nuntius offers messaging and notifications for ActiveRecord models in Ruby on Rails applications.
 
 ## Setup
+
 Add Nuntius to your Gemfile and run bundle install to install it.
 
 Create an initializer (config/initializers/nuntius.rb) and configure as desired:
@@ -57,39 +59,41 @@ class CarMessenger < Nuntius::BaseMessenger
 end
 ```
 
-If you are using the state\_machines-activemodel gem you can pass use\_state\_machine: true to the
+If you are using the state_machines-activemodel gem you can pass use_state_machine: true to the
 nuntiable call, this will automatically define empty methods for these events on the model's
 messenger class if they are not defined already.
 
-Additionally the use\_state\_machine option will add an after\_commit hook to the state machine
+Additionally the use_state_machine option will add an after_commit hook to the state machine
 to automatically trigger the event for the state transition.
 
 ## Usage
 
 ### With templates
+
 Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
 
 ```ruby
- Nuntius.with(car).message('your_event')
+ Nuntius.event('your_event', car)
 ```
 
 When custom events are enabled you can also do the following:
 
 ```ruby
- Nuntius.with( { whs: { to: 'tom@boxture.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ]).message('shipped')
+ Nuntius.event('shipped', { whs: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
 ```
 
 For the above cases you need to define templates, this is done with the maintenace pages under
 /nuntius/admin/templates (/nuntius is whatever you have defined in your routes file).
 
 When Nuntius#message is called a message will be sent for every matching template. To allow you to
-send different messages under different circumstances you can specify a template\_scope on the messenger
+send different messages under different circumstances you can specify a template_scope on the messenger
 class that uses the template's metadata in combination with the nuntiable object to determine whether
 or not the template should be used.
 
 ### Timebased events
+
 If you want to send messages based on time intervals you can add such events to your messenger with the
-timebased\_scope class method like so:
+timebased_scope class method like so:
 
 ```ruby
 class CarMessenger < Nuntius::BaseMessenger
@@ -115,41 +119,52 @@ This method also requires you to configure a template using the maintenance page
 a timebased scope as an event you will be prompted to enter an interval, you can enter anything in the
 following formats:
 
-* N minute(s)
-* N hour(s)
-* N day(s)
-* N week(s)
-* N month(s)
+- N minute(s)
+- N hour(s)
+- N day(s)
+- N week(s)
+- N month(s)
 
 To send timebased messages you need to execute Nuntius::TimestampBasedMessagesRunner.call, you could do this
 in a cronjob every 5 minutes with "bundle exec rails runner Nuntius::TimestampBasedMessagesRunner.call"
 
 ### Direct
+
 Another more direct way of using Nuntius is by just instantiating a message:
+
 ```ruby
  Nuntius::Message.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text', nuntiable: channel).deliver_as(:mail)
 ```
+
 or
+
 ```ruby
 user = User.find(1)
-user.messages.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text').deliver_as(:mail)
+user.messages.new(to: 'test@example.com', subject: 'Test', text: 'Test text').deliver_as(:mail)
 ```
+
 Here we still need a nuntiable object, in case provider settings can differ from object to object.
 
 You can also define custom events, which take a scope and an event name:
+
 ```ruby
-Nuntius.with(packing: {smurrefluts: 'hatseflats'}).message(:packed)
+Nuntius.event('packed', packing: {smurrefluts: 'hatseflats'})
 ```
+
 The main key of the hash passed will also be the liquid variable.
 
 ### Inbound
+
 Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
 
 ## Transports
 
 ### Mail
+
 ### SMS
+
 ### Push
+
 ### Voice
 
 #### Twilio
