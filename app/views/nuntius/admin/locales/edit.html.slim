@@ -1,6 +1,8 @@
 = sts.form_for([:admin, @locale]) do |f|
   = sts.card title: t('.locale'), icon: 'fal fa-language' do |card|
     - card.action
+      = f.continue
+    - card.action
       = f.submit
 
     .grid.grid-cols-12.gap-4
