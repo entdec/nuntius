@@ -16,9 +16,25 @@ class AttachTag < LiquorTag
     if argv1.is_a? String
       message.add_attachment({ url: argv1 })
     elsif argv1.instance_of?(ActiveStorageAttachedOneDrop) || argv1.instance_of?(ActiveStorage::AttachmentDrop)
-      message.add_attachment({ content: StringIO.new(argv1.download), filename: argv1.filename, content_type: argv1.content_type })
-    elsif argv1.instance_of?(ActiveStorage::AttachmentDrop)
-      message.add_attachment({ content: StringIO.new(argv1.download), filename: argv1.filename, content_type: argv1.content_type })
+
+      io = StringIO.new(argv1.download)
+      io.rewind
+      content_type = argv1.content_type
+      filename = argv1.filename
+
+      if arg(:convert) == 'pdf' && content_type != 'application/pdf'
+        content_type = 'application/pdf'
+        pdf = Labelary::Label.render(zpl: io.read,
+                                     content_type: content_type,
+                                     dpmm: 8,
+                                     width: 4,
+                                     height: 6)
+
+        io = StringIO.new(pdf)
+        filename = "#{filename}.pdf"
+      end
+
+      message.add_attachment({ content: io, filename: filename, content_type: content_type })
     end
 
     ''
