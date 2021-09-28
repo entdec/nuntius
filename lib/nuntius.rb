@@ -32,10 +32,12 @@ module Nuntius
       @i18n_store ||= Nuntius::I18nStore.new
     end
 
-    def event(event, obj, params = {}, options: {})
+    def event(event, obj, params = {})
       return unless event
       return unless obj.nuntiable?
       return unless templates?(obj, event)
+
+      options = params[:options] || {}
 
       if options[:perform_now] == true
         Nuntius::MessengerJob.perform_now(obj, event.to_s, params)
