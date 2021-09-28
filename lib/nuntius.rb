@@ -32,7 +32,7 @@ module Nuntius
       @i18n_store ||= Nuntius::I18nStore.new
     end
 
-    def event(event, obj, params = {}, options = {})
+    def event(event, obj, params = {}, options: {})
       return unless event
       return unless obj.nuntiable?
       return unless templates?(obj, event)
