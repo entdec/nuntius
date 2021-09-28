@@ -32,12 +32,16 @@ module Nuntius
       @i18n_store ||= Nuntius::I18nStore.new
     end
 
-    def event(event, obj, params = {})
+    def event(event, obj, params = {}, options = {})
       return unless event
       return unless obj.nuntiable?
       return unless templates?(obj, event)
 
-      Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
+      if options[:perform_now] == true
+        Nuntius::MessengerJob.perform_now(obj, event.to_s, params)
+      else
+        Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
+      end
     end
 
     def active_storage_enabled?
