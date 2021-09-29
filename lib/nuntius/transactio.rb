@@ -18,7 +18,7 @@ module Nuntius
         resource = transaction_log_entry.transaction_loggable
         event = transaction_log_entry.event
 
-        if event.present? && resource.nuntiable?
+        if resource.present? && event.present? && resource.nuntiable?
           params = Nuntius.config.default_params(transaction_log_entry)
 
           Nuntius.event(event, resource, params)
