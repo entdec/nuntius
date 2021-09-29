@@ -42,7 +42,9 @@ module Nuntius
       if options[:perform_now] == true
         Nuntius::MessengerJob.perform_now(obj, event.to_s, params)
       else
-        Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
+        job = Nuntius::MessengerJob
+        job.set(wait: options[:wait]) if options[:wait]
+        job.perform_later(obj, event.to_s, params)
       end
     end
 
