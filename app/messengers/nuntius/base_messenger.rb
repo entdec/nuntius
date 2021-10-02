@@ -45,6 +45,10 @@ module Nuntius
       selected_layout
     end
 
+    def attach(attachment)
+      @attachments << attachment
+    end
+
     class << self
       #
       # Returns the variable name used in the liquid context
