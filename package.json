@@ -1,7 +1,7 @@
 {
-  "name": "@components/nuntius",
+  "name": "@entdec/nuntius",
   "version": "1.0.13",
-  "repository": "git@code.entropydecelerator.com:components/nuntius.git",
+  "repository": "git@github.com:entdec/nuntius.git",
   "author": "Tom de Grunt <tom@degrunt.nl>",
   "license": "MIT",
   "files": [
