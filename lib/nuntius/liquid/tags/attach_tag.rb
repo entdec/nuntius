@@ -27,8 +27,8 @@ class AttachTag < LiquorTag
         pdf = Labelary::Label.render(zpl: io.read,
                                      content_type: content_type,
                                      dpmm: 8,
-                                     width: 4,
-                                     height: 6)
+                                     width: arg(:width).empty? ? 4 : arg(:width),
+                                     height: arg(:height).empty? ? 6 : arg(:height))
 
         io = StringIO.new(pdf)
         filename = "#{filename}.pdf"
