@@ -3,6 +3,7 @@
 class NuntiusMessagesTable < ActionTable::ActionTable
   model Nuntius::Message
 
+  column(:to)
   column(:created_at) { |message| ln(message.created_at) }
   column(:last_sent_at) { |message| message.last_sent_at ? ln(message.last_sent_at) : '-' }
   column(:origin) do |message|
