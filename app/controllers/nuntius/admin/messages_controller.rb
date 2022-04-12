@@ -17,7 +17,7 @@ module Nuntius
       def resend
         @message = Nuntius::Message.visible.find(params[:id])
         @message.resend
-        render :show
+        redirect_to admin_message_path, notice: t('.message_is_being_sent')
       end
     end
   end

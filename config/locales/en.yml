@@ -1,5 +1,9 @@
 en:
   nuntius:
+    admin:
+      messages:
+        resend:
+          message_is_being_sent: 'Message will be resend in a minute.'
     flash:
       error: There were problems saving the %{model}
       notice: The %{model} was saved successfully
