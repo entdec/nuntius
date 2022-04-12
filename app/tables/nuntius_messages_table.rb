@@ -5,6 +5,7 @@ class NuntiusMessagesTable < ActionTable::ActionTable
 
   column(:id) { |message| message.id.first(8) }
   column(:created_at) { |message| ln(message.created_at) }
+  column(:last_sent_at) { |message| message.last_sent_at ? ln(message.last_sent_at) : '-' }
   column(:transport)
   column(:provider)
   column(:origin) do |message|
