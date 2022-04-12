@@ -5,7 +5,7 @@ class NuntiusMessagesTable < ActionTable::ActionTable
 
   column(:to)
   column(:created_at) { |message| ln(message.created_at) }
-  column(:last_sent_at) { |message| message.last_sent_at ? ln(message.last_sent_at) : '-' }
+  column(:last_sent_at) { |message| ln(message.last_sent_at) }
   column(:origin) do |message|
     link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign) if message.campaign
     link_to message.template&.description, nuntius.edit_admin_template_path(message.template) if message.template
