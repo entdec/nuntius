@@ -52,4 +52,5 @@
         = info.item :provider_id, content: @message.provider_id, class: "sm:col-span-1"
         = info.item :request_id, content: @message.request_id, class: "sm:col-span-1"
         = info.item :refreshes, content: @message.refreshes, class: "sm:col-span-1"
+        = info.item :last_sent_at, content: ln(@message.last_sent_at), class: "sm:col-span-1", icon: 'fal fa-envelope'
         = info.item :created_at, content: ln(@message.created_at), class: "sm:col-span-1", icon: 'fal fa-calendar'
