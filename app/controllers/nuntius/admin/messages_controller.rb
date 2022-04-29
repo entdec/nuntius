@@ -17,7 +17,7 @@ module Nuntius
       def resend
         @message = Nuntius::Message.visible.find(params[:id])
         @message.resend
-        render :show
+        respond_with @message, success: t('.resend_success'), error: t('.resend_error')
       end
     end
   end

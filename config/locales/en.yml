@@ -6,6 +6,11 @@ en:
     context_menu:
       root: Root
       resend: Resend
+    admin:
+      messages:
+        resend:
+          resend_success: Resent message
+          resend_error: Failed to resend message
     breadcrumbs:
       nuntius: Nuntius
       dashboard: Dashboard
