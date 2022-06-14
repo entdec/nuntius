@@ -12,7 +12,8 @@
     "codemirror": "^5.48.4",
     "codemirror-liquid": "> 0",
     "element-closest": "^3.0.1",
-    "stimulus": "^2"
+    "@hotwired/stimulus": ">2.0",
+    "@hotwired/stimulus-webpack-helpers": "^1.0.1"
   },
   "devDependencies": {
     "@gitlab/svgs": "^1.68.0",
