@@ -1,7 +1,7 @@
 module Nuntius
   class InboundMessage < ApplicationRecord
-    has_one_attached :raw_message
-    has_many_attached :attachments
+    has_one_attached :raw_message, service: :nuntius
+    has_many_attached :attachments, service: :nuntius
 
     def mail
       @mail ||= Mail.from_source(source)
