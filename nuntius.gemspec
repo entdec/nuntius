@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'liquor', '~> 1' # This is our own gem, you must add it to your project's Gemfile for this to work
   s.add_dependency 'mail', '~> 2.6'
   s.add_dependency 'messagebird-rest'
+  s.add_dependency 'net-smtp'
   s.add_dependency 'parse-cron'
   s.add_dependency 'pg'
   s.add_dependency 'premailer'
