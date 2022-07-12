@@ -34,6 +34,7 @@ module Nuntius
       options = { registers: { 'template' => self, 'message' => message } }
 
       message.to = render(:to, assigns, locale, options).split(',').reject(&:empty?).join(',')
+      message.from = render(:from, assigns, locale, options).split(',').reject(&:empty?).join(',')
       message.subject = render(:subject, assigns, locale, options)
       message.html = render(:html, assigns, locale, options.merge(layout: layout&.data))
       message.text = render(:text, assigns, locale, options)
