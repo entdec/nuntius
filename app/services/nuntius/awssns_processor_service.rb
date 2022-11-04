@@ -9,6 +9,8 @@
 # \"headersTruncated\":false,\"headers\":[{\"name\":\"Received\",\"value\":\"from localhost.localdomain (ec2-52-59-100-253.eu-central-1.compute.amazonaws.com [52.59.100.253]) by email-smtp.amazonaws.com with SMTP (SimpleEmailService-2762311919) id 4AtiQr5QXc6CZ3uJYW4D for mercedes.tuin@gmail.com; Fri, 04 May 2018 19:40:12 +0000 (UTC)\"},{\"nam
 #
 #
+
+# See: https://docs.aws.amazon.com/ses/latest/dg/notification-examples.html
 module Nuntius
   class AwssnsProcessorService < ApplicationService
     def initialize(notification)
