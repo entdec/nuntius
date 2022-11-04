@@ -45,5 +45,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'webpacker', '>= 4'
 
   s.add_development_dependency 'pry', '~> 0.11'
-  s.add_development_dependency 'rubocop', '~> 0.49'
+  s.add_development_dependency 'rubocop', '~> 1'
 end
