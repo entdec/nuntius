@@ -24,12 +24,12 @@ gem 'liquor', entdec: 'liquor'
 gem 'pry'
 gem 'trado', entdec: 'trado', tag: '0.1.16'
 
-gem 'irb', '~> 1.0'
+gem 'irb', '~> 1'
 gem 'solargraph'
 
 gem 'sidekiq'
 
 group :test do
-  gem 'vcr', '~> 4.0', require: false
+  gem 'vcr', '~> 6.0', require: false
   gem 'webmock', '~> 3.3', require: false
 end
