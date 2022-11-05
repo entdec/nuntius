@@ -32,6 +32,15 @@ module Nuntius
       @i18n_store ||= Nuntius::I18nStore.new
     end
 
+    #
+    # Fires an event for use with templates with the object
+    #
+    # Nuntius.event(:your_event, car)
+    #
+    # When custom events are enabled you can also do the following:
+    #
+    # Nuntius.event('shipped', { shipped: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
+    #
     def event(event, obj, params = {})
       return unless event
       return unless obj.is_a?(Hash) || obj.nuntiable?
