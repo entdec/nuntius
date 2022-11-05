@@ -2,7 +2,7 @@
 
 module Nuntius
   class Configuration
-    attr_accessor :admin_authentication_module, :base_controller, :base_runner, :layout, :admin_layout, :jobs_queue_name, :visible_scope, :add_metadata, :metadata_fields, :default_template_scope, :allow_custom_events
+    attr_accessor :admin_authentication_module, :base_controller, :base_runner, :layout, :admin_layout, :jobs_queue_name, :visible_scope, :add_metadata, :metadata_fields, :default_template_scope, :allow_custom_events, :active_storage_service
     attr_writer :logger, :host, :metadata_humanize, :default_params
 
     attr_reader :transports, :providers
@@ -25,6 +25,7 @@ module Nuntius
       @allow_custom_events = false
       @layout = 'application'
       @admin_layout = 'application'
+      @active_storage_service = nil
     end
 
     # logger [Object].

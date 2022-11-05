@@ -5,7 +5,7 @@ module Nuntius
     delegate :download, :content_type, :filename, :signed_id, to: :content
 
     begin
-      has_one_attached :content, service: :nuntius
+      has_one_attached :content, service: Nuntius.config.active_storage_service
     rescue StandardError
       nil
     end
