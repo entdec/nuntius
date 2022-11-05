@@ -25,10 +25,12 @@ Content-Type: application/json
     }]
 }
 
-POST https://oms.boxture.com/messaging/feedback/awssns
+###
+
+POST https://9f71-85-144-159-189.eu.ngrok.io/messaging/feedback/awssns
 Content-Type: application/json
 
-{ "message": {
+{
        "notificationType":"Bounce",
        "bounce":{
           "bounceType":"Permanent",
@@ -102,4 +104,3 @@ Content-Type: application/json
            }
         }
     }
-}

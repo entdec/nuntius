@@ -10,13 +10,7 @@ module Nuntius
     layout false
 
     def awssns
-      body = JSON.parse(request.body.read)
-      if body['Type'] == 'SubscriptionConfirmation'
-        HTTPClient.get(body['SubscribeURL'])
-      else
-        notification = JSON.parse(body['Message'])
-        Nuntius::AwssnsProcessorService.new(notification).call
-      end
+      Nuntius::AwsSnsProcessorService.perform(notification: ::JSON.parse(request.body.read))
       head :ok
     end
   end

@@ -20,6 +20,12 @@ module Nuntius
     end
 
     def perform
+      if context.notification['Type'] == 'SubscriptionConfirmation'
+        Nuntius.config.logger.info('Confirming SNS subscription')
+        HTTPClient.get(body['SubscribeURL'])
+        return
+      end
+
       type = context.notification['notificationType']
 
       unless message_id
