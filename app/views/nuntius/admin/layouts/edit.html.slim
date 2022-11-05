@@ -17,7 +17,7 @@
 
       - if @layout.persisted?
         - tabs.tab :media
-          = render partial: 'nuntius/admin/layouts/attachments/index', locals: { attachments: @layout.attachments, upload_url: product_attachments_path(@layout) }
+          = render partial: 'nuntius/admin/layouts/attachments/index', locals: { attachments: @layout.attachments, upload_url: nuntius.admin_layout_attachments_path(@layout) }
 
       - if @layout.templates.size.positive?
         - tabs.tab :templates

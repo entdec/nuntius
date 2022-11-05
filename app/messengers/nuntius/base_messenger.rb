@@ -22,7 +22,7 @@ module Nuntius
     def call
       select_templates
       run_callbacks(:action) do
-        send(@event.to_sym, @object, @params)
+        send(@event.to_sym, @object, @params) if respond_to?(@event.to_sym)
       end
     end
 

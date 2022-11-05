@@ -15,21 +15,21 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-git_source(:entdec) { |repo_name| "git@code.entropydecelerator.com:#{repo_name}.git" }
+git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 
-gem 'action_table', entdec: 'components/action_table', tag: '0.2.37'
-gem 'auxilium', '~> 3', entdec: 'components/auxilium'
-gem 'evento', entdec: 'components/evento', tag: '0.1.4'
-gem 'liquor', entdec: 'components/liquor'
+gem 'action_table', entdec: 'action_table', tag: '0.2.37'
+gem 'auxilium', '~> 3', entdec: 'auxilium'
+gem 'evento', entdec: 'evento', tag: '0.1.4'
+gem 'liquor', entdec: 'liquor'
 gem 'pry'
-gem 'trado', entdec: 'components/trado', tag: '0.1.16'
+gem 'trado', entdec: 'trado', tag: '0.1.16'
 
-gem 'irb', '~> 1.0'
+gem 'irb', '~> 1'
 gem 'solargraph'
 
 gem 'sidekiq'
 
 group :test do
-  gem 'vcr', '~> 4.0', require: false
+  gem 'vcr', '~> 6.0', require: false
   gem 'webmock', '~> 3.3', require: false
 end

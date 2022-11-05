@@ -39,7 +39,7 @@ module Nuntius
       def destroy
         @template = Nuntius::Template.visible.find(params[:id])
         @template.destroy
-        respond_with @template
+        respond_with :admin, @template
       end
 
       private

@@ -18,16 +18,12 @@ module Nuntius
         self.metadata ||= {}
         unless Nuntius.config.metadata_fields.empty?
           Nuntius.config.metadata_fields.each do |field, data|
-            puts "field: #{field}"
             if data[:current]
               current = data[:current]
               self.metadata[field.to_s] ||= instance_exec(&current)
             end
-            puts "field: #{field}"
-            puts "metadata: #{self.metadata}"
           end
         end
-        puts "metadata: #{self.metadata}"
         instance_exec(&Nuntius.config.add_metadata)
       end
     end

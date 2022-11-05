@@ -6,6 +6,10 @@ module Nuntius
   class TemplateTest < ActiveSupport::TestCase
     include ActiveJob::TestHelper
 
+    setup do
+      Mail::TestMailer.deliveries.clear
+    end
+
     test 'translation scope' do
       t = Template.new(transport: 'slack', klass: 'Cow', event: 'moo')
       assert_equal 'cow.moo.slack', t.translation_scope

@@ -17,6 +17,8 @@ Nuntius.setup do
   # Enable this option to allow use of Nuntius with a Hash
   config.allow_custom_events = true
 
+  # Configure the transport you want to use
+
   # Enable e-mail
   config.transport :mail
   # Enable push notifications
@@ -28,7 +30,11 @@ Nuntius.setup do
   # Enable Slack
   config.transport :slack
 
-  # ... to be explained further
+  # Configure providers for each of the transports you enabled above.
+  # Advised is to either do this using credentials, environment variables, or somewhere in a model (securely stored away).
+  config.provider :slack, transport: :slack, settings: lambda { |_message|
+    Rails.application.credentials[:slack]
+  }
 end
 ```
 
@@ -73,13 +79,13 @@ to automatically trigger the event for the state transition.
 Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
 
 ```ruby
- Nuntius.event('your_event', car)
+ Nuntius.event(:your_event, car)
 ```
 
 When custom events are enabled you can also do the following:
 
 ```ruby
- Nuntius.event('shipped', { whs: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
+ Nuntius.event('shipped', { shipped: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
 ```
 
 For the above cases you need to define templates, this is done with the maintenace pages under
