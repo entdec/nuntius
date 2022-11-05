@@ -71,7 +71,7 @@ module Nuntius
     end
 
     def message_id
-      @message_id ||= context.notification.dig('mail', 'commonHeaders', 'messageId')
+      @message_id ||= context.notification.dig('mail', 'commonHeaders', 'messageId')&.[](1...-1)
     end
 
     def message

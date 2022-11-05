@@ -167,6 +167,8 @@ Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS a
 
 ### Mail
 
+#### AWS SES
+
 In case you use AWS SES, you can use the SNS Feedback Notifications to automatically mark messages as read, or deal with complaints and bounces. Create a AWS SNS topic, with a HTTPS subscription with the following URL (pattern):
 
 Use the following URL: https://<host>/messaging/feedback/awssns

@@ -65,7 +65,7 @@ module Nuntius
           ],
           "bounceSubType": 'General',
           "timestamp": '2016-01-27T14:59:38.237Z',
-          "feedbackId": message_id,
+          "feedbackId": "<#{message_id}>",
           "remoteMtaIp": '127.0.2.0'
         },
         "mail": {
@@ -75,7 +75,7 @@ module Nuntius
           "sourceIp": '127.0.3.0',
           "sendingAccountId": '123456789012',
           "callerIdentity": 'IAM_user_or_role_name',
-          "messageId": message_id,
+          "messageId": "<#{message_id}>",
           "destination": [
             'jane@example.com',
             'mary@example.com',
@@ -120,7 +120,7 @@ module Nuntius
             "to": [
               'Jane Doe <jane@example.com>, Mary Doe <mary@example.com>, Richard Doe <richard@example.com>'
             ],
-            "messageId": message_id,
+            "messageId": "<#{message_id}>",
             "subject": 'Hello'
           }
         }
@@ -142,12 +142,12 @@ module Nuntius
             }
           ],
           "timestamp": '2016-01-27T14:59:38.237Z',
-          "feedbackId": message_id,
+          "feedbackId": "<#{message_id}>",
           "remoteMtaIp": '127.0.2.0'
         },
         "mail": {
           "timestamp": '2016-01-27T14:59:38.237Z',
-          "messageId": message_id,
+          "messageId": "<#{message_id}>",
           "source": 'john@example.com',
           "sourceArn": 'arn:aws:ses:us-east-1:888888888888:identity/example.com',
           "sourceIp": '127.0.3.0',
@@ -197,7 +197,7 @@ module Nuntius
             "to": [
               'Jane Doe <jane@example.com>, Mary Doe <mary@example.com>, Richard Doe <richard@example.com>'
             ],
-            "messageId": message_id,
+            "messageId": "<#{message_id}>",
             "subject": 'Hello'
           }
         }
@@ -271,7 +271,7 @@ module Nuntius
             "to": [
               'Jane Doe <jane@example.com>, Mary Doe <mary@example.com>, Richard Doe <richard@example.com>'
             ],
-            "messageId": message_id,
+            "messageId": "<#{message_id}>",
             "subject": 'Hello'
           }
         }
@@ -292,7 +292,7 @@ module Nuntius
         },
         "mail": {
           "timestamp": '2016-01-27T14:59:38.237Z',
-          "messageId": message_id,
+          "messageId": "<#{message_id}>",
           "source": 'john@example.com',
           "sourceArn": 'arn:aws:ses:us-east-1:888888888888:identity/example.com',
           "sourceIp": '127.0.3.0',
@@ -342,7 +342,7 @@ module Nuntius
             "to": [
               'Jane Doe <jane@example.com>, Mary Doe <mary@example.com>, Richard Doe <richard@example.com>'
             ],
-            "messageId": message_id,
+            "messageId": "<#{message_id}>",
             "subject": 'Hello'
           }
         }
@@ -354,7 +354,7 @@ module Nuntius
         "notificationType": 'Delivery',
         "mail": {
           "timestamp": '2016-01-27T14:59:38.237Z',
-          "messageId": message_id,
+          "messageId": "<#{message_id}>",
           "source": 'john@example.com',
           "sourceArn": 'arn:aws:ses:us-east-1:888888888888:identity/example.com',
           "sourceIp": '127.0.3.0',
@@ -402,7 +402,7 @@ module Nuntius
             "to": [
               'Jane Doe <jane@example.com>'
             ],
-            "messageId": message_id,
+            "messageId": "<#{message_id}>",
             "subject": 'Hello'
           }
         },
