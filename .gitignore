@@ -7,3 +7,4 @@ test/dummy/log/*.log
 test/dummy/tmp/
 Gemfile.lock
 node_modules
+.vscode

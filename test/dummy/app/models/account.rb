@@ -5,8 +5,8 @@ class Account < ApplicationRecord
   after_update :send_update
   before_destroy :send_destroy
 
-  has_one_attached :logo
-  has_many_attached :attachments
+  has_one_attached :logo, service: :nuntius
+  has_many_attached :attachments, service: :nuntius
 
   nuntiable
 

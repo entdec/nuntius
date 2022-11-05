@@ -60,6 +60,7 @@ module Nuntius
       message.provider_id = mail.message_id
       message.status = 'undelivered'
       message.status = 'sent' if Rails.env.test? ? true : response.success?
+      message.last_sent_at = Time.zone.now if message.sent?
 
       message
     end

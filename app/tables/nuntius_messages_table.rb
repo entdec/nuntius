@@ -3,10 +3,9 @@
 class NuntiusMessagesTable < ActionTable::ActionTable
   model Nuntius::Message
 
-  column(:id) { |message| message.id.first(8) }
+  column(:to)
   column(:created_at) { |message| ln(message.created_at) }
-  column(:transport)
-  column(:provider)
+  column(:last_sent_at) { |message| ln(message.last_sent_at) }
   column(:origin) do |message|
     link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign) if message.campaign
     link_to message.template&.description, nuntius.edit_admin_template_path(message.template) if message.template
