@@ -6,7 +6,7 @@ module Nuntius
   class RetrieveInboundMailServiceTest < ActiveSupport::TestCase
     test 'retrieves new mail' do
       assert_difference 'Nuntius::InboundMessage.count', 20 do
-        Nuntius::RetrieveInboundMailService.new({}).call
+        Nuntius::RetrieveInboundMailService.perform(settings: {})
       end
       last_message = Nuntius::InboundMessage.last
       assert_equal 'delivered', last_message.status

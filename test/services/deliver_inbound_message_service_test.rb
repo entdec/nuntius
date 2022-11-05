@@ -11,7 +11,7 @@ module Nuntius
       inbound_message.text = 'Help!'
       inbound_message.save!
 
-      Nuntius::DeliverInboundMessageService.new(inbound_message).call
+      Nuntius::DeliverInboundMessageService.perform(inbound_message: inbound_message)
 
       inbound_message.reload
 

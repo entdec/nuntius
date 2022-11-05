@@ -22,6 +22,7 @@ gem 'auxilium', '~> 3', entdec: 'auxilium'
 gem 'evento', entdec: 'evento', tag: '0.1.4'
 gem 'liquor', entdec: 'liquor'
 gem 'pry'
+gem 'servitium', entdec: 'servitium', tag: '1.2.19'
 gem 'trado', entdec: 'trado', tag: '0.1.16'
 
 gem 'irb', '~> 1'
