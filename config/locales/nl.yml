@@ -1,7 +1,22 @@
 nl:
   nuntius:
+    flash:
+      error: Er waren problem om %{model} op te slaan
+      notice: De %{model} is sucesvol opgeslagen
+    context_menu:
+      root: Root
+      resend: Verstuur opnieuw
     admin:
       messages:
         resend:
-          message_is_being_sent: 'Bericht is opnieuw aangeboden bij de burelen der PTT Post ter verzending.'
-
+          resend_success: Bericht opnieuw verstuurd
+          resend_error: Het is niet gelukt het bericht opnieuw te sturen
+    breadcrumbs:
+      nuntius: Nuntius
+      dashboard: Dashboard
+      admin:
+        campaigns: Campagnes
+        messages: Berichten
+        layouts: Layouts
+        lists: Lijsten
+        templates: Templates
