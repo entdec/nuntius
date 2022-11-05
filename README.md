@@ -6,7 +6,7 @@ Nuntius offers messaging and notifications for ActiveRecord models in Ruby on Ra
 
 Add Nuntius to your Gemfile and run bundle install to install it.
 
-Create an initializer (config/initializers/nuntius.rb) and configure as desired:
+Create an initializer (config/initializers/messaging.rb) and configure as desired:
 
 ```ruby
 Nuntius.setup do
@@ -43,7 +43,7 @@ Mount the Rails engine in your routes.rb to enable Nuntius' maintenance pages:
 ```ruby
 Rails.application.routes.draw do
   # your own routes ...
-  mount Nuntius::Engine, at: '/nuntius', as: 'nuntius' # change the path and aliases at your own discretion
+  mount Nuntius::Engine, at: '/messaging', as: 'nuntius' # change the path and aliases at your own discretion
 end
 ```
 
@@ -89,7 +89,7 @@ When custom events are enabled you can also do the following:
 ```
 
 For the above cases you need to define templates, this is done with the maintenace pages under
-/nuntius/admin/templates (/nuntius is whatever you have defined in your routes file).
+/messaging/admin/templates (/messaging is whatever you have defined in your routes file).
 
 When Nuntius#message is called a message will be sent for every matching template. To allow you to
 send different messages under different circumstances you can specify a template_scope on the messenger
