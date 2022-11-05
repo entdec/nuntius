@@ -12,24 +12,27 @@
 
 # See: https://docs.aws.amazon.com/ses/latest/dg/notification-examples.html
 module Nuntius
-  class AwssnsProcessorService < ApplicationService
-    def initialize(notification)
-      @notification = notification
-      @type         = @notification['notificationType']
+  class AwsSnsProcessorService < ApplicationService
+    context do
+      attribute :notification, typecaster: lambda { |value|
+                                             value.with_indifferent_access
+                                           }
     end
 
     def perform
+      type = context.notification['notificationType']
+
       unless message_id
-        Nuntius.config.logger.warn("SNS / SES message could not determine message id: #{@notification}")
+        Nuntius.config.logger.warn("SNS / SES message could not determine message id: #{context.notification}")
         return false
       end
       unless message
         Nuntius.config.logger.warn("SNS / SES message for unknown message with message id: #{message_id}")
         return false
       end
-      Nuntius.config.logger.info("SNS /SES updating message #{message.id} for #{@type}")
+      Nuntius.config.logger.info("SNS /SES updating message #{message.id} for #{type}")
 
-      case @type
+      case type
       when 'Delivery'
         process_delivery
       when 'Bounce'
@@ -45,24 +48,24 @@ module Nuntius
 
     def process_delivery
       message.status = :delivered
-      # message.feedback = { 'type': 'delivery', 'info': @notification['delivery'] }
+      message.metadata[:feedback] = { 'type': 'delivery', 'info': context.notification['delivery'] }
       message.save!
     end
 
     def process_bounce
       message.status = :bounced
-      # message.feedback = { 'type': 'bounce', 'info': @notification['bounce'] }
+      message.metadata[:feedback] = { 'type': 'bounce', 'info': context.notification['bounce'] }
       message.save!
     end
 
     def process_complaint
       message.status = :complaint
-      # message.feedback = { 'type': 'complaint', 'info': @notification['complaint'] }
+      message.metadata[:feedback] = { 'type': 'complaint', 'info': context.notification['complaint'] }
       message.save!
     end
 
     def message_id
-      @message_id ||= @notification.dig('mail', 'commonHeaders', 'messageId')&.[](1...-1)
+      @message_id ||= context.notification.dig('mail', 'commonHeaders', 'messageId')
     end
 
     def message
