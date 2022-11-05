@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_16_122408) do
-
+ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -94,8 +93,8 @@ ActiveRecord::Schema.define(version: 2021_09_16_122408) do
     t.jsonb "payload"
     t.jsonb "metadata"
     t.string "digest"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "nuntius_layouts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -143,6 +142,7 @@ ActiveRecord::Schema.define(version: 2021_09_16_122408) do
     t.uuid "campaign_id"
     t.jsonb "payload"
     t.jsonb "metadata", default: {}
+    t.datetime "last_sent_at", precision: nil
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
     t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
