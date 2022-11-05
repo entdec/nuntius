@@ -21,3 +21,17 @@ blocked_and_non_blocked_recipients:
   html: <b>Hello World</b>
   text: Hello World
   transport: mail
+
+complaint_recipient:
+  to: "qux@foobar.com"
+  html: <b>Nee, Piet ken arie niet.</b>
+  text: Nee, Piet ken arie niet.
+  transport: mail
+  status: 'complaint'
+
+bounced_recipient:
+  to: "baz@foobar.com"
+  html: <b>Nee, Piet ken arie niet.</b>
+  text: Nee, Piet ken arie niet.
+  transport: mail
+  status: 'bounced'

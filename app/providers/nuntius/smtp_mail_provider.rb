@@ -15,6 +15,7 @@ module Nuntius
 
     def deliver
       return block unless MailAllowList.new(settings[:allow_list]).allowed?(message.to)
+      return block if Nuntius::Message.where(status: %w[complaint bounced], to: message.to).count >= 1
 
       mail = if message.from.present?
                Mail.new(sender: from_header, from: message.from)
