@@ -8,6 +8,8 @@ class Account < ApplicationRecord
   has_one_attached :logo
   has_many_attached :attachments
 
+  nuntiable
+
   private
 
   def send_create
