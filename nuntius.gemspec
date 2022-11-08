@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'i18n', '= 1.8.5'
   s.add_dependency 'inky-rb'
   s.add_dependency 'labelary'
-  s.add_dependency 'liquor', '~> 1' # This is our own gem, you must add it to your project's Gemfile for this to work
+  s.add_dependency 'liquidum', '~> 1' # This is our own gem, you must add it to your project's Gemfile for this to work
   s.add_dependency 'mail', '~> 2'
   s.add_dependency 'messagebird-rest'
   s.add_dependency 'net-imap'

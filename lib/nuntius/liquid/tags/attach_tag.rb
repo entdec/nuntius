@@ -5,7 +5,7 @@
 # == Basic usage:
 #    {%attach 'https://www.boxture.com/assets/images/logo.png'%}
 #
-class AttachTag < LiquorTag
+class AttachTag < LiquidumTag
   def render(context)
     super
 

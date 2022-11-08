@@ -3,7 +3,7 @@
 require 'auxilium'
 require 'inky'
 require 'httpclient'
-require 'liquor'
+require 'liquidum'
 require 'premailer'
 require 'state_machines-activerecord'
 
