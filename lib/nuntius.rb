@@ -38,6 +38,10 @@ module Nuntius
     #
     # Nuntius.event(:your_event, car)
     #
+    # To delay the message sending, you can pass a wait option:
+    #
+    # Nuntius.event(:your_event, car, options: { wait: 5.minutes })
+    #
     # When custom events are enabled you can also do the following:
     #
     # Nuntius.event('shipped', { shipped: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
@@ -51,10 +55,10 @@ module Nuntius
 
       if options[:perform_now] == true
         Nuntius::MessengerJob.perform_now(obj, event.to_s, params)
+      elsif options[:wait]
+        Nuntius::MessengerJob.set(wait: options[:wait]).perform_later(obj, event.to_s, params)
       else
-        job = Nuntius::MessengerJob
-        job.set(wait: options[:wait]) if options[:wait]
-        job.perform_later(obj, event.to_s, params)
+        Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
       end
     end
 
