@@ -32,6 +32,10 @@ module Nuntius
       @i18n_store ||= Nuntius::I18nStore.new
     end
 
+    # To delay the message sending, you can pass a wait option:
+    #
+    # Nuntius.event(:your_event, car, options: { wait: 5.minutes })
+    #
     def event(event, obj, params = {})
       return unless event
       return unless obj.nuntiable?
@@ -41,10 +45,10 @@ module Nuntius
 
       if options[:perform_now] == true
         Nuntius::MessengerJob.perform_now(obj, event.to_s, params)
+      elsif options[:wait]
+        Nuntius::MessengerJob.set(wait: options[:wait]).perform_later(obj, event.to_s, params)
       else
-        job = Nuntius::MessengerJob
-        job.set(wait: options[:wait]) if options[:wait]
-        job.perform_later(obj, event.to_s, params)
+        Nuntius::MessengerJob.perform_later(obj, event.to_s, params)
       end
     end
 

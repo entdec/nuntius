@@ -102,6 +102,13 @@ module Nuntius
       assert_equal 'image/png', attachment.content.content_type
     end
 
+
+    test 'template with delayed sending' do
+      delay = 5.minutes
+      job = Nuntius.event(:created, accounts(:one), options: { wait: delay })
+      assert job.scheduled_at - Time.now.to_i > delay - 5.seconds
+    end
+
     private
 
     def timerange(range)
