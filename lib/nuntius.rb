@@ -6,6 +6,7 @@ require 'httpclient'
 require 'liquidum'
 require 'premailer'
 require 'state_machines-activerecord'
+require 'servitium'
 
 require 'nuntius/deprecator'
 require 'nuntius/engine'
