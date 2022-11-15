@@ -7,7 +7,7 @@ class NuntiusCampaignsTable < ActionTable::ActionTable
   column(:metadata) { |campaign| Nuntius.config.metadata_humanize(campaign.metadata) }
   column(:transport)
   column(:state)
-  column(:list) { |campaign| campaign.list.name }
+  column(:list, sort_field: 'nuntius_lists.name') { |campaign| campaign.list.name }
 
   initial_order :name, :asc
 
@@ -17,5 +17,6 @@ class NuntiusCampaignsTable < ActionTable::ActionTable
 
   def scope
     @scope = Nuntius::Campaign.visible
+    @scope = Nuntius::Campaign.joins(:list)  if params[:order_field_name] = 'list'
   end
 end

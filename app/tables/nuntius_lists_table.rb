@@ -5,7 +5,7 @@ class NuntiusListsTable < ActionTable::ActionTable
 
   column(:name)
   column(:metadata) { |list| Nuntius.config.metadata_humanize(list.metadata) }
-  column(:subscribers) { |list| list.subscribers.count || '-' }
+  column(:subscribers, sort_field: 'subscribers_count') { |list| list.subscribers.count || '-' }
 
   initial_order :name, :asc
 
