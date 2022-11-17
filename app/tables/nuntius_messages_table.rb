@@ -6,7 +6,7 @@ class NuntiusMessagesTable < ActionTable::ActionTable
   column(:to)
   column(:created_at) { |message| ln(message.created_at) }
   column(:last_sent_at) { |message| ln(message.last_sent_at) }
-  column(:origin) do |message|
+  column(:origin , sort_field: 'campaign_name') do |message|
     link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign) if message.campaign
     link_to message.template&.description, nuntius.edit_admin_template_path(message.template) if message.template
   end
@@ -31,6 +31,7 @@ class NuntiusMessagesTable < ActionTable::ActionTable
     @scope = Nuntius::Message.visible
     @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
     @scope = @scope.where(template_id: params[:template_id]) if params[:template_id]
+    @scope = @scope.select("nuntius_messages.*", "(select description from nuntius_templates where nuntius_templates.id = nuntius_messages.template_id) as template_description, (select name from nuntius_campaigns where nuntius_campaigns.id = nuntius_messages.campaign_id) as campaign_name")
     @scope
   end
 end
