@@ -31,7 +31,7 @@ class NuntiusMessagesTable < ActionTable::ActionTable
     @scope = Nuntius::Message.visible
     @scope = @scope.where(nuntiable_id: params[:nuntiable_id], nuntiable_type: params[:nuntiable_type]) if params[:nuntiable_id]
     @scope = @scope.where(template_id: params[:template_id]) if params[:template_id]
-    @scope = @scope.select("nuntius_messages.*", "(select description from nuntius_templates where nuntius_templates.id = nuntius_messages.template_id) as template_description, (select name from nuntius_campaigns where nuntius_campaigns.id = nuntius_messages.campaign_id) as campaign_name")
+    @scope = @scope.select("nuntius_messages.*", "(select description from nuntius_templates where nuntius_templates.id = nuntius_messages.template_id) as template_description, (select name from nuntius_campaigns where nuntius_campaigns.id = nuntius_messages.campaign_id) as campaign_name") if params[:order_field_name] = 'origin'
     @scope
   end
 end
