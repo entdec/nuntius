@@ -11,25 +11,25 @@ Gem::Specification.new do |s|
   s.version     = Nuntius::VERSION
   s.authors     = ['Tom de Grunt']
   s.email       = ['tom@degrunt.nl']
-  s.homepage    = 'https://code.entropydecelerator.com/components/nuntius'
+  s.homepage    = 'https://github.com/entdec/nuntius'
   s.summary     = 'Messaging and notification for Ruby on Rails'
-  s.description = 'Messages are defined in templates editable by users.'
+  s.description = 'Messages are defined in editable liquid templates.'
   s.license     = 'MIT'
   s.required_ruby_version = Gem::Requirement.new('>= 2.6.5')
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   s.add_dependency 'apnotic', '1.7.0'
-  s.add_dependency 'auxilium', '~> 3' # This is our own gem, you must add it to your project's Gemfile for this to work
+  s.add_dependency 'auxilium', '~> 3'
   s.add_dependency 'aws-sdk-sns'
-  s.add_dependency 'evento', '~> 0.1' # This is our own gem, you must add it to your project's Gemfile for this to work
+  s.add_dependency 'evento'
   s.add_dependency 'fcm'
   s.add_dependency 'houston'
   s.add_dependency 'httpclient', '~> 2.8.3'
   s.add_dependency 'i18n', '= 1.8.5'
   s.add_dependency 'inky-rb'
   s.add_dependency 'labelary'
-  s.add_dependency 'liquidum', '~> 1' # This is our own gem, you must add it to your project's Gemfile for this to work
+  s.add_dependency 'liquidum'
   s.add_dependency 'mail', '~> 2'
   s.add_dependency 'messagebird-rest'
   s.add_dependency 'net-imap'
@@ -39,7 +39,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'premailer'
   s.add_dependency 'rails', '>= 6'
   s.add_dependency 'rubyzip', '> 2'
-  s.add_dependency 'servitium', '~> 1' # This is our own gem, you must add it to your project's Gemfile for this to work
+  s.add_dependency 'servitium', '~> 1'
   s.add_dependency 'slack-ruby-client'
   s.add_dependency 'state_machines-activerecord'
   s.add_dependency 'twilio-ruby', '~> 5'
