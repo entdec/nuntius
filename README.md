@@ -163,6 +163,18 @@ The main key of the hash passed will also be the liquid variable.
 
 ### Mail
 
+#### AWS SES
+
+In case you use AWS SES, you can use the SNS Feedback Notifications to automatically mark messages as read, or deal with complaints and bounces. Create a AWS SNS topic, with a HTTPS subscription with the following URL (pattern):
+
+Use the following URL: https://<host>/messaging/feedback/awssns
+
+The actual URL may be different depending on your routing setup.
+
+The subscription will automatically be confirmed.
+
+Next in AWS SES, configure the SNS topic to receive feedback notifications for Bounce, Complaint and Delivery and include original headers.
+
 ### Slack
 
 Slack uses the [postMessage](https://api.slack.com/methods/chat.postMessage) method to send messages. It will also upload any attachment the message has prior to sending the message itself.
@@ -177,47 +189,25 @@ SMS just support the `from` (name or phone number), `to` (the phone) and `text` 
 
 Only MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z).
 
-### Inbound
-
-Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
-
-## Transports
-
-### Mail
-
-#### AWS SES
-
-In case you use AWS SES, you can use the SNS Feedback Notifications to automatically mark messages as read, or deal with complaints and bounces. Create a AWS SNS topic, with a HTTPS subscription with the following URL (pattern):
-
-Use the following URL: https://<host>/messaging/feedback/awssns
-
-The actual URL may be different depending on your routing setup.
-
-The subscription will automatically be confirmed.
-
-Next in AWS SES, configure the SNS topic to receive feedback notifications for Bounce, Complaint and Delivery and include original headers.
-
-### SMS
-
-### Push
-
 ### Voice
 
-#### Twilio
+Currently only Twilio voice is supported in the voice transport.
 
-Information on voice TWIML is here: https://www.twilio.com/docs/voice/twiml/gather
-You can try voices here: https://www.twilio.com/console/voice/twiml/text-to-speech
+Information on voice TWIML is here: https://www.twilio.com/docs/voice/twiml
+You can try voices here: https://www.twilio.com/docs/voice/twiml/say/text-speech
+
+The Voice transport is particularly nice, because you can define whole paths in the message body, for example:
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say language="nl-NL">
-        Hallo, dit is een bericht van Boxture!
+    <Say language="en-US">
+        Hello Earthling, this is a message from your Robot Overlords!
         <break strength="x-weak" time="100ms"/>
-        <p>We geven je zo je wachtwoord-herstel-code, dus pak een pen en schrijf mee.</p>
+        <p>We will soon give you your escape-hatch-code, so grab a pen and write it down.</p>
     </Say>
     <Gather input="dtmf" numDigits="1" action="{%raw%}{{url}}{%endraw%}/code">
-       <Say language="nl-NL">Druk een toets om verder te gaan.</Say>
+       <Say language="en-US">Press any key to continue.</Say>
     </Gather>
     <Redirect>{%raw%}{{url}}{%endraw%}/code</Redirect>
 </Response>
@@ -228,20 +218,51 @@ path: /code
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Gather input="dtmf" numDigits="1">
-     <Say language="nl-NL">
-      <s>Je code is:</s>
+     <Say language="en-US">
+      <s>Your code is:</s>
       <break strength="x-weak" time="100ms"/>
-      <prosody rate="x-slow"><say-as interpret-as="character">1 n a x d 8 b</say-as></prosody>
+      <prosody rate="x-slow"><say-as interpret-as="character">s e n d h e l p</say-as></prosody>
       <break strength="x-weak" time="1s"/>
-      Druk een toets om te herhalen, of hang op.
+      Press any key to continue, or just hang up.
      </Say>
   </Gather>
   <Redirect>{%raw%}{{url}}{%endraw%}/code</Redirect>
 </Response>
 ```
 
-## Testing
+### Inbound (beta)
 
+Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
+This is done using message-boxes, for this to work you need to add a `message_boxes` folder to your `app` folder.
+
+#### SMS
+
+Twilio is currently the only supported inbound SMS provider.
+
+Point twilio to you nuntius mount path (/messaging/inbound_messages/twilio_inbound_smses)
+
+```ruby
+class FooMessageBox < Nuntius::BaseMessageBox
+  transport :sms
+  provider :twilio
+
+  route({ /\+31.+/ => :dutchies })
+end
 ```
-bundle exec sidekiq -C test/dummy/config/sidekiq.yml -r test/dummy
+
+#### Mail
+
+```ruby
+class BarMessageBox < Nuntius::BaseMessageBox
+  transport :mail
+  provider :imap
+
+  settings {
+    host: 'imap.gmail.com',
+    port: 993,
+    ssl: true,
+    username: 'foo,
+    password: 'bar'
+  }
+end
 ```
