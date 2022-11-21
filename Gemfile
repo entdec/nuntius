@@ -18,7 +18,6 @@ gemspec
 git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 
 gem 'action_table', entdec: 'action_table', tag: '0.2.37'
-gem 'evento', entdec: 'evento', tag: '0.1.4'
 gem 'pry'
 gem 'trado', entdec: 'trado', tag: '0.1.16'
 
