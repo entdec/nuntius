@@ -159,6 +159,24 @@ Nuntius.event('packed', packing: {smurrefluts: 'hatseflats'})
 
 The main key of the hash passed will also be the liquid variable.
 
+## Transports
+
+### Mail
+
+### Slack
+
+Slack uses the [postMessage](https://api.slack.com/methods/chat.postMessage) method to send messages. It will also upload any attachment the message has prior to sending the message itself.
+
+The message body is specified using `text` and additionally supports the `payload` parameter.
+
+The payload is merged with the `text`, `to` (channel or user) and `from`.
+
+### SMS
+
+SMS just support the `from` (name or phone number), `to` (the phone) and `text` attribute.
+
+Only MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z).
+
 ### Inbound
 
 Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
