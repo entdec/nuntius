@@ -9,6 +9,8 @@ class NuntiusCampaignsTable < ActionTable::ActionTable
   column(:state)
   column(:list, sort_field: 'nuntius_lists.name') { |campaign| campaign.list.name }
 
+  table_views(to_s.underscore)
+
   initial_order :name, :asc
 
   row_link { |campaign| nuntius.edit_admin_campaign_path(campaign) }

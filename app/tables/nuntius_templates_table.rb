@@ -18,6 +18,8 @@ class NuntiusTemplatesTable < ActionTable::ActionTable
     end
   end
 
+  table_views(to_s.underscore)
+
   initial_order :description, :asc
 
   row_link { |template| nuntius.edit_admin_template_path(template) }

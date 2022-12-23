@@ -12,6 +12,8 @@ class NuntiusLayoutsTable < ActionTable::ActionTable
     end
   end
 
+  table_views(to_s.underscore)
+
   initial_order :name, :asc
 
   row_link { |layout| nuntius.edit_admin_layout_path(layout) }

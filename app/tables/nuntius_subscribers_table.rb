@@ -7,6 +7,8 @@ class NuntiusSubscribersTable < ActionTable::ActionTable
   column(:email)
   column(:phonenumber)
 
+  table_views(to_s.underscore)
+
   initial_order :name, :asc
 
   row_link { |subscriber| nuntius.edit_admin_list_subscriber_path(params[:list_id], subscriber) }
