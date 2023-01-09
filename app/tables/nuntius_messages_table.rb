@@ -21,8 +21,6 @@ class NuntiusMessagesTable < ActionTable::ActionTable
   end
   column(:status)
 
-  table_views(to_s.underscore)
-
   initial_order :created_at, :desc
 
   row_link { |message| nuntius.admin_message_path(message) }

@@ -7,8 +7,6 @@ class NuntiusListsTable < ActionTable::ActionTable
   column(:metadata) { |list| Nuntius.config.metadata_humanize(list.metadata) }
   column(:subscribers, sort_field: 'subscribers_count') { |list| list.subscribers.count || '-' }
 
-  table_views(to_s.underscore)
-
   initial_order :name, :asc
 
   row_link { |list| nuntius.edit_admin_list_path(list) }
