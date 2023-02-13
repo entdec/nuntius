@@ -4,4 +4,4 @@
 
   .col-span-3.sm:col-span-3
     = sts.card title: t('.messages'), icon: 'fad fa-envelope', content_padding: false, menu: nuntius_dashboard_menu do |card|
-      = sts.table :nuntius_messages, parameters: {template_id: params[:template_id]}
+      = card.table :nuntius_messages, parameters: {template_id: params[:template_id]}, custom_views: true
