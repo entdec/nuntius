@@ -17,6 +17,6 @@ class NuntiusCampaignsTable < ActionTable::ActionTable
 
   def scope
     @scope = Nuntius::Campaign.visible
-    @scope = Nuntius::Campaign.joins(:list)  if params[:order_field_name] = 'list'
+    @scope = Nuntius::Campaign.joins(:list)  if params[:order_field_name] == 'list'
   end
 end
