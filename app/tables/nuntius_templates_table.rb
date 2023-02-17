@@ -7,7 +7,7 @@ class NuntiusTemplatesTable < ActionTable::ActionTable
   column(:enabled, as: :boolean)
   column(:klass)
   column(:event)
-  column(:"messages", sort_field: 'message_count') { |template| link_to template.messages.count, nuntius.admin_messages_path(template_id: template.id) }
+  column(:messages, sort_field: 'message_count') { |template| link_to template.messages.count, nuntius.admin_messages_path(template_id: template.id) }
 
   column(:metadata) { |template| Nuntius.config.metadata_humanize(template.metadata) }
   column(:created_at) { |flow| ln(flow.created_at) }
@@ -26,6 +26,6 @@ class NuntiusTemplatesTable < ActionTable::ActionTable
 
   def scope
     @scope = Nuntius::Template.visible
-    @scope = Nuntius::Template.visible.select('nuntius_templates.*, (select count(id) from nuntius_messages where nuntius_messages.template_id = nuntius_templates.id) as message_count') if params[:order_field_name] == 'messages'
+    @scope = Nuntius::Template.visible.select('nuntius_templates.*, (select count(id) from nuntius_messages where nuntius_messages.template_id = nuntius_templates.id) as message_count')
   end
 end
