@@ -4,6 +4,7 @@ module Nuntius
   module ApplicationHelper
     def nuntius_dashboard_menu
       Satis::Menus::Builder.build(:dashboard) do |m|
+        m.item :messages, link: nuntius.admin_messages_path, icon: 'fal fa-envelope'
         m.item :templates, link: nuntius.admin_templates_path, icon: 'fal fa-file'
         m.item :layouts, link: nuntius.admin_layouts_path, icon: 'fal fa-table-layout'
         m.item :locales, link: nuntius.admin_locales_path, icon: 'fal fa-language'
@@ -15,12 +16,6 @@ module Nuntius
     def nuntius_templates_menu
       Satis::Menus::Builder.build(:templates) do |m|
         m.item :new, link: nuntius.new_admin_template_path
-      end
-    end
-
-    def nuntius_messages_menu
-      Satis::Menus::Builder.build(:messages) do |m|
-        m.item :new, link: nuntius.new_admin_message_path
       end
     end
 
