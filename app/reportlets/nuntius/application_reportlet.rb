@@ -5,7 +5,8 @@ module Nuntius
     attr_reader :template_ids
 
     def initialize(params)
-      @template_ids = params[:template_ids]
+      super
+      @template_ids = params[:template_ids]&.split(",")
     end
 
     private
