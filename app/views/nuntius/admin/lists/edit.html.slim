@@ -5,10 +5,10 @@
     - card.action
       = f.submit
 
-    .grid.grid-cols-12.gap-4
-      .col-span-12
-        = f.input :name
+    - card.tab :edit, padding: true
+      .grid.grid-cols-12.gap-4
+        .col-span-12
+          = f.input :name
 
-br
-- if @list.subscribers.present?
-  = sts.table :nuntius_subscribers, parameters: { list_id: @list.id }
+    - if @list.subscribers.present?
+      = card.table :nuntius_subscribers, parameters: { list_id: @list.id }, custom_views: false, tab: :nuntius_subscribers

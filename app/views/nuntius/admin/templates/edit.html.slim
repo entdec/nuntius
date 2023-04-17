@@ -7,75 +7,73 @@
       - card.action
         = f.submit
 
-      = sts.tabs do |tabs|
-        - tabs.tab :edit
-          .grid.grid-cols-12.gap-4
-            .col-span-1
-              = f.input :enabled, as: :switch
-            .col-span-11
-              = f.input :description
+      - card.tab :edit, padding: true
+        .grid.grid-cols-12.gap-4
+          .col-span-1
+            = f.input :enabled, as: :switch
+          .col-span-11
+            = f.input :description
 
-          .grid.grid-cols-12.gap-4 data-controller='toggle'
+        .grid.grid-cols-12.gap-4 data-controller='toggle'
+          .col-span-6
+            = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass, input_html: { data: { 'toggle-target' => 'input' } }
+
+          .col-span-6 data-toggle-target="insertion"
+
+          template data-toggle-target='toggleable' data-toggle-not-value='Custom'
+            .col-span-6.deze data-controller='toggle' data-toggle-attr='data-timebased'
+              .grid.grid-cols-12.gap-4
+                .col-span-6
+                  = f.input :event, collection: template.all_events, include_blank: false, chain_to: 'template[klass]', input_html: { data: { 'toggle-target' => 'input' } }, as: :dropdown
+                .col-span-6 data-toggle-target="insertion"
+              template data-toggle-target='toggleable' data-toggle-value='true'
+                = f.input :interval
+
+          template data-toggle-target='toggleable' data-toggle-value='Custom'
             .col-span-6
-              = f.input :klass, collection: Nuntius.config.nuntiable_class_names.sort, selected: @template.klass, input_html: { data: { 'toggle-target' => 'input' } }
+              = f.input :event, input_html: { placeholder: 'scope#event' }
 
-            .col-span-6 data-toggle-target="insertion"
+        .grid.grid-cols-12.gap-4 data-controller='toggle'
 
-            template data-toggle-target='toggleable' data-toggle-not-value='Custom'
-              .col-span-6.deze data-controller='toggle' data-toggle-attr='data-timebased'
-                .grid.grid-cols-12.gap-4
-                  .col-span-6
-                    = f.input :event, collection: template.all_events, include_blank: false, chain_to: 'template[klass]', input_html: { data: { 'toggle-target' => 'input' } }, as: :dropdown
-                  .col-span-6 data-toggle-target="insertion"
-                template data-toggle-target='toggleable' data-toggle-value='true'
-                  = f.input :interval
+          .col-span-12
+            = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { "data-toggle-target" => 'input' }
 
-            template data-toggle-target='toggleable' data-toggle-value='Custom'
-              .col-span-6
-                = f.input :event, input_html: { placeholder: 'scope#event' }
+          .col-span-6
+            = f.input :from
+          .col-span-6
+            = f.input :to
 
-          .grid.grid-cols-12.gap-4 data-controller='toggle'
+          .col-span-12
+            .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
 
+          .col-span-12
+            = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+
+          template data-toggle-target='toggleable' data-toggle-value='mail'
             .col-span-12
-              = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { "data-toggle-target" => 'input' }
-
-            .col-span-6
-              = f.input :from
-            .col-span-6
-              = f.input :to
-
+              = f.input :subject, as: :editor, mode: 'text/plain'
             .col-span-12
-              .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
-
+              = f.association :layout, collection: @layouts, include_blank: true
             .col-span-12
-              = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+              = f.input :html, as: :editor, mode: 'text/markdown'
 
-            template data-toggle-target='toggleable' data-toggle-value='mail'
-              .col-span-12
-                = f.input :subject, as: :editor, mode: 'text/plain'
-              .col-span-12
-                = f.association :layout, collection: @layouts, include_blank: true
-              .col-span-12
-                = f.input :html, as: :editor, mode: 'text/markdown'
+          template data-toggle-target='toggleable' data-toggle-value='voice'
+            .col-span-12
+              = f.input :text, as: :editor, mode: 'text/plain'
+          template data-toggle-target='toggleable' data-toggle-value='slack'
+            .col-span-12
+              = f.input :text, as: :editor, mode: 'text/plain'
+            .col-span-12
+              = f.input :payload, as: :editor, mode: 'application/yaml'
 
-            template data-toggle-target='toggleable' data-toggle-value='voice'
-              .col-span-12
-                = f.input :text, as: :editor, mode: 'text/plain'
-            template data-toggle-target='toggleable' data-toggle-value='slack'
-              .col-span-12
-                = f.input :text, as: :editor, mode: 'text/plain'
-              .col-span-12
-                = f.input :payload, as: :editor, mode: 'application/yaml'
-
-            template data-toggle-target='toggleable' data-toggle-value='sms'
-              .col-span-12
-                = f.input :text, as: :editor, mode: 'text/plain'
-            template data-toggle-target='toggleable' data-toggle-value='push'
-              .col-span-12
-                = f.input :text, as: :editor, mode: 'text/plain'
-            template data-toggle-target='toggleable' data-toggle-value='slack'
+          template data-toggle-target='toggleable' data-toggle-value='sms'
+            .col-span-12
+              = f.input :text, as: :editor, mode: 'text/plain'
+          template data-toggle-target='toggleable' data-toggle-value='push'
+            .col-span-12
+              = f.input :text, as: :editor, mode: 'text/plain'
+          template data-toggle-target='toggleable' data-toggle-value='slack'
 
 
-        - if @template.messages.size.positive?
-          - tabs.tab :nuntius_messages, badge: @template.messages.size, padding: false
-            = sts.table :nuntius_messages, parameters: { template_id: @template.id }
+      - if @template.messages.size.positive?
+        = card.table :nuntius_messages, parameters: { template_id: @template.id }, custom_views: false, tab: :nuntius_messages
