@@ -1,5 +1,5 @@
 = sts.form_for([:admin, @list]) do |f|
-  = sts.card title: t('.list'), icon: 'fad fa-address-book', menu: nuntius_list_menu do |card|
+  = sts.card :nuntius_admin_lists, title: t('.list'), icon: 'fad fa-address-book', menu: nuntius_list_menu do |card|
     - card.action
       = f.continue
     - card.action
