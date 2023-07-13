@@ -1,7 +1,7 @@
 
 - present(@template, TemplatePresenter) do |template|
   = sts.form_for([:admin, @template]) do |f|
-    = sts.card title: t('.template'), icon: 'fal fa-file' do |card|
+    = sts.card :nuntius_admin_templates, title: t('.template'), icon: 'fal fa-file' do |card|
       - card.action
         = f.continue
       - card.action

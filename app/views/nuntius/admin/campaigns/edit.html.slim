@@ -1,6 +1,6 @@
 - if @campaign.draft?
   = sts.form_for [:admin, @campaign] do |f|
-    = sts.card title: t('.campaign'), icon: 'fal fa-megaphone' do |card|
+    = sts.card :nuntius_admin_campaigns, title: t('.campaign'), icon: 'fal fa-megaphone' do |card|
       - card.action
         = f.submit
 

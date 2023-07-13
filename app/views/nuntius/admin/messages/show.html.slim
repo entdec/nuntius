@@ -1,4 +1,4 @@
-= sts.card title: [t('.message'), @message.template&.description], icon: 'fad fa-envelope' do |card|
+= sts.card :nuntius_admin_messages, title: [t('.message'), @message.template&.description], icon: 'fad fa-envelope' do |card|
   - card.action
     = button_to(t('nuntius.context_menu.resend'), resend_admin_message_path(@message), class: 'button')
 

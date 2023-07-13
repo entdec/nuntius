@@ -1,2 +1,2 @@
-= sts.card title: t('.messages'), icon: 'fad fa-envelope', content_padding: false do |card|
+= sts.card :nuntius_admin_messages, title: t('.messages'), icon: 'fad fa-envelope', content_padding: false do |card|
   = card.table :nuntius_messages, parameters: { template_id: params[:template_id] }, custom_views: true
