@@ -33,6 +33,8 @@ module Nuntius
 
       options = { registers: { 'template' => self, 'message' => message } }
 
+      assigns = assigns.merge('message_url' => '{{message_url}}')
+
       message.to = render(:to, assigns, locale, options).split(',').reject(&:empty?).join(',')
       message.from = render(:from, assigns, locale, options).split(',').reject(&:empty?).join(',')
       message.subject = render(:subject, assigns, locale, options)
