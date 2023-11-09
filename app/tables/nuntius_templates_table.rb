@@ -12,6 +12,12 @@ class NuntiusTemplatesTable < ActionTable::ActionTable
   column(:metadata) { |template| Nuntius.config.metadata_humanize(template.metadata) }
   column(:created_at, html_value: proc { |flow| ln(flow.created_at) })
 
+  column(:traffic_light, sortable: false) do |template|
+    color = Nuntius.config.flow_color(template.id).light_color || 'green'
+
+    "<span class='traffic-signal-#{color.downcase}'><i class='fa fa-circle fa-xl'></i></span>"
+  end
+
   column :actions, title: '', sortable: false do |template|
     content_tag(:span, class: 'btn-group btn-group-xs') do
       concat link_to(content_tag(:i, nil, class: 'fa fa-trash'), nuntius.admin_template_path(template), data: { turbo_confirm: 'Are you sure you want to delete the template?', turbo_method: :delete }, class: 'btn btn-xs btn-danger')
