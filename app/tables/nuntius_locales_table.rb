@@ -6,7 +6,7 @@ class NuntiusLocalesTable < ActionTable::ActionTable
   column(:key)
   column(:metadata) { |locale| Nuntius.config.metadata_humanize(locale.metadata) }
 
-  initial_order :mkey, :asc
+  initial_order :key
 
   row_link { |locale| nuntius.edit_admin_locale_path(locale) }
 
