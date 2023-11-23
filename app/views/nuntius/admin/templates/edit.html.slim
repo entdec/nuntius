@@ -64,7 +64,7 @@
             .col-span-12
               = f.input :text, as: :editor, mode: 'text/plain'
             .col-span-12
-              = f.input :payload, as: :editor, mode: 'application/yaml'
+              = f.input :payload, as: :editor, mode: 'application/yaml', hint: 'See here for more information: https://app.slack.com/block-kit-builder/'
 
           template data-toggle-target='toggleable' data-toggle-value='sms'
             .col-span-12
