@@ -33,7 +33,9 @@ module Nuntius
 
       options = { registers: { 'template' => self, 'message' => message } }
 
-      message.to = render(:to, assigns, locale, options).split(',').reject(&:empty?).join(',')
+      message.to = render(:to, assigns, locale, options).split(',').map(&:strip).reject{ |to| to == 'Liquid error internal' }.reject(&:empty?).join(',')
+      return unless message.to.present?
+
       message.from = render(:from, assigns, locale, options).split(',').reject(&:empty?).join(',')
       message.subject = render(:subject, assigns, locale, options)
       message.html = render(:html, assigns, locale, options.merge(layout: layout&.data))
