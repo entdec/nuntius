@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'fcm', '~> 1.0'
   s.add_dependency 'houston', '~> 2.4'
   s.add_dependency 'httpclient', '~> 2.8.3'
-  s.add_dependency 'i18n', '= 1.8.5'
+  s.add_dependency 'i18n', '~> 1.8'
   s.add_dependency 'inky-rb', '~> 1.4'
   s.add_dependency 'labelary'
   s.add_dependency 'liquidum'
