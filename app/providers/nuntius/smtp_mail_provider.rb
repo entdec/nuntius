@@ -58,8 +58,11 @@ module Nuntius
 
       begin
         response = mail.deliver!
-      rescue Net::SMTPFatalError => e
+      rescue Net::SMTPFatalError
         message.status = 'rejected'
+        return message
+      rescue Net::SMTPServerBusy, Net::ReadTimeout
+        message.status = 'undelivered'
         return message
       end
 
