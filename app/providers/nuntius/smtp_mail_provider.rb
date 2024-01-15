@@ -56,7 +56,12 @@ module Nuntius
         mail.attachments[attachment.filename.to_s] = { mime_type: attachment.content_type, content: attachment.download }
       end
 
-      response = mail.deliver!
+      begin
+        response = mail.deliver!
+      rescue Net::SMTPFatalError => e
+        message.status = 'rejected'
+        return message
+      end
 
       message.provider_id = mail.message_id
       message.status = 'undelivered'
