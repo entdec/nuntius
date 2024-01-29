@@ -11,6 +11,64 @@ en:
         resend:
           resend_success: Resent message
           resend_error: Failed to resend message
+        index:
+          card:
+            nuntius_admin_messages:
+              title: Messages
+              tab:
+                Nuntius messages: messages
+        show:
+          message: Message
+          card:
+            nuntius_admin_messages:
+              tab:
+                preview: Preview
+                details: Details
+          info_item:
+            main:
+              status: Status
+              transport: Transport
+              provider: Provider
+              provider_id: Provider ID
+              request_id: Request ID
+              refreshes: Refreshes
+              last_sent_at: Last Sent At
+              created_at: Created At
+      templates:
+        index:
+          card:
+            nuntius_admin_templates:
+              title: Templates
+              tab:
+                Nuntius templates: templates
+      layouts:
+        index:
+          card:
+            nuntius_admin_layouts:
+              title: Layouts
+              tab:
+                Nuntius layouts: Layouts
+      locales:
+        index:
+          card:
+            nuntius_admin_locales:
+              title: Locales
+              tab:
+                Nuntius locales: Locales
+      campaigns:
+        index:
+          card:
+            nuntius_admin_campaigns:
+              title: Campaigns
+              tab:
+                Nuntius campaigns:
+      lists:
+        index:
+          card:
+            nuntius_admin_lists:
+              title: Lists
+              tab:
+                Nuntius lists: Lists
     breadcrumbs:
       nuntius: Nuntius
       dashboard: Dashboard
