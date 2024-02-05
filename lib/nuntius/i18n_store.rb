@@ -82,7 +82,7 @@ module Nuntius
 
     def flat_hash(hash = {})
       (hash || {}).reduce({}) do |a, (k, v)|
-        tmp = v.is_a?(Hash) ? flat_hash(v).map { |k2, v2| ["#{k}.#{k2}", v2] }.to_h : { k => v }
+        tmp = v.is_a?(Hash) ? flat_hash(v).transform_keys { |k2| "#{k}.#{k2}" } : { k => v }
         a.merge(tmp)
       end
     end

@@ -5,7 +5,6 @@ require_dependency 'nuntius/application_admin_controller'
 module Nuntius
   module Admin
     class ListsController < ApplicationAdminController
-
       def index
         @lists = Nuntius::List.visible.order(:name)
       end

@@ -31,19 +31,15 @@
         template data-toggle-target='toggleable' data-toggle-value='voice'
           .col-span-12
             = f.input :text, as: :editor, mode: 'text/plain'
-
-
 - else
-  h2 = @campaign.name
-  p We're sending this campaign, you can no longer make any changes. This is the audience we're sending it to:
-
-  table.table
-    thead
-      tr
-        th Status
-        th To
-    tbody
-      - for message in @messages
+  = sts.card :nuntius_admin_campaigns, title: @campaign.name, description: 'We are sending this campaign, you can no longer make any changes.', icon: 'fal fa-megaphone' do |card|
+    table.table
+      thead
         tr
-          td = link_to message.status, admin_message_path(message)
-          td = message.to
+          th Status
+          th To
+      tbody
+        - for message in @messages
+          tr
+            td = link_to message.status, admin_message_path(message)
+            td = message.to

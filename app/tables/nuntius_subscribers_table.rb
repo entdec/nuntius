@@ -3,13 +3,14 @@
 class NuntiusSubscribersTable < ActionTable::ActionTable
   model Nuntius::Subscriber
 
-  column(:name, sortable: false) { |subscriber| subscriber.name }
+  column(:id)
+  column(:name, sortable: false)
   column(:email)
   column(:phonenumber)
 
   initial_order :name, :asc
 
-  row_link { |subscriber| nuntius.edit_admin_list_subscriber_path(params[:list_id], subscriber) }
+  row_link { |subscriber| nuntius.edit_admin_list_subscriber_path(subscriber, list_id: subscriber.list) }
 
   private
 

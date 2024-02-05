@@ -70,11 +70,12 @@ module Nuntius
       end
 
       def class_name_for(obj)
-        if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
+        case obj
+        when Array, ActiveRecord::Relation
           obj.first.class.name.demodulize
-        elsif obj.is_a?(Hash)
+        when Hash
           'Custom'
-        elsif obj.is_a?(Class)
+        when Class
           obj.name.demodulize
         else
           obj.class.name
@@ -183,7 +184,7 @@ module Nuntius
     def liquid_context
       assigns = @params || {}
       instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope].include? i.to_s }.each do |i|
-        assigns[i.to_s[1..-1]] = instance_variable_get(i)
+        assigns[i.to_s[1..]] = instance_variable_get(i)
       end
 
       context = { liquid_variable_name_for(@object) => (@object.is_a?(Hash) ? @object[@object.keys.first].deep_stringify_keys : @object) }

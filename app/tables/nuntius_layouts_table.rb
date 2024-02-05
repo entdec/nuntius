@@ -3,7 +3,7 @@
 class NuntiusLayoutsTable < ActionTable::ActionTable
   model Nuntius::Layout
 
-  column(:name) { |layout| layout.name }
+  column(:name)
   column(:metadata) { |layout| Nuntius.config.metadata_humanize(layout.metadata) }
 
   column :actions, title: '', sortable: false do |layout|

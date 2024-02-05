@@ -8,7 +8,7 @@ module Nuntius
     attr_reader :transports, :providers
 
     def initialize
-      @logger = Logger.new(STDOUT)
+      @logger = Logger.new($stdout)
       @logger.level = Logger::INFO
       @base_controller = '::ApplicationController'
       @base_runner = 'Nuntius::BasicApplicationRunner'

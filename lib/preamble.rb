@@ -13,7 +13,7 @@ class Preamble
   end
 
   def metadata_with_content
-    @metadata.to_yaml + "---\n" + @content
+    "#{@metadata.to_yaml}---\n#{@content}"
   end
 
   def dump

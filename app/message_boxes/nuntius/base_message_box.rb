@@ -57,7 +57,7 @@ module Nuntius
 
       def message_box_for_route(message_boxes, recipients)
         klass = message_boxes.find do |message_box|
-          routes = (message_box.routes || {})
+          routes = message_box.routes || {}
           routes.any? { |regexp, _method| [*recipients].any? { |recipient| regexp.match(recipient) } }
         end
         method = klass.routes.find { |regexp, _method| [*recipients].any? { |recipient| regexp.match(recipient) } }&.last if klass

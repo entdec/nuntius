@@ -6,7 +6,7 @@ module Nuntius
 
     def initialize(params)
       super
-      @template_ids = params[:template_ids]&.split(",")
+      @template_ids = params[:template_ids]&.split(',')
     end
 
     private

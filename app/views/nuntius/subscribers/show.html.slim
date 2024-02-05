@@ -1,0 +1,6 @@
+
+= sts.card :subscriber, title: @list.name do |card|
+  - card.action
+    = link_to 'Unsubscibe', subscriber_path(@subscriber), data: { turbo_method: :delete }, class: 'btn btn-primary'
+
+  p= @list.description

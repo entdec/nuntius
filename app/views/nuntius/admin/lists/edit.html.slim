@@ -9,6 +9,8 @@
       .grid.grid-cols-12.gap-4
         .col-span-12
           = f.input :name
+        .col-span-12
+          = f.input :description, as: :text
 
     - if @list.subscribers.present?
       = card.table :nuntius_subscribers, parameters: { list_id: @list.id }, custom_views: false, tab: :nuntius_subscribers

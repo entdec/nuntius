@@ -12,13 +12,18 @@ Nuntius::Engine.routes.draw do
 
   resources :messages
   resources :campaigns
+  resources :subscribers
 
   namespace :api do
     resources :events
   end
 
   namespace :admin do
-    resources :campaigns
+    resources :campaigns do
+      member do
+        post 'publish', action: 'publish'
+      end
+    end
     resources :layouts do
       resources :attachments, controller: 'layouts/attachments'
     end

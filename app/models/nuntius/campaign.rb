@@ -17,6 +17,7 @@ module Nuntius
       event :publish do
         transition draft: :sending
       end
+
       event :sent do
         transition sending: :sent
       end
@@ -30,6 +31,7 @@ module Nuntius
     end
 
     def new_message(subscriber, assigns = {})
+      assigns['subscriber'] = subscriber
       if subscriber.nuntiable
         name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
         assigns[name] = subscriber.nuntiable
@@ -37,14 +39,15 @@ module Nuntius
       message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: subscriber.nuntiable, metadata: metadata)
 
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(subscriber.nuntiable).locale
-      locale = instance_exec(object, &locale_proc) if locale_proc
+      locale = instance_exec(subscriber.nuntiable, &locale_proc) if subscriber.nuntiable && locale_proc
 
       message.from = render(:from, assigns, locale)
-      message.to = if transport == 'mail'
-                     %["#{subscriber.first_name} #{subscriber.last_name}" <#{subscriber.email}>]
-                   elsif transport == 'sms'
+      message.to = case transport
+                   when 'mail'
+                     %["#{subscriber.name}" <#{subscriber.email}>]
+                   when 'sms'
                      subscriber.phone_number
-                   elsif transport == 'voice'
+                   when 'voice'
                      subscriber.phone_number
                    end
 
@@ -64,7 +67,7 @@ module Nuntius
 
     def render(attr, assigns, locale, options = {})
       I18n.with_locale(locale) do
-        ::Liquidum.render(send(attr), assigns: assigns.merge(options.merge('campaign' => self)), registers: { 'campaign' => self })
+        ::Liquidum.render(send(attr), { assigns: assigns.merge('campaign' => self), registers: { 'campaign' => self } }.merge(options))
       end
     end
 

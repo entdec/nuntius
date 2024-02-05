@@ -16,7 +16,7 @@ module Nuntius
       def setting_reader(name, required: false, default: nil, description: '')
         @all_settings ||= []
         @all_settings.push(name: name, required: required, default: default, description: description)
-        define_method(name) { required ? settings.fetch(name) : settings.dig(name) || default }
+        define_method(name) { required ? settings.fetch(name) : settings[name] || default }
       end
 
       def transport(transport = nil)

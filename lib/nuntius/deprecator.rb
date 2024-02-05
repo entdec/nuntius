@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nuntius
   class Deprecator
     def deprecation_warning(deprecated_method_name, message, _caller_backtrace = nil)
