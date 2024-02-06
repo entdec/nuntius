@@ -5,6 +5,8 @@ module Nuntius
     belongs_to :list
     belongs_to :nuntiable, polymorphic: true, optional: true
 
+    scope :subscribed, -> { where(unsubscribed_at: nil) }
+
     def name
       [first_name, last_name].compact.join(' ').presence || email
     end

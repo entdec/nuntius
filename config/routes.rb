@@ -12,7 +12,12 @@ Nuntius::Engine.routes.draw do
 
   resources :messages
   resources :campaigns
-  resources :subscribers
+  resources :subscribers do
+    member do
+      post :unsubscribe
+      post :subscribe
+    end
+  end
 
   namespace :api do
     resources :events

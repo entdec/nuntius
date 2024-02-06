@@ -1,4 +1,3 @@
-en:
   nuntius:
     flash:
       error: There were problems saving the %{model}
@@ -90,6 +89,9 @@ en:
             nuntius_admin_campaigns:
               title: Campaigns
       lists:
+        subscribers:
+          edit:
+            subscribers: Subscribers
         index:
           card:
             nuntius_admin_lists:
@@ -97,6 +99,8 @@ en:
               tab:
                 Nuntius lists: Lists
         edit:
+          description: List description
+          description_hint: Describe the list in detail for the subscibers, explain if they can unsubscribe, how often they will receive messages, etc.
           card:
             nuntius_admin_lists:
               title: Lists

@@ -12,8 +12,6 @@ module Nuntius
     validates :name, presence: true
 
     state_machine initial: :draft do
-      after_transition any => any, do: :do_after_transition
-
       event :publish do
         transition draft: :sending
       end
@@ -21,58 +19,10 @@ module Nuntius
       event :sent do
         transition sending: :sent
       end
-    end
 
-    def deliver
-      t = BaseTransport.class_from_name(transport).new
-      list.subscribers.each do |subscriber|
-        t.deliver(new_message(subscriber))
+      after_transition(on: :publish) do |campaign, transition|
+        DeliverCampaignService.perform(campaign: campaign)
       end
-    end
-
-    def new_message(subscriber, assigns = {})
-      assigns['subscriber'] = subscriber
-      if subscriber.nuntiable
-        name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
-        assigns[name] = subscriber.nuntiable
-      end
-      message = Nuntius::Message.new(transport: transport, campaign: self, nuntiable: subscriber.nuntiable, metadata: metadata)
-
-      locale_proc = Nuntius::BaseMessenger.messenger_for_obj(subscriber.nuntiable).locale
-      locale = instance_exec(subscriber.nuntiable, &locale_proc) if subscriber.nuntiable && locale_proc
-
-      message.from = render(:from, assigns, locale)
-      message.to = case transport
-                   when 'mail'
-                     %["#{subscriber.name}" <#{subscriber.email}>]
-                   when 'sms'
-                     subscriber.phone_number
-                   when 'voice'
-                     subscriber.phone_number
-                   end
-
-      message.subject = render(:subject, assigns, locale)
-      message.html = render(:html, assigns, locale, layout: layout&.data)
-
-      message
-    end
-
-    def translation_scope
-      scope = %w[nuntius]
-      scope << layout.name.underscore.tr(' ', '_') if layout
-      scope.join('.')
-    end
-
-    private
-
-    def render(attr, assigns, locale, options = {})
-      I18n.with_locale(locale) do
-        ::Liquidum.render(send(attr), { assigns: assigns.merge('campaign' => self), registers: { 'campaign' => self } }.merge(options))
-      end
-    end
-
-    def do_after_transition(transition)
-      deliver if transition.event == :publish
     end
   end
 end

@@ -38,7 +38,7 @@ module Nuntius
       def set_objects; end
 
       def list_params
-        params.require(:list).permit(:name)
+        params.require(:list).permit(:name, :slug, :allow_unsubscribe, :description, :metadata_yaml)
       end
     end
   end
