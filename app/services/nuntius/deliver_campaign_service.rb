@@ -35,7 +35,7 @@ module Nuntius
       message.from = render(:from, assigns, locale)
       message.to = case campaign.transport
                   when 'mail'
-                    %["#{subscriber.name}" <#{subscriber.email}>]
+                    subscriber.email
                   when 'sms'
                     subscriber.phone_number
                   when 'voice'

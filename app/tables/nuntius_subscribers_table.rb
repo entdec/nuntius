@@ -3,10 +3,10 @@
 class NuntiusSubscribersTable < ActionTable::ActionTable
   model Nuntius::Subscriber
 
-  column(:id)
   column(:name, sortable: false)
   column(:email)
   column(:phonenumber)
+  column(:unsubscribed_at) { |subscriber| ln(subscriber.unsubscribed_at) }
 
   initial_order :name, :asc
 

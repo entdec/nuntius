@@ -32,7 +32,7 @@
           .col-span-12
             = f.input :text, as: :editor, mode: 'text/plain'
 - else
-  = sts.card :nuntius_admin_campaigns, title: @campaign.name, description: 'We are sending this campaign, you can no longer make any changes.', icon: 'fal fa-megaphone' do |card|
+  = sts.card :nuntius_admin_campaigns, title: @campaign.name, description: 'We are sending this campaign, you can no longer make any changes.', icon: 'fal fa-megaphone', content_padding: false do |card|
     table.table
       thead
         tr
