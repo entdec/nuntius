@@ -1,43 +1,8 @@
 {
-  "name": "@entdec/nuntius",
-  "version": "1.1.3",
-  "repository": "git@github.com:entdec/nuntius.git",
-  "author": "Tom de Grunt <tom@degrunt.nl>",
-  "license": "MIT",
-  "files": [
-    "./frontend/**/*"
-  ],
-  "browserslist": "> 1%",
-  "peerDependencies": {
-    "codemirror": "^5.48.4",
-    "codemirror-liquid": "> 0",
-    "element-closest": "^3.0.1",
-    "@hotwired/stimulus": ">2.0",
-    "@hotwired/stimulus-webpack-helpers": "^1.0.1"
-  },
-  "devDependencies": {
-    "@gitlab/svgs": "^1.68.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "clean-webpack-plugin": "^0.1.19",
-    "copy-webpack-plugin": "^4.6.0",
-    "css-loader": "^0.28.9",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "file-loader": "^2.0.0",
-    "mini-css-extract-plugin": "^0.8.0",
-    "node-sass": "^4.12.0",
-    "postcss-custom-properties": "^8.0.9",
-    "sass-loader": "^7.3.1",
-    "style-loader": "^1.0.0",
-    "url-loader": "^2.1.0",
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7"
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "postcss-comment": "^2.0.0",
+    "postcss-import": "^16.0.1",
+    "tailwindcss": "^3.4.1"
   }
 }

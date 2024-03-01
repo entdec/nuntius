@@ -1,22 +1,22 @@
 = sts.form_for([:admin, @layout]) do |f|
   = sts.card :nuntius_admin_layouts, icon: 'fal fa-table-layout' do |card|
-    - card.action
+    - card.with_action
       = f.submit
 
 
-    - card.tab :edit, padding: true
+    - card.with_tab:edit, padding: true
       .grid.grid-cols-12.gap-4
         .col-span-12
           = f.input :name
         .col-span-12
           = f.input :data, as: :editor, mode: 'text/html', height: '400px'
-    - card.tab :metadata, padding: true
+    - card.with_tab:metadata, padding: true
       .grid.grid-cols-12.gap-4
         .col-span-12
           = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
     - if @layout.persisted?
-      - card.tab :media, padding: true
+      - card.with_tab:media, padding: true
         = render partial: 'nuntius/admin/layouts/attachments/index', locals: { attachments: @layout.attachments, upload_url: nuntius.admin_layout_attachments_path(@layout) }
 
     - if @layout.templates.size.positive?

@@ -43,7 +43,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'slack-ruby-client'
   s.add_dependency 'state_machines-activerecord'
   s.add_dependency 'twilio-ruby', '~> 5'
-  s.add_dependency 'webpacker', '>= 4'
 
   s.add_development_dependency 'pry', '~> 0.11'
   s.add_development_dependency 'rubocop', '~> 1'

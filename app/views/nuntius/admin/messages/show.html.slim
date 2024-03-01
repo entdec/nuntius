@@ -1,8 +1,8 @@
 = sts.card :nuntius_admin_messages, title: [t('.message'), @message.template&.description], icon: 'fad fa-envelope' do |card|
-  - card.action
+  - card.with_action
     = button_to(t('nuntius.context_menu.resend'), resend_admin_message_path(@message), class: 'button')
 
-  - card.tab :preview, padding: true
+  - card.with_tab:preview, padding: true
 
     table.table
       thead
@@ -44,13 +44,13 @@
     - if @message.transport == 'mail' && @message.html.present?
       iframe.border.rounded-lg.border-gray-200 src=message_path(@message.id) style="width: 100%; height: 600px; border: 0px;"
 
-  - card.tab :details, padding: true
+  - card.with_tab:details, padding: true
       = sts.info class: "grid grid-cols-1 gap-4 sm:grid-cols-3" do |info|
-        = info.item :status, content: @message.status, class: "sm:col-span-1"
-        = info.item :transport, content: @message.transport, class: "sm:col-span-1"
-        = info.item :provider, content: @message.provider, class: "sm:col-span-1"
-        = info.item :provider_id, content: @message.provider_id, class: "sm:col-span-1"
-        = info.item :request_id, content: @message.request_id, class: "sm:col-span-1"
-        = info.item :refreshes, content: @message.refreshes, class: "sm:col-span-1"
-        = info.item :last_sent_at, content: ln(@message.last_sent_at), class: "sm:col-span-1", icon: 'fal fa-envelope'
-        = info.item :created_at, content: ln(@message.created_at), class: "sm:col-span-1", icon: 'fal fa-calendar'
+        = info.with_item :status, content: @message.status, class: "sm:col-span-1"
+        = info.with_item :transport, content: @message.transport, class: "sm:col-span-1"
+        = info.with_item :provider, content: @message.provider, class: "sm:col-span-1"
+        = info.with_item :provider_id, content: @message.provider_id, class: "sm:col-span-1"
+        = info.with_item :request_id, content: @message.request_id, class: "sm:col-span-1"
+        = info.with_item :refreshes, content: @message.refreshes, class: "sm:col-span-1"
+        = info.with_item :last_sent_at, content: ln(@message.last_sent_at), class: "sm:col-span-1", icon: 'fal fa-envelope'
+        = info.with_item :created_at, content: ln(@message.created_at), class: "sm:col-span-1", icon: 'fal fa-calendar'

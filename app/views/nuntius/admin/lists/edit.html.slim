@@ -1,11 +1,11 @@
 = sts.form_for([:admin, @list]) do |f|
   = sts.card :nuntius_admin_lists, icon: 'fad fa-address-book', menu: nuntius_list_menu do |card|
-    - card.action
+    - card.with_action
       = f.continue
-    - card.action
+    - card.with_action
       = f.submit
 
-    - card.tab :edit, padding: true
+    - card.with_tab:edit, padding: true
       .grid.grid-cols-12.gap-4
         .col-span-6= f.input :name
         .col-span-4= f.input :slug
