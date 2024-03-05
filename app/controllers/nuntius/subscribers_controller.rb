@@ -4,7 +4,7 @@ require_dependency 'nuntius/application_controller'
 
 module Nuntius
   class SubscribersController < ApplicationController
-    skip_before_action :authenticate_user!, only: %i[show destroy]
+    # skip_before_action :authenticate_user!, only: %i[show destroy]
 
     def show
       @subscriber = Nuntius::Subscriber.find_by(id: params[:id])
