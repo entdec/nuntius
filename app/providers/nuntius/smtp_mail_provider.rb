@@ -43,7 +43,7 @@ module Nuntius
           charset: 'UTF-8'
         )
         if message.html.present?
-          message.html = message.html.gsub('%7B%7Bmessage_url%7D%7D') { message_url(message) }
+          message.html = message.html.gsub('{{message_url}}') { message_url(message) }
           p.html_part = Mail::Part.new(
             body: message.html,
             content_type: 'text/html',
