@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -111,6 +111,10 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "metadata", default: {}, null: false
+    t.text "description"
+    t.string "slug"
+    t.boolean "allow_unsubscribe", default: true, null: false
+    t.index ["slug"], name: "index_nuntius_lists_on_slug", unique: true
   end
 
   create_table "nuntius_locales", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -160,6 +164,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
     t.datetime "updated_at", null: false
     t.string "nuntiable_type"
     t.uuid "nuntiable_id"
+    t.datetime "unsubscribed_at", precision: nil
     t.index ["list_id"], name: "index_nuntius_subscribers_on_list_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_subscribers_on_nuntiable_type_and_nuntiable_id"
   end
