@@ -29,7 +29,7 @@ module Nuntius
       #   'NumSegments' => '1',
       #   'MessageSid' => 'SMb711289e438f577f230f5837e9c74a08',
       #   'AccountSid' => 'ACf54dd7a47a8011d65b54d472a7190549',
-      #   'From' => '+31641085630',
+      #   'From' => '+31612345678',
       #   'ApiVersion' => '2010-04-01',
       #   'controller' => 'nuntius/inbound_messages/twilio_inbound_smses',
       #   'action' => 'create' }
