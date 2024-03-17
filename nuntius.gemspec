@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rubyzip', '> 2'
   s.add_dependency 'servitium', '~> 1'
   s.add_dependency 'slack-ruby-client'
-  s.add_dependency 'state_machines-activemodel'
+  s.add_dependency 'state_machines-activerecord'
   s.add_dependency 'twilio-ruby', '~> 5'
 
   s.add_development_dependency 'pry', '~> 0.11'

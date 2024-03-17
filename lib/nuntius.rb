@@ -1,14 +1,5 @@
 # frozen_string_literal: true
 
-require 'auxilium'
-require 'evento'
-require 'inky'
-require 'httpclient'
-require 'liquidum'
-require 'premailer'
-require 'state_machines-activemodel'
-require 'servitium'
-
 require 'nuntius/deprecator'
 require 'nuntius/engine'
 require 'nuntius/configuration'

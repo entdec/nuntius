@@ -1,5 +1,14 @@
 # frozen_string_literal: true
 
+require 'auxilium'
+require 'evento'
+require 'inky'
+require 'httpclient'
+require 'liquidum'
+require 'premailer'
+require 'state_machines-activerecord'
+require 'servitium'
+
 module Nuntius
   class Engine < ::Rails::Engine
     isolate_namespace Nuntius
