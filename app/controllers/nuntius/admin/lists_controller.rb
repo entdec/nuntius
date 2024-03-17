@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
@@ -35,7 +35,8 @@ module Nuntius
 
       private
 
-      def set_objects; end
+      def set_objects
+      end
 
       def list_params
         params.require(:list).permit(:name, :slug, :allow_unsubscribe, :description, :metadata_yaml)

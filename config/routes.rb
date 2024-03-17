@@ -5,10 +5,10 @@ Nuntius::Engine.routes.draw do
     resource :twilio_inbound_smses
   end
 
-  get 'callbacks/:message_id(/*path)', to: 'callbacks#create', as: :callback
-  post 'callbacks/:message_id(/*path)', to: 'callbacks#create'
+  get "callbacks/:message_id(/*path)", to: "callbacks#create", as: :callback
+  post "callbacks/:message_id(/*path)", to: "callbacks#create"
 
-  post 'feedback/awssns' => 'feedback#awssns'
+  post "feedback/awssns" => "feedback#awssns"
 
   resources :messages
   resources :campaigns
@@ -26,24 +26,24 @@ Nuntius::Engine.routes.draw do
   namespace :admin do
     resources :campaigns do
       member do
-        post 'publish', action: 'publish'
+        post "publish", action: "publish"
       end
     end
     resources :layouts do
-      resources :attachments, controller: 'layouts/attachments'
+      resources :attachments, controller: "layouts/attachments"
     end
     resources :lists do
-      resources :subscribers, controller: 'lists/subscribers'
+      resources :subscribers, controller: "lists/subscribers"
     end
     resources :messages do
       member do
-        post 'resend', action: 'resend'
+        post "resend", action: "resend"
       end
     end
     resources :layouts
     resources :locales
     resources :templates
   end
-  root to: 'dashboard#show'
-  mount Trado::Engine, at: '/'
+  root to: "dashboard#show"
+  mount Trado::Engine, at: "/"
 end

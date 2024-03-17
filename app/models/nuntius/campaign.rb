@@ -8,7 +8,7 @@ module Nuntius
     accepts_nested_attributes_for :list, reject_if: :all_blank
 
     belongs_to :layout, optional: true
-    has_many :messages, class_name: 'Nuntius::Message'
+    has_many :messages, class_name: "Nuntius::Message"
     validates :name, presence: true
 
     state_machine initial: :draft do

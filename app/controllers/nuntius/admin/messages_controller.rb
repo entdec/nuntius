@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
@@ -17,7 +17,7 @@ module Nuntius
       def resend
         @message = Nuntius::Message.visible.find(params[:id])
         @message.resend
-        respond_with @message, success: t('.resend_success'), error: t('.resend_error')
+        respond_with @message, success: t(".resend_success"), error: t(".resend_error")
       end
     end
   end

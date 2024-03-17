@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
@@ -24,7 +24,8 @@ module Nuntius
         redirect_to :edit_admin_campaign, status: :see_other
       end
 
-      def edit; end
+      def edit
+      end
 
       def update
         @campaign.update(campaign_params)

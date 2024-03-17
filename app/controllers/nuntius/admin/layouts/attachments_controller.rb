@@ -6,7 +6,8 @@ module Nuntius
       class AttachmentsController < ApplicationController
         before_action :set_objects
 
-        def index; end
+        def index
+        end
 
         def create
           params[:attachments].each do |file|

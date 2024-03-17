@@ -22,7 +22,7 @@ module Nuntius
           params = Nuntius.config.default_params(transaction_log_entry)
 
           Nuntius.event(event, resource, params)
-          Nuntius.event('save', resource, params) if %w[create update].include?(event)
+          Nuntius.event("save", resource, params) if %w[create update].include?(event)
         end
       end
     end

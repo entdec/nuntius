@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-desc 'Release a new version'
+desc "Release a new version"
 namespace :nuntius do
   task :release do
-    version_file = './lib/nuntius/version.rb'
-    File.open(version_file, 'w') do |file|
+    version_file = "./lib/nuntius/version.rb"
+    File.open(version_file, "w") do |file|
       file.puts <<~EOVERSION
         # frozen_string_literal: true
 
         module Nuntius
-          VERSION = '#{Nuntius::VERSION.split('.').map(&:to_i).tap { |parts| parts[2] += 1 }.join('.')}'
+          VERSION = '#{Nuntius::VERSION.split(".").map(&:to_i).tap { |parts| parts[2] += 1 }.join(".")}'
         end
       EOVERSION
     end

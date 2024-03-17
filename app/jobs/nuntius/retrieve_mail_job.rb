@@ -10,7 +10,7 @@ module Nuntius
         RetrieveInboundMailService.perform(settings: klass.settings)
       end
 
-      Nuntius::InboundMessage.where(status: 'pending').each do |message|
+      Nuntius::InboundMessage.where(status: "pending").each do |message|
         Nuntius::DeliverInboundMessageJob.perform_later(message)
       end
     end

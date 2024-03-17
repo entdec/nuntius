@@ -8,7 +8,7 @@ module Nuntius
     scope :subscribed, -> { where(unsubscribed_at: nil) }
 
     def name
-      [first_name, last_name].compact.join(' ').presence || email
+      [first_name, last_name].compact.join(" ").presence || email
     end
 
     def first_name

@@ -10,8 +10,8 @@ module Nuntius
     def initialize
       @logger = Logger.new($stdout)
       @logger.level = Logger::INFO
-      @base_controller = '::ApplicationController'
-      @base_runner = 'Nuntius::BasicApplicationRunner'
+      @base_controller = "::ApplicationController"
+      @base_runner = "Nuntius::BasicApplicationRunner"
       @nuntiable_classes = []
       @nuntiable_class_names = []
       @transports = []
@@ -23,8 +23,8 @@ module Nuntius
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
       @allow_custom_events = false
-      @layout = 'application'
-      @admin_layout = 'application'
+      @layout = "application"
+      @admin_layout = "application"
       @active_storage_service = nil
     end
 
@@ -44,7 +44,7 @@ module Nuntius
 
     # admin_mount_point [String].
     def admin_mount_point
-      @admin_mount_point ||= '/nuntius'
+      @admin_mount_point ||= "/nuntius"
     end
 
     def add_nuntiable_class(klass)
@@ -83,7 +83,7 @@ module Nuntius
 
     def compile_nuntiable_class_names
       names = []
-      names << 'Custom' if allow_custom_events
+      names << "Custom" if allow_custom_events
 
       @nuntiable_classes.each do |klass_name|
         klass = klass_name.constantize

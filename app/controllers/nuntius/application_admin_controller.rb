@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_controller'
+require_dependency "nuntius/application_controller"
 
 module Nuntius
   class ApplicationAdminController < ApplicationController

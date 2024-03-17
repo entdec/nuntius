@@ -8,8 +8,8 @@ module Nuntius
 
     def perform
       Mail::IMAP.new(context.settings).all do |message, imap, uid|
-        inbound_message = Nuntius::InboundMessage.find_or_create_by!(transport: 'mail', provider: 'imap', provider_id: message.message_id,
-                                                                     digest: Digest::SHA256.hexdigest(message.to_s), status: 'pending')
+        inbound_message = Nuntius::InboundMessage.find_or_create_by!(transport: "mail", provider: "imap", provider_id: message.message_id,
+          digest: Digest::SHA256.hexdigest(message.to_s), status: "pending")
         inbound_message.from = message.from
         inbound_message.to = message.to
         inbound_message.text = message.body
@@ -20,7 +20,7 @@ module Nuntius
           if Digest::SHA256.hexdigest(message.to_s) == Digest::SHA256.hexdigest(inbound_message.raw_message.download)
             # Only if we have an attachment and it's digest is the same as we find in the mailbox, delete!
             # This never happens on the first round of fetching it.
-            imap.store(uid, '+FLAGS', [Net::IMAP::DELETED])
+            imap.store(uid, "+FLAGS", [Net::IMAP::DELETED])
             imap.expunge
           end
         else

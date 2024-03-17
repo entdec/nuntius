@@ -11,8 +11,8 @@ module Nuntius
         original_message = message
         message = message.dup
         message.parent_message = original_message
-        message.status = 'pending'
-        message.provider_id = ''
+        message.status = "pending"
+        message.provider_id = ""
       end
       message.provider = provider_name
       message.save!

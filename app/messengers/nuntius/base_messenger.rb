@@ -61,11 +61,11 @@ module Nuntius
         return obj.keys.first.to_s if obj.is_a?(Hash)
 
         plural = obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
-        list   = plural ? obj : [obj]
-        klass  = list.first.class
-        klass  = klass.base_class if klass.respond_to?(:base_class)
-        name   = klass.name.demodulize
-        name   = name.pluralize if plural
+        list = plural ? obj : [obj]
+        klass = list.first.class
+        klass = klass.base_class if klass.respond_to?(:base_class)
+        name = klass.name.demodulize
+        name = name.pluralize if plural
         name.underscore
       end
 
@@ -74,7 +74,7 @@ module Nuntius
         when Array, ActiveRecord::Relation
           obj.first.class.name.demodulize
         when Hash
-          'Custom'
+          "Custom"
         when Class
           obj.name.demodulize
         else
@@ -144,7 +144,7 @@ module Nuntius
       end
 
       def timebased_scope(name, &scope_proc)
-        raise ArgumentError, 'timebased_scope must start with before or after' unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
+        raise ArgumentError, "timebased_scope must start with before or after" unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
 
         name = name.to_sym
         timebased_scopes[name] = scope_proc if scope_proc.present?
@@ -187,7 +187,7 @@ module Nuntius
         assigns[i.to_s[1..]] = instance_variable_get(i)
       end
 
-      context = { liquid_variable_name_for(@object) => (@object.is_a?(Hash) ? @object[@object.keys.first].deep_stringify_keys : @object) }
+      context = {liquid_variable_name_for(@object) => (@object.is_a?(Hash) ? @object[@object.keys.first].deep_stringify_keys : @object)}
       assigns.merge(context)
     end
   end

@@ -12,7 +12,7 @@ module Nuntius
 
       orchestrator.override_devise_notification do |notification, *devise_params|
         # All notifications have either a token as the first param, or nothing
-        Nuntius.event(notification, self, { token: devise_params.first })
+        Nuntius.event(notification, self, {token: devise_params.first})
       end
     end
   end

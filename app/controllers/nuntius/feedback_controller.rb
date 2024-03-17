@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_controller'
-require 'httpclient'
+require_dependency "nuntius/application_controller"
+require "httpclient"
 
 module Nuntius
   class FeedbackController < ApplicationController

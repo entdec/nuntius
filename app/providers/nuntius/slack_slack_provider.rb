@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'slack'
+require "slack"
 
 module Nuntius
   class SlackSlackProvider < BaseProvider
     transport :slack
 
-    setting_reader :api_key, required: true, description: 'API key for the Slack workspace'
+    setting_reader :api_key, required: true, description: "API key for the Slack workspace"
 
     def deliver
       client = Slack::Web::Client.new(token: api_key)
@@ -24,11 +24,11 @@ module Nuntius
       args = (message.payload || {}).merge(channel: message[:to], text: message.text, as_user: true, username: message[:from])
       response = client.chat_postMessage(args.deep_symbolize_keys)
 
-      message.status = if response['ok']
-                         'sent'
-                       else
-                         'undelivered'
-                       end
+      message.status = if response["ok"]
+        "sent"
+      else
+        "undelivered"
+      end
 
       message
     end

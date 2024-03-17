@@ -3,7 +3,7 @@
 module Nuntius
   class BaseTransport
     def kind
-      self.class.name.demodulize.gsub(/Transport$/, '').underscore.to_sym
+      self.class.name.demodulize.gsub(/Transport$/, "").underscore.to_sym
     end
 
     def deliver(message)

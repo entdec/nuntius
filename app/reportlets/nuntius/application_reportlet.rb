@@ -6,13 +6,13 @@ module Nuntius
 
     def initialize(params)
       super
-      @template_ids = params[:template_ids]&.split(',')
+      @template_ids = params[:template_ids]&.split(",")
     end
 
     private
 
     def ymds(_for_display = false)
-      results.map { |r| r['ymd'] }.uniq.sort_by { |w| Date.strptime(w, '%F') }
+      results.map { |r| r["ymd"] }.uniq.sort_by { |w| Date.strptime(w, "%F") }
     end
 
     def all_templates
@@ -21,7 +21,7 @@ module Nuntius
 
     # Helper to get item for ymd, template_id
     def ymd_template_id(ymd, template_id, what)
-      find_item(results, { ymd: ymd, template_id: template_id }, what)
+      find_item(results, {ymd: ymd, template_id: template_id}, what)
     end
 
     # Arel helpers

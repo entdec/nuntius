@@ -6,7 +6,7 @@ class NuntiusMessagesTable < ActionTable::ActionTable
   column(:to)
   column(:created_at, html_value: proc { |message| ln(message.created_at) })
   column(:last_sent_at, html_value: proc { |message| ln(message.last_sent_at) })
-  column(:origin, sort_field: 'nuntius_messages.campaign_id, nuntius_messages.template_id') do |message|
+  column(:origin, sort_field: "nuntius_messages.campaign_id, nuntius_messages.template_id") do |message|
     link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign) if message.campaign
     link_to message.template&.description, nuntius.edit_admin_template_path(message.template) if message.template
   end
@@ -14,8 +14,8 @@ class NuntiusMessagesTable < ActionTable::ActionTable
     if message.nuntiable
       link_to "#{message.nuntiable_type} [#{message.nuntiable}]", begin
         url_for(message.nuntiable)
-      rescue StandardError
-        '#'
+      rescue
+        "#"
       end
     end
   end

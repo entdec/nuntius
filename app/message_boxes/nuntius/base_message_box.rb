@@ -43,7 +43,7 @@ module Nuntius
       end
 
       def mail
-        return nil if transport != 'mail' && provider != 'imap'
+        return nil if transport != "mail" && provider != "imap"
         return @mail if @mail
 
         @mail = Mail.read(inbound_message.raw_message.download)

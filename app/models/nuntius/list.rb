@@ -14,7 +14,7 @@ module Nuntius
 
     accepts_nested_attributes_for :subscribers, reject_if: :all_blank
 
-    scope :subscribed_by, -> (nuntiable) { where(id: nuntiable.nuntius_subscriptions.select(:list_id)) }
-    scope :not_subscribed_by, -> (nuntiable) { where.not(id: nuntiable.nuntius_subscriptions.select(:list_id)) }
+    scope :subscribed_by, ->(nuntiable) { where(id: nuntiable.nuntius_subscriptions.select(:list_id)) }
+    scope :not_subscribed_by, ->(nuntiable) { where.not(id: nuntiable.nuntius_subscriptions.select(:list_id)) }
   end
 end

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_reportlet'
+require_dependency "nuntius/application_reportlet"
 
 module Nuntius
   class DailyMessagesPerTemplateReportlet < ApplicationReportlet
-    title 'Daily messages per template'
+    title "Daily messages per template"
     cache 1.minute
 
     def table_data
-      data = [[''] + ymds(true)]
+      data = [[""] + ymds(true)]
 
       matrix = all_templates.map do |template|
         tmpl = Nuntius::Template.find(template)

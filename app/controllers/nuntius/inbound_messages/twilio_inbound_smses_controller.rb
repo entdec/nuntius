@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_controller'
-require 'twilio-ruby'
+require_dependency "nuntius/application_controller"
+require "twilio-ruby"
 
 module Nuntius
   module InboundMessages
@@ -34,7 +34,7 @@ module Nuntius
       #   'controller' => 'nuntius/inbound_messages/twilio_inbound_smses',
       #   'action' => 'create' }
       def create
-        inbound_message = Nuntius::InboundMessage.find_or_create_by!(transport: 'sms', provider: 'twilio', provider_id: params[:SmsSid])
+        inbound_message = Nuntius::InboundMessage.find_or_create_by!(transport: "sms", provider: "twilio", provider_id: params[:SmsSid])
         inbound_message.from = params[:From]
         inbound_message.to = params[:To]
         inbound_message.text = params[:Body]
@@ -48,8 +48,8 @@ module Nuntius
         # end
 
         render body: twiml.to_s,
-               content_type: 'text/xml',
-               layout: false
+          content_type: "text/xml",
+          layout: false
       end
     end
   end

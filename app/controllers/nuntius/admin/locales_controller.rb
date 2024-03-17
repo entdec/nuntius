@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
@@ -36,7 +36,8 @@ module Nuntius
 
       private
 
-      def set_objects; end
+      def set_objects
+      end
 
       def locale_params
         params.require(:locale).permit(:key, :data, :metadata_yaml, :data_yaml)

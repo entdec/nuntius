@@ -20,13 +20,13 @@ module Nuntius
     end
 
     def perform
-      if context.notification['Type'] == 'SubscriptionConfirmation'
-        Nuntius.config.logger.info('Confirming SNS subscription')
-        HTTPClient.get(body['SubscribeURL'])
+      if context.notification["Type"] == "SubscriptionConfirmation"
+        Nuntius.config.logger.info("Confirming SNS subscription")
+        HTTPClient.get(body["SubscribeURL"])
         return
       end
 
-      type = context.notification['notificationType']
+      type = context.notification["notificationType"]
 
       unless message_id
         Nuntius.config.logger.warn("SNS / SES message could not determine message id: #{context.notification}")
@@ -39,11 +39,11 @@ module Nuntius
       Nuntius.config.logger.info("SNS /SES updating message #{message.id} for #{type}")
 
       case type
-      when 'Delivery'
+      when "Delivery"
         process_delivery
-      when 'Bounce'
+      when "Bounce"
         process_bounce
-      when 'Complaint'
+      when "Complaint"
         process_complaint
       else
         false
@@ -54,24 +54,24 @@ module Nuntius
 
     def process_delivery
       message.status = :delivered
-      message.metadata[:feedback] = { 'type': 'delivery', 'info': context.notification['delivery'] }
+      message.metadata[:feedback] = {type: "delivery", info: context.notification["delivery"]}
       message.save!
     end
 
     def process_bounce
       message.status = :bounced
-      message.metadata[:feedback] = { 'type': 'bounce', 'info': context.notification['bounce'] }
+      message.metadata[:feedback] = {type: "bounce", info: context.notification["bounce"]}
       message.save!
     end
 
     def process_complaint
       message.status = :complaint
-      message.metadata[:feedback] = { 'type': 'complaint', 'info': context.notification['complaint'] }
+      message.metadata[:feedback] = {type: "complaint", info: context.notification["complaint"]}
       message.save!
     end
 
     def message_id
-      @message_id ||= context.notification.dig('mail', 'commonHeaders', 'messageId')&.[](1...-1)
+      @message_id ||= context.notification.dig("mail", "commonHeaders", "messageId")&.[](1...-1)
     end
 
     def message
