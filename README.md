@@ -253,6 +253,7 @@ end
 
 #### Mail
 Nuntius will look at a mailbox and for each of the mails will check whether it can find a route for it in any of the message-boxes. 
+After delivery, on the next round of fetching mail, nuntius will move processed message to the Archive folder 
 
 ```ruby
 class BarMessageBox < Nuntius::BaseMessageBox

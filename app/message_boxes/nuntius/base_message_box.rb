@@ -50,7 +50,10 @@ module Nuntius
         klasses = message_box_for(transport: message.transport.to_sym, provider: message.provider.to_sym)
         klass, method = message_box_for_route(klasses, message)
 
-        klass.new(message).send(method) if method
+        if method
+          klass.new(message).send(method)
+          true
+        end
       end
 
       def message_box_for(transport: nil, provider: nil)

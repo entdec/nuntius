@@ -41,7 +41,7 @@ module Nuntius
         inbound_message.metadata = params
         inbound_message.save!
 
-        twiml = Nuntius::DeliverInboundMessageService.new(inbound_message).call
+        twiml = Nuntius::DeliverInboundMessageService.perform(inbound_message: inbound_message)
 
         # twiml = Twilio::TwiML::MessagingResponse.new do |resp|
         #   resp.message body: 'The Robots are coming! Head for the hills!'
