@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'auxilium'
+require 'evento'
 require 'inky'
 require 'httpclient'
 require 'liquidum'
