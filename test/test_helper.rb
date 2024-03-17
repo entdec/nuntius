@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'mail'
+require 'net/imap'
 
 # Configure Rails Environment
 ENV['RAILS_ENV'] = 'test'
@@ -55,7 +56,7 @@ class MockIMAP
   @@marked_for_deletion = []
   @@default_examples = {
     default: (0..19).map do |i|
-      MockIMAPFetchData.new("test#{i.to_s.rjust(2, '0')}", i, "DummyFlag#{i}")
+      MockIMAPFetchData.new("To: test#{i.to_s.rjust(2, '0')}\r\nFrom: dummy@example.com\r\nSubject: Test mail\r\nThis is body", i, "DummyFlag#{i}")
     end
   }
   @@default_examples['UTF-8'] = @@default_examples[:default].slice(0, 1)
@@ -102,7 +103,8 @@ class MockIMAP
   end
 
   def expunge
-    @@marked_for_deletion.reverse.each do |i| # start with highest index first
+    @@marked_for_deletion.reverse.each do |i|
+      # start with highest index first
       self.class.examples.delete_at(i)
     end
     @@marked_for_deletion = []
@@ -127,7 +129,6 @@ class MockIMAP
   end
 end
 
-require 'net/imap'
 class Net::IMAP
   def self.new(*_args)
     MockIMAP.new

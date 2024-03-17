@@ -7,7 +7,7 @@ module Nuntius
       klasses = Nuntius::BaseMessageBox.message_box_for(transport: :mail)
 
       klasses.each do |klass|
-        RetrieveInboundMailService.new(klass.settings).call
+        RetrieveInboundMailService.perform(settings: klass.settings)
       end
 
       Nuntius::InboundMessage.where(status: 'pending').each do |message|

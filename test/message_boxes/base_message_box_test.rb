@@ -3,6 +3,8 @@
 require 'test_helper'
 
 class Nuntius::BaseMessageBoxTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   test 'finds its descendants' do
     assert_equal [BarMessageBox, FooMessageBox, QuxMessageBox], Nuntius::BaseMessageBox.send(:descendants)
   end
@@ -20,4 +22,13 @@ class Nuntius::BaseMessageBoxTest < ActiveSupport::TestCase
   test 'returns nil for no message box matching a recipient' do
     assert_nil Nuntius::BaseMessageBox.send(:message_box_for_route, [BarMessageBox, FooMessageBox], %w[+33612345678])
   end
+
+  test 'retrieves inbound mail' do
+    # QuxMessageBox - mail / imap
+    perform_enqueued_jobs do
+      Nuntius::RetrieveMailJob.perform_now
+    end
+    assert_equal "hatseflats", QuxMessageBox.hatseflats
+  end
+
 end
