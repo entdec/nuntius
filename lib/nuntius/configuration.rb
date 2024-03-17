@@ -1,31 +1,59 @@
 # frozen_string_literal: true
 
 module Nuntius
+  module Options
+    module ClassMethods
+      def option(name, default: nil)
+        attr_accessor(name)
+        schema[name] = default
+      end
+
+      def schema
+        @schema ||= {}
+      end
+    end
+
+    def set_defaults!
+      self.class.schema.each do |name, default|
+        instance_variable_set(:"@#{name}", default)
+      end
+    end
+
+    def self.included(cls)
+      cls.extend(ClassMethods)
+    end
+  end
+
   class Configuration
-    attr_accessor :admin_authentication_module, :base_controller, :base_runner, :layout, :admin_layout, :jobs_queue_name, :visible_scope, :add_metadata, :metadata_fields, :default_template_scope, :allow_custom_events, :active_storage_service
-    attr_writer :logger, :host, :metadata_humanize, :default_params, :flow_color
+    include Options
+
+    option :logger, default: Rails.logger
+    option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
+    option :base_controller, default: "::ApplicationController"
+    option :base_runner, default: "Nuntius::BasicApplicationRunner"
+    option :layout, default: "application"
+    option :admin_layout, default: "application"
+    option :jobs_queue_name, default: "message"
+    option :allow_custom_events, default: false
+    option :active_storage_service
+
+    attr_accessor :visible_scope, :add_metadata, :metadata_fields, :default_template_scope
+    attr_writer :host, :metadata_humanize, :default_params, :flow_color
 
     attr_reader :transports, :providers
 
     def initialize
-      @logger = Logger.new($stdout)
-      @logger.level = Logger::INFO
-      @base_controller = "::ApplicationController"
-      @base_runner = "Nuntius::BasicApplicationRunner"
+      set_defaults!
+
       @nuntiable_classes = []
       @nuntiable_class_names = []
       @transports = []
       @providers = {}
-      @jobs_queue_name = :message
       @visible_scope = -> { all }
       @add_metadata = -> {}
       @metadata_fields = {}
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
-      @allow_custom_events = false
-      @layout = "application"
-      @admin_layout = "application"
-      @active_storage_service = nil
     end
 
     # logger [Object].
@@ -40,11 +68,6 @@ module Nuntius
     # Make the part that is important for visible readable for humans
     def metadata_humanize(metadata)
       @metadata_humanize.is_a?(Proc) ? instance_exec(metadata, &@metadata_humanize) : @metadata_humanize
-    end
-
-    # admin_mount_point [String].
-    def admin_mount_point
-      @admin_mount_point ||= "/nuntius"
     end
 
     def add_nuntiable_class(klass)
@@ -96,6 +119,24 @@ module Nuntius
 
     def compile_nuntiable_class_names!
       @nuntiable_class_names = compile_nuntiable_class_names
+    end
+  end
+
+  module Configurable
+    attr_writer :config
+
+    def config
+      @config ||= Configuration.new
+    end
+
+    def configure
+      yield(config)
+    end
+
+    alias_method :setup, :configure
+
+    def reset_config!
+      @config = Configuration.new
     end
   end
 end

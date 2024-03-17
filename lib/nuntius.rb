@@ -9,18 +9,12 @@ require "nuntius/i18n_store"
 require "nuntius/mail_allow_list"
 
 module Nuntius
+  extend Configurable
   ROOT_PATH = Pathname.new(File.join(__dir__, ".."))
 
   class Error < StandardError; end
 
   class << self
-    attr_reader :config
-
-    def setup
-      @config = Configuration.new
-      yield config
-    end
-
     def i18n_store
       @i18n_store ||= Nuntius::I18nStore.new
     end
