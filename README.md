@@ -270,5 +270,10 @@ class BarMessageBox < Nuntius::BaseMessageBox
   })
   
   route to: :process
+  
+  def process
+    puts message.status # Message is Nuntius's inbound message.
+    puts mail.to 
+  end
 end
 ```

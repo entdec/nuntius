@@ -11,8 +11,11 @@ module Nuntius
       @message = message
     end
 
+    # In case of mail transport mail will return the mail itself, using https://github.com/mikel/mail
+    # For other transports  it will return nil.
+    # @return [Mail::Message]
     def mail
-      return nil if self.class.transport != "mail" && self.class.provider != "imap"
+      return nil unless self.class.transport.to_sym == :mail
       return @mail if @mail
 
       @mail = Mail.new(message.raw_message.download)
