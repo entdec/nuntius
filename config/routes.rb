@@ -45,5 +45,4 @@ Nuntius::Engine.routes.draw do
     resources :templates
   end
   root to: "dashboard#show"
-  mount Trado::Engine, at: "/"
 end
