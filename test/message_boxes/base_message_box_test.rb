@@ -16,11 +16,11 @@ class Nuntius::BaseMessageBoxTest < ActiveSupport::TestCase
   end
 
   test "finds a message box matching a recipient" do
-    assert_equal [FooMessageBox, :dutchies], Nuntius::BaseMessageBox.send(:message_box_for_route, [BarMessageBox, FooMessageBox], %w[+31612345678])
+    assert_equal [FooMessageBox, :dutchies], Nuntius::BaseMessageBox.send(:message_box_for_route, [BarMessageBox, FooMessageBox], Nuntius::InboundMessage.new(to: %w[+31612345678]))
   end
 
   test "returns nil for no message box matching a recipient" do
-    assert_nil Nuntius::BaseMessageBox.send(:message_box_for_route, [BarMessageBox, FooMessageBox], %w[+33612345678])
+    assert_nil Nuntius::BaseMessageBox.send(:message_box_for_route, [BarMessageBox, FooMessageBox], Nuntius::InboundMessage.new(to: %w[+33612345678]))
   end
 
   test "retrieves inbound mail" do

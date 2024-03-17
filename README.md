@@ -232,7 +232,7 @@ path: /code
 </Response>
 ```
 
-### Inbound (beta)
+### Inbound
 
 Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
 This is done using message-boxes, for this to work you need to add a `message_boxes` folder to your `app` folder.
@@ -240,31 +240,35 @@ This is done using message-boxes, for this to work you need to add a `message_bo
 #### SMS
 
 Twilio is currently the only supported inbound SMS provider.
-
-Point twilio to you nuntius mount path (/messaging/inbound_messages/twilio_inbound_smses)
+Point Twilio to you nuntius mount path (/messaging/inbound_messages/twilio_inbound_smses)
 
 ```ruby
 class FooMessageBox < Nuntius::BaseMessageBox
   transport :sms
   provider :twilio
 
-  route({ /\+31.+/ => :dutchies })
+  route /\+31.+/, to: :dutchies
 end
 ```
 
 #### Mail
+Nuntius will look at a mailbox and for each of the mails will check whether it can find a route for it in any of the message-boxes. 
 
 ```ruby
 class BarMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
 
-  settings {
-    host: 'imap.gmail.com',
+  settings({
+    address: 'imap.gmail.com',
     port: 993,
-    ssl: true,
-    username: 'foo,
-    password: 'bar'
-  }
+    user_name: '',
+    password: '',
+    authentication: '',
+    enable_ssl: false,
+    enable_starttls: false
+  })
+  
+  route to: :process
 end
 ```

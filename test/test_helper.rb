@@ -148,7 +148,7 @@ class QuxMessageBox < Nuntius::BaseMessageBox
 
   @hatseflats = nil
 
-  route({/.+/ => :smurrefluts})
+  route(:to, /.+/, to: :smurrefluts)
 
   def smurrefluts
     QuxMessageBox.hatseflats("hatseflats")
@@ -159,7 +159,7 @@ class FooMessageBox < Nuntius::BaseMessageBox
   transport :sms
   provider :twilio
 
-  route({/\+31.+/ => :dutchies})
+  route :to, /\+31.*/, to: :dutchies
 end
 
 class BarMessageBox < Nuntius::BaseMessageBox
