@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pry"
 module Nuntius
   # Stores individual messages to individual recipients
   #
@@ -69,15 +70,16 @@ module Nuntius
         # FIXME: This is a possible security problem
         attachment[:io] = File.open(uri.path)
       elsif uri
-        client = Faraday.new(ssl: {verify: false}) do
-          faraday.response :follow_redirects
-          faraday.adapter Faraday.default_adapter
+        client = Faraday.new(ssl: {verify: false}) do |builder|
+          builder.response :follow_redirects
+          builder.adapter Faraday.default_adapter
         end
+
         response = client.get(options[:url])
         content_disposition = response.headers["Content-Disposition"] || ""
 
         options[:filename] ||= content_disposition[/filename="([^"]+)"/, 1]
-        attachment[:content_type] = response.content_type
+        attachment[:content_type] = response.headers["Content-Type"]
         attachment[:io] = if response.body.is_a? String
           StringIO.new(response.body)
         else

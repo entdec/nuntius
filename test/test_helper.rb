@@ -33,7 +33,7 @@ WebMock.allow_net_connect!
 
 VCR.configure do |config|
   config.cassette_library_dir = "test/vcr_cassettes"
-  config.hook_into :webmock
+  config.hook_into :faraday
   config.default_cassette_options = {record: :new_episodes, match_requests_on: [:host]}
   # config.allow_http_connections_when_no_cassette = true
 end
