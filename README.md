@@ -185,6 +185,14 @@ The message body is specified using `text` and additionally supports the `payloa
 
 The payload is merged with the `text`, `to` (channel or user) and `from`.
 
+### Teams
+
+For Microsoft Teams you need to have the webhook URL for a channel. You right-click the channel (not the team) and click "Manage channel". 
+Then on the settings click "Edit" under "Manage the connectors that post to this channel", then search for "Incoming Webhook" and add it and configure it.
+You can give it a name and an image.
+
+See [Create Incoming Webhooks](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet) for details.
+
 ### SMS
 
 SMS just support the `from` (name or phone number), `to` (the phone) and `text` attribute.
