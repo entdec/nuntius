@@ -15,7 +15,7 @@ module Nuntius
 
       inbound_message.reload
 
-      assert_equal "delivered", inbound_message.status
+      assert_equal "processed", inbound_message.status
       assert_equal "hatseflats", QuxMessageBox.hatseflats
     end
   end

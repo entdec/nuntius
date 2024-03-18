@@ -56,7 +56,7 @@ class MockIMAP
   @@marked_for_deletion = []
   @@default_examples = {
     default: (0..19).map do |i|
-      MockIMAPFetchData.new("To: test#{i.to_s.rjust(2, "0")}\r\nFrom: dummy@example.com\r\nSubject: Test mail\r\nThis is body", i, "DummyFlag#{i}")
+      MockIMAPFetchData.new("Message-Id: #{i}\r\nTo: test#{i.to_s.rjust(2, "0")}\r\nFrom: dummy@example.com\r\nSubject: Test mail\r\nThis is body", i, "DummyFlag#{i}")
     end
   }
   @@default_examples["UTF-8"] = @@default_examples[:default].slice(0, 1)
@@ -139,6 +139,8 @@ class QuxMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
 
+  settings({})
+
   class << self
     def hatseflats(wut = nil)
       @hatseflats = wut if wut
@@ -159,10 +161,14 @@ class FooMessageBox < Nuntius::BaseMessageBox
   transport :sms
   provider :twilio
 
+  settings({})
+
   route :to, /\+31.*/, to: :dutchies
 end
 
 class BarMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
+
+  settings({})
 end
