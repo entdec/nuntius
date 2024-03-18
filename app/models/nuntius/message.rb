@@ -66,13 +66,16 @@ module Nuntius
       uri = options[:url] && URI.parse(options[:url])
 
       if uri&.scheme == "file"
+        # FIXME: This is a possible security problem
         attachment[:io] = File.open(uri.path)
       elsif uri
-        client = HTTPClient.new
-        client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        client.ssl_config.set_default_paths unless Gem.win_platform?
-        response = client.get(options[:url], follow_redirect: true)
+        client = Faraday.new(ssl: {verify: false}) do
+          faraday.response :follow_redirects
+          faraday.adapter Faraday.default_adapter
+        end
+        response = client.get(options[:url])
         content_disposition = response.headers["Content-Disposition"] || ""
+
         options[:filename] ||= content_disposition[/filename="([^"]+)"/, 1]
         attachment[:content_type] = response.content_type
         attachment[:io] = if response.body.is_a? String

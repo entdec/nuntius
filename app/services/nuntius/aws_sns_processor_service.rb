@@ -22,7 +22,7 @@ module Nuntius
     def perform
       if context.notification["Type"] == "SubscriptionConfirmation"
         Nuntius.config.logger.info("Confirming SNS subscription")
-        HTTPClient.get(body["SubscribeURL"])
+        Faraday.get(body["SubscribeURL"])
         return
       end
 
