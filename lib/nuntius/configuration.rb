@@ -27,7 +27,7 @@ module Nuntius
   class Configuration
     include Options
 
-    option :logger, default: Rails.logger
+    option :logger, default: -> { Rails.logger }
     option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
     option :base_controller, default: "::ApplicationController"
     option :base_runner, default: "Nuntius::BasicApplicationRunner"
@@ -36,9 +36,10 @@ module Nuntius
     option :jobs_queue_name, default: "message"
     option :allow_custom_events, default: false
     option :active_storage_service
+    option :host, default: ->(message) {}
 
     attr_accessor :visible_scope, :add_metadata, :metadata_fields, :default_template_scope
-    attr_writer :host, :metadata_humanize, :default_params, :flow_color
+    attr_writer :metadata_humanize, :default_params, :flow_color
 
     attr_reader :transports, :providers
 
@@ -54,15 +55,6 @@ module Nuntius
       @metadata_fields = {}
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
-    end
-
-    # logger [Object].
-    def logger
-      @logger.is_a?(Proc) ? instance_exec(&@logger) : @logger
-    end
-
-    def host(message)
-      @host.is_a?(Proc) ? instance_exec(message, &@host) : @host
     end
 
     # Make the part that is important for visible readable for humans
@@ -86,7 +78,7 @@ module Nuntius
         @providers[transport.to_sym] ||= []
         @providers[transport.to_sym].push(provider: provider, priority: priority, timeout: timeout, settings: settings)
       else
-        Nuntius.logger.warn "provider #{provider} not enabled as transport #{transport} is not enabled"
+        Nuntius.config.logger.call.warn "provider #{provider} not enabled as transport #{transport} is not enabled"
       end
     end
 

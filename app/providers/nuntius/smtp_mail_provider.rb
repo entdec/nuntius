@@ -82,7 +82,7 @@ module Nuntius
     private
 
     def message_url(message)
-      Nuntius::Engine.routes.url_helpers.message_url(message.id, host: Nuntius.config.host(message))
+      Nuntius::Engine.routes.url_helpers.message_url(message.id, host: Nuntius.config.host.call(message))
     end
   end
 end

@@ -24,7 +24,7 @@ module Nuntius
       response = client.message(message.provider_id)
       message.provider_id = response.id
       message.status = translated_status(response.recipients["items"].first.status)
-      Nuntius.logger.info "SMS #{message.to} status: #{message.status}"
+      Nuntius.config.logger.call.info "SMS #{message.to} status: #{message.status}"
       message
     rescue => _e
       message
