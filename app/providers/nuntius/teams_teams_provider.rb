@@ -6,6 +6,7 @@ module Nuntius
 
     def deliver
       # NOTE: Attachments are not supported
+      # https://adaptivecards.io/designer/
       # https://learn.microsoft.com/en-us/power-automate/overview-adaptive-cards
       # https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet
 
