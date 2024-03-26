@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "apnotic", "1.7.0"
   s.add_runtime_dependency "auxilium", "~> 3"
   s.add_runtime_dependency "aws-sdk-sns", "~> 1.56"
-  s.add_runtime_dependency "evento", "~> 0"
   s.add_runtime_dependency "fcm", "~> 1.0"
   s.add_runtime_dependency "houston", "~> 2.4"
   s.add_runtime_dependency "faraday", ">= 2.9"

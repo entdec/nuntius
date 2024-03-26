@@ -7,12 +7,25 @@ module Nuntius
     included do
       raise "#{name} must be nuntiable" unless nuntiable?
 
-      orchestrator = Evento::Orchestrator.new(self)
-      orchestrator.define_event_methods_on(messenger, state_machine: true) { |object, options = {}| }
+      attr_accessor :___nuntius_state_machine_events
 
-      orchestrator.after_audit_trail_commit(:nuntius) do |resource_state_transition|
-        resource = resource_state_transition.resource
-        Nuntius.event(event, resource) if resource.nuntiable? && event.present?
+      state_machine.events.map(&:name)
+                   .reject { |event_name| messenger.method_defined?(event_name) }
+                   .each do |event_name|
+        messenger.send(:define_method, event_name) { |object, options = {}| }
+      end
+
+      after_commit do
+        ___nuntius_state_machine_events&.each do |event|
+          Nuntius.event(event, self)
+        end
+      end
+
+      state_machine do
+        after_transition any => any do |record, transition|
+          record.___nuntius_state_machine_events ||= []
+          record.___nuntius_state_machine_events << transition.event
+        end
       end
     end
   end

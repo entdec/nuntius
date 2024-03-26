@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "auxilium"
-require "evento"
 require "inky"
 require "faraday"
 require "faraday/follow_redirects"
