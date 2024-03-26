@@ -34,7 +34,6 @@ module Nuntius
     def nuntius_campaigns_menu
       Satis::Menus::Builder.build(:campaign) do |m|
         m.item :new, link: nuntius.new_admin_campaign_path
-        m.item :lists, link: nuntius.admin_lists_path
       end
     end
 
