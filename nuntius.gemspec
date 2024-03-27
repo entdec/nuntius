@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "faraday-follow_redirects", "~> 0"
   s.add_runtime_dependency "i18n", "~> 1.8.5"
   s.add_runtime_dependency "inky-rb", "~> 1.4"
-  s.add_runtime_dependency "labelary"
+  s.add_runtime_dependency "labelary", "~> 0.5"
   s.add_runtime_dependency "liquidum", "~> 1"
   s.add_runtime_dependency "mail", "~> 2"
   s.add_runtime_dependency "messagebird-rest"
