@@ -15,20 +15,25 @@ module Nuntius
       end
 
       after_commit do
-        # # puts "___nuntius_state_machine_events: #{___nuntius_state_machine_events} #{self.class.name} #{object_id}"
-        # puts "Nuntius.events: #{Thread.current['___nuntius_state_machine_events']}"
-        # binding.pry
         Thread.current['___nuntius_state_machine_events']&.each do |event|
           Nuntius.event(event[:event], event[:object])
         end
-        # After events were generated we can clear
+        # After events are fired we can clear the events
         Thread.current['___nuntius_state_machine_events'] = []
       end
 
       state_machine do
+        # This records events within the same thread, and clears them in the same thread.
+        # A different thread is a different transaction.
         after_transition any => any do |record, transition|
+          ___record__nuntius_state_machine_event(transition.event, record)
+          ___record__nuntius_state_machine_event(:update, record)
+          ___record__nuntius_state_machine_event(:save, record)
+        end
+
+        def ___record__nuntius_state_machine_event(event, object)
           Thread.current['___nuntius_state_machine_events'] ||= []
-          Thread.current['___nuntius_state_machine_events'] << { event: transition.event, object: record, class: record.class.name, id: record.id }
+          Thread.current['___nuntius_state_machine_events'] << { event: event, object: object }
         end
       end
     end

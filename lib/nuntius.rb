@@ -31,7 +31,6 @@ module Nuntius
     def event(event, obj, params = {})
       return unless event
       return unless obj.is_a?(Hash) || obj.nuntiable?
-      puts "Nuntius.event #{event} #{obj.class.name} (#{obj.object_id})"
       return unless templates?(obj, event)
 
       options = params[:options] || {}
