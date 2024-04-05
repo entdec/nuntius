@@ -11,7 +11,8 @@ module Nuntius
     setting_reader :port, required: true, description: "Port (example: 578)"
     setting_reader :username, required: true, description: "Username (nuntius@entdec.com)"
     setting_reader :password, required: true, description: "Password"
-    setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [boxture.com, tom@degrunt.net])"
+    setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [example.com, tim@apple.com])"
+    setting_reader :ssl, required: false, default: false, description: "Whether to use SSL or not"
 
     def deliver
       return block unless MailAllowList.new(settings[:allow_list]).allowed?(message.to)
@@ -31,7 +32,8 @@ module Nuntius
           port: port,
           user_name: username,
           password: password,
-          return_response: true
+          return_response: true,
+          ssl: ssl
       end
 
       mail.to = message.to

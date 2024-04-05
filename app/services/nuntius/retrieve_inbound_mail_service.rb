@@ -7,7 +7,13 @@ module Nuntius
     end
 
     def perform
-      Mail::IMAP.new(context.settings).all do |message, imap, uid|
+      settings = context.settings
+      settings.merge!(address: context.settings[:host],
+        port: context.settings[:port],
+        enable_ssl: context.settings[:enable_ssl],
+        user_name: context.settings[:username],
+        password: context.settings[:password])
+      Mail::IMAP.new(settings).all do |message, imap, uid|
         inbound_message = Nuntius::InboundMessage.find_or_initialize_by(transport: "mail", provider: "imap", provider_id: message.message_id)
         if inbound_message.new_record?
           inbound_message.digest = Digest::SHA256.hexdigest(message.to_s)
