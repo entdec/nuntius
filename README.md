@@ -281,8 +281,10 @@ class BarMessageBox < Nuntius::BaseMessageBox
   route to: :process
   
   def process
-    puts message.status # Message is Nuntius's inbound message.
-    puts mail.to 
+    puts message.status # message is Nuntius's inbound message.
+    puts mail.to # mail gives you the Mail representation, when it's a mail (transport)
   end
 end
 ```
+
+Add `Nuntius::RetrieveMailJob` to your cron.

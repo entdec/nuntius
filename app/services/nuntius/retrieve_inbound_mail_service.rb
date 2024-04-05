@@ -13,7 +13,10 @@ module Nuntius
           inbound_message.digest = Digest::SHA256.hexdigest(message.to_s)
           inbound_message.from = message.from
           inbound_message.to = message.to
-          inbound_message.text = message.body
+          inbound_message.cc = message.cc
+          inbound_message.text = message.text_part&.decoded
+          inbound_message.html = message.html_part&.decoded
+          inbound_message.subject = message.subject
           inbound_message.save!
 
           si = StringIO.new
