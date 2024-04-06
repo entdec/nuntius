@@ -46,6 +46,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "slim-rails", "~> 3.6"
 
   s.add_development_dependency "pry", "~> 0"
+  s.add_development_dependency "debug", "~> 0"
   s.add_development_dependency "rubocop", "~> 1"
   s.add_development_dependency "standard", "~> 1"
 end

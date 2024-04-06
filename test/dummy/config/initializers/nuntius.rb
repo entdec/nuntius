@@ -2,7 +2,7 @@
 
 Nuntius.setup do |config|
   config.base_controller = "::ApplicationController"
-  config.logger = Rails.logger
+  config.logger = -> { Rails.logger }
 
   config.transport :mail
   config.transport :push

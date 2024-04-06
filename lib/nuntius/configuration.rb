@@ -3,9 +3,20 @@
 module Nuntius
   module Options
     module ClassMethods
-      def option(name, default: nil)
-        attr_accessor(name)
-        schema[name] = default
+      def option(name, default: nil, proc: false)
+        attr_writer(name)
+        schema[name] = {default: default, proc: proc}
+
+        if schema[name][:proc]
+          define_method(name) do |*params|
+            value = instance_variable_get(:"@#{name}")
+            instance_exec(*params, &value)
+          end
+        else
+          define_method(name) do
+            instance_variable_get(:"@#{name}")
+          end
+        end
       end
 
       def schema
@@ -14,8 +25,8 @@ module Nuntius
     end
 
     def set_defaults!
-      self.class.schema.each do |name, default|
-        instance_variable_set(:"@#{name}", default)
+      self.class.schema.each do |name, options|
+        instance_variable_set(:"@#{name}", options[:default])
       end
     end
 
@@ -27,7 +38,7 @@ module Nuntius
   class Configuration
     include Options
 
-    option :logger, default: -> { Rails.logger }
+    option :logger, default: -> { Rails.logger }, proc: true
     option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
     option :base_controller, default: "::ApplicationController"
     option :base_runner, default: "Nuntius::BasicApplicationRunner"
@@ -36,7 +47,7 @@ module Nuntius
     option :jobs_queue_name, default: "message"
     option :allow_custom_events, default: false
     option :active_storage_service
-    option :host, default: ->(message) {}
+    option :host, default: ->(message) {}, proc: true
 
     attr_accessor :visible_scope, :add_metadata, :metadata_fields, :default_template_scope
     attr_writer :metadata_humanize, :default_params, :flow_color
