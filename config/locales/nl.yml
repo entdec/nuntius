@@ -1,4 +1,18 @@
 nl:
+  menu:
+    nuntius:
+      templates:
+        new: Nieuwe template
+      layouts:
+        new: Nieuwe layout
+      locales:
+        new: Nieuwe locale
+      campaigns:
+        new: Nieuwe campagne
+        lists: Lijsten
+      lists:
+        new: Nieuwe lijst
+        new_subscriber: Nieuwe abonnee
   nuntius:
     flash:
       error: Er waren problem om %{model} op te slaan
@@ -11,12 +25,109 @@ nl:
         resend:
           resend_success: Bericht opnieuw verstuurd
           resend_error: Het is niet gelukt het bericht opnieuw te sturen
-    breadcrumbs:
-      nuntius: Nuntius
-      dashboard: Dashboard
-      admin:
-        campaigns: Campagnes
-        messages: Berichten
-        layouts: Layouts
-        lists: Lijsten
-        templates: Templates
+        index:
+          card:
+            nuntius_admin_messages:
+              title: Berichten
+              tab:
+                Nuntius messages: Berichten
+        show:
+          message: Message
+          card:
+            nuntius_admin_messages:
+          tabs:
+            main:
+              tab:
+                preview: Preview
+                details: Details
+          info_item:
+            main:
+              status: Status
+              transport: Transport
+              provider: Provider
+              provider_id: Provider ID
+              request_id: Request ID
+              refreshes: Refreshes
+              last_sent_at: Last Sent At
+              created_at: Created At
+      templates:
+        index:
+          card:
+            nuntius_admin_templates:
+              title: Templates
+              tab:
+                Nuntius templates: Templates
+        edit:
+          card:
+            nuntius_admin_templates:
+              title: Template
+          tabs:
+            main:
+              tab:
+                edit: Bewerk
+                messages: Berichten
+          metadata: Metadata
+      layouts:
+        index:
+          card:
+            nuntius_admin_layouts:
+              title: Layouts
+              tab:
+                Nuntius layouts: Layouts
+        edit:
+          card:
+            nuntius_admin_layouts:
+              title: Layouts
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                metadata: Metadata
+                media: Media
+
+          metadata: Metadata
+      locales:
+        index:
+          card:
+            nuntius_admin_locales:
+              title: Locales
+              tab:
+                Nuntius locales: Locales
+        edit:
+          card:
+            nuntius_admin_locales:
+              title: Locales
+          data: Data
+          metadata: Metadata
+      campaigns:
+        index:
+          card:
+            nuntius_admin_campaigns:
+              title: Campaigns
+              tab:
+                Nuntius campaigns: Campaigns
+        edit:
+          card:
+            nuntius_admin_campaigns:
+              title: Campaigns
+      lists:
+        subscribers:
+          edit:
+            subscribers: Subscribers
+        index:
+          card:
+            nuntius_admin_lists:
+              title: Lists
+              tab:
+                Nuntius lists: Lists
+        edit:
+          description: List description
+          description_hint: Describe the list in detail for the subscibers, explain if they can unsubscribe, how often they will receive messages, etc.
+          card:
+            nuntius_admin_lists:
+              title: Lists
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                nuntius_subscribers: Subscribers

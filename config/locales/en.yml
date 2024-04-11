@@ -1,4 +1,18 @@
 en:
+  menu:
+    nuntius:
+      templates:
+        new: New template
+      layouts:
+        new: New layout
+      locales:
+        new: New locale
+      campaigns:
+        new: New campaign
+        lists: Lists
+      lists:
+        new: New list
+        new_subscriber: New subscriber
   nuntius:
     flash:
       error: There were problems saving the %{model}
@@ -101,7 +115,7 @@ en:
                 Nuntius lists: Lists
         edit:
           description: List description
-          description_hint: Describe the list in detail for the subscibers, explain if they can unsubscribe, how often they will receive messages, etc.
+          description_hint: Describe the list in detail for the subscribers, explain if they can unsubscribe, how often they will receive messages, etc.
           card:
             nuntius_admin_lists:
               title: Lists
