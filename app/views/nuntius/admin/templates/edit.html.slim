@@ -7,7 +7,7 @@
       - card.with_action
         = f.submit
 
-      - card.with_tab:edit, padding: true
+      - card.with_tab :edit, padding: true
         .grid.grid-cols-12.gap-4
           .col-span-1
             = f.input :enabled, as: :switch
@@ -75,5 +75,6 @@
           template data-toggle-target='toggleable' data-toggle-value='slack'
 
 
-      - if @template.messages.size.positive?
-        = card.table :nuntius_messages, parameters: { template_id: @template.id }, custom_views: false, tab: :nuntius_messages
+      - if @template.messages.exists?
+        - card.with_tab :messages, padding: false
+          = sts.table :"nuntius/messages", filters: { template_id: @template.id }

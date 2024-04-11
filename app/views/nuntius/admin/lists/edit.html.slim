@@ -20,5 +20,6 @@
         .col-span-12
           = f.input :metadata_yaml, as: :editor, mode: 'application/yaml'
 
-    - if @list.subscribers.present?
-      = card.table :nuntius_subscribers, parameters: { list_id: @list.id }, custom_views: false, tab: :nuntius_subscribers
+    - if @list.subscribers.exists?
+      - card.with_tab :subscribers, padding: false
+        = sts.table :"nuntius/subscribers", filters: { list_id: @list.id }

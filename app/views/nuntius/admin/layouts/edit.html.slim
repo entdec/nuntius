@@ -19,5 +19,6 @@
       - card.with_tab:media, padding: true
         = render partial: 'nuntius/admin/layouts/attachments/index', locals: { attachments: @layout.attachments, upload_url: nuntius.admin_layout_attachments_path(@layout) }
 
-    - if @layout.templates.size.positive?
-      = card.table :nuntius_templates, parameters: { layout_id: @layout.id }, custom_views: false, tab: :templates
+    - if @layout.templates.exists?
+      - card.with_tab :templates, padding: false
+        = sts.table :"nuntius/templates", filters: { layout_id: @layout.id }
