@@ -1,3 +1,4 @@
+en:
   nuntius:
     flash:
       error: There were problems saving the %{model}
@@ -43,10 +44,10 @@
         edit:
           card:
             nuntius_admin_templates:
-              title: Templates
+              title: Template
               tab:
                 edit: Edit
-                nuntius_messages: Messages
+                messages: Messages
           metadata: Metadata
       layouts:
         index:
