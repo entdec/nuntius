@@ -14,38 +14,38 @@ module Nuntius
     end
 
     def nuntius_templates_menu
-      Satis::Menus::Builder.build(:templates) do |m|
+      Satis::Menus::Builder.build([:nuntius, :templates]) do |m|
         m.item :new, link: nuntius.new_admin_template_path
       end
     end
 
     def nuntius_layouts_menu
-      Satis::Menus::Builder.build(:layouts) do |m|
+      Satis::Menus::Builder.build([:nuntius, :layouts]) do |m|
         m.item :new, link: nuntius.new_admin_layout_path
       end
     end
 
     def nuntius_locales_menu
-      Satis::Menus::Builder.build(:locales) do |m|
+      Satis::Menus::Builder.build([:nuntius, :locales]) do |m|
         m.item :new, link: nuntius.new_admin_locale_path
       end
     end
 
     def nuntius_campaigns_menu
-      Satis::Menus::Builder.build(:campaign) do |m|
+      Satis::Menus::Builder.build([:nuntius, :campaigns]) do |m|
         m.item :new, link: nuntius.new_admin_campaign_path
         m.item :lists, link: nuntius.admin_lists_path
       end
     end
 
     def nuntius_lists_menu
-      Satis::Menus::Builder.build(:lists) do |m|
+      Satis::Menus::Builder.build([:nuntius, :lists]) do |m|
         m.item :new, link: nuntius.new_admin_list_path
       end
     end
 
     def nuntius_list_menu
-      Satis::Menus::Builder.build(:lists) do |m|
+      Satis::Menus::Builder.build([:nuntius, :lists]) do |m|
         m.item :new_subscriber, link: nuntius.new_admin_list_subscriber_path(@list) if @list.persisted?
       end
     end
