@@ -24,7 +24,7 @@ Nuntius.setup do |config|
   config.provider :houston, transport: :push, settings: {certificate: ""}
   config.provider :firebase, transport: :push, settings: {server_key: ""}
 
-  config.provider :message_bird, transport: :sms, priority: 1, timeout: 20, settings: {from: "Sovein", auth_token: ""}
+  config.provider :message_bird, transport: :sms, priority: 1, timeout: 20, settings: {from: "YourApp", auth_token: ""}
   config.provider :twilio, transport: :sms, priority: 2, settings: {sid: "", auth_token: "", from: ""}
 
   config.provider :twilio, transport: :voice, settings: {sid: "", auth_token: "", from: ""}

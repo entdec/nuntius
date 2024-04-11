@@ -29,7 +29,7 @@ module Nuntius
       column(:traffic_light) do # , sortable: false) do |template|
         render do
           html do |template|
-            color = Nuntius.config.flow_color(template.id).light_color || "green"
+            color = Nuntius.config.flow_color(template.id)&.light_color || "green"
             content_tag(:span, class: "traffic-signal-#{color.downcase}") do
               content_tag(:i, nil, class: "fa fa-circle fa-xl")
             end
