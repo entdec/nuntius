@@ -5,7 +5,7 @@ module Nuntius
     include Nuntius::Concerns::MetadataScoped
     include Nuntius::Concerns::Yamlify
 
-    has_many :subscribers, counter_cache: :subscribers_count, dependent: :delete_all
+    has_many :subscribers, dependent: :delete_all
 
     validates :name, presence: true
     validates :slug, presence: true, uniqueness: true

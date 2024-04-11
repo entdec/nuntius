@@ -2,7 +2,7 @@
 
 module Nuntius
   class Subscriber < ApplicationRecord
-    belongs_to :list
+    belongs_to :list, counter_cache: :subscribers_count
     belongs_to :nuntiable, polymorphic: true, optional: true
 
     scope :subscribed, -> { where(unsubscribed_at: nil) }
