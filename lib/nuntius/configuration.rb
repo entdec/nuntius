@@ -66,6 +66,7 @@ module Nuntius
       @metadata_fields = {}
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
+      @default_params = {}
     end
 
     # Make the part that is important for visible readable for humans
@@ -97,8 +98,8 @@ module Nuntius
       @transports.push(transport) if transport
     end
 
-    def default_params(transaction_log_entry)
-      @default_params.is_a?(Proc) ? instance_exec(transaction_log_entry, &@default_params) : @default_params
+    def default_params(event, record)
+      @default_params.is_a?(Proc) ? instance_exec(event, record, &@default_params) : @default_params
     end
 
     def flow_color(template_id)

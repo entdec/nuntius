@@ -33,6 +33,7 @@ module Nuntius
       return unless obj.is_a?(Hash) || obj.nuntiable?
       return unless templates?(obj, event)
 
+      params = (Nuntius.config.default_params(event, obj) || {}).merge(params)
       options = params[:options] || {}
 
       if options[:perform_now] == true
