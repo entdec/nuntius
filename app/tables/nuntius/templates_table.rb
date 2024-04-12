@@ -26,7 +26,7 @@ module Nuntius
         end
       end
 
-      column(:traffic_light) do # , sortable: false) do |template|
+      column(:status) do
         render do
           html do |template|
             color = Nuntius.config.flow_color(template.id)&.light_color || "green"
