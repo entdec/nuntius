@@ -7,16 +7,18 @@ module Nuntius
     included do
       raise "#{name} must be nuntiable" unless nuntiable?
 
-      after_commit do
-        if previously_persisted?
-          Nuntius.event(:destroy, self)
-        elsif previously_new_record?
-          Nuntius.event(:create, self)
-          Nuntius.event(:save, self)
-        else
-          Nuntius.event(:update, self)
-          Nuntius.event(:save, self)
-        end
+      after_create_commit do
+        Nuntius.event(:create, self)
+        Nuntius.event(:save, self)
+      end
+
+      after_update_commit do
+        Nuntius.event(:update, self)
+        Nuntius.event(:save, self)
+      end
+
+      after_destroy_commit do
+        Nuntius.event(:destroy, self)
       end
 
       %i[create destroy update save].each do |event_name|

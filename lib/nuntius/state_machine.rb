@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Nuntius
-
   module StateMachine
     extend ActiveSupport::Concern
 
@@ -9,17 +8,17 @@ module Nuntius
       raise "#{name} must be nuntiable" unless nuntiable?
 
       state_machine.events.map(&:name)
-                   .reject { |event_name| messenger.method_defined?(event_name) }
-                   .each do |event_name|
+        .reject { |event_name| messenger.method_defined?(event_name) }
+        .each do |event_name|
         messenger.send(:define_method, event_name) { |object, options = {}| }
       end
 
       after_commit do
-        Thread.current['___nuntius_state_machine_events']&.each do |event|
+        Thread.current["___nuntius_state_machine_events"]&.each do |event|
           Nuntius.event(event[:event], event[:object])
         end
         # After events are fired we can clear the events
-        Thread.current['___nuntius_state_machine_events'] = []
+        Thread.current["___nuntius_state_machine_events"] = []
       end
 
       state_machine do
@@ -32,8 +31,8 @@ module Nuntius
         end
 
         def ___record__nuntius_state_machine_event(event, object)
-          Thread.current['___nuntius_state_machine_events'] ||= []
-          Thread.current['___nuntius_state_machine_events'] << { event: event, object: object }
+          Thread.current["___nuntius_state_machine_events"] ||= []
+          Thread.current["___nuntius_state_machine_events"] << {event: event, object: object}
         end
       end
     end
