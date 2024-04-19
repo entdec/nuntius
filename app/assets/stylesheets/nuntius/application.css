@@ -1,0 +1,14 @@
+
+span.traffic-signal {
+    &-red {
+        @apply text-red-600;
+    }
+
+    &-green {
+        @apply text-green-600;
+    }
+
+    &-orange {
+        @apply text-orange-400;
+    }
+}

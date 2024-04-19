@@ -3,46 +3,26 @@
     = button_to(t('nuntius.context_menu.resend'), resend_admin_message_path(@message), class: 'button')
 
   - card.with_tab:preview, padding: true
-
-    table.table
-      thead
-        tr
-          th Name
-          th Value
-      tbody
-        tr
-          td To
-          td = @message.to
-
-        - if @message.transport == 'mail'
-          tr
-            td Subject
-            td = @message.subject
-          tr
-            td Attachments
-            td
-              - @message.attachments.each do |attachment|
-                = link_to(main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename) do
-                  i.far.fa-paperclip
-                  span=attachment.filename
-                br
-
-        - if @message.transport == 'sms'
-          tr
-            td Text
-            td = @message.text
-
-        - if @message.transport == 'slack'
-          tr
-            td Text
-            td = @message.text
-          tr
-            td Payload
-            td
-              pre = YAML.dump(@message.payload)
-
-    - if @message.transport == 'mail' && @message.html.present?
-      iframe.border.rounded-lg.border-gray-200 src=message_path(@message.id) style="width: 100%; height: 600px; border: 0px;"
+    = sts.info class: "grid grid-cols-1 gap-4 sm:grid-cols-3" do |info|
+      = info.with_item :to, content: @message.to, class: "sm:col-span-1"
+      = info.with_item :from, content: @message.from, class: "sm:col-span-1"
+      - if @message.transport == 'mail'
+        = info.with_item :subject, content: @message.subject, class: "sm:col-span-4"
+        = info.with_item :attachments, class: "sm:col-span-4" 
+          - @message.attachments.each do |attachment|
+            = link_to(main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename) do
+              i.far.fa-paperclip
+              span=attachment.filename
+            br
+      - if @message.transport == 'sms'
+        = info.with_item :text, content: @message.text, class: "sm:col-span-4"
+      - if @message.transport == 'slack'
+        = info.with_item :text, content: @message.text, class: "sm:col-span-4"
+        = info.with_item :payload, content: @message.text, class: "sm:col-span-4"
+          pre = YAML.dump(@message.payload)
+      - if @message.transport == 'mail' && @message.html.present?
+        = info.with_item :html, class: "sm:col-span-4"
+          iframe.border.rounded-lg.border-gray-200 src=message_path(@message.id) style="width: 100%; height: 600px; border: 0px;"
 
   - card.with_tab:details, padding: true
       = sts.info class: "grid grid-cols-1 gap-4 sm:grid-cols-3" do |info|

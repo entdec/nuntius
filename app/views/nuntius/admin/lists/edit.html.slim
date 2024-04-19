@@ -12,10 +12,7 @@
         .col-span-2= f.input :allow_unsubscribe, as: :switch
 
         .col-span-12.mt-4.mb-4
-          h4 = t('nuntius.admin.lists.edit.description')
-          p.mb-4 = t('nuntius.admin.lists.edit.description_hint')
-          = f.input :description, as: :hidden
-          trix-editor input="list_description" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
+          = f.rich_text :description, hint: t('nuntius.admin.lists.edit.description_hint')
 
         .col-span-12
           = f.input :metadata_yaml, as: :editor, mode: 'application/yaml'

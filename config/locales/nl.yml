@@ -1,133 +1,164 @@
 nl:
+  activerecord:
+    attributes:
+      nuntius/campaign:
+        from: Van
+        layout: Layout
+        list: Lijst
+        name: Naam
+        state: Staat
+        subject: Onderwerp
+        transport: Transport
+      nuntius/layout:
+        name: Naam
+      nuntius/list:
+        allow_unsubscribe: Uitschrijven toestaan
+        description: Omschrijving
+        name: Naam
+        slug: Slug
+        subscribers_count: Aantal abonnees
+      nuntius/template:
+        description: Omschrijving
+        enabled: Ingeschakeld
+        event: Gebeurtenis
+        from: Van
+        klass: Klasse
+        subject: Onderwerp
+        to: Aan
+        transport: Transport
+    models:
+      campaign: Campagne
+      layout: Layout
+      list: Lijst
+      message: Bericht
+      subscriber: Abonnee
+      template: Template
   menu:
     nuntius:
-      templates:
-        new: Nieuwe template
+      campaigns:
+        lists: Lijsten
+        new: Nieuwe campagne
       layouts:
         new: Nieuwe layout
-      locales:
-        new: Nieuwe locale
-      campaigns:
-        new: Nieuwe campagne
-        lists: Lijsten
       lists:
         new: Nieuwe lijst
         new_subscriber: Nieuwe abonnee
-  nuntius:
-    flash:
-      error: Er waren problem om %{model} op te slaan
-      notice: De %{model} is sucesvol opgeslagen
-    context_menu:
-      root: Root
-      resend: Verstuur opnieuw
-    admin:
-      messages:
-        resend:
-          resend_success: Bericht opnieuw verstuurd
-          resend_error: Het is niet gelukt het bericht opnieuw te sturen
-        index:
-          card:
-            nuntius_admin_messages:
-              title: Berichten
-              tab:
-                Nuntius messages: Berichten
-        show:
-          message: Message
-          card:
-            nuntius_admin_messages:
-          tabs:
-            main:
-              tab:
-                preview: Preview
-                details: Details
-          info_item:
-            main:
-              status: Status
-              transport: Transport
-              provider: Provider
-              provider_id: Provider ID
-              request_id: Request ID
-              refreshes: Refreshes
-              last_sent_at: Last Sent At
-              created_at: Created At
+      locales:
+        new: Nieuwe locale
       templates:
-        index:
-          card:
-            nuntius_admin_templates:
-              title: Templates
-              tab:
-                Nuntius templates: Templates
+        new: Nieuwe template
+  nuntius:
+    admin:
+      campaigns:
         edit:
           card:
-            nuntius_admin_templates:
-              title: Template
-          tabs:
-            main:
+            nuntius_admin_campaigns:
+              title: Campagne
+        index:
+          card:
+            nuntius_admin_campaigns:
               tab:
-                edit: Bewerk
-                messages: Berichten
-          metadata: Metadata
+                Nuntius campaigns: Campagnes
+              title: Campagnes
       layouts:
-        index:
-          card:
-            nuntius_admin_layouts:
-              title: Layouts
-              tab:
-                Nuntius layouts: Layouts
         edit:
           card:
             nuntius_admin_layouts:
               title: Layouts
+          metadata: Metadata
           tabs:
             main:
               tab:
                 edit: Edit
-                metadata: Metadata
                 media: Media
-
-          metadata: Metadata
-      locales:
+                metadata: Metadata
         index:
           card:
-            nuntius_admin_locales:
-              title: Locales
+            nuntius_admin_layouts:
               tab:
-                Nuntius locales: Locales
+                Nuntius layouts: Layouts
+              title: Layouts
+      lists:
+        edit:
+          card:
+            nuntius_admin_lists:
+              title: Lijsten
+          description_hint: Omschrijf de list in detail voor abonnees, leg uit of ze kunnen uitschrijven, hoe veel en hoe vaak berichten ze berichten ontvangen, etc.
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                subscribers: Abonnees
+        index:
+          card:
+            nuntius_admin_lists:
+              title: Lijsten
+        subscribers:
+          edit:
+            subscribers: Abonnees
+      locales:
         edit:
           card:
             nuntius_admin_locales:
               title: Locales
           data: Data
           metadata: Metadata
-      campaigns:
         index:
           card:
-            nuntius_admin_campaigns:
-              title: Campaigns
+            nuntius_admin_locales:
               tab:
-                Nuntius campaigns: Campaigns
-        edit:
-          card:
-            nuntius_admin_campaigns:
-              title: Campaigns
-      lists:
-        subscribers:
-          edit:
-            subscribers: Subscribers
+                Nuntius locales: Locales
+              title: Locales
+      messages:
         index:
           card:
-            nuntius_admin_lists:
-              title: Lists
+            nuntius_admin_messages:
               tab:
-                Nuntius lists: Lists
-        edit:
-          description: List description
-          description_hint: Describe the list in detail for the subscibers, explain if they can unsubscribe, how often they will receive messages, etc.
+                Nuntius messages: Berichten
+              title: Berichten
+        resend:
+          resend_error: Het is niet gelukt het bericht opnieuw te sturen
+          resend_success: Bericht opnieuw verstuurd
+        show:
           card:
-            nuntius_admin_lists:
-              title: Lists
+            nuntius_admin_messages:
+          info_item:
+            main:
+              created_at: Created At
+              from: Van
+              html: HTML
+              last_sent_at: Last Sent At
+              provider: Provider
+              provider_id: Provider ID
+              refreshes: Refreshes
+              request_id: Request ID
+              status: Status
+              subject: Onderwerp
+              to: Aan
+              transport: Transport
+          message: Message
           tabs:
             main:
               tab:
-                edit: Edit
-                nuntius_subscribers: Subscribers
+                details: Details
+                preview: Preview
+      templates:
+        edit:
+          card:
+            nuntius_admin_templates:
+              title: Template
+          metadata: Metadata
+          tabs:
+            main:
+              tab:
+                edit: Bewerk
+                messages: Berichten
+        index:
+          card:
+            nuntius_admin_templates:
+              tab:
+                Nuntius templates: Templates
+              title: Templates
+    context_menu:
+      resend: Verstuur opnieuw
+      root: Root
