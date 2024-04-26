@@ -43,7 +43,7 @@ module Nuntius
       private
 
       def layout_params
-        params.require(:layout).permit(:name, :data, :metadata_yaml)
+        params.require(:layout).permit(:name, :data, :metadata_yaml, attachments: [])
       end
     end
   end

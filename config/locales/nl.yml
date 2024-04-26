@@ -1,4 +1,5 @@
 nl:
+  choose_files: Kies bestanden
   activerecord:
     attributes:
       nuntius/campaign:
@@ -72,6 +73,7 @@ nl:
                 edit: Edit
                 media: Media
                 metadata: Metadata
+                templates: Templates
         index:
           card:
             nuntius_admin_layouts:
