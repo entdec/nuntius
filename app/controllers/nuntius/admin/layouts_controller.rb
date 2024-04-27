@@ -43,7 +43,9 @@ module Nuntius
       private
 
       def layout_params
-        params.require(:layout).permit(:name, :data, :metadata_yaml, attachments: [])
+        permitted = %i[name data metadata_yaml]
+        permitted += [attachments: []] if params[:layout][:attachments].compact_blank.present?
+        params.require(:layout).permit(permitted)
       end
     end
   end

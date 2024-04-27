@@ -1,6 +1,8 @@
 = sts.form_for([:admin, @layout]) do |f|
   = sts.card :nuntius_admin_layouts, icon: 'fal fa-table-layout' do |card|
     - card.with_action
+      = f.continue
+    - card.with_action
       = f.submit
 
 

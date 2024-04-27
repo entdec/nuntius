@@ -55,16 +55,16 @@
             .col-span-12
               = f.association :layout, collection: @layouts, include_blank: true
             .col-span-12
-              = f.input :html, as: :editor, mode: 'text/markdown'
+              = f.input :html, as: :editor, mode: 'text/markdown', height: '400px'
 
           template data-toggle-target='toggleable' data-toggle-value='voice'
             .col-span-12
-              = f.input :text, as: :editor, mode: 'text/plain'
+              = f.input :text, as: :editor, mode: 'text/plain', height: '400px'
           template data-toggle-target='toggleable' data-toggle-value='slack'
             .col-span-12
-              = f.input :text, as: :editor, mode: 'text/plain'
+              = f.input :text, as: :editor, mode: 'text/plain', height: '400px'
             .col-span-12
-              = f.input :payload, as: :editor, mode: 'application/yaml', hint: 'See here for more information: https://app.slack.com/block-kit-builder/'
+              = f.input :payload, as: :editor, mode: 'application/yaml', hint: 'See here for more information: https://app.slack.com/block-kit-builder/', height: '400px'
 
           template data-toggle-target='toggleable' data-toggle-value='sms'
             .col-span-12
@@ -72,7 +72,11 @@
           template data-toggle-target='toggleable' data-toggle-value='push'
             .col-span-12
               = f.input :text, as: :editor, mode: 'text/plain'
-          template data-toggle-target='toggleable' data-toggle-value='slack'
+          template data-toggle-target='toggleable' data-toggle-value='teams'
+            .col-span-12
+              = f.input :text, as: :editor, mode: 'text/plain', height: '400px'
+            .col-span-12
+              = f.input :payload, as: :editor, mode: 'application/yaml', hint: 'See here for more information: https://www.adaptivecards.io/designer/', height: '400px'
 
 
       - if @template.messages.exists?
