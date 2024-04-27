@@ -32,10 +32,11 @@
                 = (attachment.blob.byte_size / 1048576.0).round(2)
                 ' MB
                 = link_to admin_layout_attachment_path(@layout, attachment.id), data: { controller: 'attachment-delete', 'action': 'attachment-delete#delete' } do
-                    i.fal.fa-xmark
+                    i.fas.fa-xmark
                 =< link_to(main_app.rails_blob_path(attachment, disposition: 'attachment'),
                       title: attachment.filename)
-                    i.fal.fa-download
+                    i.fas.fa-download
+                code.text-xs = sts.copyable main_app.rails_blob_url(attachment)
 
     - if @layout.templates.exists?
       - card.with_tab :templates, padding: false
