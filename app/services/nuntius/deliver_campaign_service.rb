@@ -11,7 +11,7 @@ module Nuntius
 
     def perform
       deliver
-      campaign.sent!
+      # campaign.sent!
     end
 
     def deliver
@@ -22,6 +22,7 @@ module Nuntius
     end
 
     def new_message(subscriber, assigns = {})
+      assigns["campaign"] = context.campaign
       assigns["subscriber"] = subscriber
       if subscriber.nuntiable
         name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
@@ -29,8 +30,11 @@ module Nuntius
       end
       message = Nuntius::Message.new(transport: campaign.transport, campaign: campaign, nuntiable: subscriber.nuntiable, metadata: campaign.metadata)
 
-      locale_proc = Nuntius::BaseMessenger.messenger_for_obj(subscriber.nuntiable).locale
-      locale = instance_exec(subscriber.nuntiable, &locale_proc) if subscriber.nuntiable && locale_proc
+      locale = nil
+      if subscriber.nuntiable
+        locale_proc = Nuntius::BaseMessenger.messenger_for_obj(subscriber.nuntiable).locale
+        locale = instance_exec(subscriber.nuntiable, &locale_proc) if locale_proc
+      end
 
       message.from = render(:from, assigns, locale)
       message.to = case campaign.transport

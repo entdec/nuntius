@@ -3,6 +3,9 @@
 module Nuntius
   class Campaign < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
+    include Nuntius::Concerns::Yamlify
+
+    yamlify :metadata
 
     belongs_to :list
     accepts_nested_attributes_for :list, reject_if: :all_blank

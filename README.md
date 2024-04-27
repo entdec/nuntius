@@ -165,6 +165,8 @@ The main key of the hash passed will also be the liquid variable.
 
 Outbound mail is handled through SMTP. We've only exposed the HTML of mail, we can create text-versions based on sanitized HTML. HTML allows for [Foundation for Emails](https://get.foundation/emails/docs/index.html). You will have to include the CSS in the layouts.
 
+In the layout you can add `<a href="{{message_url}}">Link to mail</a>` to provide a link to the online version of the message.
+
 #### AWS SES
 
 In case you use AWS SES, you can use the SNS Feedback Notifications to automatically mark messages as read, or deal with complaints and bounces. Create a AWS SNS topic, with a HTTPS subscription with the following URL (pattern):

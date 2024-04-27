@@ -55,6 +55,7 @@ nl:
           card:
             nuntius_admin_campaigns:
               title: Campagne
+          metadata: Metadata
         index:
           card:
             nuntius_admin_campaigns:

@@ -31,6 +31,11 @@ module Nuntius
       def update
         @layout = Nuntius::Layout.visible.find(params[:id])
         @layout.update(layout_params)
+        if params[:layout][:attachments].present?
+          params[:layout][:attachments].each do |attachment|
+            @layout.attachments.attach(attachment)
+          end
+        end
         respond_with :admin, @layout
       end
 
@@ -44,7 +49,6 @@ module Nuntius
 
       def layout_params
         permitted = %i[name data metadata_yaml]
-        permitted += [attachments: []] if params[:layout][:attachments].compact_blank.present?
         params.require(:layout).permit(permitted)
       end
     end
