@@ -21,12 +21,12 @@
           .col-span-6 data-toggle-target="insertion"
 
           template data-toggle-target='toggleable' data-toggle-not-value='Custom'
-            .col-span-6.deze data-controller='toggle' data-toggle-attr='data-timebased'
+            .col-span-6 data-controller='toggle' data-toggle-attr='data-timebased'
               .grid.grid-cols-12.gap-4
                 .col-span-6
                   = f.input :event, collection: template.all_events, include_blank: false, chain_to: 'template[klass]', input_html: { data: { 'toggle-target' => 'input' } }, as: :dropdown
                 .col-span-6 data-toggle-target="insertion"
-              template data-toggle-target='toggleable' data-toggle-value='true'
+              template data-toggle-target='toggleable' data-toggle-value='Y'
                 = f.input :interval
 
           template data-toggle-target='toggleable' data-toggle-value='Custom'

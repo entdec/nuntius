@@ -9,7 +9,7 @@ class TemplatePresenter < ApplicationPresenter
       messenger = Nuntius::BaseMessenger.messenger_for_class(class_name)
       messenger.instance_methods(false).each do |m|
         events << [m, m, {"data-chain": class_name,
-                          "data-timebased": messenger.timebased_scopes.include?(m)}]
+                          "data-timebased": messenger.timebased_scopes.include?(m) ? "Y" : "N"}]
       end
     end
     events.sort_by(&:first)
