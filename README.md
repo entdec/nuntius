@@ -55,7 +55,7 @@ class Car < ApplicationRecord
 end
 ```
 
-Additionally you need to define an extension of the Nuntius::BaseMessenger for the same model with a matching name (in app/messengers):
+Additionally you need to define an extension of the Nuntius::BaseMessenger for the same model with a matching name (in app/messengers). Messengers can set extra parameters, but also manipulate templates selected.
 
 ```ruby
 class CarMessenger < Nuntius::BaseMessenger
@@ -132,7 +132,7 @@ following formats:
 - N month(s)
 
 To send timebased messages you need to execute Nuntius::TimestampBasedMessagesRunner.call, you could do this
-in a cronjob every 5 minutes with "bundle exec rails runner Nuntius::TimestampBasedMessagesRunner.call"
+in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'"
 
 ### Direct
 

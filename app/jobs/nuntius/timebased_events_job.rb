@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Nuntius
-  class TimebasedEventsRunner < ApplicationRunner
+  class TimebasedEventsJob < ApplicationJob
     def perform
       Nuntius::Template.where.not(interval: nil).each do |template|
         messenger = Nuntius::BaseMessenger.messenger_for_class(template.klass)
