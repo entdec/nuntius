@@ -41,7 +41,6 @@ module Nuntius
     option :logger, default: -> { Rails.logger }, proc: true
     option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
     option :base_controller, default: "::ApplicationController"
-    option :base_runner, default: "Nuntius::BasicApplicationRunner"
     option :layout, default: "application"
     option :admin_layout, default: "application"
     option :jobs_queue_name, default: "message"
