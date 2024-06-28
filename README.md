@@ -105,6 +105,11 @@ timebased_scope class method like so:
 class CarMessenger < Nuntius::BaseMessenger
   # time_range is a range, for a before scope the time_range the interval is added to the current
   # time, the end of the range is 1 hour from the start.
+  # 
+  # So say the interval is "10 days", the timerange will be: 
+  # from: today +  10 days - 1 hour 
+  # until: today + 10 days
+  # So it basically selects all Car's with a tuneup_at within 10 days from now (in a 1 hour window)
   timebased_scope :before_tuneup do |time_range, metadata|
     cars = Car.where(tuneup_at: time_range)
     cars = cars.where(color: metadata['color']) if metadata['color'].present?
@@ -113,6 +118,11 @@ class CarMessenger < Nuntius::BaseMessenger
 
   # For an after scope the time_range the interval is taken from the current time, the end of the
   # range is 1 hour from its start.
+  #
+  # So say the interval is "10 days", the timerange will be: 
+  # from: today -  10 days - 1 hour 
+  # until: today - 10 days
+  # So it basically selects all Car's with a tuneup_at 10 days since now (in a 1 hour window)
   timebased_scope :after_tuneup do |time_range, metadata|
     cars = Car.where(tuneup_at: time_range)
     cars = cars.where(color: metadata['color']) if metadata['color'].present?
@@ -132,7 +142,8 @@ following formats:
 - N month(s)
 
 To send timebased messages you need to execute Nuntius::TimebasedEventsJob.perform, you could do this
-in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'"
+in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'".
+Beter even is using Sidekiq::Cron or GoodJob
 
 ### Direct
 
