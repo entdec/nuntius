@@ -210,7 +210,13 @@ See [Create Incoming Webhooks](https://learn.microsoft.com/en-us/microsoftteams/
 
 SMS just support the `from` (name or phone number), `to` (the phone) and `text` attribute.
 
-Only MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z).
+#### Twilio
+
+#### MessageBird (now Bird)
+
+Only MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z). 
+
+The MessageBird API we use (REST) is now considered legacy, new signups are no longer possible. We don't recommend using MessageBird (Bird).
 
 ### Voice
 
