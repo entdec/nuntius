@@ -31,7 +31,7 @@ module Nuntius
           html do |template|
             color = Nuntius.config.flow_color(template.id)&.light_color || "green"
             content_tag(:span, class: "traffic-signal-#{color.downcase}") do
-              content_tag(:i, nil, class: "fa fa-circle fa-xl")
+              content_tag(:i, nil, class: "fa-regular fa-circle fa-xl")
             end
           end
         end
@@ -39,7 +39,7 @@ module Nuntius
 
       action :delete do
         link { |template| nuntius.admin_template_path(template) }
-        icon "fa fa-trash"
+        icon "fa-regular fa-trash"
         link_attributes data: {"turbo-confirm": "Are you sure you want to delete the template?", "turbo-method": :delete}
       end
 

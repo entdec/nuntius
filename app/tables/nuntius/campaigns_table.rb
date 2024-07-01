@@ -24,7 +24,7 @@ module Nuntius
         # FIXME: next unless campaign.can_publish?
         show ->(campaign) { campaign.transport != "sms" && campaign.can_publish? }
         link { |campaign| campaign.can_publish? ? nuntius.publish_admin_campaign_path(campaign) : nil }
-        icon "fa fa-paper-plane"
+        icon "fa-regular fa-paper-plane"
         link_attributes data: {"turbo-confirm": "Are you sure you want to send out this campaign?", "turbo-method": :post}
       end
 

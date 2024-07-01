@@ -8,10 +8,10 @@
       = info.with_item :from, content: @message.from, class: "sm:col-span-1"
       - if @message.transport == 'mail'
         = info.with_item :subject, content: @message.subject, class: "sm:col-span-4"
-        = info.with_item :attachments, class: "sm:col-span-4" 
+        = info.with_item :attachments, class: "sm:col-span-4"
           - @message.attachments.each do |attachment|
             = link_to(main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename) do
-              i.far.fa-paperclip
+              i.fa-regular.fa-paperclip
               span=attachment.filename
             br
       - if @message.transport == 'sms'
