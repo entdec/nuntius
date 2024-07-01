@@ -216,7 +216,7 @@ SMS just support the `from` (name or phone number), `to` (the phone) and `text` 
 
 Only MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z). 
 
-The MessageBird API we use (REST) is now considered legacy, new signups are no longer possible. We don't recommend using MessageBird (Bird).
+The MessageBird API we use (REST) is now considered legacy by Bird, new signups are no longer possible. We don't recommend using MessageBird (Bird).
 
 ### Voice
 
