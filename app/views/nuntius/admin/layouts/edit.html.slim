@@ -21,22 +21,7 @@
       - card.with_tab:media, padding: true
         .grid.grid-cols-4.gap-4
           .col-span-4 
-            = f.input :attachments, as: :file, multiple: true
-          ul.col-span-4 
-            - @layout.attachments.each do |attachment|
-              li.col-span-1
-                - if attachment.previewable?
-                  = image_tag attachment.preview(resize_to_limit: [500, 500]).url, class: 'object-cover pointer-events-none'
-                - elsif attachment.image?
-                  = image_tag main_app.url_for(attachment.variant(resize_to_limit: [500, 500])), class: 'object-cover pointer-events-none'
-                = (attachment.blob.byte_size / 1048576.0).round(2)
-                ' MB
-                = link_to admin_layout_attachment_path(@layout, attachment.id), data: { controller: 'attachment-delete', 'action': 'attachment-delete#delete' } do
-                    i.fas.fa-xmark
-                =< link_to(main_app.rails_blob_path(attachment, disposition: 'attachment'),
-                      title: attachment.filename)
-                    i.fas.fa-download
-                code.text-xs = sts.copyable main_app.rails_blob_url(attachment)
+            = sts.attachments(@layout, upload_url: admin_layout_attachments_path(@layout))
 
     - if @layout.templates.exists?
       - card.with_tab :templates, padding: false
