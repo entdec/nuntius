@@ -32,8 +32,7 @@ module Nuntius
       message.attachments << attachment
 
       PurgeMessageJob.perform_now(account_id, 6)
-
-      # Reload the message and attachment to ensure they are not deleted
+      
       assert message.reload
       assert attachment.reload
     end
@@ -47,12 +46,10 @@ module Nuntius
 
       PurgeMessageJob.perform_now(account_id, 6)
 
-      # Assert that the message has been destroyed
       assert_raises ActiveRecord::RecordNotFound do
         message.reload
       end
 
-      # Check that the attachment is purged if it is not associated with any other messages
       assert_raises ActiveRecord::RecordNotFound do
         attachment.reload
       end
