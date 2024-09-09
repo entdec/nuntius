@@ -7,7 +7,11 @@ module Nuntius
 
       Nuntius::Message.where(parent_message_id: messages.pluck(:id)).in_batches.update_all(parent_message_id: nil)
 
-      messages.in_batches.destroy_all
+      messages.find_each do |message|
+        message.files.purge if message.respond_to?(:files)
+
+        message.destroy
+      end
     end
   end
 end
