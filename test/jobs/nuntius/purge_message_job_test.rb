@@ -23,5 +23,36 @@ module Nuntius
         message.reload
       end
     end
+
+    test "does not purge attachments for message less than 6 months ago" do
+      account_id = SecureRandom.uuid
+      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", status: "sent", metadata: {account_id: account_id}, created_at: 1.month.ago)
+
+      attachment = Nuntius::Attachment.create!
+      message.attachments << attachment
+
+      PurgeMessageJob.perform_now(account_id, 6)
+      
+      assert message.reload
+      assert attachment.reload
+    end
+
+    test "purges attachments for message more than 6 months ago" do
+      account_id = SecureRandom.uuid
+      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", status: "sent", metadata: {account_id: account_id}, created_at: 7.months.ago)
+
+      attachment = Nuntius::Attachment.create!
+      message.attachments << attachment
+
+      PurgeMessageJob.perform_now(account_id, 6)
+
+      assert_raises ActiveRecord::RecordNotFound do
+        message.reload
+      end
+
+      assert_raises ActiveRecord::RecordNotFound do
+        attachment.reload
+      end
+    end
   end
 end
