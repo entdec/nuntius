@@ -8,6 +8,16 @@ module Nuntius
       column(:to)
       column(:created_at)
       column(:last_sent_at)
+      column(:actions) do
+        render do
+          html do |message|
+            link_to(nuntius.resend_admin_message_path(message), title: 'Resend Message', data: { turbo_method: :post }, class: 'bg-gray-200 text-black p-1 w-6 items-center flex rounded dark:bg-gray-700 dark:text-white') do
+              content_tag(:i, nil, class: 'fal fa-rotate-right')
+            end
+          end
+        end
+      end
+
       column(:campaign_id) do
         render do
           html do |message|
