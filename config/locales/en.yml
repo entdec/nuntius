@@ -138,8 +138,8 @@ en:
               subject: Subject
               to: To
               transport: Transport
-          message:
-            tabs:
+          message: Message
+          tabs:
             main:
               tab:
                 details: Details
