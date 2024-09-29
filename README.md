@@ -221,6 +221,10 @@ Only MessageBird allows for names when sending SMS messages. Messagebird does no
 
 The MessageBird API we use (REST) is now considered legacy by Bird, new signups are no longer possible. We don't recommend using MessageBird (Bird).
 
+#### smstools
+
+Support for [smstools](https://www.smstools.nl) is currently in beta.
+
 ### Voice
 
 Currently only Twilio voice is supported in the voice transport.
