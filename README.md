@@ -145,6 +145,9 @@ To send timebased messages you need to execute Nuntius::TimebasedEventsJob.perfo
 in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'".
 Beter even is using Sidekiq::Cron or GoodJob
 
+Nuntius will automatically prevent sending duplicates within the timerange you define. 
+It will also ONLY send messages for objects (the one in template class), created after you created this template.
+
 ### Direct
 
 Another more direct way of using Nuntius is by just instantiating a message:
