@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "slack-ruby-client"
   s.add_runtime_dependency "state_machines-activerecord"
   s.add_runtime_dependency "twilio-ruby", "~> 7.0.2"
-  s.add_runtime_dependency "smstools_api", "~> 0.1.4"
+  s.add_runtime_dependency "smstools_api", "~> 0.1.7"
   s.add_runtime_dependency "slim-rails", "~> 3.6"
 
   s.add_development_dependency "pry", "~> 0"
