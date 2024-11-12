@@ -19,9 +19,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  s.add_runtime_dependency "apnotic", "1.7.0"
+  s.add_runtime_dependency "apnotic", "~> 1.7"
   s.add_runtime_dependency "auxilium", "~> 3"
-  s.add_runtime_dependency "aws-sdk-sns", "~> 1.56"
+  s.add_runtime_dependency "aws-sdk-sns", "~> 1"
   s.add_runtime_dependency "fcm", "~> 1.0"
   s.add_runtime_dependency "houston", "~> 2.4"
   s.add_runtime_dependency "faraday", ">= 2.9"
@@ -47,8 +47,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "smstools_api", "~> 0.1.7"
   s.add_runtime_dependency "slim-rails", "~> 3.6"
 
-  s.add_development_dependency "pry", "~> 0"
-  s.add_development_dependency "debug", "~> 0"
+  s.add_development_dependency "debug", "~> 1"
   s.add_development_dependency "rubocop", "~> 1"
   s.add_development_dependency "standard", "~> 1"
 end
