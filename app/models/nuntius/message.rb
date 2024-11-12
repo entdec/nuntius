@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
 module Nuntius
   # Stores individual messages to individual recipients
   #
