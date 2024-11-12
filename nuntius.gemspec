@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "messagebird-rest"
   s.add_runtime_dependency "net-imap"
   s.add_runtime_dependency "net-smtp"
+  s.add_runtime_dependency "ostruct"
   s.add_runtime_dependency "parse-cron", "~> 0.1"
   s.add_runtime_dependency "pg"
   s.add_runtime_dependency "premailer", "~> 1.23"
