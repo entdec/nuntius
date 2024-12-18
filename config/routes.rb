@@ -34,5 +34,18 @@ Nuntius::Engine.routes.draw do
     resources :locales
     resources :templates
   end
+
+    namespace :admin do
+    resources :templates do
+      member do
+        patch :rollback, to: 'templates#rollback'
+      end
+    end
+  end
+
+  namespace :admin do
+    get 'dialog/rollback', to: 'nuntius/#rollback', as: :rollback_dialog
+  end
+
   root to: 'dashboard#show'
 end

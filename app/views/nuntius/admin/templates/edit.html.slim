@@ -75,6 +75,10 @@
                 = f.input :text, as: :editor, mode: 'text/plain'
             template data-toggle-target='toggleable' data-toggle-value='slack'
 
+        - card.with_tab :previous_versions
+          .grid.grid-cols-12.gap-4
+            .col-span-12
+              = render partial: 'nuntius/paper_trail' , locals: { card: card }
 
         - if @template.messages.size.positive?
           - tabs.tab :nuntius_messages, badge: @template.messages.size, padding: false

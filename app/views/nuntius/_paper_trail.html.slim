@@ -1,0 +1,76 @@
+- if defined?(PaperTrail) && @template.versions.present?
+  - current_version = YAML.dump(@template.attributes)
+  - previous_version = @template.versions.last.reify ? YAML.dump(@template.versions.last.reify.attributes) : @template.versions.last.object
+
+  - diff = Diffy::SplitDiff.new(previous_version, current_version, format: :html)
+
+  ruby:
+    rows = []
+    rows << [
+              @template.versions.last&.id + 1, 
+              @template.versions.last.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+              User.find(@template.paper_trail.originator).email,
+              
+              diff.left.html_safe,
+              diff.right.html_safe,
+              @template.versions.last
+            ]
+       
+    @template.versions.reverse.each_with_index do |version|
+      if version.previous
+        version_diff = Diffy::SplitDiff.new(
+        version.previous.reify ? YAML.dump(version.previous.reify.attributes) : YAML.dump(version.previous.object),
+        YAML.dump(version.reify ? version.reify.attributes : version.attributes),
+        format: :html)
+
+        rows << [ 
+                  version.id, 
+                  version.previous.created_at.strftime('%Y-%m-%d %H:%M:%S'),  
+                  User.find(version.whodunnit).email || "Unknown",
+
+                  version_diff.left.html_safe,
+                  version_diff.right.html_safe,
+                  version
+                ]
+      end 
+    end
+    
+
+  table.table style="width: 100%;"
+    thead
+      tr class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200"
+        th Version Number
+        th Changed At
+        th Changed By
+        th
+        th
+    - rows.each do |row|
+      tbody data-controller="paper-trail"
+        tr class="text-center border-b dark:border-gray-600 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-300"
+          td class="px-4"
+            = row[0]
+          td class="px-4"
+            = row[1]
+          td class="px-4"
+            = row[2]
+          td class="px-4"
+            button type="button" class="button" data-action="click->paper-trail#toggle" View Changes
+          td class="px-4"
+            button type="button" class="button" data-action="click->paper-trail#show" data-version-id="#{row[0]}" Rollback
+
+          div id="rollback-dialog-#{row[0]}" class="hidden"
+            = sts.dialog title: "Are you sure you want to rollback?", icon: "fas fa-triangle-exclamation text-red-600" do |dialog|
+              | Are you sure you want to revert to version #{row[0]}?
+              - dialog.with_action
+                button.button data-action="satis-dialog#close"
+                  | Cancel
+              - dialog.with_action
+                = button_to 'Rollback', rollback_admin_template_path(@template, version_id: row[5].id), method: :patch, class: 'button harmful'
+
+
+        tr data-paper-trail-target="diffContainer" class="hidden border-b dark:border-gray-600"
+          td colspan="5"
+            div class="w-[49%] float-left mr-2"
+              = row[3]
+            div class="w-[49%] float-left"
+              = row[4]

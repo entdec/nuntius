@@ -5,6 +5,8 @@ module Nuntius
     include Nuntius::Concerns::MetadataScoped
     include Nuntius::Concerns::Yamlify
 
+    has_paper_trail if defined?(PaperTrail) 
+
     belongs_to :layout, optional: true
     has_many :messages, class_name: 'Nuntius::Message', dependent: :nullify
 
