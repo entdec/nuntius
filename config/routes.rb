@@ -30,7 +30,7 @@ Nuntius::Engine.routes.draw do
       end
     end
     resources :layouts do
-      resources :attachments, controller: "layouts/attachments"
+      resources :attachments, controller: "satis/attachments"
     end
     resources :lists do
       resources :subscribers, controller: "lists/subscribers"
