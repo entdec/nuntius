@@ -21,7 +21,7 @@
       - card.with_tab:media, padding: true
         .grid.grid-cols-4.gap-4
           .col-span-4 
-            = f.attachments :layout
+            = f.attachments :attachments
 
     - if @layout.templates.exists?
       - card.with_tab :templates, padding: false
