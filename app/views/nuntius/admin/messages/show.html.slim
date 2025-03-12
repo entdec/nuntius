@@ -11,7 +11,7 @@
         = info.with_item :attachments, class: "sm:col-span-4"
           - @message.attachments.each do |attachment|
             = link_to(main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename) do
-              i.fa-regular.fa-paperclip
+              i.fa-solid.fa-paperclip
               span=attachment.filename
             br
       - if @message.transport == 'sms'
