@@ -3,6 +3,7 @@
 # Initializes the appropriate Messenger class and calls the event method
 module Nuntius
   class MessengerJob < ApplicationJob
+    after_perform :cleanup_nuntius_events
     def perform(obj, event, params = {})
       return unless obj
 
@@ -12,6 +13,17 @@ module Nuntius
       messenger.call
       templates = messenger.templates
       messenger.dispatch(templates) if templates.present?
+    end
+
+    def cleanup_nuntius_events
+      obj = arguments.first
+      event = arguments.second
+
+      nuntius_events = Nuntius::Event.where(
+        transitionable: obj,
+        transition_event: event.to_s
+      )
+      nuntius_events.destroy_all
     end
   end
 end
