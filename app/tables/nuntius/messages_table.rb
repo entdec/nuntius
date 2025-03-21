@@ -16,11 +16,6 @@ module Nuntius
         show ->(message) { true }
       end
       
-      
-      
-      
-      
-
       column(:campaign_id) do
         render do
           html do |message|
