@@ -7,7 +7,8 @@ module Nuntius
         state_machine do
           after_transition any => any do |record, transition|
             event = Nuntius::Event.find_or_initialize_by(
-              transitionable: record,
+              transitionable_id: record.id,
+              transitionable_type: record.class.to_s,
               transition_event: transition.event.to_s,
               transition_attribute: transition.attribute.to_s
             )
