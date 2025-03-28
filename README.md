@@ -64,6 +64,7 @@ class CarMessenger < Nuntius::BaseMessenger
     pdf = ApplicationController.renderer.new(http_host: object.account.hostname, https: true).render(template: "commercial_invoice/show", formats: [:pdf], assigns: {order: object})
 
     attachments << {content: StringIO.new(pdf), content_type: "application/pdf", filename: "commercial_invoice.pdf"}
+    # Return false here if you don't want the message to be sent
   end
 end
 ```

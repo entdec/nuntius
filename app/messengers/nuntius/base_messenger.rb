@@ -22,9 +22,11 @@ module Nuntius
     # Calls the event method on the messenger
     def call
       select_templates
+      result = nil
       run_callbacks(:action) do
-        send(@event.to_sym, @object, @params) if respond_to?(@event.to_sym)
+        result = send(@event.to_sym, @object, @params) if respond_to?(@event.to_sym)
       end
+      result
     end
 
     # Turns the templates in messages, and dispatches the messages to transports
