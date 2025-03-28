@@ -127,6 +127,7 @@ nl:
             nuntius_admin_messages:
           info_item:
             main:
+              attachments: Bijlagen
               created_at: Created At
               from: Van
               html: HTML
