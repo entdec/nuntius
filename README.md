@@ -60,7 +60,10 @@ Additionally you need to define an extension of the Nuntius::BaseMessenger for t
 ```ruby
 class CarMessenger < Nuntius::BaseMessenger
   def your_event(car, params)
-    # your optional logic here
+    # your optional logic here, you could add attachments here
+    pdf = ApplicationController.renderer.new(http_host: object.account.hostname, https: true).render(template: "commercial_invoice/show", formats: [:pdf], assigns: {order: object})
+
+    attachments << {content: StringIO.new(pdf), content_type: "application/pdf", filename: "commercial_invoice.pdf"}
   end
 end
 ```
