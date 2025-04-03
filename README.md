@@ -150,7 +150,7 @@ in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedE
 Beter even is using Sidekiq::Cron or GoodJob
 
 Nuntius will automatically prevent sending duplicates within the timerange you define. 
-It will also ONLY send messages for objects (the one in template class), created after you created this template.
+It will also ONLY send messages for objects (the one in template class), created after you created this template, this prevents sending dozens of emails which may make no sense, when you add a new template.
 
 ### Direct
 
