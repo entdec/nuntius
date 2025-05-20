@@ -5,15 +5,27 @@ module Nuntius
   class MessengerJob < ApplicationJob
     def perform(obj, event, params = {})
       return unless obj
+      ActiveRecord::Base.transaction do
+        messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event, params)
+        return unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym)
 
-      messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event, params)
-      return unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym)
+        result = messenger.call
+        return if result == false
 
-      result = messenger.call
-      return if result == false
+        templates = messenger.templates
+        messenger.dispatch(templates) if templates.present?
+      end
+      cleanup_nuntius_events(obj, event)
+    end
 
-      templates = messenger.templates
-      messenger.dispatch(templates) if templates.present?
+    def cleanup_nuntius_events(obj, event)
+
+      nuntius_events = Nuntius::Event.where(
+        transitionable_id: obj["id"],
+        transitionable_type: obj["type"],
+        transition_event: event.to_s
+      )
+      nuntius_events.destroy_all
     end
   end
 end
