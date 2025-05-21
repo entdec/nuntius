@@ -16,7 +16,7 @@ module Nuntius::ActiveRecordHelpers
     def nuntiable(options = {})
       @_nuntius_nuntiable_options = options
       include Nuntius::Nuntiable
-      include Nuntius::Concerns::EventsTransaction
+      include Nuntius::Concerns::EventsTransaction if options[:use_state_machine]
       include Nuntius::Devise if options[:override_devise]
       include Nuntius::LifeCycle if options[:life_cycle]
     end

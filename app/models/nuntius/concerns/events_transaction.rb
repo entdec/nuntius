@@ -4,6 +4,13 @@ module Nuntius
       extend ActiveSupport::Concern
 
       included do
+
+        state_machine.events.map(&:name)
+                     .reject { |event_name| messenger.method_defined?(event_name) }
+                     .each do |event_name|
+          messenger.send(:define_method, event_name) { |object, options = {}| }
+        end
+
         state_machine do
           after_transition any => any do |record, transition|
             event = Nuntius::Event.find_or_initialize_by(
