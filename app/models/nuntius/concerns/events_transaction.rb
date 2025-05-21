@@ -27,8 +27,7 @@ module Nuntius
           transitionable_type: self.class.to_s,
           transitionable_id: self.id
         ).each do |transition|
-          transitionable = transition.transitionable_type.constantize.find(transition.transitionable_id)
-          Nuntius.event(transition.transition_event.to_sym, transitionable)
+          Nuntius.event(transition.transition_event.to_sym, transition.transitionable)
         end
       end
     end
