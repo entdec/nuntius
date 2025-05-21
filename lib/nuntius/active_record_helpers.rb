@@ -2,7 +2,6 @@
 
 require_relative "nuntiable"
 require_relative "devise"
-require_relative "state_machine"
 require_relative "life_cycle"
 # require_relative "transactio"
 
@@ -17,8 +16,7 @@ module Nuntius::ActiveRecordHelpers
     def nuntiable(options = {})
       @_nuntius_nuntiable_options = options
       include Nuntius::Nuntiable
-      include Nuntius::StateMachine if options[:use_state_machine]
-      include Nuntius::Concerns::EventsTransaction if options[:use_state_machine]
+      include Nuntius::Concerns::EventsTransaction
       include Nuntius::Devise if options[:override_devise]
       include Nuntius::LifeCycle if options[:life_cycle]
     end
