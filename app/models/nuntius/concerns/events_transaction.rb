@@ -30,11 +30,19 @@ module Nuntius
       end
 
       def dispatch_nuntius_events
-        Nuntius::Event.where(
-          transitionable_type: self.class.to_s,
-          transitionable_id: self.id
-        ).each do |transition|
-          Nuntius.event(transition.transition_event.to_sym, transition.transitionable)
+        self.class.transaction do
+          events = Nuntius::Event
+                     .where(transitionable_type: self.class.to_s, transitionable_id: self.id)
+                     .lock("FOR UPDATE OF nuntius_events SKIP LOCKED")
+
+          events.find_each do |transition|
+            begin
+              Nuntius.event(transition.transition_event.to_sym, transition.transitionable)
+              transition.destroy!
+            rescue => e
+              Rails.logger.error("Failed to dispatch Nuntius event #{transition.id}: #{e.message}")
+            end
+          end
         end
       end
     end
