@@ -43,7 +43,7 @@ module Nuntius
 
         self.class.transaction do
           events.each do |event|
-            unless event.transitionable?
+            unless event.transitionable
               successful_ids << event.id
               next
             end
