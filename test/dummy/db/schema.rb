@@ -10,16 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_21_132554) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -27,7 +27,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.string "record_type", null: false
     t.uuid "record_id", null: false
     t.uuid "blob_id", null: false
-    t.datetime "created_at", null: false
+    t.datetime "created_at", precision: nil, null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
@@ -39,7 +39,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.text "metadata"
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
-    t.datetime "created_at", null: false
+    t.datetime "created_at", precision: nil, null: false
     t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
@@ -51,8 +51,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
   end
 
   create_table "nuntius_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "nuntius_attachments_messages", id: false, force: :cascade do |t|
@@ -70,13 +70,25 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.string "subject"
     t.text "text"
     t.text "html"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.jsonb "metadata", default: {}, null: false
     t.uuid "layout_id"
     t.string "state"
     t.index ["layout_id"], name: "index_nuntius_campaigns_on_layout_id"
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
+  end
+
+  create_table "nuntius_events", force: :cascade do |t|
+    t.string "transitionable_type"
+    t.uuid "transitionable_id"
+    t.string "transition_attribute"
+    t.string "transition_event"
+    t.string "transition_from"
+    t.string "transition_to"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transitionable_type", "transitionable_id", "transition_event"], name: "index_nuntius_events_on_type_id_event"
   end
 
   create_table "nuntius_inbound_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -101,15 +113,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.string "name"
     t.text "data"
     t.jsonb "metadata", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "nuntius_lists", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.integer "subscribers_count"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.jsonb "metadata", default: {}, null: false
     t.text "description"
     t.string "slug"
@@ -121,8 +133,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.string "key"
     t.jsonb "data"
     t.jsonb "metadata"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "nuntius_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -141,8 +153,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.string "subject"
     t.text "html"
     t.text "text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "campaign_id"
     t.jsonb "payload"
     t.jsonb "metadata", default: {}
@@ -160,8 +172,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.string "email"
     t.string "phone_number"
     t.string "tags"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "nuntiable_type"
     t.uuid "nuntiable_id"
     t.datetime "unsubscribed_at", precision: nil
@@ -181,8 +193,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_06_203019) do
     t.text "html"
     t.text "text"
     t.text "payload"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "layout_id"
     t.boolean "enabled", default: true
     t.string "interval"
