@@ -25,3 +25,5 @@ group :test do
   gem "vcr", "~> 6.0", require: false
   gem "webmock", "~> 3.3", require: false
 end
+
+gem "debug"

@@ -2,6 +2,7 @@
 
 require "mail"
 require "net/imap"
+require "debug"
 
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
