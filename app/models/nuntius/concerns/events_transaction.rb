@@ -11,10 +11,13 @@ module Nuntius
         end
 
         state_machine do
-          after_transition any => any do |record, transition|
-            Nuntius::Event.find_or_initialize_by(
-              transitionable_id: record.id,
-              transitionable_type: record.class.to_s,
+          after_transition any => any do |object, transition|
+            return unless object.persisted?
+
+            Nuntius::Event.find_or_create_by!(
+              transitionable_type: object.class.name,
+              transitionable_id: object.id,
+              # transitionable: object,
               transition_event: transition.event.to_s,
               transition_attribute: transition.attribute.to_s
             ) do |event|
@@ -28,10 +31,15 @@ module Nuntius
       end
 
       def dispatch_nuntius_events
+        # puts "Dispatching Nuntius events for #{self.class.name} with ID #{id}"
+        # puts "Nuntius::Event count: #{Nuntius::Event.count}"
+        # binding.break
         Nuntius::Event
           .where(transitionable: self)
           .includes(:transitionable)
           .select(:transition_event, :transitionable_type, :transitionable_id).distinct.each do |event|
+          # puts "Dispatching event: #{event.transition_event} for #{event.transitionable_type} with ID #{event.transitionable_id}"
+          # binding.break
           Nuntius.event(event.transition_event.to_sym, event.transitionable)
         end
       end
