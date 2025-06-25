@@ -21,8 +21,8 @@ module Nuntius
     def cleanup_nuntius_events(obj, event)
 
       nuntius_events = Nuntius::Event.where(
-        transitionable_id: obj["id"],
-        transitionable_type: obj["type"],
+        transitionable_id: obj.id,
+        transitionable_type: obj.class.name,
         transition_event: event.to_s
       )
       nuntius_events.destroy_all
