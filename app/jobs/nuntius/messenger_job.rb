@@ -25,7 +25,7 @@ module Nuntius
         transitionable_type: obj.class.name,
         transition_event: event.to_s
       )
-      nuntius_events.destroy_all
+      nuntius_events.delete_all
     end
   end
 end
