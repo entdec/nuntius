@@ -49,4 +49,9 @@ class Nuntius::Test < ActiveSupport::TestCase
     assert_equal "accounts", StiBaseMessenger.liquid_variable_name_for([Account.new])
     assert_equal "account", StiBaseMessenger.liquid_variable_name_for(Account.new)
   end
+
+  test "returns whether there are templates" do
+    user = User.create!(name: "test", email: "test@example.com")
+    assert Nuntius.templates?(user, :create)
+  end
 end

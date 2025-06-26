@@ -50,10 +50,13 @@ module Nuntius
     end
 
     def templates?(obj, event)
-      Nuntius::Template.where(klass: Nuntius::BaseMessenger.class_names_for(obj),
-        event: Nuntius::BaseMessenger.event_name_for(
-          obj, event
-        )).where(enabled: true).count.positive?
+      messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event)
+      return false unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym)
+
+      result = messenger.call
+      return false if result == false
+
+      messenger.templates.exists?
     end
   end
 
