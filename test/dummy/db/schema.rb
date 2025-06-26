@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_25_131705) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_26_093449) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -199,6 +199,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_25_131705) do
     t.boolean "enabled", default: true
     t.string "interval"
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
+  end
+
+  create_table "reports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "state"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sti_bases", force: :cascade do |t|
