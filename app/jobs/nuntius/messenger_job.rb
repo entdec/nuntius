@@ -16,7 +16,7 @@ module Nuntius
         return if result == false
 
         templates = messenger.templates
-        messenger.dispatch(templates) if templates.present?
+        messenger.dispatch(templates) if templates.exists?
       end
     end
 
