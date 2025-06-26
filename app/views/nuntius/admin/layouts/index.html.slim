@@ -1,2 +1,2 @@
-= sts.card title: t('.layouts'), icon: 'fad fa-table-layout', content_padding: false, menu: nuntius_layouts_menu do |card|
-  = sts.table :nuntius_layouts
+= sts.card :nuntius_admin_layouts, icon: 'fad fa-table-layout', content_padding: false, menu: nuntius_layouts_menu do |card|
+  = sts.table :"nuntius/layouts", custom_views: true

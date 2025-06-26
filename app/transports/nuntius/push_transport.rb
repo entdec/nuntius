@@ -5,7 +5,7 @@ module Nuntius
     # We split per email address, to allow easy resends
     def deliver(message)
       message.request_id = SecureRandom.uuid
-      message.to.split(',').each do |to|
+      message.to.split(",").each do |to|
         new_message = message.dup
         new_message.to = to
         super(new_message)

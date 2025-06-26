@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'nuntiable'
-require_relative 'devise'
-require_relative 'state_machine'
-require_relative 'transactio'
+require_relative "nuntiable"
+require_relative "devise"
+require_relative "life_cycle"
+# require_relative "transactio"
 
 module Nuntius::ActiveRecordHelpers
   extend ActiveSupport::Concern
@@ -16,9 +16,9 @@ module Nuntius::ActiveRecordHelpers
     def nuntiable(options = {})
       @_nuntius_nuntiable_options = options
       include Nuntius::Nuntiable
-      include Nuntius::StateMachine if options[:use_state_machine]
+      include Nuntius::Concerns::EventsTransaction if options[:use_state_machine] || options[:state_machine]
       include Nuntius::Devise if options[:override_devise]
-      include Nuntius::Transactio
+      include Nuntius::LifeCycle if options[:life_cycle]
     end
 
     def nuntiable?

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
@@ -24,17 +24,19 @@ module Nuntius
         redirect_to :edit_admin_campaign, status: :see_other
       end
 
-      def edit; end
+      def edit
+      end
 
       def update
-        saved = @campaign.update(campaign_params)
+        @campaign.update(campaign_params)
 
-        if saved && params[:commit] == 'send'
-          @campaign.publish! if @campaign.can_publish?
-          redirect_to :edit_admin_campaign, status: :see_other
-        else
-          respond_with :admin, @campaign
-        end
+        respond_with :admin, @campaign
+      end
+
+      def publish
+        @campaign.publish! if @campaign.can_publish?
+
+        redirect_to :admin_campaigns, status: :see_other
       end
 
       private
@@ -49,7 +51,7 @@ module Nuntius
       def campaign_params
         return unless params[:campaign]
 
-        params.require(:campaign).permit(:name, :transport, :layout_id, :list_id, :from, :subject, :text, :html)
+        params.require(:campaign).permit(:name, :transport, :layout_id, :list_id, :from, :subject, :text, :html, :metadata_yaml)
       end
     end
   end

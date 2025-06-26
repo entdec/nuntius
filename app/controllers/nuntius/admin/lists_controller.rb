@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
     class ListsController < ApplicationAdminController
-
       def index
         @lists = Nuntius::List.visible.order(:name)
       end
@@ -36,10 +35,11 @@ module Nuntius
 
       private
 
-      def set_objects; end
+      def set_objects
+      end
 
       def list_params
-        params.require(:list).permit(:name)
+        params.require(:list).permit(:name, :slug, :allow_unsubscribe, :description, :metadata_yaml)
       end
     end
   end

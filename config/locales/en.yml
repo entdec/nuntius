@@ -1,22 +1,166 @@
 en:
-  nuntius:
-    flash:
-      error: There were problems saving the %{model}
-      notice: The %{model} was saved successfully
-    context_menu:
-      root: Root
-      resend: Resend
-    admin:
-      messages:
-        resend:
-          resend_success: Resent message
-          resend_error: Failed to resend message
-    breadcrumbs:
-      nuntius: Nuntius
-      dashboard: Dashboard
-      admin:
-        campaigns: Campaigns
-        messages: Messages
-        layouts: Layouts
+  choose_files: Choose files
+  activerecord:
+    attributes:
+      nuntius/campaign:
+        from: From
+        layout: Layout
+        list: List
+        name: Name
+        state: Staat
+        subject: Subject
+        transport: Transport
+      nuntius/layout:
+        name: Name
+      nuntius/list:
+        allow_unsubscribe: unsubscribe allowed
+        description: Description
+        name: Name
+        slug: Slug
+        subscribers_count: Subscriber count
+      nuntius/template:
+        description: Description
+        enabled: Enabled
+        event: Event
+        from: From
+        klass: Klass
+        subject: Subject
+        to: To
+        transport: Transport
+    models:
+      campaign: Campaign
+      layout: Layout
+      list: List
+      message: Message
+      subscriber: Subscriber
+      template: Template
+  menu:
+    nuntius:
+      campaigns:
         lists: Lists
-        templates: Templates
+        new: New campaign
+      layouts:
+        new: New layout
+      lists:
+        new: New list
+        new_subscriber: New subscriber
+      locales:
+        new: New locale
+      templates:
+        new: New template
+  nuntius:
+    admin:
+      campaigns:
+        edit:
+          card:
+            nuntius_admin_campaigns:
+              title: Campaigns
+          metadata: Metadata
+        index:
+          card:
+            nuntius_admin_campaigns:
+              tab:
+                Nuntius campaigns: Campaigns
+              title: Campaigns
+      layouts:
+        edit:
+          card:
+            nuntius_admin_layouts:
+              title: Layouts
+          metadata: Metadata
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                media: Media
+                metadata: Metadata
+        index:
+          card:
+            nuntius_admin_layouts:
+              tab:
+                Nuntius layouts: Layouts
+              title: Layouts
+      lists:
+        edit:
+          card:
+            nuntius_admin_lists:
+              title: Lists
+          description_hint: Describe the list in detail for the subscribers, explain if they can unsubscribe, how often they will receive messages, etc.
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                subscribers: Abonnees
+        index:
+          card:
+            nuntius_admin_lists:
+              title: Lists
+        subscribers:
+          edit:
+            subscribers: Subscribers
+      locales:
+        edit:
+          card:
+            nuntius_admin_locales:
+              title: Locales
+          data: Data
+          metadata: Metadata
+        index:
+          card:
+            nuntius_admin_locales:
+              tab:
+                Nuntius locales: Locales
+              title: Locales
+      messages:
+        index:
+          card:
+            nuntius_admin_messages:
+              tab:
+                Nuntius messages: Messages
+              title: Messages
+        resend:
+          resend_error: Failed to resend message
+          resend_success: Resent message
+        show:
+          card:
+            nuntius_admin_messages:
+          info_item:
+            main:
+              created_at: Created At
+              from: From
+              html: HTML
+              last_sent_at: Last Sent At
+              provider: Provider
+              provider_id: Provider ID
+              refreshes: Refreshes
+              request_id: Request ID
+              status: Status
+              subject: Subject
+              to: To
+              transport: Transport
+          message: Message
+          tabs:
+            main:
+              tab:
+                details: Details
+                preview: Preview
+      templates:
+        edit:
+          card:
+            nuntius_admin_templates:
+              title: Template
+          metadata: Metadata
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                messages: Messages
+        index:
+          card:
+            nuntius_admin_templates:
+              tab:
+                Nuntius templates: Templates
+              title: Templates
+    context_menu:
+      resend: Resend
+      root: Root

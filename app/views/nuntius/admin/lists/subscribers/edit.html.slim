@@ -1,6 +1,6 @@
 = sts.form_for(@subscriber, url: @subscriber.new_record? ? admin_list_subscribers_path(@list) : admin_list_subscriber_path(@list, @subscriber), html: {multipart: true}) do |f|
-  = sts.card title: t('.subscribers'), icon: 'fad fa-address-card' do |card|
-    - card.action
+  = sts.card :nuntius_admin_lists_subscribers, title: t('.subscribers'), icon: 'fad fa-address-card' do |card|
+    - card.with_action
       = f.submit
 
     .grid.grid-cols-12.gap-4

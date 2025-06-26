@@ -8,11 +8,11 @@ module Nuntius
       class_methods do
         def yamlify(attr)
           define_method(:"#{attr}_yaml=") do |yaml|
-            write_attribute attr, YAML.safe_load(yaml.gsub("\t", '  '))
+            write_attribute attr, YAML.safe_load(yaml.gsub("\t", "  "))
           end
 
           define_method(:"#{attr}_yaml") do
-            return '' if attributes[attr.to_s].blank?
+            return "" if attributes[attr.to_s].blank?
 
             YAML.dump(attributes[attr.to_s])
           end

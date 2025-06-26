@@ -11,14 +11,14 @@ class CreateNuntiusLayouts < ActiveRecord::Migration[5.2]
       t.timestamps
     end
 
-    remove_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: { to_table: :nuntius_templates }
-    add_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: { to_table: :nuntius_layouts }
-    add_reference :nuntius_campaigns, :layout, index: true, type: :uuid, foreign_key: { to_table: :nuntius_layouts }
+    remove_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: {to_table: :nuntius_templates}
+    add_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: {to_table: :nuntius_layouts}
+    add_reference :nuntius_campaigns, :layout, index: true, type: :uuid, foreign_key: {to_table: :nuntius_layouts}
   end
 
   def down
     drop_table :nuntius_layouts
-    remove_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: { to_table: :nuntius_layouts }
-    add_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: { to_table: :nuntius_templates }
+    remove_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: {to_table: :nuntius_layouts}
+    add_reference :nuntius_templates, :layout, index: true, type: :uuid, foreign_key: {to_table: :nuntius_templates}
   end
 end

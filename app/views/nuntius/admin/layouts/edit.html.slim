@@ -1,24 +1,28 @@
 = sts.form_for([:admin, @layout]) do |f|
-  = sts.card title: t('.layout'), icon: 'fal fa-table-layout' do |card|
-    - card.action
+  = sts.card :nuntius_admin_layouts, icon: 'fal fa-table-layout' do |card|
+    - card.with_action
+      = f.continue
+    - card.with_action
       = f.submit
 
-    = sts.tabs do |tabs|
-      - tabs.tab :edit
-        .grid.grid-cols-12.gap-4
-          .col-span-12
-            = f.input :name
-          .col-span-12
-            = f.input :data, as: :editor, mode: 'text/html', height: '400px'
-      - tabs.tab :metadata
-        .grid.grid-cols-12.gap-4
-          .col-span-12
-            = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
-      - if @layout.persisted?
-        - tabs.tab :media
-          = render partial: 'nuntius/admin/layouts/attachments/index', locals: { attachments: @layout.attachments, upload_url: nuntius.admin_layout_attachments_path(@layout) }
+    - card.with_tab:edit, padding: true
+      .grid.grid-cols-12.gap-4
+        .col-span-12
+          = f.input :name
+        .col-span-12
+          = f.input :data, as: :editor, mode: 'text/html', height: '400px'
+    - card.with_tab:metadata, padding: true
+      .grid.grid-cols-12.gap-4
+        .col-span-12
+          = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
-      - if @layout.templates.size.positive?
-        - tabs.tab :templates
-          = sts.table :nuntius_templates, parameters: { layout_id: @layout.id }
+    - if @layout.persisted?
+      - card.with_tab:media, padding: true
+        .grid.grid-cols-4.gap-4
+          .col-span-4 
+            = f.attachments :attachments
+
+    - if @layout.templates.exists?
+      - card.with_tab :templates, padding: false
+        = sts.table :"nuntius/templates", filters: { layout_id: @layout.id }

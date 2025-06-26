@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Nuntius
-  VERSION = "1.0.41"
+  VERSION = "1.4.1"
 end

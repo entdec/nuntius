@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_controller'
-require 'preamble'
+require_dependency "nuntius/application_controller"
+require "preamble"
 
 module Nuntius
   class CallbacksController < ApplicationController
@@ -14,8 +14,8 @@ module Nuntius
       response = message.nuntius_provider(message).callback(params)
 
       render body: response[2].first,
-             content_type: response[1]['Content-Type'],
-             layout: false
+        content_type: response[1]["Content-Type"],
+        layout: false
     end
   end
 end

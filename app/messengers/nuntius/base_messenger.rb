@@ -9,7 +9,8 @@ module Nuntius
 
     define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
-    attr_reader :templates, :attachments, :event, :object, :params
+    attr_reader :attachments, :event, :object, :params
+    attr_accessor :templates
 
     def initialize(object, event, params = {})
       @object = object
@@ -21,9 +22,11 @@ module Nuntius
     # Calls the event method on the messenger
     def call
       select_templates
+      result = nil
       run_callbacks(:action) do
-        send(@event.to_sym, @object, @params) if respond_to?(@event.to_sym)
+        result = send(@event.to_sym, @object, @params) if respond_to?(@event.to_sym)
       end
+      result
     end
 
     # Turns the templates in messages, and dispatches the messages to transports
@@ -61,20 +64,21 @@ module Nuntius
         return obj.keys.first.to_s if obj.is_a?(Hash)
 
         plural = obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
-        list   = plural ? obj : [obj]
-        klass  = list.first.class
-        klass  = klass.base_class if klass.respond_to?(:base_class)
-        name   = klass.name.demodulize
-        name   = name.pluralize if plural
+        list = plural ? obj : [obj]
+        klass = list.first.class
+        klass = klass.base_class if klass.respond_to?(:base_class)
+        name = klass.name.demodulize
+        name = name.pluralize if plural
         name.underscore
       end
 
       def class_name_for(obj)
-        if obj.is_a?(Array) || obj.is_a?(ActiveRecord::Relation)
+        case obj
+        when Array, ActiveRecord::Relation
           obj.first.class.name.demodulize
-        elsif obj.is_a?(Hash)
-          'Custom'
-        elsif obj.is_a?(Class)
+        when Hash
+          "Custom"
+        when Class
           obj.name.demodulize
         else
           obj.class.name
@@ -143,7 +147,7 @@ module Nuntius
       end
 
       def timebased_scope(name, &scope_proc)
-        raise ArgumentError, 'timebased_scope must start with before or after' unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
+        raise ArgumentError, "timebased_scope must start with before or after" unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
 
         name = name.to_sym
         timebased_scopes[name] = scope_proc if scope_proc.present?
@@ -183,10 +187,10 @@ module Nuntius
     def liquid_context
       assigns = @params || {}
       instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope].include? i.to_s }.each do |i|
-        assigns[i.to_s[1..-1]] = instance_variable_get(i)
+        assigns[i.to_s[1..]] = instance_variable_get(i)
       end
 
-      context = { liquid_variable_name_for(@object) => (@object.is_a?(Hash) ? @object[@object.keys.first].deep_stringify_keys : @object) }
+      context = {liquid_variable_name_for(@object) => (@object.is_a?(Hash) ? @object[@object.keys.first].deep_stringify_keys : @object)}
       assigns.merge(context)
     end
   end

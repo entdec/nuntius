@@ -13,10 +13,10 @@ module Nuntius
         @all_settings ||= []
       end
 
-      def setting_reader(name, required: false, default: nil, description: '')
+      def setting_reader(name, required: false, default: nil, description: "")
         @all_settings ||= []
         @all_settings.push(name: name, required: required, default: default, description: description)
-        define_method(name) { required ? settings.fetch(name) : settings.dig(name) || default }
+        define_method(name) { required ? settings.fetch(name) : settings[name] || default }
       end
 
       def transport(transport = nil)
@@ -31,7 +31,7 @@ module Nuntius
 
       def class_from_name(name, transport)
         Nuntius.const_get("#{name}_#{transport}_provider".camelize)
-      rescue StandardError
+      rescue
         nil
       end
     end
@@ -48,17 +48,17 @@ module Nuntius
 
     # Override this in implementation
     def callback(_params)
-      [404, { 'Content-Type' => 'text/html; charset=utf-8' }, ['Not found']]
+      [404, {"Content-Type" => "text/html; charset=utf-8"}, ["Not found"]]
     end
 
     def name
-      self.class.name.demodulize.underscore.gsub(/_#{self.class.transport}_provider$/, '').to_sym
+      self.class.name.demodulize.underscore.gsub(/_#{self.class.transport}_provider$/, "").to_sym
     end
 
     private
 
     def translated_status(status)
-      self.class.states.find { |key, _value| key.is_a?(Array) ? key.include?(status) : key == status }&.last || 'sent'
+      self.class.states.find { |key, _value| key.is_a?(Array) ? key.include?(status) : key == status }&.last || "sent"
     end
 
     def settings

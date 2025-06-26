@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'delegate'
+require "delegate"
 
 # http://nithinbekal.com/posts/rails-presenters/
 class ApplicationPresenter < SimpleDelegator

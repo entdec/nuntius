@@ -13,12 +13,12 @@ module Nuntius
   class Message < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
 
-    has_and_belongs_to_many :attachments, class_name: 'Attachment'
+    has_and_belongs_to_many :attachments, class_name: "Attachment"
 
     belongs_to :campaign, optional: true
     belongs_to :template, optional: true
-    belongs_to :parent_message, class_name: 'Message', optional: true
-    has_many :child_messages, class_name: 'Message', foreign_key: 'parent_message_id', dependent: :destroy
+    belongs_to :parent_message, class_name: "Message", optional: true
+    has_many :child_messages, class_name: "Message", foreign_key: "parent_message_id", dependent: :destroy
     belongs_to :nuntiable, polymorphic: true, optional: true
 
     validates :transport, presence: true
@@ -32,19 +32,19 @@ module Nuntius
     # end
 
     def pending?
-      status == 'pending'
+      status == "pending"
     end
 
     def sent?
-      status == 'sent'
+      status == "sent"
     end
 
     def blocked?
-      status == 'blocked'
+      status == "blocked"
     end
 
     def delivered?
-      status == 'delivered'
+      status == "delivered"
     end
 
     def delivered_or_blocked?
@@ -52,12 +52,12 @@ module Nuntius
     end
 
     def undelivered?
-      status == 'undelivered'
+      status == "undelivered"
     end
 
     # Removes only pending child messages
     def cleanup!
-      Nuntius::Message.where(status: 'pending').where(parent_message: self).destroy_all
+      Nuntius::Message.where(status: "pending").where(parent_message: self).destroy_all
     end
 
     def add_attachment(options)
@@ -65,35 +65,39 @@ module Nuntius
 
       uri = options[:url] && URI.parse(options[:url])
 
-      if uri&.scheme == 'file'
+      if uri&.scheme == "file"
+        # FIXME: This is a possible security problem
         attachment[:io] = File.open(uri.path)
       elsif uri
-        client = HTTPClient.new
-        client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        client.ssl_config.set_default_paths unless Gem.win_platform?
-        response = client.get(options[:url], follow_redirect: true)
-        content_disposition = response.headers['Content-Disposition'] || ''
+        client = Faraday.new(ssl: {verify: false}) do |builder|
+          builder.response :follow_redirects
+          builder.adapter Faraday.default_adapter
+        end
+
+        response = client.get(options[:url])
+        content_disposition = response.headers["Content-Disposition"] || ""
+
         options[:filename] ||= content_disposition[/filename="([^"]+)"/, 1]
-        attachment[:content_type] = response.content_type
+        attachment[:content_type] = response.headers["Content-Type"]
         attachment[:io] = if response.body.is_a? String
-                            StringIO.new(response.body)
-                          else
-                            # Assume IO object
-                            response.body
-                          end
+          StringIO.new(response.body)
+        else
+          # Assume IO object
+          response.body
+        end
       elsif options[:content].respond_to?(:read)
         attachment[:content_type] = options[:content_type]
         attachment[:io] = options[:content]
       else
-        raise 'Cannot add attachment without url or content'
+        raise "Cannot add attachment without url or content"
       end
 
       # Set the filename
-      attachment[:filename] = options[:filename] || uri.path.split('/').last || 'attachment'
+      attachment[:filename] = options[:filename] || uri.path.split("/").last || "attachment"
 
       # (Try to) add file extension if it is missing
-      file_extension = File.extname(attachment[:filename]).delete('.')
-      attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(';').first).to_sym}" if file_extension.blank? && attachment[:content_type]
+      file_extension = File.extname(attachment[:filename]).delete(".")
+      attachment[:filename] += ".#{Mime::Type.lookup(attachment[:content_type].split(";").first).to_sym}" if file_extension.blank? && attachment[:content_type]
 
       # Fix content type if file extension known but content type blank
       attachment[:content_type] ||= Mime::Type.lookup_by_extension(file_extension)&.to_s if file_extension
@@ -103,17 +107,17 @@ module Nuntius
           zio.put_next_entry attachment[:file_name]
           zio.write attachment[:io].read
         end
-        attachment[:content_type] = 'application/zip'
+        attachment[:content_type] = "application/zip"
         attachment[:io] = zip_stream
       end
 
       nuntius_attachment = Nuntius::Attachment.new
       nuntius_attachment.content.attach(io: attachment[:io],
-                                        filename: attachment[:filename],
-                                        content_type: attachment[:content_type])
+        filename: attachment[:filename],
+        content_type: attachment[:content_type])
 
       attachments.push(nuntius_attachment)
-    rescue StandardError => e
+    rescue => e
       Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
     end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 # Declare your gem's dependencies in nuntius.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
@@ -17,16 +17,13 @@ gemspec
 
 git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 
-gem 'action_table', entdec: 'action_table', tag: '0.2.37'
-gem 'pry'
-gem 'trado', entdec: 'trado', tag: '0.1.16'
+gem "action_table", entdec: "action_table", tag: "0.2.37"
 
-gem 'irb', '~> 1'
-gem 'solargraph'
-
-gem 'sidekiq'
+gem "sidekiq"
 
 group :test do
-  gem 'vcr', '~> 6.0', require: false
-  gem 'webmock', '~> 3.3', require: false
+  gem "vcr", "~> 6.0", require: false
+  gem "webmock", "~> 3.3", require: false
 end
+
+gem "debug"

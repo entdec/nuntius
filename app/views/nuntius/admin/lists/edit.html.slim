@@ -1,14 +1,22 @@
 = sts.form_for([:admin, @list]) do |f|
-  = sts.card title: t('.list'), icon: 'fad fa-address-book', menu: nuntius_list_menu do |card|
-    - card.action
+  = sts.card :nuntius_admin_lists, icon: 'fad fa-address-book', menu: nuntius_list_menu do |card|
+    - card.with_action
       = f.continue
-    - card.action
+    - card.with_action
       = f.submit
 
-    .grid.grid-cols-12.gap-4
-      .col-span-12
-        = f.input :name
+    - card.with_tab:edit, padding: true
+      .grid.grid-cols-12.gap-4
+        .col-span-6= f.input :name
+        .col-span-4= f.input :slug
+        .col-span-2= f.input :allow_unsubscribe, as: :switch
 
-br
-- if @list.subscribers.present?
-  = sts.table :nuntius_subscribers, parameters: { list_id: @list.id }
+        .col-span-12.mt-4.mb-4
+          = f.rich_text :description, hint: t('nuntius.admin.lists.edit.description_hint')
+
+        .col-span-12
+          = f.input :metadata_yaml, as: :editor, mode: 'application/yaml'
+
+    - if @list.subscribers.exists?
+      - card.with_tab :subscribers, padding: false
+        = sts.table :"nuntius/subscribers", filters: { list_id: @list.id }

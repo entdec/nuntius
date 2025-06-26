@@ -1,22 +1,168 @@
 nl:
-  nuntius:
-    flash:
-      error: Er waren problem om %{model} op te slaan
-      notice: De %{model} is sucesvol opgeslagen
-    context_menu:
-      root: Root
-      resend: Verstuur opnieuw
-    admin:
-      messages:
-        resend:
-          resend_success: Bericht opnieuw verstuurd
-          resend_error: Het is niet gelukt het bericht opnieuw te sturen
-    breadcrumbs:
-      nuntius: Nuntius
-      dashboard: Dashboard
-      admin:
-        campaigns: Campagnes
-        messages: Berichten
-        layouts: Layouts
+  choose_files: Kies bestanden
+  activerecord:
+    attributes:
+      nuntius/campaign:
+        from: Van
+        layout: Layout
+        list: Lijst
+        name: Naam
+        state: Staat
+        subject: Onderwerp
+        transport: Transport
+      nuntius/layout:
+        name: Naam
+      nuntius/list:
+        allow_unsubscribe: Uitschrijven toestaan
+        description: Omschrijving
+        name: Naam
+        slug: Slug
+        subscribers_count: Aantal abonnees
+      nuntius/template:
+        description: Omschrijving
+        enabled: Ingeschakeld
+        event: Gebeurtenis
+        from: Van
+        klass: Klasse
+        subject: Onderwerp
+        to: Aan
+        transport: Transport
+    models:
+      campaign: Campagne
+      layout: Layout
+      list: Lijst
+      message: Bericht
+      subscriber: Abonnee
+      template: Template
+  menu:
+    nuntius:
+      campaigns:
         lists: Lijsten
-        templates: Templates
+        new: Nieuwe campagne
+      layouts:
+        new: Nieuwe layout
+      lists:
+        new: Nieuwe lijst
+        new_subscriber: Nieuwe abonnee
+      locales:
+        new: Nieuwe locale
+      templates:
+        new: Nieuwe template
+  nuntius:
+    admin:
+      campaigns:
+        edit:
+          card:
+            nuntius_admin_campaigns:
+              title: Campagne
+          metadata: Metadata
+        index:
+          card:
+            nuntius_admin_campaigns:
+              tab:
+                Nuntius campaigns: Campagnes
+              title: Campagnes
+      layouts:
+        edit:
+          card:
+            nuntius_admin_layouts:
+              title: Layouts
+          metadata: Metadata
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                media: Media
+                metadata: Metadata
+                templates: Templates
+        index:
+          card:
+            nuntius_admin_layouts:
+              tab:
+                Nuntius layouts: Layouts
+              title: Layouts
+      lists:
+        edit:
+          card:
+            nuntius_admin_lists:
+              title: Lijsten
+          description_hint: Omschrijf de list in detail voor abonnees, leg uit of ze kunnen uitschrijven, hoe veel en hoe vaak berichten ze berichten ontvangen, etc.
+          tabs:
+            main:
+              tab:
+                edit: Edit
+                subscribers: Abonnees
+        index:
+          card:
+            nuntius_admin_lists:
+              title: Lijsten
+        subscribers:
+          edit:
+            subscribers: Abonnees
+      locales:
+        edit:
+          card:
+            nuntius_admin_locales:
+              title: Locales
+          data: Data
+          metadata: Metadata
+        index:
+          card:
+            nuntius_admin_locales:
+              tab:
+                Nuntius locales: Locales
+              title: Locales
+      messages:
+        index:
+          card:
+            nuntius_admin_messages:
+              tab:
+                Nuntius messages: Berichten
+              title: Berichten
+        resend:
+          resend_error: Het is niet gelukt het bericht opnieuw te sturen
+          resend_success: Bericht opnieuw verstuurd
+        show:
+          card:
+            nuntius_admin_messages:
+          info_item:
+            main:
+              attachments: Bijlagen
+              created_at: Created At
+              from: Van
+              html: HTML
+              last_sent_at: Last Sent At
+              provider: Provider
+              provider_id: Provider ID
+              refreshes: Refreshes
+              request_id: Request ID
+              status: Status
+              subject: Onderwerp
+              to: Aan
+              transport: Transport
+          message: Message
+          tabs:
+            main:
+              tab:
+                details: Details
+                preview: Preview
+      templates:
+        edit:
+          card:
+            nuntius_admin_templates:
+              title: Template
+          metadata: Metadata
+          tabs:
+            main:
+              tab:
+                edit: Bewerk
+                messages: Berichten
+        index:
+          card:
+            nuntius_admin_templates:
+              tab:
+                Nuntius templates: Templates
+              title: Templates
+    context_menu:
+      resend: Verstuur opnieuw
+      root: Root

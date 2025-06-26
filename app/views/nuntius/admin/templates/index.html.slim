@@ -1,2 +1,2 @@
-= sts.card title: t('.templates'), icon: 'fad fa-language', content_padding: false, menu: nuntius_templates_menu do |card|
-  = sts.table :nuntius_templates
+= sts.card :nuntius_admin_templates, icon: 'fad fa-file', content_padding: false, menu: nuntius_templates_menu do |card|
+  = sts.table :"nuntius/templates", custom_views: true

@@ -55,12 +55,16 @@ class Car < ApplicationRecord
 end
 ```
 
-Additionally you need to define an extension of the Nuntius::BaseMessenger for the same model with a matching name (in app/messengers):
+Additionally you need to define an extension of the Nuntius::BaseMessenger for the same model with a matching name (in app/messengers). Messengers can set extra parameters, but also manipulate templates selected.
 
 ```ruby
 class CarMessenger < Nuntius::BaseMessenger
   def your_event(car, params)
-    # your optional logic here
+    # your optional logic here, you could add attachments here
+    pdf = ApplicationController.renderer.new(http_host: object.account.hostname, https: true).render(template: "commercial_invoice/show", formats: [:pdf], assigns: {order: object})
+
+    attachments << {content: StringIO.new(pdf), content_type: "application/pdf", filename: "commercial_invoice.pdf"}
+    # Return false here if you don't want the message to be sent
   end
 end
 ```
@@ -105,6 +109,11 @@ timebased_scope class method like so:
 class CarMessenger < Nuntius::BaseMessenger
   # time_range is a range, for a before scope the time_range the interval is added to the current
   # time, the end of the range is 1 hour from the start.
+  # 
+  # So say the interval is "10 days", the timerange will be: 
+  # from: today +  10 days - 1 hour 
+  # until: today + 10 days
+  # So it basically selects all Car's with a tuneup_at within 10 days from now (in a 1 hour window)
   timebased_scope :before_tuneup do |time_range, metadata|
     cars = Car.where(tuneup_at: time_range)
     cars = cars.where(color: metadata['color']) if metadata['color'].present?
@@ -113,6 +122,11 @@ class CarMessenger < Nuntius::BaseMessenger
 
   # For an after scope the time_range the interval is taken from the current time, the end of the
   # range is 1 hour from its start.
+  #
+  # So say the interval is "10 days", the timerange will be: 
+  # from: today -  10 days - 1 hour 
+  # until: today - 10 days
+  # So it basically selects all Car's with a tuneup_at 10 days since now (in a 1 hour window)
   timebased_scope :after_tuneup do |time_range, metadata|
     cars = Car.where(tuneup_at: time_range)
     cars = cars.where(color: metadata['color']) if metadata['color'].present?
@@ -131,8 +145,12 @@ following formats:
 - N week(s)
 - N month(s)
 
-To send timebased messages you need to execute Nuntius::TimestampBasedMessagesRunner.call, you could do this
-in a cronjob every 5 minutes with "bundle exec rails runner Nuntius::TimestampBasedMessagesRunner.call"
+To send timebased messages you need to execute Nuntius::TimebasedEventsJob.perform, you could do this
+in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'".
+Beter even is using Sidekiq::Cron or GoodJob
+
+Nuntius will automatically prevent sending duplicates within the timerange you define. 
+It will also ONLY send messages for objects (the one in template class), created after you created this template, this prevents sending dozens of emails which may make no sense, when you add a new template.
 
 ### Direct
 
@@ -163,6 +181,10 @@ The main key of the hash passed will also be the liquid variable.
 
 ### Mail
 
+Outbound mail is handled through SMTP. We've only exposed the HTML of mail, we can create text-versions based on sanitized HTML. HTML allows for [Foundation for Emails](https://get.foundation/emails/docs/index.html). You will have to include the CSS in the layouts.
+
+In the layout you can add `<a href="{{message_url}}">Link to mail</a>` to provide a link to the online version of the message.
+
 #### AWS SES
 
 In case you use AWS SES, you can use the SNS Feedback Notifications to automatically mark messages as read, or deal with complaints and bounces. Create a AWS SNS topic, with a HTTPS subscription with the following URL (pattern):
@@ -183,11 +205,28 @@ The message body is specified using `text` and additionally supports the `payloa
 
 The payload is merged with the `text`, `to` (channel or user) and `from`.
 
+### Teams
+
+For Microsoft Teams you need to have the webhook URL for a channel. You right-click the channel (not the team) and click "Manage channel". 
+Then on the settings click "Edit" under "Manage the connectors that post to this channel", then search for "Incoming Webhook" and add it and configure it.
+You can give it a name and an image.
+
+See [Create Incoming Webhooks](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook?tabs=newteams%2Cdotnet) for details.
+
 ### SMS
 
 SMS just support the `from` (name or phone number), `to` (the phone) and `text` attribute.
 
-Only MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z).
+#### Twilio
+
+#### MessageBird (now Bird)
+
+MessageBird allows for names when sending SMS messages. Messagebird does not support a hypen in the name, just alphabetical characters (A-Za-z).
+The MessageBird API we use (REST) is now considered legacy by Bird, new signups are no longer possible. We don't recommend using MessageBird (Bird).
+
+#### smstools
+
+We have support for [smstools](https://www.smstools.nl). smstools supports names when sending SMS messages. 
 
 ### Voice
 
@@ -230,7 +269,7 @@ path: /code
 </Response>
 ```
 
-### Inbound (beta)
+### Inbound
 
 Inbound messages are also possible, currently mail/IMAP and Twilio inbound SMS are supported.
 This is done using message-boxes, for this to work you need to add a `message_boxes` folder to your `app` folder.
@@ -238,31 +277,43 @@ This is done using message-boxes, for this to work you need to add a `message_bo
 #### SMS
 
 Twilio is currently the only supported inbound SMS provider.
-
-Point twilio to you nuntius mount path (/messaging/inbound_messages/twilio_inbound_smses)
+Point Twilio to you nuntius mount path (/messaging/inbound_messages/twilio_inbound_smses)
 
 ```ruby
 class FooMessageBox < Nuntius::BaseMessageBox
   transport :sms
   provider :twilio
 
-  route({ /\+31.+/ => :dutchies })
+  route /\+31.+/, to: :dutchies
 end
 ```
 
 #### Mail
+Nuntius will look at a mailbox and for each of the mails will check whether it can find a route for it in any of the message-boxes. 
+After delivery, on the next round of fetching mail, nuntius will move processed message to the Archive folder 
 
 ```ruby
 class BarMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
 
-  settings {
-    host: 'imap.gmail.com',
+  settings({
+    address: 'imap.gmail.com',
     port: 993,
-    ssl: true,
-    username: 'foo,
-    password: 'bar'
-  }
+    user_name: '',
+    password: '',
+    authentication: '',
+    enable_ssl: false,
+    enable_starttls: false
+  })
+  
+  route to: :process
+  
+  def process
+    puts message.status # message is Nuntius's inbound message.
+    puts mail.to # mail gives you the Mail representation, when it's a mail (transport)
+  end
 end
 ```
+
+Add `Nuntius::RetrieveMailJob` to your cron.

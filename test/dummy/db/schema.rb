@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_26_093449) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -79,6 +79,18 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
   end
 
+  create_table "nuntius_events", force: :cascade do |t|
+    t.string "transitionable_type"
+    t.uuid "transitionable_id"
+    t.string "transition_attribute"
+    t.string "transition_event"
+    t.string "transition_from"
+    t.string "transition_to"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transitionable_type", "transitionable_id", "transition_event"], name: "index_nuntius_events_on_type_id_event"
+  end
+
   create_table "nuntius_inbound_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "status", default: "pending"
     t.string "transport"
@@ -111,6 +123,10 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "metadata", default: {}, null: false
+    t.text "description"
+    t.string "slug"
+    t.boolean "allow_unsubscribe", default: true, null: false
+    t.index ["slug"], name: "index_nuntius_lists_on_slug", unique: true
   end
 
   create_table "nuntius_locales", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -160,6 +176,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
     t.datetime "updated_at", null: false
     t.string "nuntiable_type"
     t.uuid "nuntiable_id"
+    t.datetime "unsubscribed_at", precision: nil
     t.index ["list_id"], name: "index_nuntius_subscribers_on_list_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_subscribers_on_nuntiable_type_and_nuntiable_id"
   end
@@ -184,8 +201,24 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_12_114148) do
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
   end
 
+  create_table "reports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "state"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "sti_bases", force: :cascade do |t|
     t.string "type"
+  end
+
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "state"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

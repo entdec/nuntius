@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'i18n/core_ext/hash'
+require "i18n/core_ext/hash"
 
 module Nuntius
   begin
-    require 'oj'
+    require "oj"
     class JSON
       class << self
         def encode(value)
@@ -17,12 +17,13 @@ module Nuntius
       end
     end
   rescue LoadError
-    require 'active_support/json'
+    require "active_support/json"
     JSON = ActiveSupport::JSON
   end
 
   class I18nStore
-    def initialize; end
+    def initialize
+    end
 
     def keys
       return [] unless template
@@ -82,7 +83,7 @@ module Nuntius
 
     def flat_hash(hash = {})
       (hash || {}).reduce({}) do |a, (k, v)|
-        tmp = v.is_a?(Hash) ? flat_hash(v).map { |k2, v2| ["#{k}.#{k2}", v2] }.to_h : { k => v }
+        tmp = v.is_a?(Hash) ? flat_hash(v).transform_keys { |k2| "#{k}.#{k2}" } : {k => v}
         a.merge(tmp)
       end
     end

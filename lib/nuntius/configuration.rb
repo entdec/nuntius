@@ -1,50 +1,76 @@
 # frozen_string_literal: true
 
 module Nuntius
+  module Options
+    module ClassMethods
+      def option(name, default: nil, proc: false)
+        attr_writer(name)
+        schema[name] = {default: default, proc: proc}
+
+        if schema[name][:proc]
+          define_method(name) do |*params|
+            value = instance_variable_get(:"@#{name}")
+            instance_exec(*params, &value)
+          end
+        else
+          define_method(name) do
+            instance_variable_get(:"@#{name}")
+          end
+        end
+      end
+
+      def schema
+        @schema ||= {}
+      end
+    end
+
+    def set_defaults!
+      self.class.schema.each do |name, options|
+        instance_variable_set(:"@#{name}", options[:default])
+      end
+    end
+
+    def self.included(cls)
+      cls.extend(ClassMethods)
+    end
+  end
+
   class Configuration
-    attr_accessor :admin_authentication_module, :base_controller, :base_runner, :layout, :admin_layout, :jobs_queue_name, :visible_scope, :add_metadata, :metadata_fields, :default_template_scope, :allow_custom_events, :active_storage_service
-    attr_writer :logger, :host, :metadata_humanize, :default_params
+    include Options
+
+    option :logger, default: -> { Rails.logger }, proc: true
+    option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
+    option :base_controller, default: "::ApplicationController"
+    option :layout, default: "application"
+    option :admin_layout, default: "application"
+    option :jobs_queue_name, default: "message"
+    option :allow_custom_events, default: false
+    option :active_storage_service
+    option :host, default: ->(message) {}, proc: true
+
+    attr_accessor :visible_scope, :add_metadata, :metadata_fields, :default_template_scope
+    attr_writer :metadata_humanize, :default_params, :flow_color
 
     attr_reader :transports, :providers
 
     def initialize
-      @logger = Logger.new(STDOUT)
-      @logger.level = Logger::INFO
-      @base_controller = '::ApplicationController'
-      @base_runner = 'Nuntius::BasicApplicationRunner'
+      set_defaults!
+
       @nuntiable_classes = []
       @nuntiable_class_names = []
       @transports = []
       @providers = {}
-      @jobs_queue_name = :message
       @visible_scope = -> { all }
       @add_metadata = -> {}
       @metadata_fields = {}
       @metadata_humanize = ->(data) { data.inspect }
       @default_template_scope = ->(_object) { all }
-      @allow_custom_events = false
-      @layout = 'application'
-      @admin_layout = 'application'
-      @active_storage_service = nil
-    end
-
-    # logger [Object].
-    def logger
-      @logger.is_a?(Proc) ? instance_exec(&@logger) : @logger
-    end
-
-    def host(message)
-      @host.is_a?(Proc) ? instance_exec(message, &@host) : @host
+      @default_params = {}
     end
 
     # Make the part that is important for visible readable for humans
     def metadata_humanize(metadata)
       @metadata_humanize.is_a?(Proc) ? instance_exec(metadata, &@metadata_humanize) : @metadata_humanize
-    end
-
-    # admin_mount_point [String].
-    def admin_mount_point
-      @admin_mount_point ||= '/nuntius'
     end
 
     def add_nuntiable_class(klass)
@@ -63,7 +89,7 @@ module Nuntius
         @providers[transport.to_sym] ||= []
         @providers[transport.to_sym].push(provider: provider, priority: priority, timeout: timeout, settings: settings)
       else
-        Nuntius.logger.warn "provider #{provider} not enabled as transport #{transport} is not enabled"
+        Nuntius.config.logger.call.warn "provider #{provider} not enabled as transport #{transport} is not enabled"
       end
     end
 
@@ -71,15 +97,19 @@ module Nuntius
       @transports.push(transport) if transport
     end
 
-    def default_params(transaction_log_entry)
-      @default_params.is_a?(Proc) ? instance_exec(transaction_log_entry, &@default_params) : @default_params
+    def default_params(event, record)
+      @default_params.is_a?(Proc) ? instance_exec(event, record, &@default_params) : @default_params
+    end
+
+    def flow_color(template_id)
+      @flow_color.is_a?(Proc) ? instance_exec(template_id, &@flow_color) : @flow_color
     end
 
     private
 
     def compile_nuntiable_class_names
       names = []
-      names << 'Custom' if allow_custom_events
+      names << "Custom" if allow_custom_events
 
       @nuntiable_classes.each do |klass_name|
         klass = klass_name.constantize
@@ -92,6 +122,24 @@ module Nuntius
 
     def compile_nuntiable_class_names!
       @nuntiable_class_names = compile_nuntiable_class_names
+    end
+  end
+
+  module Configurable
+    attr_writer :config
+
+    def config
+      @config ||= Configuration.new
+    end
+
+    def configure
+      yield(config)
+    end
+
+    alias_method :setup, :configure
+
+    def reset_config!
+      @config = Configuration.new
     end
   end
 end

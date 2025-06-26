@@ -7,10 +7,11 @@ module Nuntius
     included do
       raise "#{name} must be nuntiable" unless nuntiable?
 
-      orchestrator = Evento::Orchestrator.new(self)
-      orchestrator.define_event_methods_on(messenger, devise: true) { |object, options = {}| }
+      I18n.t('devise.mailer').keys.map(&:to_s).each do |event_name|
+        messenger.send(:define_method, event_name) { |object, options = {}| }
+      end
 
-      orchestrator.override_devise_notification do |notification, *devise_params|
+      define_method(:send_devise_notification) do |notification, *devise_params|
         # All notifications have either a token as the first param, or nothing
         Nuntius.event(notification, self, { token: devise_params.first })
       end

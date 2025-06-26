@@ -11,8 +11,8 @@ module Nuntius
         original_message = message
         message = message.dup
         message.parent_message = original_message
-        message.status = 'pending'
-        message.provider_id = ''
+        message.status = "pending"
+        message.provider_id = ""
       end
       message.provider = provider_name
       message.save!
@@ -24,8 +24,8 @@ module Nuntius
       # First refresh check is after 5 seconds
       if message.delivered_or_blocked?
         message.cleanup!
-      else
-        Nuntius::TransportRefreshJob.set(wait: 5).perform_later(provider_name, message) unless Rails.env.development?
+      elsif !Rails.env.development? && !Rails.env.test?
+        Nuntius::TransportRefreshJob.set(wait: 5).perform_later(provider_name, message)
       end
     end
   end

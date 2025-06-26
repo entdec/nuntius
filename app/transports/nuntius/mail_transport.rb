@@ -18,7 +18,7 @@ module Nuntius
       message.to = tos.first
       messages << message
 
-      tos[1..-1].each do |to|
+      tos[1..].each do |to|
         # FIXME: Sadly this also duplicates the attachments
         new_message = message.deep_dup
         new_message.to = to

@@ -26,3 +26,21 @@ two_recipients_with_translations:
   subject: "{{'.subject'|t}}"
   html: "<b>{{'.greeting'|t}}</b>"
   text: Hoi
+
+user_activate:
+  transport: mail
+  klass: User
+  event: activate
+  to: "{{user.email}}"
+  subject: "Subject"
+  html: "<b>Hoi</b>"
+  text: Hoi
+
+user_create:
+  transport: mail
+  klass: User
+  event: create
+  to: "{{user.email}}"
+  subject: "Subject"
+  html: "<b>Hoi</b>"
+  text: Hoi

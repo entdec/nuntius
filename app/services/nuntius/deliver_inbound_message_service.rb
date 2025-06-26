@@ -7,8 +7,9 @@ module Nuntius
     end
 
     def perform
-      context.inbound_message.update(status: 'delivered')
-      Nuntius::BaseMessageBox.deliver(context.inbound_message)
+      context.inbound_message.update!(status: "delivered")
+      result = Nuntius::BaseMessageBox.deliver(context.inbound_message)
+      context.inbound_message.update!(status: "processed") if result
     end
   end
 end

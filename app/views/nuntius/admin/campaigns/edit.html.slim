@@ -1,7 +1,9 @@
 - if @campaign.draft?
   = sts.form_for [:admin, @campaign] do |f|
-    = sts.card title: t('.campaign'), icon: 'fal fa-megaphone' do |card|
-      - card.action
+    = sts.card :nuntius_admin_campaigns, icon: 'fal fa-megaphone' do |card|
+      - card.with_action
+        = f.continue
+      - card.with_action
         = f.submit
 
       .grid.grid-cols-12.gap-4 data-controller="toggle"
@@ -25,25 +27,13 @@
           .col-span-12
             = f.input :subject
           .col-span-12
-            = f.input :html, as: :hidden
-            trix-editor input="campaign_html" style="background-color: #fff; height: 400px; margin-bottom: 20px;"
+            = f.rich_text :html
+          .col-span-12
+            = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
         template data-toggle-target='toggleable' data-toggle-value='voice'
           .col-span-12
             = f.input :text, as: :editor, mode: 'text/plain'
-
-
 - else
-  h2 = @campaign.name
-  p We're sending this campaign, you can no longer make any changes. This is the audience we're sending it to:
-
-  table.table
-    thead
-      tr
-        th Status
-        th To
-    tbody
-      - for message in @messages
-        tr
-          td = link_to message.status, admin_message_path(message)
-          td = message.to
+  = sts.card :nuntius_admin_campaigns, title: @campaign.name, description: 'We are sending or have sent this campaign, you can no longer make any changes.', icon: 'fal fa-megaphone', content_padding: false do |card|
+    = sts.table :"nuntius/campaign_messages", params: { campaign_id: @campaign.id }

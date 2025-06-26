@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nuntius
   class InboundMessage < ApplicationRecord
     has_one_attached :raw_message, service: Nuntius.config.active_storage_service

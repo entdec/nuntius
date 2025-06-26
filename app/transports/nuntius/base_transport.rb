@@ -3,7 +3,7 @@
 module Nuntius
   class BaseTransport
     def kind
-      self.class.name.demodulize.gsub(/Transport$/, '').underscore.to_sym
+      self.class.name.demodulize.gsub(/Transport$/, "").underscore.to_sym
     end
 
     def deliver(message)
@@ -15,7 +15,7 @@ module Nuntius
         providers_for_priority.each do |hash|
           message.update(provider: hash[:provider].to_s) if message.provider.blank?
 
-          Nuntius::TransportDeliveryJob.set(wait: !Rails.env.development? && wait_time).perform_later(hash[:provider].to_s, message)
+          Nuntius::TransportDeliveryJob.set(wait: !Rails.env.development? && !Rails.env.test? && wait_time).perform_later(hash[:provider].to_s, message)
           time_out += hash[:timeout].seconds if hash[:timeout].positive?
         end
         wait_time += time_out

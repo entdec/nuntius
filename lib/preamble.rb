@@ -9,11 +9,11 @@ class Preamble
 
   def initialize(metadata, content)
     @metadata = metadata
-    @content  = content
+    @content = content
   end
 
   def metadata_with_content
-    @metadata.to_yaml + "---\n" + @content
+    "#{@metadata.to_yaml}---\n#{@content}"
   end
 
   def dump
@@ -29,8 +29,8 @@ class Preamble
   end
 
   def self.parse(data)
-    preamble_lines = +''
-    content_lines  = +''
+    preamble_lines = +""
+    content_lines = +""
 
     state = :before_preamble
 
@@ -42,24 +42,24 @@ class Preamble
       when :before_preamble
 
         new_state = case stripped
-                    when '---'
-                      :preamble
-                    when ''
-                      :before_preamble
-                    else
-                      content_lines << line
-                      :after_preamble
-                    end
+        when "---"
+          :preamble
+        when ""
+          :before_preamble
+        else
+          content_lines << line
+          :after_preamble
+        end
 
       when :preamble
 
         new_state = case stripped
-                    when '---'
-                      :after_preamble
-                    else
-                      preamble_lines << line
-                      :preamble
-                    end
+        when "---"
+          :after_preamble
+        else
+          preamble_lines << line
+          :preamble
+        end
 
       when :after_preamble
         new_state = :after_preamble

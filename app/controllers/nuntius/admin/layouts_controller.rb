@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'nuntius/application_admin_controller'
+require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
   module Admin
@@ -31,6 +31,11 @@ module Nuntius
       def update
         @layout = Nuntius::Layout.visible.find(params[:id])
         @layout.update(layout_params)
+        if params[:layout][:attachments].present?
+          params[:layout][:attachments].each do |attachment|
+            @layout.attachments.attach(attachment)
+          end
+        end
         respond_with :admin, @layout
       end
 
@@ -43,7 +48,8 @@ module Nuntius
       private
 
       def layout_params
-        params.require(:layout).permit(:name, :data, :metadata_yaml)
+        permitted = %i[name data metadata_yaml]
+        params.require(:layout).permit(permitted)
       end
     end
   end

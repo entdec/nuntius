@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'mail'
+require "mail"
 
 module Nuntius
   class MailAllowList
@@ -14,7 +14,7 @@ module Nuntius
 
       mail_to = Mail::Address.new(email.downcase)
       allow_list_match = @allow_list.detect do |allow|
-        allow == (allow.include?('@') ? mail_to.to_s : mail_to.domain)
+        allow == (allow.include?("@") ? mail_to.to_s : mail_to.domain)
       end
 
       allow_list_match.present?

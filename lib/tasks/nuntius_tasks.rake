@@ -1,27 +1,13 @@
-# frozen_string_literal: true
-
-desc 'Release a new version'
 namespace :nuntius do
-  task :release do
-    version_file = './lib/nuntius/version.rb'
-    File.open(version_file, 'w') do |file|
-      file.puts <<~EOVERSION
-        # frozen_string_literal: true
-
-        module Nuntius
-          VERSION = '#{Nuntius::VERSION.split('.').map(&:to_i).tap { |parts| parts[2] += 1 }.join('.')}'
-        end
-      EOVERSION
+  namespace :tailwindcss do
+    desc "Configure your Tailwind CSS"
+    task :config do
+      Rails::Generators.invoke("nuntius:tailwind_config", ["--force"])
     end
-    module Nuntius
-      remove_const :VERSION
-    end
-    load version_file
-    puts "Updated version to #{Nuntius::VERSION}"
-
-    `git commit lib/nuntius/version.rb -m "Version #{Nuntius::VERSION}"`
-    `git push`
-    `git tag #{Nuntius::VERSION}`
-    `git push --tags`
   end
+end
+
+if Rake::Task.task_defined?("tailwindcss:build")
+  Rake::Task["tailwindcss:build"].enhance(["nuntius:tailwindcss:config"])
+  Rake::Task["tailwindcss:watch"].enhance(["nuntius:tailwindcss:config"])
 end
