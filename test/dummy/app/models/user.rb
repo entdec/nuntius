@@ -8,5 +8,5 @@ class User < ApplicationRecord
       transition active: :disabled
     end
   end
-  nuntiable use_state_machine: true
+  nuntiable use_state_machine: true, life_cycle: true
 end

@@ -35,3 +35,12 @@ user_activate:
   subject: "Subject"
   html: "<b>Hoi</b>"
   text: Hoi
+
+user_create:
+  transport: mail
+  klass: User
+  event: create
+  to: "{{user.email}}"
+  subject: "Subject"
+  html: "<b>Hoi</b>"
+  text: Hoi
