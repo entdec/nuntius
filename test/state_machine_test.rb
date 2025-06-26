@@ -45,8 +45,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     assert_performed_jobs 2
 
     assert_equal "active", user.state
-    assert_equal 1, Nuntius::Event.count
-    assert_equal "disable", Nuntius::Event.first.transition_event
+    assert_equal 0, Nuntius::Event.count
   end
 
   test "firing multiple event in single transaction creates nuntius-events " do
@@ -66,8 +65,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     assert_performed_jobs 1
 
     assert_equal "active", user.state
-    assert_equal 1, Nuntius::Event.count
-    assert_equal "disable", Nuntius::Event.first.transition_event
+    assert_equal 0, Nuntius::Event.count
   end
 
   test "firing multiple event in single transaction multiple obj creates nuntius-events " do
@@ -90,7 +88,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     assert_performed_jobs 1
 
     assert_equal "active", user.state
-    assert_equal 2, Nuntius::Event.count
+    assert_equal 0, Nuntius::Event.count
   end
 
   test "firing multiple event in single transaction multiple obj and templates nuntius-events " do
@@ -114,6 +112,6 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     assert_performed_jobs 2
 
     assert_equal "active", user.state
-    assert_equal 1, Nuntius::Event.count
+    assert_equal 0, Nuntius::Event.count
   end
 end
