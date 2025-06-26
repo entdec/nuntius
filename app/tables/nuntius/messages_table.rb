@@ -2,12 +2,20 @@
 
 module Nuntius
   class MessagesTable < Nuntius::ApplicationTable
+
     definition do
       model Nuntius::Message
 
       column(:to)
       column(:created_at)
       column(:last_sent_at)
+      action :resend do
+        link { |message| nuntius.resend_admin_message_path(message) }
+        icon "fal fa-rotate-right"
+        link_attributes data: {"turbo-confirm": "Are you sure you want to resend the message?", "turbo-method": :post}
+        show ->(message) { true }
+      end
+      
       column(:campaign_id) do
         render do
           html do |message|
