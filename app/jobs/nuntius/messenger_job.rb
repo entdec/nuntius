@@ -21,12 +21,9 @@ module Nuntius
     end
 
     def cleanup_nuntius_events
-      obj = job.arguments.first
-      event = job.arguments.second
-
       Nuntius::Event.where(
-        transitionable: obj,
-        transition_event: event.to_s
+        transitionable: arguments.first,
+        transition_event: arguments.second.to_s
       ).delete_all
     end
   end

@@ -31,15 +31,10 @@ module Nuntius
       end
 
       def dispatch_nuntius_events
-        # puts "Dispatching Nuntius events for #{self.class.name} with ID #{id}"
-        # puts "Nuntius::Event count: #{Nuntius::Event.count}"
-        # binding.break
         Nuntius::Event
           .where(transitionable: self)
           .includes(:transitionable)
           .select(:transition_event, :transitionable_type, :transitionable_id).distinct.each do |event|
-          # puts "Dispatching event: #{event.transition_event} for #{event.transitionable_type} with ID #{event.transitionable_id}"
-          # binding.break
           Nuntius.event(event.transition_event.to_sym, event.transitionable)
         end
       end

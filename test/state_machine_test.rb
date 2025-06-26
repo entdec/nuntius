@@ -6,7 +6,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   test "firing an event creates nuntius-events" do
-    user = User.create!(name: "test")
+    user = User.create!(name: "test", email: "test@example.com")
     assert_equal "pending", user.state
 
     perform_enqueued_jobs(only: [Nuntius::MessengerJob]) do
