@@ -12,17 +12,17 @@ module Nuntius
 
         state_machine do
           after_transition any => any do |object, transition|
-            return unless object.persisted?
-            return unless Nuntius.templates?(object, transition.event)
-            Nuntius::Event.find_or_create_by!(
-              transitionable_type: object.class.name,
-              transitionable_id: object.id,
-              # transitionable: object,
-              transition_event: transition.event.to_s,
-              transition_attribute: transition.attribute.to_s
-            ) do |event|
-              event.transition_from = transition.from.to_s
-              event.transition_to = transition.to.to_s
+            if object.persisted? && Nuntius.templates?(object, transition.event)
+              Nuntius::Event.find_or_create_by!(
+                transitionable_type: object.class.name,
+                transitionable_id: object.id,
+                # transitionable: object,
+                transition_event: transition.event.to_s,
+                transition_attribute: transition.attribute.to_s
+              ) do |event|
+                event.transition_from = transition.from.to_s
+                event.transition_to = transition.to.to_s
+              end
             end
           end
         end
