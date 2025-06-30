@@ -34,12 +34,14 @@ module Nuntius
       filtered_templates.each do |template|
         template.layout = override_layout(template.layout)
         msg = template.new_message(@object, liquid_context, params)
+        next unless msg.present?
+
         @attachments.each do |attachment|
           msg.add_attachment(attachment)
         end
 
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
-        transport.deliver(msg) if msg.to.present?
+        transport.deliver(msg)
       end
     end
 
