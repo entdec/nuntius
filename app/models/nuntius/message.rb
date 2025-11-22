@@ -69,7 +69,7 @@ module Nuntius
         # FIXME: This is a possible security problem
         attachment[:io] = File.open(uri.path)
       elsif uri
-        client = Faraday.new(ssl: {verify: false}) do |builder|
+        client = Faraday.new do |builder|
           builder.response :follow_redirects
           builder.adapter Faraday.default_adapter
         end
