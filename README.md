@@ -152,6 +152,48 @@ Beter even is using Sidekiq::Cron or GoodJob
 Nuntius will automatically prevent sending duplicates within the timerange you define. 
 It will also ONLY send messages for objects (the one in template class), created after you created this template, this prevents sending dozens of emails which may make no sense, when you add a new template.
 
+### Locales
+
+Nuntius supports locale support in it's mails. You can add locales for your emails per language:
+
+Add a locale with key `en`:
+```yaml
+en:
+  salutation: "Hello %{name}"
+```
+
+Then in your template you can do:
+```liquid
+{{'salutation' | t name: {{car.owner}} }}
+```
+
+### Metadata
+
+You can use metadata in your template to guide some text and information in your layout. 
+
+Say you need to change the header of an email, based on the template. In your layout you can then do this:
+
+```html
+<h2>{{template.metadata.header}}</h2>
+```
+
+And in you template metadata:
+
+```yaml
+header: You lost your password?
+```
+
+Say your layout has a logo image, which needs to change based on the brand of the car.
+In your layout html you can do the following, to grab
+
+```html
+<img src="{%render template.metadata.logo_url%}" alt="logo"/>
+```
+
+in your template metadata:
+```yaml
+logo_path: "{{car.brand.logo_path}}"
+```
 ### Direct
 
 Another more direct way of using Nuntius is by just instantiating a message:
