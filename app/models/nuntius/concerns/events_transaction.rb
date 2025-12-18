@@ -16,7 +16,6 @@ module Nuntius
               Nuntius::Event.find_or_create_by!(
                 transitionable_type: object.class.name,
                 transitionable_id: object.id,
-                # transitionable: object,
                 transition_event: transition.event.to_s,
                 transition_attribute: transition.attribute.to_s
               ) do |event|
@@ -32,7 +31,7 @@ module Nuntius
 
       def dispatch_nuntius_events
         Nuntius::Event
-          .where(transitionable: self)
+          .where(transitionable_type: self.class.name,transitionable_id: self.id,)
           .includes(:transitionable)
           .select(:transition_event, :transitionable_type, :transitionable_id).distinct.each do |event|
           Nuntius.event(event.transition_event.to_sym, event.transitionable)
