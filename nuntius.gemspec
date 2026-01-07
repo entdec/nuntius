@@ -23,7 +23,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "auxilium", "~> 3"
   s.add_runtime_dependency "aws-sdk-sns", "~> 1"
   s.add_runtime_dependency "fcm", "~> 1.0"
-  s.add_runtime_dependency "houston", "~> 2.4"
   s.add_runtime_dependency "faraday", ">= 2.9"
   s.add_runtime_dependency "faraday-follow_redirects", "~> 0"
   s.add_runtime_dependency "i18n", "~> 1.8.5"
