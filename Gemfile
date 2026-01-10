@@ -24,6 +24,7 @@ gem "sidekiq"
 group :test do
   gem "vcr", "~> 6.0", require: false
   gem "webmock", "~> 3.3", require: false
+  gem "minitest-mock"
 end
 
 gem "debug"
