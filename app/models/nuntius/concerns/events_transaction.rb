@@ -19,6 +19,7 @@ module Nuntius
                 transition_event: transition.event.to_s,
                 transition_attribute: transition.attribute.to_s
               ) do |event|
+                puts "Creating Nuntius::Event for #{object.class.name}##{object.id} - #{transition.event}"
                 event.transition_from = transition.from.to_s
                 event.transition_to = transition.to.to_s
               end
@@ -31,10 +32,15 @@ module Nuntius
 
       def dispatch_nuntius_events
         Nuntius::Event
-          .where(transitionable_type: self.class.name,transitionable_id: self.id,)
+          .where(transitionable_type: self.class.name, transitionable_id: id)
           .includes(:transitionable)
-          .select(:transition_event, :transitionable_type, :transitionable_id).distinct.each do |event|
+          .select(:transition_event, :transition_attribute, :transitionable_type, :transitionable_id).distinct.each do |event|
           Nuntius.event(event.transition_event.to_sym, event.transitionable)
+
+          # Immediately cleanup the events after dispatching
+          Nuntius::Event.where(transitionable_type: self.class.name, transitionable_id: id,
+            transition_event: event.transition_event.to_s,
+            transition_attribute: event.transition_attribute).delete_all
         end
       end
     end
