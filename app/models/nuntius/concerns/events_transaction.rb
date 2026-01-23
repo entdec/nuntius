@@ -19,7 +19,6 @@ module Nuntius
                 transition_event: transition.event.to_s,
                 transition_attribute: transition.attribute.to_s
               ) do |event|
-                puts "Creating Nuntius::Event for #{object.class.name}##{object.id} - #{transition.event}"
                 event.transition_from = transition.from.to_s
                 event.transition_to = transition.to.to_s
               end
