@@ -32,7 +32,7 @@ module Nuntius
       message.attachments << attachment
 
       PurgeMessageJob.perform_now(account_id, 6)
-      
+
       assert message.reload
       assert attachment.reload
     end
