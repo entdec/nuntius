@@ -55,6 +55,14 @@ module Nuntius
       status == "undelivered"
     end
 
+    def opened?
+      opened_at.present?
+    end
+
+    def clicked?
+      clicked_at.present?
+    end
+
     # Removes only pending child messages
     def cleanup!
       Nuntius::Message.where(status: "pending").where(parent_message: self).destroy_all
@@ -147,6 +155,10 @@ module Nuntius
       klass = BaseTransport.class_from_name(transport).new
       klass.deliver(self)
       self
+    end
+
+    def tracking_enabled?
+      template&.tracking_enabled?
     end
   end
 end

@@ -35,8 +35,10 @@
 
         .grid.grid-cols-12.gap-4 data-controller='toggle'
 
-          .col-span-12
+          .col-span-10
             = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { "data-toggle-target" => 'input' }
+          .col-span-2
+            = f.input :tracking_enabled, as: :switch
 
           .col-span-6
             = f.input :from

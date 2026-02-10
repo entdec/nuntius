@@ -45,7 +45,11 @@ module Nuntius
           charset: "UTF-8"
         )
         if message.html.present?
+          # Apply email tracking (tracking pixel and link wrapping)
+          Nuntius::EmailTrackingService.perform(message: message)
+
           message.html = message.html.gsub("{{message_url}}") { message_url(message) }
+
           p.html_part = Mail::Part.new(
             body: message.html,
             content_type: "text/html",
@@ -70,7 +74,7 @@ module Nuntius
 
       message.provider_id = mail.message_id
       message.status = "undelivered"
-      message.status = "sent" if Rails.env.test? ? true : response.success?
+      message.status = "sent" if Rails.env.test? || response.success?
       message.last_sent_at = Time.zone.now if message.sent?
 
       message

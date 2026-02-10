@@ -10,6 +10,10 @@ Nuntius::Engine.routes.draw do
 
   post "feedback/awssns" => "feedback#awssns"
 
+  # Email tracking routes
+  get "t/:message_id/p.gif", to: "tracking#p", as: :tracking_open
+  get "t/:message_id/link", to: "tracking#link", as: :tracking_click
+
   resources :messages
   resources :campaigns
   resources :subscribers do
