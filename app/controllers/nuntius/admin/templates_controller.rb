@@ -49,7 +49,7 @@ module Nuntius
       end
 
       def template_params
-        params.require(:template).permit(:enabled, :klass, :event, :interval, :transport, :description, :metadata_yaml, :payload, :from, :to, :subject, :layout_id, :html, :text, :payload)
+        params.require(:template).permit(:enabled, :klass, :event, :interval, :transport, :description, :metadata_yaml, :payload, :from, :to, :subject, :layout_id, :html, :text, :payload, :tracking_enabled)
       end
     end
   end

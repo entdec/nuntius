@@ -2,7 +2,6 @@
 
 module Nuntius
   class MessagesTable < Nuntius::ApplicationTable
-
     definition do
       model Nuntius::Message
 
@@ -15,7 +14,9 @@ module Nuntius
         link_attributes data: {"turbo-confirm": "Are you sure you want to resend the message?", "turbo-method": :post}
         show ->(message) { true }
       end
-      
+      column(:open_count)
+      column(:click_count)
+
       column(:campaign_id) do
         render do
           html do |message|
