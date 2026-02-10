@@ -12,8 +12,11 @@ Gem::Specification.new do |s|
   s.authors = ["Tom de Grunt"]
   s.email = ["tom@degrunt.nl"]
   s.homepage = "https://github.com/entdec/nuntius"
-  s.summary = "Messaging and notification for Ruby on Rails"
-  s.description = "Messages are defined in editable liquid templates."
+  s.summary = "Easily send emails, sms messages, teams & slack messages, and push notifications from your Rails app."
+  s.description = <<~DESCRIPTION
+    Messsages can be sent based on creating, updating, or destroying a record.
+    It also uses state-events to send messages based on state changes.
+  DESCRIPTION
   s.license = "MIT"
   s.required_ruby_version = Gem::Requirement.new(">= 2.6.5")
 
