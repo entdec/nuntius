@@ -10,6 +10,7 @@ require "nuntius/mail_allow_list"
 
 module Nuntius
   extend Configurable
+
   ROOT_PATH = Pathname.new(File.join(__dir__, ".."))
 
   class Error < StandardError; end
