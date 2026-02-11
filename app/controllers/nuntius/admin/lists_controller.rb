@@ -5,6 +5,8 @@ require_dependency "nuntius/application_admin_controller"
 module Nuntius
   module Admin
     class ListsController < ApplicationAdminController
+      before_action :set_objects, except: [:index]
+
       def index
         @lists = Nuntius::List.visible.order(:name)
       end
@@ -16,7 +18,7 @@ module Nuntius
 
       def create
         @list = Nuntius::List.create(list_params)
-        respond_with :admin, @list
+        respond_with :admin, @list, action: :edit
       end
 
       def show
@@ -24,18 +26,18 @@ module Nuntius
       end
 
       def edit
-        @list = Nuntius::List.visible.find(params[:id])
       end
 
       def update
-        @list = Nuntius::List.visible.find(params[:id])
         @list.update(list_params)
-        respond_with :admin, @list
+        respond_with :admin, @list, action: :edit
       end
 
       private
 
       def set_objects
+        @list = Nuntius::List.visible.find(params[:id]) if params[:id]
+        @list ||= Nuntius::List.new
       end
 
       def list_params

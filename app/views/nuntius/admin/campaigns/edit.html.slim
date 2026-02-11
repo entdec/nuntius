@@ -24,6 +24,10 @@
           .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
 
         template data-toggle-target='toggleable' data-toggle-value='mail'
+          .col-span-6
+            = f.input :link_tracking, as: :switch
+          .col-span-6
+            = f.input :open_tracking, as: :switch
           .col-span-12
             = f.input :subject
           .col-span-12

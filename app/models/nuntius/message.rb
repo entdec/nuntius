@@ -157,8 +157,12 @@ module Nuntius
       self
     end
 
-    def tracking_enabled?
-      template&.tracking_enabled?
+    def link_tracking_enabled?
+      template&.link_tracking? || campaign&.link_tracking?
+    end
+
+    def open_tracking_enabled?
+      template&.open_tracking? || campaign&.open_tracking?
     end
   end
 end

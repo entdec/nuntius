@@ -35,10 +35,8 @@
 
         .grid.grid-cols-12.gap-4 data-controller='toggle'
 
-          .col-span-10
+          .col-span-12
             = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: { "data-toggle-target" => 'input' }
-          .col-span-2
-            = f.input :tracking_enabled, as: :switch
 
           .col-span-6
             = f.input :from
@@ -52,6 +50,10 @@
             = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
           template data-toggle-target='toggleable' data-toggle-value='mail'
+            .col-span-6
+              = f.input :link_tracking, as: :switch
+            .col-span-6
+              = f.input :open_tracking, as: :switch
             .col-span-12
               = f.input :subject, as: :editor, mode: 'text/plain'
             .col-span-12
