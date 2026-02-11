@@ -10,36 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_26_093449) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
   enable_extension "uuid-ossp"
 
   create_table "accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name", null: false
-    t.string "record_type", null: false
-    t.uuid "record_id", null: false
     t.uuid "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.uuid "record_id", null: false
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
     t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
@@ -56,109 +56,109 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_093449) do
   end
 
   create_table "nuntius_attachments_messages", id: false, force: :cascade do |t|
-    t.uuid "message_id"
     t.uuid "attachment_id"
+    t.uuid "message_id"
     t.index ["attachment_id"], name: "index_nuntius_attachments_messages_on_attachment_id"
     t.index ["message_id"], name: "index_nuntius_attachments_messages_on_message_id"
   end
 
   create_table "nuntius_campaigns", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
-    t.string "transport", default: "mail"
-    t.uuid "list_id"
+    t.datetime "created_at", null: false
     t.string "from"
+    t.text "html"
+    t.uuid "layout_id"
+    t.uuid "list_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name"
+    t.string "state"
     t.string "subject"
     t.text "text"
-    t.text "html"
-    t.datetime "created_at", null: false
+    t.string "transport", default: "mail"
     t.datetime "updated_at", null: false
-    t.jsonb "metadata", default: {}, null: false
-    t.uuid "layout_id"
-    t.string "state"
     t.index ["layout_id"], name: "index_nuntius_campaigns_on_layout_id"
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
   end
 
-  create_table "nuntius_events", force: :cascade do |t|
-    t.string "transitionable_type"
-    t.uuid "transitionable_id"
+  create_table "nuntius_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.string "transition_attribute"
     t.string "transition_event"
     t.string "transition_from"
     t.string "transition_to"
-    t.datetime "created_at", null: false
+    t.uuid "transitionable_id"
+    t.string "transitionable_type"
     t.datetime "updated_at", null: false
     t.index ["transitionable_type", "transitionable_id", "transition_event"], name: "index_nuntius_events_on_type_id_event"
   end
 
   create_table "nuntius_inbound_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "status", default: "pending"
-    t.string "transport"
+    t.string "cc"
+    t.datetime "created_at", null: false
+    t.string "digest"
+    t.string "from"
+    t.text "html"
+    t.jsonb "metadata"
+    t.jsonb "payload"
     t.string "provider"
     t.string "provider_id"
-    t.string "from"
-    t.string "to"
-    t.string "cc"
+    t.string "status", default: "pending"
     t.string "subject"
-    t.text "html"
     t.text "text"
-    t.jsonb "payload"
-    t.jsonb "metadata"
-    t.string "digest"
-    t.datetime "created_at", null: false
+    t.string "to"
+    t.string "transport"
     t.datetime "updated_at", null: false
   end
 
   create_table "nuntius_layouts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
+    t.datetime "created_at", null: false
     t.text "data"
     t.jsonb "metadata", default: {}, null: false
-    t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
   create_table "nuntius_lists", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
-    t.integer "subscribers_count"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.jsonb "metadata", default: {}, null: false
-    t.text "description"
-    t.string "slug"
     t.boolean "allow_unsubscribe", default: true, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name"
+    t.string "slug"
+    t.integer "subscribers_count"
+    t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_nuntius_lists_on_slug", unique: true
   end
 
   create_table "nuntius_locales", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "key"
-    t.jsonb "data"
-    t.jsonb "metadata"
     t.datetime "created_at", null: false
+    t.jsonb "data"
+    t.string "key"
+    t.jsonb "metadata"
     t.datetime "updated_at", null: false
   end
 
   create_table "nuntius_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "template_id"
-    t.uuid "parent_message_id"
-    t.string "nuntiable_type"
+    t.uuid "campaign_id"
+    t.datetime "created_at", null: false
+    t.string "from"
+    t.text "html"
+    t.datetime "last_sent_at", precision: nil
+    t.jsonb "metadata", default: {}
     t.uuid "nuntiable_id"
-    t.integer "refreshes", default: 0
-    t.string "status", default: "pending"
-    t.string "transport"
+    t.string "nuntiable_type"
+    t.uuid "parent_message_id"
+    t.jsonb "payload"
     t.string "provider"
     t.string "provider_id"
+    t.integer "refreshes", default: 0
     t.string "request_id"
-    t.string "from"
-    t.string "to"
+    t.string "status", default: "pending"
     t.string "subject"
-    t.text "html"
+    t.uuid "template_id"
     t.text "text"
-    t.datetime "created_at", null: false
+    t.string "to"
+    t.string "transport"
     t.datetime "updated_at", null: false
-    t.uuid "campaign_id"
-    t.jsonb "payload"
-    t.jsonb "metadata", default: {}
-    t.datetime "last_sent_at", precision: nil
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
     t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
@@ -166,46 +166,46 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_093449) do
   end
 
   create_table "nuntius_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "list_id"
+    t.datetime "created_at", null: false
+    t.string "email"
     t.string "first_name"
     t.string "last_name"
-    t.string "email"
+    t.uuid "list_id"
+    t.uuid "nuntiable_id"
+    t.string "nuntiable_type"
     t.string "phone_number"
     t.string "tags"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "nuntiable_type"
-    t.uuid "nuntiable_id"
     t.datetime "unsubscribed_at", precision: nil
+    t.datetime "updated_at", null: false
     t.index ["list_id"], name: "index_nuntius_subscribers_on_list_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_subscribers_on_nuntiable_type_and_nuntiable_id"
   end
 
   create_table "nuntius_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "klass"
-    t.string "event"
-    t.string "transport"
-    t.string "description"
-    t.jsonb "metadata", default: {}, null: false
-    t.string "from"
-    t.string "to"
-    t.string "subject"
-    t.text "html"
-    t.text "text"
-    t.text "payload"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.uuid "layout_id"
+    t.string "description"
     t.boolean "enabled", default: true
+    t.string "event"
+    t.string "from"
+    t.text "html"
     t.string "interval"
+    t.string "klass"
+    t.uuid "layout_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.text "payload"
+    t.string "subject"
+    t.text "text"
+    t.string "to"
+    t.string "transport"
+    t.datetime "updated_at", null: false
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
   end
 
   create_table "reports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
-    t.string "email"
-    t.string "state"
     t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.string "state"
     t.datetime "updated_at", null: false
   end
 
@@ -214,10 +214,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_093449) do
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
-    t.string "email"
-    t.string "state"
     t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.string "state"
     t.datetime "updated_at", null: false
   end
 
