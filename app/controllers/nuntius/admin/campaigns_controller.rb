@@ -30,7 +30,7 @@ module Nuntius
       def update
         @campaign.update(campaign_params)
 
-        respond_with :admin, @campaign
+        respond_with :admin, @campaign, action: :edit
       end
 
       def publish
@@ -51,7 +51,7 @@ module Nuntius
       def campaign_params
         return unless params[:campaign]
 
-        params.require(:campaign).permit(:name, :transport, :layout_id, :list_id, :from, :subject, :text, :html, :metadata_yaml)
+        params.require(:campaign).permit(:name, :transport, :layout_id, :list_id, :from, :subject, :text, :html, :metadata_yaml, :open_tracking, :link_tracking)
       end
     end
   end
