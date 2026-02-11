@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_10_122500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -67,9 +67,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
     t.string "from"
     t.text "html"
     t.uuid "layout_id"
+    t.boolean "link_tracking", default: false
     t.uuid "list_id"
     t.jsonb "metadata", default: {}, null: false
     t.string "name"
+    t.boolean "open_tracking", default: false
     t.string "state"
     t.string "subject"
     t.text "text"
@@ -137,8 +139,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "nuntius_message_trackings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.integer "count", default: 0
+    t.datetime "created_at", null: false
+    t.uuid "message_id"
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["message_id"], name: "index_nuntius_message_trackings_on_message_id"
+  end
+
   create_table "nuntius_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "campaign_id"
+    t.integer "click_count", default: 0
+    t.datetime "clicked_at"
     t.datetime "created_at", null: false
     t.string "from"
     t.text "html"
@@ -146,6 +159,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
     t.jsonb "metadata", default: {}
     t.uuid "nuntiable_id"
     t.string "nuntiable_type"
+    t.integer "open_count", default: 0
+    t.datetime "opened_at"
     t.uuid "parent_message_id"
     t.jsonb "payload"
     t.string "provider"
@@ -191,7 +206,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
     t.string "interval"
     t.string "klass"
     t.uuid "layout_id"
+    t.boolean "link_tracking", default: false
     t.jsonb "metadata", default: {}, null: false
+    t.boolean "open_tracking", default: false
     t.text "payload"
     t.string "subject"
     t.text "text"
@@ -227,6 +244,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_23_160443) do
   add_foreign_key "nuntius_attachments_messages", "nuntius_messages", column: "message_id"
   add_foreign_key "nuntius_campaigns", "nuntius_layouts", column: "layout_id"
   add_foreign_key "nuntius_campaigns", "nuntius_lists", column: "list_id"
+  add_foreign_key "nuntius_message_trackings", "nuntius_messages", column: "message_id"
   add_foreign_key "nuntius_messages", "nuntius_campaigns", column: "campaign_id"
   add_foreign_key "nuntius_messages", "nuntius_messages", column: "parent_message_id"
   add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"

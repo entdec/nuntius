@@ -11,8 +11,9 @@ class AddTrackingToNuntiusMessages < ActiveRecord::Migration[7.0]
     add_column :nuntius_templates, :link_tracking, :boolean, default: false
 
     create_table :nuntius_message_trackings, id: :uuid do |t|
-      t.references :nuntius_message, type: :uuid, foreign_key: {to_table: :nuntius_messages}
+      t.references :message, type: :uuid, foreign_key: {to_table: :nuntius_messages}
       t.string :url
+      t.integer :count, default: 0
 
       t.timestamps
     end
