@@ -4,8 +4,8 @@ nl:
     attributes:
       nuntius/campaign:
         from: Van
-        layout: Layout
-        list: Lijst
+        layout_id: Layout
+        list_id: Lijst
         name: Naam
         state: Staat
         subject: Onderwerp
@@ -58,6 +58,7 @@ nl:
               title: Campagne
           metadata: Metadata
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
+          list_hint: "Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
         index:
           card:
             nuntius_admin_campaigns:

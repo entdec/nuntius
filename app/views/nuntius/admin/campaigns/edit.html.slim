@@ -15,7 +15,7 @@
         .col-span-4
           = f.association :layout, collection: @layouts
         .col-span-4
-          = f.association :list, collection: @lists
+          = f.association :list, collection: @lists, hint: t(".list_hint")
 
         .col-span-12
           = f.input :from, hint: t(".from_hint")

@@ -57,6 +57,7 @@ en:
             nuntius_admin_campaigns:
               title: Campaigns
           from_hint: "You can leave this blank, only fill this in if you want to override the default"
+          list_hint: "You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
           metadata: Metadata
         index:
           card:
