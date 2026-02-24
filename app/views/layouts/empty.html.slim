@@ -1,0 +1,21 @@
+head.h-full.bg-white
+  title= t(:app_name)
+  meta name="viewport" content="width=device-width, initial-scale=1.0"
+  meta name="turbo-prefetch" content="false"
+  = javascript_include_tag asset_url("fontawesome.js"), defer: true
+  = javascript_include_tag asset_url("solid.js"), defer: true
+  = javascript_include_tag asset_url("duotone.js"), defer: true
+  = javascript_include_tag asset_url("light.js"), defer: true    
+
+  = javascript_importmap_tags "application"
+  = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
+  = csrf_meta_tags
+  = csp_meta_tag
+  - if content_for?(:head)
+    = yield(:head)
+
+body
+  main
+    = yield
+
+  = render(Signum::Notifications::Component.new([request.session.id]))

@@ -18,7 +18,7 @@
           = f.association :list, collection: @lists
 
         .col-span-12
-          = f.input :from, hint: 'You can leave this blank, only fill this in if you want to override the default'
+          = f.input :from, hint: t(".from_hint")
 
         .col-span-12
           .grid.grid-cols-12.gap-4 data-toggle-target="insertion"

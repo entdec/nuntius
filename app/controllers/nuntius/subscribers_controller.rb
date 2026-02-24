@@ -5,6 +5,7 @@ require_dependency "nuntius/application_controller"
 module Nuntius
   class SubscribersController < ApplicationController
     # skip_before_action :authenticate_user!, only: %i[show destroy]
+    layout "empty"
 
     def show
       @subscriber = Nuntius::Subscriber.find_by(id: params[:id])
@@ -19,14 +20,15 @@ module Nuntius
     def subscribe
       @subscriber = Nuntius::Subscriber.find(params[:id])
       @subscriber.update(unsubscribed_at: nil)
-      flash[:notice] = "Subscription has been restored."
+      Signum.success(request.session.id, text: "Subscription has been restored.")
+
       redirect_to nuntius.subscriber_path(@subscriber), status: :see_other
     end
 
     def unsubscribe
       @subscriber = Nuntius::Subscriber.find(params[:id])
       @subscriber.touch(:unsubscribed_at)
-      flash[:notice] = "Subscription has been removed."
+      Signum.success(request.session.id, text: "Subscription has been removed.")
       redirect_to nuntius.subscriber_path(@subscriber), status: :see_other
     end
   end
