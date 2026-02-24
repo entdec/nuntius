@@ -34,3 +34,12 @@
         = info.with_item :refreshes, content: @message.refreshes, class: "sm:col-span-1"
         = info.with_item :last_sent_at, content: ln(@message.last_sent_at), class: "sm:col-span-1", icon: 'fal fa-envelope'
         = info.with_item :created_at, content: ln(@message.created_at), class: "sm:col-span-1", icon: 'fal fa-calendar'
+        - if @message.link_tracking_enabled?
+          = info.with_item :click_count, content: @message.click_count, class: "sm:col-span-1"
+        - if @message.open_tracking_enabled?
+          = info.with_item :open_count, content: @message.open_count, class: "sm:col-span-1"
+  
+  - if @message.link_tracking_enabled? || @message.open_tracking_enabled?
+    - card.with_tab:tracking
+      = sts.table :"nuntius/message_trackings", params: {message_id: @message.id}
+

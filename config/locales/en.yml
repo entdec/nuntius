@@ -140,12 +140,15 @@ en:
               subject: Subject
               to: To
               transport: Transport
+              click_count: Click Count
+              open_count: Open Count
           message: Message
           tabs:
             main:
               tab:
                 details: Details
                 preview: Preview
+                tracking: Tracking
       templates:
         edit:
           card:
