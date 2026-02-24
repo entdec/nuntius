@@ -1,4 +1,5 @@
 nl:
+  subscriber_url_text: "Klik hier om uit te schrijven"
   choose_files: Kies bestanden
   activerecord:
     attributes:

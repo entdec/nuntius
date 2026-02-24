@@ -22,13 +22,16 @@ module Nuntius
     end
 
     def new_message(subscriber, assigns = {})
+      message = Nuntius::Message.create!(transport: campaign.transport, campaign: campaign, nuntiable: subscriber.nuntiable, metadata: campaign.metadata)
+
       assigns["campaign"] = context.campaign
       assigns["subscriber"] = subscriber
+      assigns["subscriber_link"] = subscriber_link(subscriber, message)
+
       if subscriber.nuntiable
         name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
         assigns[name] = subscriber.nuntiable
       end
-      message = Nuntius::Message.new(transport: campaign.transport, campaign: campaign, nuntiable: subscriber.nuntiable, metadata: campaign.metadata)
 
       locale = nil
       if subscriber.nuntiable
@@ -49,6 +52,7 @@ module Nuntius
       message.subject = render(:subject, assigns, locale)
       message.html = render(:html, assigns, locale, layout: campaign.layout&.data)
 
+      message.save!
       message
     end
 
@@ -56,6 +60,11 @@ module Nuntius
       scope = %w[nuntius]
       scope << campaign.layout.name.underscore.tr(" ", "_") if layout
       scope.join(".")
+    end
+
+    def subscriber_link(subscriber, message)
+      url = Nuntius::Engine.routes.url_helpers.subscriber_url(subscriber, host: Nuntius.config.host(message))
+      "<a href=\"#{url}\" data-nuntius-tracking=\"false\">#{t("subscriber_url_text")}</a>"
     end
 
     private

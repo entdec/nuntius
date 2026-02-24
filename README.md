@@ -230,6 +230,8 @@ In the layout you can add `<a href="{{message_url}}">Link to mail</a>` to provid
 Nuntius supports email tracking, to enable this, you need to enable tracking for a template.
 Nuntius will then inject a tracking pixel and track clicks on links.
 
+Per link you can disable tracking by adding `data-nuntius-tracking="false"` to the link.
+
 #### AWS SES
 
 In case you use AWS SES, you can use the SNS Feedback Notifications to automatically mark messages as read, or deal with complaints and bounces. Create a AWS SNS topic, with a HTTPS subscription with the following URL (pattern):

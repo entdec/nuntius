@@ -1,4 +1,5 @@
 en:
+  subscriber_url_text: "Click here to unsubscribe"
   choose_files: Choose files
   activerecord:
     attributes:
