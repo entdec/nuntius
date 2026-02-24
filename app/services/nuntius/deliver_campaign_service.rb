@@ -11,7 +11,7 @@ module Nuntius
 
     def perform
       deliver
-      # campaign.sent!
+      campaign.sent!
     end
 
     def deliver
