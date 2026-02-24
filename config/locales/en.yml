@@ -10,6 +10,7 @@ en:
         state: Staat
         subject: Subject
         transport: Transport
+        html: Body
       nuntius/layout:
         name: Name
       nuntius/list:
@@ -55,6 +56,7 @@ en:
           card:
             nuntius_admin_campaigns:
               title: Campaigns
+          from_hint: "You can leave this blank, only fill this in if you want to override the default"
           metadata: Metadata
         index:
           card:

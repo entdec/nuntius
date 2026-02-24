@@ -10,6 +10,7 @@ nl:
         state: Staat
         subject: Onderwerp
         transport: Transport
+        html: Body
       nuntius/layout:
         name: Naam
       nuntius/list:
@@ -56,6 +57,7 @@ nl:
             nuntius_admin_campaigns:
               title: Campagne
           metadata: Metadata
+          from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
         index:
           card:
             nuntius_admin_campaigns:
