@@ -85,4 +85,4 @@
 
       - if @template.messages.exists?
         - card.with_tab :messages, padding: false
-          = sts.table :"nuntius/messages", filters: { template_id: @template.id }
+          = sts.table :"nuntius/messages", params: { template_id: @template.id }

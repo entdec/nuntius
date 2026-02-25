@@ -25,4 +25,4 @@
 
     - if @layout.templates.exists?
       - card.with_tab :templates, padding: false
-        = sts.table :"nuntius/templates", filters: { layout_id: @layout.id }
+        = sts.table :"nuntius/templates", params: { layout_id: @layout.id }

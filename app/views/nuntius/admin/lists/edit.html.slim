@@ -19,4 +19,4 @@
 
     - if @list.subscribers.exists?
       - card.with_tab :subscribers, padding: false
-        = sts.table :"nuntius/subscribers", filters: { list_id: @list.id }
+        = sts.table :"nuntius/subscribers", params: { list_id: @list.id }
