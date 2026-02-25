@@ -60,6 +60,15 @@ nl:
           metadata: Metadata
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
           list_hint: "Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
+          tabs:
+            main:
+              tab:
+                statistics: Statistieken
+                messages: Berichten
+          messages_sent: Berichten verzonden
+          messages_not_sent: Berichten niet verzonden
+          messages_opened: Berichten geopend
+          messages_clicked: Berichten geklikt
         index:
           card:
             nuntius_admin_campaigns:

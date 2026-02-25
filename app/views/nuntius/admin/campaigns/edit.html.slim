@@ -39,5 +39,31 @@
           .col-span-12
             = f.input :text, as: :editor, mode: 'text/plain'
 - else
-  = sts.card :nuntius_admin_campaigns, title: @campaign.name, description: 'We are sending or have sent this campaign, you can no longer make any changes.', icon: 'fal fa-megaphone', content_padding: false do |card|
-    = sts.table :"nuntius/campaign_messages", params: { campaign_id: @campaign.id }
+  = sts.card :nuntius_admin_campaigns, title: @campaign.name, icon: 'fal fa-megaphone', content_padding: false do |card|
+    - card.with_tab :statistics, padding: true do |tab|
+      .grid.grid-cols-4.gap-4
+        .col-span-4
+          dl.grid.grid-cols-4.gap-1.overflow-hidden.rounded-2xl.text-center.sm:grid-cols-4.lg:grid-cols-4
+            .flex.flex-col.bg-gray-200.p-8
+              dt.text-sm.font-semibold.leading-6.text-gray-600
+                = t(".messages_sent")
+              dd.order-first.text-3xl.font-semibold.tracking-tight.text-gray-900
+                = @campaign.messages.where(status: "sent").count
+            .flex.flex-col.bg-gray-200.p-8
+              dt.text-sm.font-semibold.leading-6.text-gray-600
+                = t(".messages_not_sent") 
+              dd.order-first.text-3xl.font-semibold.tracking-tight.text-gray-900
+                = @campaign.messages.where.not(status: "sent").count
+            .flex.flex-col.bg-gray-200.p-8
+              dt.text-sm.font-semibold.leading-6.text-gray-600
+                = t(".messages_opened")
+              dd.order-first.text-3xl.font-semibold.tracking-tight.text-gray-900
+                = @campaign.messages.where("open_count >= 1").count
+            .flex.flex-col.bg-gray-200.p-8
+              dt.text-sm.font-semibold.leading-6.text-gray-600
+                = t(".messages_clicked")
+              dd.order-first.text-3xl.font-semibold.tracking-tight.text-gray-900
+                = @campaign.messages.where("click_count >= 1").count
+        
+    - card.with_tab :messages, padding: false do |tab|
+      = sts.table :"nuntius/campaign_messages", params: { campaign_id: @campaign.id }

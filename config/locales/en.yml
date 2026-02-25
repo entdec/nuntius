@@ -60,6 +60,15 @@ en:
           from_hint: "You can leave this blank, only fill this in if you want to override the default"
           list_hint: "You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
           metadata: Metadata
+          tabs:
+            main:
+              tab:
+                statistics: Statistics
+                messages: Messages
+          messages_sent: Messages sent
+          messages_not_sent: Messages not sent
+          messages_opened: Messages opened
+          messages_clicked: Messages clicked
         index:
           card:
             nuntius_admin_campaigns:
