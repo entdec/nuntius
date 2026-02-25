@@ -2,10 +2,14 @@
 
 module Nuntius
   class Subscriber < ApplicationRecord
+    include Nuntius::Concerns::Yamlify
+
     belongs_to :list, counter_cache: :subscribers_count
     belongs_to :nuntiable, polymorphic: true, optional: true
 
     scope :subscribed, -> { where(unsubscribed_at: nil) }
+
+    yamlify :metadata
 
     def name
       [first_name, last_name].compact.join(" ").presence || email

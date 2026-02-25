@@ -110,6 +110,7 @@ en:
               title: Lists
         subscribers:
           edit:
+            metadata: Metadata
             subscribers: Subscribers
       locales:
         edit:

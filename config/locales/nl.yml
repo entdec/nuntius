@@ -123,6 +123,7 @@ nl:
               title: Lijsten
         subscribers:
           edit:
+            metadata: Metadata
             subscribers: Abonnees
       locales:
         edit:

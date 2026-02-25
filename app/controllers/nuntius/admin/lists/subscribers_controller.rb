@@ -38,7 +38,7 @@ module Nuntius
         private
 
         def subscriber_params
-          params.require(:subscriber).permit(:first_name, :last_name, :email, :phone_number, tags: [])
+          params.require(:subscriber).permit(:first_name, :last_name, :email, :phone_number, :metadata_yaml, tags: [])
         end
 
         def set_objects
