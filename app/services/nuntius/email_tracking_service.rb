@@ -41,9 +41,6 @@ module Nuntius
       doc = Nokogiri::HTML.fragment(html)
 
       doc.css("a[href]").each do |link|
-        puts "*" * 80
-        puts link["data-nuntius-tracking"]
-        puts "*" * 80
         next if link["data-nuntius-tracking"] == "false"
 
         original_url = link["href"]
