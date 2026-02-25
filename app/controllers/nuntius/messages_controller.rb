@@ -13,9 +13,7 @@ module Nuntius
 
     # GET /messages/:message_id/pixel.gif
     def pixel
-      return if request.env["HTTP_REFERER"].to_s.include?(Nuntius.config.host(@message))
-
-      if @message&.open_tracking_enabled?
+      if external? && @message&.open_tracking_enabled?
         # Record the first open time
         @message.opened_at ||= Time.current
         @message.open_count = (@message.open_count || 0) + 1
@@ -28,11 +26,9 @@ module Nuntius
 
     # GET /messages/:message_id/link?url=...
     def link
-      return if request.env["HTTP_REFERER"].to_s.include?(Nuntius.config.host(@message))
-
       url = params[:url]
 
-      if @message&.link_tracking_enabled? && url.present?
+      if external? && @message&.link_tracking_enabled? && url.present?
         # Record the first click time
         @message.clicked_at ||= Time.current
         @message.click_count = (@message.click_count || 0) + 1
@@ -52,6 +48,10 @@ module Nuntius
     end
 
     private
+
+    def external?
+      request.env["HTTP_REFERER"].to_s.include?(Nuntius.config.host(@message))
+    end
 
     def set_objects
       @message = Nuntius::Message.find(params[:id])
