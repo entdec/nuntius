@@ -7,6 +7,7 @@ nl:
         from: Van
         layout_id: Layout
         list_id: Lijst
+        list_name: Lijst naam
         name: Naam
         state: Staat
         subject: Onderwerp
@@ -29,6 +30,17 @@ nl:
         subject: Onderwerp
         to: Aan
         transport: Transport
+        messages_count: Aantal berichten
+      nuntius/message:
+        to: Aan
+        from: Van
+        subject: Onderwerp
+        transport: Transport
+        last_sent_at: Laatste keer verzonden
+        open_count: Aantal geopend
+        click_count: Aantal geklikt
+        campaign_id: Campagne
+        created_at: Aangemaakt om
     models:
       campaign: Campagne
       layout: Layout
