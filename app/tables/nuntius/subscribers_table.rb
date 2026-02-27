@@ -61,6 +61,8 @@ module Nuntius
 
     def scope
       @scope = Nuntius::Subscriber.all
+      @scope = @scope.where(list_id: params[:list_id]) if params[:list_id].present?
+      @scope
     end
   end
 end
