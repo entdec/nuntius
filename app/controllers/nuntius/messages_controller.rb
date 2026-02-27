@@ -50,7 +50,7 @@ module Nuntius
     private
 
     def external?
-      request.env["HTTP_REFERER"].to_s.include?(Nuntius.config.host(@message))
+      !request.env["HTTP_REFERER"].to_s.include?(Nuntius.config.host(@message))
     end
 
     def set_objects
