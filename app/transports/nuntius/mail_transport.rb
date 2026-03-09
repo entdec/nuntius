@@ -10,9 +10,7 @@ module Nuntius
 
       message.request_id = SecureRandom.uuid
 
-      return if message.to.blank?
-
-      tos = message.to.split(/[\s;,]+/)
+      tos = message.to.to_s.split(/[\s;,]+/)
 
       messages = []
       message.to = tos.first

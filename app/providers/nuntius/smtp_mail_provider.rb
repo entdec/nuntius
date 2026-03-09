@@ -17,6 +17,7 @@ module Nuntius
     def deliver
       return block unless MailAllowList.new(settings[:allow_list]).allowed?(message.to)
       return block if Nuntius::Message.where(status: %w[complaint bounced], to: message.to).count >= 1
+      return no_recipients if message.to.blank?
 
       mail = if message.from.present?
         Mail.new(sender: from_header, from: message.from)
@@ -82,6 +83,11 @@ module Nuntius
 
     def block
       message.status = "blocked"
+      message
+    end
+
+    def no_recipients
+      message.status = "no_recipients"
       message
     end
 
