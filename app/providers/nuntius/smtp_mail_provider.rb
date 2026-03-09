@@ -15,9 +15,9 @@ module Nuntius
     setting_reader :ssl, required: false, default: false, description: "Whether to use SSL or not"
 
     def deliver
+      return no_recipient if message.to.blank?
       return block unless MailAllowList.new(settings[:allow_list]).allowed?(message.to)
       return block if Nuntius::Message.where(status: %w[complaint bounced], to: message.to).count >= 1
-      return no_recipients if message.to.blank?
 
       mail = if message.from.present?
         Mail.new(sender: from_header, from: message.from)
@@ -86,8 +86,8 @@ module Nuntius
       message
     end
 
-    def no_recipients
-      message.status = "no_recipients"
+    def no_recipient
+      message.status = "no_recipient"
       message
     end
 
