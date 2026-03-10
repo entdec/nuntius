@@ -1,5 +1,5 @@
 nl:
-  subscriber_url_text: "Klik hier om uit te schrijven"
+  subscriber_url_text: "Klik hier om je uit te schrijven"
   choose_files: Kies bestanden
   activerecord:
     attributes:
@@ -193,6 +193,10 @@ nl:
               tab:
                 Nuntius templates: Templates
               title: Templates
+    subscribers:
+      show:
+        unsubscribe: Uitschrijven
+        resubscribe: Opnieuw inschrijven
     context_menu:
       resend: Verstuur opnieuw
       root: Root

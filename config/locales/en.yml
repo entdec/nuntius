@@ -178,6 +178,10 @@ en:
               tab:
                 Nuntius templates: Templates
               title: Templates
+    subscribers:
+      show:
+        unsubscribe: Unsubscribe
+        resubscribe: Resubscribe
     context_menu:
       resend: Resend
       root: Root
