@@ -5,6 +5,7 @@ require_dependency "nuntius/application_controller"
 module Nuntius
   class SubscribersController < ApplicationController
     # skip_before_action :authenticate_user!, only: %i[show destroy]
+    skip_before_action :verify_authenticity_token, only: :unsubscribe
     layout "empty"
 
     def show

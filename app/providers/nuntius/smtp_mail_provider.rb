@@ -25,6 +25,13 @@ module Nuntius
         Mail.new(from: from_header)
       end
 
+      mail.header["X-Nuntius-Message-Id"] = message.id
+
+      if message.campaign.present? && message.subscriber.present?
+        mail.header["List-Unsubscribe"] = "<" + message.subscriber.unsubscribe_link(message.campaign, message) + ">"
+        mail.header["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+      end
+
       if Rails.env.test?
         mail.delivery_method :test
       else

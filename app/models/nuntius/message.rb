@@ -18,6 +18,8 @@ module Nuntius
     belongs_to :campaign, optional: true
     belongs_to :template, optional: true
     belongs_to :parent_message, class_name: "Message", optional: true
+    belongs_to :subscriber, optional: true
+
     has_many :child_messages, class_name: "Message", foreign_key: "parent_message_id", dependent: :destroy
     has_many :message_trackings, class_name: "MessageTracking", dependent: :destroy
 

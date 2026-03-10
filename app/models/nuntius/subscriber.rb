@@ -32,5 +32,15 @@ module Nuntius
 
       super
     end
+
+    def link(campaign, message, tag: true)
+      link_text = campaign.metadata["subscriber_url_text"] || I18n.t("subscriber_url_text")
+      url = Nuntius::Engine.routes.url_helpers.subscriber_url(self, host: Nuntius.config.host(message), protocol: "https")
+      tag ? "<a href=\"#{url}\" data-nuntius-tracking=\"false\">#{link_text}</a>" : url
+    end
+
+    def unsubscribe_link(campaign, message)
+      Nuntius::Engine.routes.url_helpers.unsubscribe_subscriber_url(self, host: Nuntius.config.host(message), protocol: "https")
+    end
   end
 end

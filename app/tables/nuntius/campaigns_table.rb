@@ -25,7 +25,7 @@ module Nuntius
         show ->(campaign) { campaign.transport != "sms" && campaign.can_publish? }
         link { |campaign| campaign.can_publish? ? nuntius.publish_admin_campaign_path(campaign) : nil }
         icon "fa-solid fa-paper-plane"
-        link_attributes data: {"turbo-confirm": "Are you sure you want to send out this campaign?", "turbo-method": :post}
+        link_attributes data: {"turbo-confirm": t(".campaign_publish_confirm"), "turbo-method": :post}
       end
 
       order name: :asc
