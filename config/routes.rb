@@ -20,7 +20,9 @@ Nuntius::Engine.routes.draw do
   resources :campaigns
   resources :subscribers do
     member do
+      get :unsubscribe
       post :unsubscribe
+      get :subscribe
       post :subscribe
     end
   end
