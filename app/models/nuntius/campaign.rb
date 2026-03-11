@@ -24,7 +24,7 @@ module Nuntius
       end
 
       after_transition(on: :publish) do |campaign, transition|
-        DeliverCampaignService.perform(campaign: campaign)
+        DeliverCampaignService.perform_later(campaign: campaign)
       end
     end
   end
