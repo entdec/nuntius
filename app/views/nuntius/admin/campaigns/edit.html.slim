@@ -24,10 +24,12 @@
           .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
 
         template data-toggle-target='toggleable' data-toggle-value='mail'
-          .col-span-6
+          .col-span-4
             = f.input :link_tracking, as: :switch
-          .col-span-6
+          .col-span-4
             = f.input :open_tracking, as: :switch
+          .col-span-4
+            = f.input :publish_at, as: :date_time
           .col-span-12
             = f.input :subject
           .col-span-12
@@ -51,7 +53,7 @@
                 = @campaign.messages.where(status: "sent").count
             .flex.flex-col.bg-gray-200.p-8
               dt.text-sm.font-semibold.leading-6.text-gray-600
-                = t(".messages_not_sent") 
+                = t(".messages_not_sent")
               dd.order-first.text-3xl.font-semibold.tracking-tight.text-gray-900
                 = @campaign.messages.where.not(status: "sent").count
             .flex.flex-col.bg-gray-200.p-8
@@ -64,6 +66,6 @@
                 = t(".messages_clicked")
               dd.order-first.text-3xl.font-semibold.tracking-tight.text-gray-900
                 = @campaign.messages.where("click_count >= 1").count
-        
+
     - card.with_tab :messages, padding: false do |tab|
       = sts.table :"nuntius/campaign_messages", params: { campaign_id: @campaign.id }

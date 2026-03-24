@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_25_123822) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_140324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -72,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_123822) do
     t.jsonb "metadata", default: {}, null: false
     t.string "name"
     t.boolean "open_tracking", default: false
+    t.datetime "publish_at"
     t.string "state"
     t.string "subject"
     t.text "text"
@@ -169,6 +170,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_123822) do
     t.string "request_id"
     t.string "status", default: "pending"
     t.string "subject"
+    t.uuid "subscriber_id"
     t.uuid "template_id"
     t.text "text"
     t.string "to"
@@ -177,6 +179,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_123822) do
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
     t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
+    t.index ["subscriber_id"], name: "index_nuntius_messages_on_subscriber_id"
     t.index ["template_id"], name: "index_nuntius_messages_on_template_id"
   end
 
@@ -248,6 +251,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_123822) do
   add_foreign_key "nuntius_message_trackings", "nuntius_messages", column: "message_id"
   add_foreign_key "nuntius_messages", "nuntius_campaigns", column: "campaign_id"
   add_foreign_key "nuntius_messages", "nuntius_messages", column: "parent_message_id"
+  add_foreign_key "nuntius_messages", "nuntius_subscribers", column: "subscriber_id"
   add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"
   add_foreign_key "nuntius_subscribers", "nuntius_lists", column: "list_id"
   add_foreign_key "nuntius_templates", "nuntius_layouts", column: "layout_id"

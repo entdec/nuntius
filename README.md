@@ -364,3 +364,10 @@ end
 ```
 
 Add `Nuntius::RetrieveMailJob` to your cron.
+
+## Campaigns
+
+Campaigns allows you to bulk send many mails to subscribers.
+We support multiple lists with many subscribers.
+
+You can manually publish the campaign or have Nuntius publish the campaign after a certain date/time. If you want to have Nuntius publish it for you, add `Nuntius::CampaignPublishJob` to your cron.
