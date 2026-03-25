@@ -65,6 +65,8 @@ module Nuntius
       end
     end
 
+    nuntiable use_state_machine: true
+
     def delivered_or_blocked?
       delivered? || blocked?
     end
