@@ -50,7 +50,7 @@ module Nuntius
           end
         end
       end
-      column(:status)
+      column(:state)
 
       order created_at: :desc
 

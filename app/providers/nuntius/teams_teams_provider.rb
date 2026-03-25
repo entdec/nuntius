@@ -13,10 +13,10 @@ module Nuntius
       args = (message.payload || {}).merge(text: message.text)
       response = Faraday.post(message[:to], JSON.dump(args), {"Content-Type": "application/json"})
 
-      message.status = if response.status == 200
-        "sent"
+      if response.status == 200
+        message.sent
       else
-        "undelivered"
+        message.undelivered
       end
 
       message

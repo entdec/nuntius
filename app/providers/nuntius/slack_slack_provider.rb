@@ -24,10 +24,10 @@ module Nuntius
       args = (message.payload || {}).merge(channel: message[:to], text: message.text, as_user: true, username: message[:from])
       response = client.chat_postMessage(args.deep_symbolize_keys)
 
-      message.status = if response["ok"]
-        "sent"
+      if response["ok"]
+        message.sent
       else
-        "undelivered"
+        message.undelivered
       end
 
       message

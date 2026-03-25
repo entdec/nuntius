@@ -14,10 +14,10 @@ module Nuntius
       options = (message.payload || {}).merge(data: {body: message.text})
       response = fcm.send([message.to], options)
 
-      message.status = if response[:status_code] != 200 || response[:response] != "success"
-        "undelivered"
+      if response[:status_code] != 200 || response[:response] != "success"
+        message.undelivered
       else
-        "sent"
+        message.sent
       end
 
       message

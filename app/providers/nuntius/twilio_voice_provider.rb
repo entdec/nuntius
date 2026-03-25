@@ -19,14 +19,14 @@ module Nuntius
       # Need hostname here too
       response = client.calls.create(from: message.from.present? ? message.from : from, to: message.to, method: "POST", url: callback_url)
       message.provider_id = response.sid
-      message.status = translated_status(response.status)
+      message.send(translated_status(response.status))
       message
     end
 
     def refresh
       response = client.calls(message.provider_id).fetch
       message.provider_id = response.sid
-      message.status = translated_status(response.status)
+      message.send(translated_status(response.status))
       message
     end
 

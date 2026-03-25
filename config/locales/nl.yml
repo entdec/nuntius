@@ -42,6 +42,7 @@ nl:
         click_count: Aantal geklikt
         campaign_id: Campagne
         created_at: Aangemaakt om
+        state: Status
     models:
       campaign: Campagne
       layout: Layout
@@ -163,7 +164,7 @@ nl:
               provider_id: Provider ID
               refreshes: Refreshes
               request_id: Request ID
-              status: Status
+              state: Status
               subject: Onderwerp
               to: Aan
               transport: Transport

@@ -2,6 +2,6 @@
 
 module Nuntius
   class CampaignDrop < ApplicationDrop
-    delegate :id, :metadata, to: :@object
+    delegate :id, :metadata, :name, :transport, to: :@object
   end
 end

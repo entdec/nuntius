@@ -53,19 +53,19 @@ module Nuntius
     private
 
     def process_delivery
-      message.status = :delivered
+      message.delivered
       message.metadata[:feedback] = {type: "delivery", info: context.notification["delivery"]}
       message.save!
     end
 
     def process_bounce
-      message.status = :bounced
+      message.bounced
       message.metadata[:feedback] = {type: "bounce", info: context.notification["bounce"]}
       message.save!
     end
 
     def process_complaint
-      message.status = :complaint
+      message.complaint
       message.metadata[:feedback] = {type: "complaint", info: context.notification["complaint"]}
       message.save!
     end

@@ -17,7 +17,7 @@ module Nuntius
     def deliver
       return no_recipient if message.to.blank?
       return block unless MailAllowList.new(settings[:allow_list]).allowed?(message.to)
-      return block if Nuntius::Message.where(status: %w[complaint bounced], to: message.to).count >= 1
+      return block if Nuntius::Message.where(state: %w[complaint bounced], to: message.to).count >= 1
 
       mail = if message.from.present?
         Mail.new(sender: from_header, from: message.from)
@@ -73,28 +73,28 @@ module Nuntius
       begin
         response = mail.deliver!
       rescue Net::SMTPFatalError
-        message.status = "rejected"
+        message.rejected
         return message
       rescue Net::SMTPServerBusy, Net::ReadTimeout
-        message.status = "undelivered"
+        message.undelivered
         return message
       end
 
       message.provider_id = mail.message_id
-      message.status = "undelivered"
-      message.status = "sent" if Rails.env.test? || response.success?
+      message.undelivered
+      message.sent if Rails.env.test? || response.success?
       message.last_sent_at = Time.zone.now if message.sent?
 
       message
     end
 
     def block
-      message.status = "blocked"
+      message.blocked
       message
     end
 
     def no_recipient
-      message.status = "no_recipient"
+      message.no_recipient
       message
     end
 

@@ -33,10 +33,10 @@ module Nuntius
 
       response = connection.push(notification)
 
-      message.status = if response.ok?
-        "sent"
+      if response.ok?
+        message.sent
       else
-        "undelivered"
+        message.undelivered
       end
       message
     end

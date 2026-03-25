@@ -17,7 +17,7 @@ module Nuntius
     def deliver
       response = client.messages.create(sender: message.from.present? ? message.from : from, to: message.to, message: message.text)
       message.provider_id = response.body.messageid
-      message.status = translated_status(response.status)
+      message.send(translated_status(response.status))
       message
     end
 

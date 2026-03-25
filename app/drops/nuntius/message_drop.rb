@@ -2,7 +2,7 @@
 
 module Nuntius
   class MessageDrop < ApplicationDrop
-    delegate :id, :from, :to, :subject, :html, :text, to: :@object
+    delegate :id, :from, :to, :subject, :html, :text, :template, :campaign, to: :@object
 
     def base_url
       Nuntius::Engine.routes.url_helpers.message_url(@object.id, host: host)

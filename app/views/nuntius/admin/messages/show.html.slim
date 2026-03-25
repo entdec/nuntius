@@ -26,7 +26,7 @@
 
   - card.with_tab:details, padding: true
       = sts.info class: "grid grid-cols-1 gap-4 sm:grid-cols-3" do |info|
-        = info.with_item :status, content: @message.status, class: "sm:col-span-1"
+        = info.with_item :state, content: @message.state, class: "sm:col-span-1"
         = info.with_item :transport, content: @message.transport, class: "sm:col-span-1"
         = info.with_item :provider, content: @message.provider, class: "sm:col-span-1"
         = info.with_item :provider_id, content: @message.provider_id, class: "sm:col-span-1"

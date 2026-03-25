@@ -17,7 +17,7 @@ module Nuntius
         message.deliver_as(:mail)
         assert message
         assert message.persisted?
-        assert_equal "pending", message.status
+        assert_equal "pending", message.state
         assert_equal "mail", message.transport
         assert_equal "smtp", message.reload.provider
 
@@ -35,7 +35,7 @@ module Nuntius
         assert message
         assert message.persisted?
         message.reload
-        assert_equal "blocked", message.status
+        assert_equal "blocked", message.state
         assert_equal "mail", message.transport
         assert_equal "smtp", message.reload.provider
 
@@ -51,7 +51,7 @@ module Nuntius
         assert message
         assert message.persisted?
         message.reload
-        assert_equal "blocked", message.status
+        assert_equal "blocked", message.state
         assert_equal "mail", message.transport
         assert_equal "smtp", message.reload.provider
 
@@ -67,7 +67,7 @@ module Nuntius
         assert message
         assert message.persisted?
         message.reload
-        assert_equal "blocked", message.status
+        assert_equal "blocked", message.state
         assert_equal "mail", message.transport
         assert_equal "smtp", message.reload.provider
 

@@ -16,15 +16,15 @@ module Nuntius
     def deliver
       response = client.message_create(message.from.present? ? message.from : from, message.to, message.text)
       message.provider_id = response.id
-      message.status = translated_status(response.recipients["items"].first.status)
+      message.send(translated_status(response.recipients["items"].first.status))
       message
     end
 
     def refresh
       response = client.message(message.provider_id)
       message.provider_id = response.id
-      message.status = translated_status(response.recipients["items"].first.status)
-      Nuntius.config.logger.call.info "SMS #{message.to} status: #{message.status}"
+      message.send(translated_status(response.recipients["items"].first.status))
+      Nuntius.config.logger.call.info "SMS #{message.to} state: #{message.state}"
       message
     rescue => _e
       message

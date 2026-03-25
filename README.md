@@ -357,7 +357,7 @@ class BarMessageBox < Nuntius::BaseMessageBox
   route to: :process
   
   def process
-    puts message.status # message is Nuntius's inbound message.
+    puts message.state # message is Nuntius's inbound message.
     puts mail.to # mail gives you the Mail representation, when it's a mail (transport)
   end
 end

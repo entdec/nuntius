@@ -27,11 +27,11 @@ complaint_recipient:
   html: <b>Nee, Piet ken arie niet.</b>
   text: Nee, Piet ken arie niet.
   transport: mail
-  status: 'complaint'
+  state: 'complaint'
 
 bounced_recipient:
   to: "baz@foobar.com"
   html: <b>Nee, Piet ken arie niet.</b>
   text: Nee, Piet ken arie niet.
   transport: mail
-  status: 'bounced'
+  state: 'bounced'

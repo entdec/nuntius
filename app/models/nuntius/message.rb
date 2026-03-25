@@ -29,34 +29,44 @@ module Nuntius
 
     before_destroy :cleanup_attachments
 
-    # Weird loading sequence error, is fixed by the lib/nuntius/helpers
-    # begin
-    #   has_many_attached :attachments
-    # rescue NoMethodError
-    # end
-
-    def pending?
-      status == "pending"
-    end
-
-    def sent?
-      status == "sent"
-    end
-
-    def blocked?
-      status == "blocked"
-    end
-
-    def delivered?
-      status == "delivered"
+    state_machine initial: :pending do
+      event :pending do
+        transition any => :pending
+      end
+      event :sent do
+        transition any => :sent
+      end
+      event :blocked do
+        transition any => :blocked
+      end
+      event :delivered do
+        transition any => :delivered
+      end
+      event :undelivered do
+        transition any => :undelivered
+      end
+      event :rejected do
+        transition any => :rejected
+      end
+      event :bounced do
+        transition any => :bounced
+      end
+      event :complaint do
+        transition any => :complaint
+      end
+      event :no_recipient do
+        transition any => :no_recipient
+      end
+      event :opened do
+        transition any => any
+      end
+      event :clicked do
+        transition any => any
+      end
     end
 
     def delivered_or_blocked?
       delivered? || blocked?
-    end
-
-    def undelivered?
-      status == "undelivered"
     end
 
     def opened?
@@ -69,7 +79,7 @@ module Nuntius
 
     # Removes only pending child messages
     def cleanup!
-      Nuntius::Message.where(status: "pending").where(parent_message: self).destroy_all
+      Nuntius::Message.where(state: "pending").where(parent_message: self).destroy_all
     end
 
     def add_attachment(options)
