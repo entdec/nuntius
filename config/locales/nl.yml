@@ -134,6 +134,7 @@ nl:
             import: Importeer
             no_file: Geen bestand geselecteerd
             invalid_csv: "Ongeldig CSV-bestand: %{message}"
+            queued: "Import gestart, je ontvangt een melding zodra de import klaar is."
             success: "%{imported} abonnee(s) geïmporteerd, %{failed} mislukt"
             hint: Upload een CSV-bestand om abonnees in bulk te importeren. De eerste rij moet de kolomkoppen bevatten.
             columns_hint: "Ondersteunde kolommen: first_name, last_name, email, phone_number. Extra kolommen worden opgeslagen in metadata."

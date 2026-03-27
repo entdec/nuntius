@@ -120,6 +120,7 @@ en:
             import: Import
             hint: "Upload a CSV file to bulk import subscribers into this list. The first row must contain column headers."
             columns_hint: "Supported columns: first_name, last_name, email, phone_number. Any additional columns will be stored in the subscriber's metadata."
+            queued: "Import started, you will be notified when it completes."
             no_file: Please select a CSV file to import.
             invalid_csv: "Invalid CSV file: %{message}"
             success: "Import complete: %{imported} subscriber(s) imported, %{failed} failed."

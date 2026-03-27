@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "csv"
 require_dependency "nuntius/application_admin_controller"
 
 module Nuntius
@@ -22,31 +21,14 @@ module Nuntius
             redirect_to import_admin_list_subscribers_path(@list) and return
           end
 
-          imported = 0
-          failed = 0
-          errors = []
+          blob = ActiveStorage::Blob.create_and_upload!(
+            io: file,
+            filename: file.original_filename,
+            content_type: "text/csv"
+          )
+          ImportSubscribersJob.perform_later(@list, blob, Current.user)
 
-          begin
-            known_columns = %i[first_name last_name email phone_number]
-            CSV.parse(file.read, headers: true, header_converters: :symbol) do |row|
-              row_hash = row.to_h
-              attrs = row_hash.slice(*known_columns)
-              extra = row_hash.except(*known_columns).reject { |_, v| v.nil? }
-              attrs[:metadata] = extra unless extra.empty?
-              subscriber = @list.subscribers.new(attrs)
-              if subscriber.save
-                imported += 1
-              else
-                failed += 1
-                errors << "#{attrs[:email]}: #{subscriber.errors.full_messages.join(", ")}"
-              end
-            end
-          rescue CSV::MalformedCSVError => e
-            Signum.error(Current.user, text: t(".invalid_csv", message: e.message))
-            redirect_to import_admin_list_subscribers_path(@list) and return
-          end
-
-          Signum.success(Current.user, text: t(".success", imported: imported, failed: failed))
+          Signum.info(Current.user, text: t(".queued"))
           redirect_to nuntius.admin_list_path(@list)
         end
 
