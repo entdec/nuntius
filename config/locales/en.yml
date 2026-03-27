@@ -180,6 +180,10 @@ en:
                 Nuntius templates: Templates
               title: Templates
     subscribers:
+      edit:
+        subscribe_to_list: Subscribe to %{list}
+        create: Subscribe
+        update: Update
       show:
         unsubscribe: Unsubscribe
         resubscribe: Resubscribe

@@ -1,0 +1,20 @@
+= sts.form_for(@subscriber, url: @subscriber.new_record? ? subscribers_path(@list) : subscriber_path(@subscriber), html: {multipart: true}) do |f|
+  = f.hidden_field :list_id
+  = sts.card :nuntius_admin_lists_subscribers, title: t('.subscribe_to_list', list: @subscriber.list.name), icon: 'fad fa-address-card' do |card|
+    - card.with_action
+      = f.button class: 'button primary' do
+        - if @subscriber.new_record?
+          = t('.create')
+        - else
+          = t('.update')
+
+
+    .grid.grid-cols-12.gap-4
+      .col-span-6
+        = f.input :first_name
+      .col-span-6
+        = f.input :last_name
+      .col-span-12
+        = f.input :phone_number
+      .col-span-12
+        = f.input :email

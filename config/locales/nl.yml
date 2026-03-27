@@ -196,6 +196,10 @@ nl:
                 Nuntius templates: Templates
               title: Templates
     subscribers:
+      edit:
+        subscribe_to_list: Abbonnement op %{list}
+        create: Abbonneren
+        update: Aanpassen
       show:
         unsubscribe: Uitschrijven
         resubscribe: Opnieuw inschrijven
