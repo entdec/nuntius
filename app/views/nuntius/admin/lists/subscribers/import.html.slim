@@ -1,0 +1,15 @@
+= form_with url: import_admin_list_subscribers_path(@list), multipart: true do |f|
+  = sts.card :nuntius_admin_lists_subscribers_import, title: t('.title'), icon: 'fad fa-file-import' do |card|
+    - card.with_action
+      = f.submit t('.import'), class: 'btn btn-primary'
+
+    .grid.grid-cols-12.gap-4.p-4
+      .col-span-12
+        p.text-sm.text-gray-600= t('.hint')
+
+      .col-span-12
+        label.block.text-sm.font-medium.mb-1= t('.file_label')
+        = f.file_field :file, accept: '.csv', class: 'block w-full text-sm'
+
+      .col-span-12
+        p.text-xs.text-gray-500= t('.columns_hint')

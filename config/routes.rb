@@ -41,7 +41,12 @@ Nuntius::Engine.routes.draw do
       resources :attachments, controller: "satis/attachments"
     end
     resources :lists do
-      resources :subscribers, controller: "lists/subscribers"
+      resources :subscribers, controller: "lists/subscribers" do
+        collection do
+          get :import
+          post :import
+        end
+      end
     end
     resources :messages do
       member do

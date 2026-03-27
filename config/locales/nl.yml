@@ -60,6 +60,7 @@ nl:
       lists:
         new: Nieuwe lijst
         new_subscriber: Nieuwe abonnee
+        import_subscribers: Importeer abonnees
       locales:
         new: Nieuwe locale
       templates:
@@ -127,6 +128,15 @@ nl:
           edit:
             metadata: Metadata
             subscribers: Abonnees
+          import:
+            title: Abonnees importeren
+            file_label: CSV-bestand
+            import: Importeer
+            no_file: Geen bestand geselecteerd
+            invalid_csv: "Ongeldig CSV-bestand: %{message}"
+            success: "%{imported} abonnee(s) geïmporteerd, %{failed} mislukt"
+            hint: Upload een CSV-bestand om abonnees in bulk te importeren. De eerste rij moet de kolomkoppen bevatten.
+            columns_hint: "Ondersteunde kolommen: first_name, last_name, email, phone_number. Extra kolommen worden opgeslagen in metadata."
       locales:
         edit:
           card:

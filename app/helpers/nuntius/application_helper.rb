@@ -47,6 +47,7 @@ module Nuntius
     def nuntius_list_menu
       Satis::Menus::Builder.build([:nuntius, :lists]) do |m|
         m.item :new_subscriber, link: nuntius.new_admin_list_subscriber_path(@list) if @list.persisted?
+        m.item :import_subscribers, link: nuntius.import_admin_list_subscribers_path(@list) if @list.persisted?
       end
     end
 
