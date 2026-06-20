@@ -27,4 +27,12 @@ group :test do
   gem "minitest-mock"
 end
 
+group :development, :test do
+  gem "rubocop", require: false
+  gem "standard", require: false
+  gem "rubocop-rails", require: false
+  gem "ruby-lsp", require: false
+  gem "ruby-lsp-rails", require: false
+end
+
 gem "debug"

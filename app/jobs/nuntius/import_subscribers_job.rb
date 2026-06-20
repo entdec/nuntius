@@ -7,18 +7,30 @@ module Nuntius
     KNOWN_COLUMNS = %i[first_name last_name email phone_number].freeze
 
     def perform(list, blob, user)
-      csv_content = blob.download
+      blob.open do |io|
+        import(list, io, user)
+      end
+    ensure
+      blob.purge
+    end
 
+    def import(list, io, user)
       imported = 0
       failed = 0
 
-      CSV.parse(csv_content, headers: true, header_converters: :symbol) do |row|
+      detect_column_separator(io)
+
+      CSV.parse(io, headers: true, header_converters: :symbol, converters: ->(v) { v&.strip }, col_sep: @column_separator) do |row|
         row_hash = row.to_h
         attrs = row_hash.slice(*KNOWN_COLUMNS)
         extra = row_hash.except(*KNOWN_COLUMNS).reject { |_, v| v.nil? }
         attrs[:metadata] = extra unless extra.empty?
 
-        subscriber = list.subscribers.new(attrs)
+        subscriber = if attrs[:id].present?
+          list.subscribers.find_by(id: attrs[:id])
+        else
+          list.subscribers.new(attrs)
+        end
         if subscriber.save
           imported += 1
         else
@@ -26,11 +38,15 @@ module Nuntius
         end
       end
 
-      Signum.success(user, text: I18n.t("nuntius.admin.lists.subscribers.import.success", imported: imported, failed: failed))
+      Signum.success(user, text: I18n.t("nuntius.admin.lists.subscribers.import.success", imported: imported, failed: failed)) if defined?(Signum)
     rescue CSV::MalformedCSVError => e
-      Signum.error(user, text: I18n.t("nuntius.admin.lists.subscribers.import.invalid_csv", message: e.message))
-    ensure
-      blob.purge
+      Signum.error(user, text: I18n.t("nuntius.admin.lists.subscribers.import.invalid_csv", message: e.message)) if defined?(Signum)
+    end
+
+    # Detect column separator based on the first 50 bytes of the CSV, it's naive but works for most cases
+    def detect_column_separator(io)
+      @column_separator = io.read(128).include?(";") ? ";" : ","
+      io.rewind
     end
   end
 end
