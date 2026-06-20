@@ -4,7 +4,7 @@ require "csv"
 
 module Nuntius
   class ImportSubscribersJob < ApplicationJob
-    KNOWN_COLUMNS = %i[first_name last_name email phone_number].freeze
+    KNOWN_COLUMNS = %i[id first_name last_name email phone_number tags].freeze
 
     def perform(list, blob, user)
       blob.open do |io|
@@ -27,7 +27,9 @@ module Nuntius
         attrs[:metadata] = extra unless extra.empty?
 
         subscriber = if attrs[:id].present?
-          list.subscribers.find_by(id: attrs[:id])
+          s = list.subscribers.find_by(id: attrs[:id])
+          s.assign_attributes(attrs)
+          s
         else
           list.subscribers.new(attrs)
         end

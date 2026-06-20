@@ -2,7 +2,7 @@
 
 module Nuntius
   class SubscriberDrop < ApplicationDrop
-    delegate :id, :first_name, :last_name, :name, :list, :metadata, :unsubscribed_at, to: :@object
+    delegate :id, :first_name, :last_name, :name, :list, :metadata, :email, :phone_number, :tags, :unsubscribed_at, to: :@object
 
     def subscribed?
       @object.unsubscribed_at.nil?
