@@ -5,6 +5,7 @@ Nuntius.setup do |config|
   config.logger = -> { Rails.logger }
 
   config.transport :mail
+  config.transport :lmtp
   config.transport :push
   config.transport :sms
   config.transport :voice
@@ -19,6 +20,15 @@ Nuntius.setup do |config|
       password: "",
       allow_list: ["example.com"]
     }
+  }
+
+  # LMTP delivery to a mailbox, on its own transport. The recipient and
+  # per-message LMTP server are inline-encoded in the template `to` as
+  # `<email>@<host>:<port>`; `host`/`port` are optional fallbacks for plain
+  # addresses.
+  config.provider :lmtp, transport: :lmtp, settings: {
+    from_header: "Example <example@example.com>",
+    allow_list: ["example.com"]
   }
 
   config.provider :houston, transport: :push, settings: {certificate: ""}

@@ -223,7 +223,7 @@ The main key of the hash passed will also be the liquid variable.
 
 ### Mail
 
-Outbound mail is handled through SMTP. We've only exposed the HTML of mail, we can create text-versions based on sanitized HTML. HTML allows for [Foundation for Emails](https://get.foundation/emails/docs/index.html). You will have to include the CSS in the layouts.
+Outbound mail is handled through SMTP (the `:smtp` provider on the `:mail` transport). LMTP delivery to a mailbox is available through a separate `:lmtp` transport (see below). We've only exposed the HTML of mail, we can create text-versions based on sanitized HTML. HTML allows for [Foundation for Emails](https://get.foundation/emails/docs/index.html). You will have to include the CSS in the layouts.
 
 In the layout you can add `<a href="{{message_url}}">Link to mail</a>` to provide a link to the online version of the message.
 
@@ -243,6 +243,28 @@ The actual URL may be different depending on your routing setup.
 The subscription will automatically be confirmed.
 
 Next in AWS SES, configure the SNS topic to receive feedback notifications for Bounce, Complaint and Delivery and include original headers.
+
+### LMTP
+
+LMTP (RFC 2033) delivers a message directly to a mailbox. It is its own transport, so it never interferes with `:mail`/SMTP delivery. Enable the transport and provider, and give the relevant templates `transport: "lmtp"`:
+
+```ruby
+config.transport :lmtp
+config.provider :lmtp, transport: :lmtp, settings: {
+  from_header: "Example <example@example.com>",
+  allow_list: ["example.com"]
+}
+```
+
+With LMTP both the recipient email address and the target LMTP server are provided by the template, inline-encoded in the `to` field as:
+
+```
+<email>@<host>:<port>
+```
+
+For example a template `to` of `{{user.email}}@mx.internal:24` renders to `user@example.com@mx.internal:24`. The provider uses the email (`user@example.com`) for the `To:` header and the envelope `RCPT TO`, and connects to the LMTP server at `mx.internal:24`. A plain address (without an inline `@host:port`) falls back to the optional `host`/`port` settings.
+
+LMTP templates use the same fields as mail templates (subject, html, layout, tracking). Delivery is synchronous: the server confirms delivery in its reply, so the message is marked `delivered` straight away and no refresh is needed.
 
 ### Slack
 

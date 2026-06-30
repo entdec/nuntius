@@ -27,6 +27,22 @@ module Nuntius
       end
     end
 
+    test "delivering an lmtp message routes through the lmtp transport and provider" do
+      message = Nuntius::Message.create!(transport: "lmtp", to: "user@example.com@mx.internal:24", html: "Hi", text: "Hi")
+
+      perform_enqueued_jobs do
+        message.deliver_as(:lmtp)
+
+        assert_equal "lmtp", message.reload.provider
+        assert message.reload.delivered?
+
+        assert_equal 1, Mail::TestMailer.deliveries.length
+        mail = Mail::TestMailer.deliveries.first
+        assert_equal ["user@example.com"], mail.to
+        assert_equal ["user@example.com"], mail.smtp_envelope_to
+      end
+    end
+
     test "delivering a message that does not match the allow list will block it" do
       message = nuntius_messages(:blocked_recipient)
 
