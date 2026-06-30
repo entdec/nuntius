@@ -6,6 +6,9 @@ module Nuntius
   class SmtpMailProvider < BaseProvider
     transport :mail
 
+    # RFC 5321 null reverse-path, used for auto-generated/bounce notifications.
+    NULL_REVERSE_PATH = "<>"
+
     setting_reader :from_header, required: true, description: "From header (example: Nuntius Messenger <nuntius@entdec.com>)"
     setting_reader :host, required: true, description: "Host (example: smtp.soverin.net)"
     setting_reader :port, required: true, description: "Port (example: 578)"
@@ -32,16 +35,14 @@ module Nuntius
         mail.header["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
       end
 
+      null_sender = apply_mail_overrides(mail)
+
       if Rails.env.test?
         mail.delivery_method :test
+      elsif null_sender
+        mail.delivery_method Nuntius::NullSenderSmtp, smtp_settings
       else
-        mail.delivery_method :smtp,
-          address: host,
-          port: port,
-          user_name: username,
-          password: password,
-          return_response: true,
-          ssl: ssl
+        mail.delivery_method :smtp, smtp_settings
       end
 
       mail.to = message.to
@@ -99,6 +100,45 @@ module Nuntius
     end
 
     private
+
+    def smtp_settings
+      {
+        address: host,
+        port: port,
+        user_name: username,
+        password: password,
+        return_response: true,
+        ssl: ssl
+      }
+    end
+
+    # Applies any messenger-provided overrides stored on the message: extra
+    # headers and/or a custom SMTP envelope sender. Returns true when a null
+    # reverse-path (+MAIL FROM:<>+) was requested, so the caller can pick the
+    # delivery method that can actually emit it.
+    def apply_mail_overrides(mail)
+      overrides = message.metadata&.dig("mail")
+      return false if overrides.blank?
+
+      (overrides["headers"] || {}).each do |key, value|
+        mail.header[key] = value
+      end
+
+      return false unless overrides.key?("envelope_from")
+
+      envelope_from = overrides["envelope_from"]
+      if null_reverse_path?(envelope_from)
+        mail.smtp_envelope_from = NULL_REVERSE_PATH
+        true
+      else
+        mail.smtp_envelope_from = envelope_from
+        false
+      end
+    end
+
+    def null_reverse_path?(value)
+      value.blank? || value == NULL_REVERSE_PATH
+    end
 
     def message_url(message)
       Nuntius::Engine.routes.url_helpers.message_url(message.id, host: Nuntius.config.host(message))

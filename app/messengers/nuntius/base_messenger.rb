@@ -9,14 +9,16 @@ module Nuntius
 
     define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
-    attr_reader :attachments, :event, :object, :params
-    attr_accessor :templates
+    attr_reader :attachments, :headers, :event, :object, :params
+    attr_accessor :templates, :smtp_envelope_from
 
     def initialize(object, event, params = {})
       @object = object
       @event = event
       @params = params
       @attachments = params.fetch(:attachments, [])
+      @headers = params.fetch(:headers, {})
+      @smtp_envelope_from = params[:smtp_envelope_from]
     end
 
     # Calls the event method on the messenger
@@ -39,6 +41,7 @@ module Nuntius
         @attachments.each do |attachment|
           msg.add_attachment(attachment)
         end
+        apply_mail_overrides(msg)
 
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
         transport.deliver(msg)
@@ -52,6 +55,12 @@ module Nuntius
 
     def attach(attachment)
       @attachments << attachment
+    end
+
+    # Sets an extra header on the resulting message (currently applied by the
+    # mail transport). Useful for things like "Auto-Submitted" or "Precedence".
+    def header(key, value)
+      @headers[key.to_s] = value
     end
 
     class << self
@@ -172,6 +181,19 @@ module Nuntius
 
     private
 
+    # Persists any messenger-provided mail overrides (extra headers and/or a
+    # custom SMTP envelope sender) onto the message so they survive the
+    # transport delivery job and can be applied by the provider.
+    def apply_mail_overrides(message)
+      return if @headers.blank? && @smtp_envelope_from.nil?
+
+      mail = {}
+      mail["headers"] = @headers if @headers.present?
+      mail["envelope_from"] = @smtp_envelope_from unless @smtp_envelope_from.nil?
+
+      message.metadata = (message.metadata || {}).merge("mail" => mail)
+    end
+
     # Returns the relevant templates for the object / event combination
     def select_templates
       return @templates if @templates
@@ -188,7 +210,7 @@ module Nuntius
 
     def liquid_context
       assigns = @params || {}
-      instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope].include? i.to_s }.each do |i|
+      instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope @headers @smtp_envelope_from].include? i.to_s }.each do |i|
         assigns[i.to_s[1..]] = instance_variable_get(i)
       end
 
