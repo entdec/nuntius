@@ -79,6 +79,14 @@ module Nuntius
       clicked_at.present?
     end
 
+    def opened?
+      opened_at.present?
+    end
+
+    def clicked?
+      clicked_at.present?
+    end
+
     # Removes only pending child messages
     def cleanup!
       Nuntius::Message.where(state: "pending").where(parent_message: self).destroy_all
