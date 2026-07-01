@@ -21,6 +21,17 @@ Nuntius.setup do |config|
     }
   }
 
+  # LMTP delivery to a mailbox, on its own `:lmtp` transport. Enable the
+  # transport and provider, then give such templates `transport: "lmtp"`. The
+  # recipient and per-message LMTP server are inline-encoded in the template
+  # `to` as `<email>@<host>:<port>`, e.g. `user@example.com@mx.internal:24`.
+  # `host`/`port` here are optional fallbacks for plain addresses.
+  # config.transport :lmtp
+  # config.provider :lmtp, transport: :lmtp, settings: {
+  #   from_header: "Example <example@example.com>",
+  #   allow_list: ["example.com"]
+  # }
+
   config.provider :houston, transport: :push, settings: {certificate: ""}
   config.provider :firebase, transport: :push, settings: {server_key: ""}
 
