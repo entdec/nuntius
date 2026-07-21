@@ -3,7 +3,7 @@
 module Nuntius
   class TimebasedEventsJob < ApplicationJob
     def perform
-      Nuntius::Template.where.not(interval: nil).each do |template|
+      Nuntius::Template.where(enabled: true).where.not(interval: nil).each do |template|
         messenger_class = Nuntius::BaseMessenger.messenger_for_class(template.klass)
 
         messenger_class.timebased_scope_for(template).each do |object|
