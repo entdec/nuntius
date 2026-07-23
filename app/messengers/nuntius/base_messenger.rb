@@ -145,12 +145,16 @@ module Nuntius
 
       def locale(locale = nil)
         @locale = locale if locale
-        @locale
+        return @locale if defined?(@locale) && @locale
+
+        superclass.respond_to?(:locale) ? superclass.locale : nil
       end
 
       def template_scope(template_scope = nil)
         @template_scope = template_scope if template_scope
-        @template_scope
+        return @template_scope if defined?(@template_scope) && @template_scope
+
+        superclass.respond_to?(:template_scope) ? superclass.template_scope : nil
       end
 
       def timebased_scopes
