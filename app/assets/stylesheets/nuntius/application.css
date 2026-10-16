@@ -1,14 +1,12 @@
 
-span.traffic-signal {
-    &-red {
-        @apply text-red-600;
-    }
+span.traffic-signal-red {
+    @apply text-red-600;
+}
 
-    &-green {
-        @apply text-green-600;
-    }
+span.traffic-signal-green {
+    @apply text-green-600;
+}
 
-    &-orange {
-        @apply text-orange-400;
-    }
+span.traffic-signal-orange {
+    @apply text-orange-400;
 }
