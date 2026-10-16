@@ -36,3 +36,7 @@ group :development, :test do
 end
 
 gem "debug"
+
+source "https://rubygems.pkg.github.com/entdec" do
+  gem "shipkit"
+end
