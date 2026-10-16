@@ -17,7 +17,7 @@ gemspec
 
 git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 
-gem "action_table", entdec: "action_table", tag: "0.2.37"
+gem "mensa", entdec: "mensa"
 
 gem "sidekiq"
 
