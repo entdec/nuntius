@@ -1,5 +1,4 @@
 {
-  "peerDependencies": {
   "name": "nuntius",
   "private": true,
   "dependencies": {
