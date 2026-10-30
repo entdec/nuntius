@@ -1,7 +1,8 @@
 name: "nuntius"
 
 services:
-  rails-app:
+  # Named app, so OrbStack serves the dummy app on http://app.nuntius.orb.local
+  app:
     cpu_count: 2
     build:
       context: ..
@@ -9,6 +10,8 @@ services:
 
     volumes:
       - ../..:/workspaces:cached
+      # Always mount the project itself on the workspaceFolder, also when opened from a git worktree with another name
+      - ..:/workspaces/nuntius:cached
       # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
@@ -21,6 +24,9 @@ services:
       - selenium
       - postgres
       - redis
+
+    labels:
+      dev.orbstack.http-port: "3000"
 
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432

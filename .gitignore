@@ -9,3 +9,7 @@ Gemfile.lock
 node_modules
 .vscode
 vendor/bundle
+# Local tool versions and secrets (GitHub packages token, RAILS_MASTER_KEY)
+mise.toml
+.devcontainer/.env
+.devcontainer/de-host/

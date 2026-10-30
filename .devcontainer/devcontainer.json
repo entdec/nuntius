@@ -1,41 +1,46 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ruby
+// README at: https://github.com/devcontainers/templates/tree/main/src/ruby-rails-postgres
 {
-  "name": "nuntius",
-  "dockerComposeFile": "compose.yaml",
-  "service": "rails-app",
-  "workspaceFolder": "/workspaces/nuntius",
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "configureZshAsDefaultShell": true,
-      "installOhMyZsh": false,
-      "installOhMyZshConfig": false
+    "name": "nuntius",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "features": {
+        "ghcr.io/devcontainers/features/node:2": {},
+        "ghcr.io/devcontainers/features/common-utils:2.7.1": {
+            "configureZshAsDefaultShell": true,
+            "installOhMyZsh": false,
+            "installOhMyZshConfig": false
+        },
+        "ghcr.io/rails/devcontainer/features/activestorage": {},
+        "ghcr.io/rails/devcontainer/features/postgres-client": {
+            "version": "18"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "moby": false
+        },
+        // Your own tools from ~/.config/de/config.json, written by bin/de
+        // initialize, see https://github.com/tdegrunt/de#your-own-tools
+        "./de-host": {}
     },
-    "ghcr.io/devcontainers/features/github-cli:1": { },
-    "ghcr.io/rails/devcontainer/features/activestorage": { },
-    "ghcr.io/rails/devcontainer/features/postgres-client": {
-      "version": "17"
+    "mounts": [
+        "source=/run/host-services/ssh-auth.sock,target=/ssh-agent,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached"
+    ],
+    "initializeCommand": "bin/de initialize",
+    // Closing the editor leaves the environment running, bin/de down stops it
+    "shutdownAction": "none",
+    "postStartCommand": ".devcontainer/postStart.sh",
+    "containerEnv": {
+        "VISUAL": "vi",
+        "SSH_AUTH_SOCK": "/ssh-agent"
     },
-    "ghcr.io/devcontainers/features/node:1": { },
-    "ghcr.io/duduribeiro/devcontainer-features/tmux:1": { }
-  },
-  "containerEnv": {
-    "CAPYBARA_SERVER_PORT": "45678",
-    "SELENIUM_HOST": "selenium",
-    "DB_HOST": "postgres",
-    "SSH_AUTH_SOCK": "/ssh-agent"
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "Shopify.ruby-lsp"
-      ]
-    }
-  },
-  "mounts": [
-      "source=/run/host-services/ssh-auth.sock,target=/ssh-agent,type=bind",
-      "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached"
-  ],
-  "postCreateCommand": "bin/setup"
+    "remoteEnv": {
+        // The repository's bin/, so `rails test` works in terminals
+        "PATH": "${containerWorkspaceFolder}/bin:${containerEnv:PATH}"
+    },
+    "customizations": {},
+    // Where docker-compose.yml mounts this checkout, see env_init in bin/de.
+    // /workspaces/nuntius links here too, but only once the container runs.
+    "workspaceFolder": "/workspaces${localWorkspaceFolder}"
 }
