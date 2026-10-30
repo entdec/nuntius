@@ -1,8 +1,15 @@
 # frozen_string_literal: true
 
+# Lettermint settings come from the (development) credentials, see: bin/rails credentials:edit --environment development
+lettermint = Rails.application.credentials.lettermint || {}
+
 Nuntius.setup do |config|
   config.base_controller = "::ApplicationController"
   config.logger = -> { Rails.logger }
+
+  # The dummy app has no users, so no authentication for the admin pages
+  config.admin_authentication_module = nil
+  config.host = ->(_message) { "app.nuntius.orb.local" }
 
   config.transport :mail
   config.transport :lmtp
@@ -12,15 +19,36 @@ Nuntius.setup do |config|
   config.allow_custom_events = true
 
   config.provider :smtp, transport: :mail, settings: lambda { |_message|
-    {
-      from_header: "Example <example@example.com>",
-      host: "",
-      port: "",
-      username: "",
-      password: "",
-      allow_list: ["example.com"]
-    }
+    if lettermint[:smtp_password].present?
+      {
+        from_header: lettermint[:from_header],
+        host: "smtp.lettermint.co",
+        port: 587,
+        username: "lettermint",
+        password: lettermint[:smtp_password],
+        allow_list: lettermint[:allow_list] || []
+      }
+    else
+      {
+        from_header: "Example <example@example.com>",
+        host: "",
+        port: "",
+        username: "",
+        password: "",
+        allow_list: ["example.com"]
+      }
+    end
   }
+
+  # Lettermint has to be able to reach the webhook, app.nuntius.orb.local is only reachable locally, so use a tunnel
+  if lettermint[:api_token].present? && lettermint[:webhook_host].present?
+    config.lettermint_webhook(
+      api_token: lettermint[:api_token],
+      project_id: lettermint[:project_id],
+      route_id: lettermint[:route_id],
+      host: lettermint[:webhook_host]
+    )
+  end
 
   # LMTP delivery to a mailbox, on its own transport. The recipient and
   # per-message LMTP server are inline-encoded in the template `to` as

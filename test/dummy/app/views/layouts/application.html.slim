@@ -1,0 +1,28 @@
+= sts.page do |page|
+  - page.with_head
+    title Nuntius
+    meta name="viewport" content="width=device-width, initial-scale=1.0"
+    = javascript_importmap_tags
+    = stylesheet_link_tag "tailwind"
+    / Font Awesome Free (from mensa), icon packs load before fontawesome.js
+    = javascript_include_tag asset_url("regular.js"), defer: true
+    = javascript_include_tag asset_url("brands.js"), defer: true
+    = javascript_include_tag asset_url("solid.js"), defer: true
+    = javascript_include_tag asset_url("fontawesome.js"), defer: true
+    = csrf_meta_tags
+    = csp_meta_tag
+    - if content_for?(:head)
+      = yield(:head)
+
+  - page.with_navbar do |navbar|
+    .flex-1.flex
+    #top-bar-menu.ml-4.flex.items-center.md:ml-6.space-x-4
+      = sts.appearance_switcher
+
+  - page.with_sidebar_mobile do |sidebar|
+
+  - page.with_sidebar do |sidebar|
+    = sts.sidebar_menu(sidebar_menu)
+
+  - page.with_body
+    = yield

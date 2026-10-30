@@ -75,6 +75,17 @@ module Nuntius
       end
     end
 
+    test "delivering a message with an email that soft bounced will not be blocked" do
+      soft_bounced = Nuntius::Message.create!(transport: "mail", html: "smurrefluts", to: "soft@example.com", state: :soft_bounced)
+      message = Nuntius::Message.create!(transport: "mail", html: "smurrefluts", to: soft_bounced.to)
+
+      perform_enqueued_jobs do
+        message.deliver_as(:mail)
+        assert_equal "sent", message.reload.state
+        assert_equal 1, Mail::TestMailer.deliveries.length
+      end
+    end
+
     test "delivering a message with an email that was bounced will immediately be blocked" do
       message = Nuntius::Message.create!(transport: "mail", html: "smurrefluts", to: nuntius_messages(:bounced_recipient).to)
 

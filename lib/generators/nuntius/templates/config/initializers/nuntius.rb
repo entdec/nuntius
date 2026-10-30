@@ -32,6 +32,15 @@ Nuntius.setup do |config|
   #   allow_list: ["example.com"]
   # }
 
+  # Receive delivery, bounce, open and click events from Lettermint. Nuntius creates the webhook with Lettermint
+  # and checks it on every server start. `route_id` is optional, `host` defaults to `config.host`.
+  # config.lettermint_webhook(
+  #   api_token: ENV["LETTERMINT_TEAM_TOKEN"],
+  #   project_id: "your-project-id",
+  #   route_id: "your-route-id",
+  #   host: "https://app.example.com"
+  # )
+
   config.provider :houston, transport: :push, settings: {certificate: ""}
   config.provider :firebase, transport: :push, settings: {server_key: ""}
 

@@ -1,4 +1,11 @@
 namespace :nuntius do
+  namespace :lettermint do
+    desc "Check the Lettermint webhook is set up correctly, create it when missing"
+    task setup_webhook: :environment do
+      Nuntius::LettermintWebhookSetupService.perform
+    end
+  end
+
   namespace :tailwindcss do
     desc "Configure your Tailwind CSS"
     task :config do

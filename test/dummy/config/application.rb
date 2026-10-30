@@ -3,6 +3,8 @@
 require_relative "boot"
 
 require "rails/all"
+# The engines' tailwindcss:config tasks invoke generators
+require "rails/generators"
 
 Bundler.require(*Rails.groups)
 require "nuntius"
@@ -16,5 +18,8 @@ module Dummy
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
     config.active_job.queue_adapter = :inline
+
+    # Run the engine's migrations along with the dummy app's (db:migrate, db:prepare)
+    config.paths["db/migrate"] << File.expand_path("../../../db/migrate", __dir__)
   end
 end

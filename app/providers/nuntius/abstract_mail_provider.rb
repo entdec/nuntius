@@ -64,10 +64,12 @@ module Nuntius
 
       begin
         response = mail.deliver!
-      rescue Net::SMTPFatalError
+      rescue Net::SMTPFatalError => e
+        Nuntius.config.logger.warn("Mail: message #{message.id} rejected: #{e.message.strip}")
         message.rejected
         return message
-      rescue Net::SMTPServerBusy, Net::ReadTimeout
+      rescue Net::SMTPServerBusy, Net::ReadTimeout => e
+        Nuntius.config.logger.warn("Mail: message #{message.id} undelivered: #{e.class}: #{e.message.strip}")
         message.undelivered
         return message
       end

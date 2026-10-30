@@ -21,6 +21,13 @@ gem "mensa", entdec: "mensa"
 
 gem "sidekiq"
 
+# Dummy app (test/dummy)
+gem "puma"
+gem "sprockets-rails"
+gem "satis"
+gem "tailwindcss-rails", "~> 4.0"
+gem "overmind", require: false
+
 group :test do
   gem "vcr", "~> 6.0", require: false
   gem "webmock", "~> 3.3", require: false

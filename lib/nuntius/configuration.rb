@@ -51,7 +51,7 @@ module Nuntius
     attr_accessor :visible_scope, :add_metadata, :metadata_fields, :default_template_scope
     attr_writer :metadata_humanize, :default_params, :flow_color
 
-    attr_reader :transports, :providers
+    attr_reader :transports, :providers, :lettermint_webhook_settings
 
     def initialize
       set_defaults!
@@ -95,6 +95,25 @@ module Nuntius
 
     def transport(transport)
       @transports.push(transport) if transport
+    end
+
+    # Receive message status updates from Lettermint through a webhook. Nuntius creates (or repairs) the webhook
+    # with Lettermint on every server start.
+    #
+    #   api_token:     Lettermint Team API token, used to manage the webhook
+    #   project_id:    Lettermint project to receive events for
+    #   route_id:      optional, limit events to a single route of the project
+    #   host:          public host Nuntius is reachable on (example: https://app.example.com), defaults to config.host
+    #   setup_on_boot: check/create the webhook on server start (default: true)
+    def lettermint_webhook(api_token:, project_id:, route_id: nil, host: nil, name: "Nuntius", setup_on_boot: true)
+      @lettermint_webhook_settings = {
+        api_token: api_token,
+        project_id: project_id,
+        route_id: route_id.presence,
+        host: host,
+        name: name,
+        setup_on_boot: setup_on_boot
+      }
     end
 
     def default_params(event, record)

@@ -9,6 +9,7 @@ module Nuntius
   #   sent - we've sent it on to the provider
   #   delivered - have delivery confirmation
   #   undelivered - have confirmation of non-delivery
+  #   soft_bounced - temporary delivery failure, the provider will retry
   # Not all transports may provide all states
   class Message < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
@@ -50,6 +51,9 @@ module Nuntius
       end
       event :bounced do
         transition any => :bounced
+      end
+      event :soft_bounced do
+        transition any => :soft_bounced
       end
       event :complaint do
         transition any => :complaint

@@ -15,7 +15,8 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
-  config.active_job.queue_adapter = :sidekiq
+  # Run jobs in-process, no separate worker needed
+  config.active_job.queue_adapter = :async
 
   # Enable/disable caching. By default caching is disabled.
   if Rails.root.join("tmp/caching-dev.txt").exist?
@@ -42,13 +43,8 @@ Rails.application.configure do
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
-  # Debug mode disables concatenation and preprocessing of assets.
-  # This option may cause significant delays in view rendering with a large
-  # number of complex assets.
-  # config.assets.debug = true
-
   # Suppress logger output for asset requests.
-  # config.assets.quiet = true
+  config.assets.quiet = true
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
@@ -57,4 +53,7 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
   config.active_storage.service = :local
+
+  # Served on http://app.nuntius.orb.local from the devcontainer
+  config.hosts.clear
 end

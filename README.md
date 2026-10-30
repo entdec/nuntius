@@ -244,6 +244,40 @@ The subscription will automatically be confirmed.
 
 Next in AWS SES, configure the SNS topic to receive feedback notifications for Bounce, Complaint and Delivery and include original headers.
 
+#### Lettermint
+
+When you send mail through [Lettermint](https://lettermint.co) (e.g. with the `:smtp` provider pointed at Lettermint's SMTP server), Nuntius can receive message status updates through a Lettermint webhook. Nuntius creates the webhook with Lettermint itself:
+
+```ruby
+Nuntius.setup do |config|
+  config.lettermint_webhook(
+    api_token: ENV["LETTERMINT_TEAM_TOKEN"], # Lettermint Team API token
+    project_id: "your-project-id",
+    route_id: "your-route-id",               # optional, limits the webhook to one route
+    host: "https://app.example.com"          # where Nuntius is reachable, defaults to config.host
+  )
+end
+```
+
+On every server start Nuntius checks the webhook exists and is configured correctly, and creates or repairs it when needed. You can also do this by hand with `bin/rails nuntius:lettermint:setup_webhook`. The webhook id and its signing secret are stored in `nuntius_webhooks`; webhook deliveries are verified against that secret.
+
+The webhook points at https://<host>/messaging/feedback/lettermint (depending on where you mount Nuntius) and updates messages as follows:
+
+| Lettermint event         | Message                          |
+|--------------------------|----------------------------------|
+| `message.sent`           | sent                             |
+| `message.delivered`      | delivered                        |
+| `message.hard_bounced`   | bounced                          |
+| `message.soft_bounced`   | soft_bounced (temporary, Lettermint retries) |
+| `message.spam_complaint` | complaint                        |
+| `message.failed`         | undelivered                      |
+| `message.suppressed`     | blocked                          |
+| `message.policy_rejected`| rejected                         |
+| `message.opened`         | `opened_at` / `open_count`       |
+| `message.clicked`        | `clicked_at` / `click_count` and link tracking |
+
+Opens and clicks require open/click tracking to be enabled on the Lettermint route.
+
 ### LMTP
 
 LMTP (RFC 2033) delivers a message directly to a mailbox. It is its own transport, so it never interferes with `:mail`/SMTP delivery. Enable the transport and provider, and give the relevant templates `transport: "lmtp"`:
@@ -393,3 +427,18 @@ Campaigns allows you to bulk send many mails to subscribers.
 We support multiple lists with many subscribers.
 
 You can manually publish the campaign or have Nuntius publish the campaign after a certain date/time. If you want to have Nuntius publish it for you, add `Nuntius::CampaignPublishJob` to your cron.
+
+## Development
+
+Nuntius comes with a devcontainer and a dummy app (in test/dummy) using Satis and Mensa, like a host app would.
+
+```sh
+bin/setup        # installs gems, prepares the database and builds the Tailwind CSS
+bin/overmind s   # starts the web server and Tailwind watcher (see Procfile), jobs run in-process
+```
+
+With OrbStack the dummy app is available on http://app.nuntius.orb.local.
+
+Credentials for the dummy app (e.g. Lettermint) live in test/dummy/config/credentials/development.yml.enc, edit them with
+`bin/rails credentials:edit --environment development` from test/dummy (not from the root). The key is not checked in, put it in
+test/dummy/config/credentials/development.key or set `RAILS_MASTER_KEY` (e.g. in your mise.toml), which takes precedence.

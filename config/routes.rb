@@ -9,6 +9,7 @@ Nuntius::Engine.routes.draw do
   post "callbacks/:message_id(/*path)", to: "callbacks#create"
 
   post "feedback/awssns" => "feedback#awssns"
+  post "feedback/lettermint" => "feedback#lettermint", :as => :lettermint_feedback
 
   resources :messages do
     # Email tracking routes
