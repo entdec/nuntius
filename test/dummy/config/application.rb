@@ -20,6 +20,10 @@ module Dummy
     config.active_job.queue_adapter = :inline
 
     # Run the engine's migrations along with the dummy app's (db:migrate, db:prepare)
-    config.paths["db/migrate"] << File.expand_path("../../../db/migrate", __dir__)
+    # when run from here, e.g. by bin/setup. The engine's bin/rails sets
+    # ENGINE_ROOT, then Active Record adds them itself for the app: tasks.
+    unless defined?(ENGINE_ROOT)
+      config.paths["db/migrate"] << File.expand_path("../../../db/migrate", __dir__)
+    end
   end
 end

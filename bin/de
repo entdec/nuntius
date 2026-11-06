@@ -25,6 +25,8 @@ DE_TEMPLATE=""
 DE_DOCS="https://github.com/tdegrunt/de#readme"
 # Your own tools for every environment, see env_write_host_feature
 DE_CONFIG="${DE_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/de/config.json}"
+# Where the folders "home" in DE_CONFIG lists are kept, shared by every environment
+DE_HOME_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/de/home"
 # `de exec` passes a SELENIUM_URL from the caller on, see env.conf. Unset it
 # so env.conf's value isn't exported to the commands this script runs.
 ENV_SELENIUM_URL_GIVEN="${SELENIUM_URL:-}"
@@ -41,6 +43,35 @@ else
   exit 1
 fi
 
+# The commands of a repository's bin/de, also listed by the de repository's help
+usage_commands() {
+  cat <<'EOF'
+  new <branch> [folder] [--from <ref>] [--no-trust]
+                     Create a worktree for a branch (next to the main checkout
+                     as <repository>-<branch> unless a folder is given) and
+                     start its environment. New branches start from the
+                     default branch, or from --from. --no-trust as for up.
+  up [--rebuild] [--no-trust]
+                     Create or start this checkout's environment and prepare
+                     its databases. --rebuild recreates the containers after
+                     changing .devcontainer/, keeping the data. Trusts the
+                     checkout's mise config on the host, unless --no-trust.
+  exec <command...>  Run a command in this checkout's devcontainer, in the same
+                     directory relative to the checkout.
+  status             Show the environment's containers, health and URLs.
+  code [<checkout>]  Open a checkout in VS Code inside its devcontainer,
+                     starting it first if needed. <checkout> is a branch,
+                     environment name, worktree folder name or a path in
+                     it, default this one.
+  down [--destroy-persistent]
+                     Remove an ephemeral environment with its data. A
+                     persistent one is only stopped, unless
+                     --destroy-persistent is given and its name confirmed.
+  prune [--yes]      Remove ephemeral environments whose worktree or branch
+                     is gone. --yes skips the confirmation.
+EOF
+}
+
 usage() {
   cat <<EOF
 Usage: bin/de <command> [arguments]
@@ -52,26 +83,7 @@ persistent and keep their data, all others are ephemeral. A primary branch
 (${PRIMARY_BRANCHES[*]}) gets one named $ENV_REPO, the others $ENV_REPO-<branch>.
 
 Commands:
-  new <branch> [folder] [--from <ref>]
-                     Create a worktree for a branch (next to the main checkout
-                     as $ENV_REPO-<branch> unless a folder is given) and start
-                     its environment. New branches start from the default
-                     branch, or from --from.
-  up [--rebuild]     Create or start this checkout's environment and prepare
-                     its databases. --rebuild recreates the containers after
-                     changing .devcontainer/, keeping the data.
-  exec <command...>  Run a command in this checkout's devcontainer, in the same
-                     directory relative to the checkout.
-  status             Show the environment's containers, health and URLs.
-  code [<checkout>]  Open a checkout in VS Code inside its devcontainer,
-                     starting it first if needed. <checkout> is a branch,
-                     environment name or worktree folder, default this one.
-  down [--destroy-persistent]
-                     Remove an ephemeral environment with its data. A
-                     persistent one is only stopped, unless
-                     --destroy-persistent is given and its name confirmed.
-  prune [--yes]      Remove ephemeral environments whose worktree or branch
-                     is gone. --yes skips the confirmation.
+$(usage_commands)
   help               Show this help.
 
 Examples:
@@ -81,7 +93,7 @@ Examples:
   bin/de code main
 
 Settings: .devcontainer/env.conf, your own tools: $DE_CONFIG,
-docs: $DE_DOCS. To update bin/de, run \`de init\` from the de repository.
+docs: $DE_DOCS. To update bin/de, run \`de update\` from the de repository.
 EOF
 }
 
@@ -97,12 +109,17 @@ command to the bin/de of the checkout you're in.
 Commands:
   init [<repository>] [--force]
                      Set up development environments in a repository (default
-                     the current one), or update its bin/de. Repository
-                     specific files that already exist there are kept, unless
-                     --force is given.
+                     the current one). Repository specific files that already
+                     exist there are kept, unless --force is given.
+  update [<repository>] [--force]
+                     Update a repository's bin/de, and add what's new in the
+                     setup, like init but only where it's set up already.
+  upgrade            Update this copy of de with a git pull. Then run de
+                     update in a repository to update its bin/de.
   help               Show this help.
-  <command>          Any bin/de command, run by the current checkout's bin/de,
-                     e.g. de up, de exec bin/rails test. See bin/de help there.
+
+Run by the current checkout's bin/de (see bin/de help there):
+$(usage_commands)
 
 Your own tools for every environment: $DE_CONFIG
 EOF
@@ -322,31 +339,45 @@ checkouts() {
 #   {
 #     "extensions": ["anthropic.claude-code", "openai.chatgpt"],
 #     "npm": ["@anthropic-ai/claude-code", "@openai/codex"],
-#     "features": { "ghcr.io/devcontainers/features/python:1": {} }
+#     "features": { "ghcr.io/devcontainers/features/python:1": {} },
+#     "home": [".claude", ".codex"],
+#     "env": { "CLAUDE_CONFIG_DIR": "/home/vscode/.claude" }
 #   }
+#
+# "home" lists folders in the container's home directory that every
+# environment shares, kept on the host in $DE_HOME_STATE, e.g. logins. "env"
+# sets environment variables in the container.
 #
 # A feature, so the editor installs its extensions in the container whoever
 # opens it, and its packages are part of the image. Changes apply on the next
 # build, bin/de up --rebuild.
 env_write_host_feature() {
-  local dir="$ENV_PATH/.devcontainer/de-host" config='{}'
+  local dir="$ENV_PATH/.devcontainer/de-host" config='{}' path
   if [ -f "$DE_CONFIG" ]; then
     command -v jq >/dev/null 2>&1 || die "reading $DE_CONFIG needs jq"
     config="$(jq -e 'if type == "object" then . else error("not an object") end' "$DE_CONFIG")" ||
       die "$DE_CONFIG isn't a JSON object"
   fi
+  # Docker refuses a missing bind source
+  while IFS= read -r path; do
+    case "$path" in "" | /* | *..*) die "home in $DE_CONFIG takes paths inside the home directory, not $path" ;; esac
+    mkdir -p "$DE_HOME_STATE/$path"
+  done < <([ "$config" = '{}' ] || jq -r '.home // [] | .[]' <<<"$config")
   mkdir -p "$dir"
   if [ "$config" = '{}' ]; then
     printf '{ "id": "de-host", "version": "1.0.0", "name": "Nothing from %s" }\n' "$DE_CONFIG" > "$dir/devcontainer-feature.json"
     printf '#!/bin/sh\n# Written by bin/de, %s has nothing to install\n' "$DE_CONFIG" > "$dir/install.sh"
   else
-    jq --arg config "$DE_CONFIG" '{
+    jq --arg config "$DE_CONFIG" --arg state "$DE_HOME_STATE" '{
         id: "de-host",
         version: "1.0.0",
         name: "Your own tools from \($config), written by bin/de",
         installsAfter: ["ghcr.io/devcontainers/features/node"],
         customizations: { vscode: { extensions: (.extensions // []) } }
-      } + (if (.features // {}) != {} then { dependsOn: .features } else {} end)' <<<"$config" > "$dir/devcontainer-feature.json"
+      }
+      + (if (.features // {}) != {} then { dependsOn: .features } else {} end)
+      + (if (.home // []) != [] then { mounts: [.home[] | { type: "bind", source: "\($state)/\(.)", target: "/home/vscode/\(.)" }] } else {} end)
+      + (if (.env // {}) != {} then { containerEnv: .env } else {} end)' <<<"$config" > "$dir/devcontainer-feature.json"
     {
       printf '#!/bin/sh\n# Written by bin/de from %s, do not edit\nset -e\n' "$DE_CONFIG"
       jq -r '.npm // [] | if length > 0 then "npm install --global --no-fund --no-audit " + (map(@sh) | join(" ")) else empty end' <<<"$config"
@@ -357,6 +388,19 @@ env_write_host_feature() {
 
 # Runs on the host before the containers start, see initializeCommand in
 # devcontainer.json, so opening a checkout from an editor works too
+# The Mac's mise refuses a checkout's config until it's trusted, also for
+# commands this script runs there, like npx. Trust is per path, so every
+# worktree needs it, the container trusts its own copy in postStart.sh.
+env_trust_mise() {
+  local file
+  command -v mise >/dev/null 2>&1 || return 0
+  for file in mise.toml mise.local.toml .mise.toml .mise.local.toml; do
+    [ -f "$ENV_PATH/$file" ] || continue
+    log "Trusting $file on the host (--no-trust to skip)"
+    run mise trust --quiet "$ENV_PATH/$file"
+  done
+}
+
 cmd_initialize() {
   # docker-compose.yml mounts it, and Docker refuses a missing bind source
   mkdir -p "$HOME/.config/git"
@@ -368,9 +412,10 @@ cmd_initialize() {
 # Copies the setup into a repository, from the de repository. bin/de is
 # generic and always updated; the template is repository
 # specific, a starting point that is only copied when missing, or with --force.
+# As de update, the same for a repository that's set up already.
 cmd_init() {
   local target="" force=false arg rel src common repo up_command entry
-  local usage_line="usage: de init [<repository>] [--force]"
+  local usage_line="usage: de $command [<repository>] [--force]"
   for arg in "$@"; do
     case "$arg" in
       --force) force=true ;;
@@ -383,6 +428,9 @@ cmd_init() {
   target="$(cd "$(git -C "$target" rev-parse --show-toplevel 2>/dev/null)" && pwd -P)" ||
     die "$target isn't a git checkout"
   [ "$target" != "$DE_ROOT" ] || die "$target is the de repository itself"
+  if [ "$command" = update ] && [ ! -f "$target/.devcontainer/env.conf" ]; then
+    die "$target isn't set up yet, run: de init"
+  fi
 
   common="$(cd "$target" && cd "$(git rev-parse --git-common-dir)" && pwd -P)"
   repo="$(env_sanitize "$(basename "$(dirname "$common")")")"
@@ -393,7 +441,11 @@ cmd_init() {
   else
     up_command=""
   fi
-  log "Setting up development environments in $target ($repo)"
+  if [ "$command" = update ]; then
+    log "Updating development environments in $target ($repo)"
+  else
+    log "Setting up development environments in $target ($repo)"
+  fi
 
   # Generic: always the same as in the de repository
   if cmp -s "$DE_ROOT/bin/de" "$target/bin/de"; then
@@ -429,8 +481,17 @@ cmd_init() {
     # A file inside, as a directory entry like de-host/ only matches what's in it
     git -C "$target" check-ignore -q --no-index -- "${entry%/}$([ "${entry%/}" = "$entry" ] || echo /x)" && continue
     log "Adding $entry to .gitignore"
+    # Not onto the last line when the file doesn't end in a newline
+    if [ -s "$target/.gitignore" ] && [ -n "$(tail -c1 "$target/.gitignore")" ]; then
+      echo >> "$target/.gitignore"
+    fi
     printf '%s\n' "$entry" >> "$target/.gitignore"
   done
+
+  if [ "$command" = update ]; then
+    log "Done, review the changes in $target and commit them"
+    return
+  fi
 
   cat <<EOF
 
@@ -445,26 +506,46 @@ Done. Review the repository specific files for $repo, then start it:
 
   cd $target && bin/de up
 
-Run de init there again later to update its bin/de.
+Run de update there later to update its bin/de.
 EOF
 }
 
+# Pulls the de repository, as install.sh does when it's already installed.
+# Repositories keep their bin/de until de update runs there.
+cmd_upgrade() {
+  local before after
+  [ "$#" -eq 0 ] || die "usage: de upgrade"
+  git -C "$DE_ROOT" rev-parse --git-dir >/dev/null 2>&1 || die "$DE_ROOT isn't a git checkout"
+  before="$(git -C "$DE_ROOT" rev-parse HEAD)"
+  log "Updating $DE_ROOT"
+  git -C "$DE_ROOT" pull --ff-only --quiet || die "couldn't update $DE_ROOT"
+  after="$(git -C "$DE_ROOT" rev-parse HEAD)"
+  if [ "$before" = "$after" ]; then
+    log "Already up to date"
+    return
+  fi
+  git -C "$DE_ROOT" log --oneline --no-decorate "$before..$after" >&2
+  log "Updated, run de update in a repository to update its bin/de"
+}
+
 cmd_new() {
-  local branch="" folder="" from="" file dest
+  local branch="" folder="" from="" file dest up_args=()
+  local usage_line="usage: bin/de new <branch> [folder] [--from <ref>] [--no-trust]"
   while [ "$#" -gt 0 ]; do
     case "$1" in
-      --from) [ "$#" -ge 2 ] || die "usage: bin/de new <branch> [folder] [--from <ref>]"; from="$2"; shift 2 ;;
-      -*) die "usage: bin/de new <branch> [folder] [--from <ref>]" ;;
+      --from) [ "$#" -ge 2 ] || die "$usage_line"; from="$2"; shift 2 ;;
+      --no-trust) up_args+=(--no-trust); shift ;;
+      -*) die "$usage_line" ;;
       *)
         if [ -z "$branch" ]; then branch="$1"
         elif [ -z "$folder" ]; then folder="$1"
-        else die "usage: bin/de new <branch> [folder] [--from <ref>]"
+        else die "$usage_line"
         fi
         shift
         ;;
     esac
   done
-  [ -n "$branch" ] || die "usage: bin/de new <branch> [folder] [--from <ref>]"
+  [ -n "$branch" ] || die "$usage_line"
   git check-ref-format --branch "$branch" >/dev/null || die "$branch isn't a valid branch name"
 
   [ -n "$folder" ] || folder="$(dirname "$ENV_MAIN_CHECKOUT")/$(env_sanitize "$ENV_REPO-$branch")"
@@ -498,7 +579,12 @@ cmd_new() {
     done
   fi
 
-  run "$folder/bin/de" up
+  # A branch's older bin/de may not know --no-trust
+  if [ "${#up_args[@]}" -gt 0 ] && ! grep -q -- '--no-trust' "$folder/bin/de"; then
+    warn "$branch's bin/de doesn't support --no-trust, it won't trust mise config anyway"
+    up_args=()
+  fi
+  run "$folder/bin/de" up ${up_args[@]+"${up_args[@]}"}
 
   cat <<EOF
 
@@ -512,11 +598,12 @@ EOF
 }
 
 cmd_up() {
-  local up_args=() arg other entry health deadline
+  local up_args=() trust=true arg other entry health deadline
   for arg in "$@"; do
     case "$arg" in
       --rebuild) up_args=(--remove-existing-container) ;;
-      *) die "usage: bin/de up [--rebuild]" ;;
+      --no-trust) trust=false ;;
+      *) die "usage: bin/de up [--rebuild] [--no-trust]" ;;
     esac
   done
 
@@ -550,6 +637,10 @@ cmd_up() {
         run cp -pR "$ENV_MAIN_CHECKOUT/$entry" "$ENV_PATH/$entry"
       done < "$ENV_MAIN_CHECKOUT/.worktreeinclude"
     fi
+  fi
+
+  if $trust; then
+    env_trust_mise
   fi
 
   log "Writing $ENV_DOTENV"
@@ -648,7 +739,7 @@ EOF
 cmd_code() {
   local target="$ENV_PATH" path branch name host_hex
   if [ "$#" -gt 1 ]; then
-    die "usage: bin/de code [branch | environment | folder]"
+    die "usage: bin/de code [branch | environment | folder | path]"
   elif [ "$#" -eq 1 ]; then
     target=""
     while IFS=$'\t' read -r path branch; do
@@ -658,6 +749,11 @@ cmd_code() {
         break
       fi
     done < <(checkouts)
+    # Or any folder in a checkout, e.g. the absolute path Orca's "Open in" adds
+    if [ -z "$target" ] && [ -d "$1" ]; then
+      target="$(cd "$(git -C "$1" rev-parse --show-toplevel)" && pwd -P)" ||
+        die "$1 is not inside a git checkout"
+    fi
 
     if [ -z "$target" ]; then
       warn "no checkout of $ENV_REPO matches $1, these exist:"
@@ -789,8 +885,15 @@ command="${1:-help}"
 if [ -n "$DE_TEMPLATE" ]; then
   case "$command" in
     help | -h | --help) usage_source; exit ;;
-    init) cmd_init "$@"; exit ;;
+    init | update) cmd_init "$@"; exit ;;
+    upgrade) cmd_upgrade "$@"; exit ;;
   esac
+  # `code <folder>` (Orca's "Open in" runs it from /) opens the checkout that
+  # folder is in, from inside it, so a checkout's older bin/de handles it too
+  if [ "$command" = code ] && [ "$#" -eq 1 ] && [ -d "$1" ]; then
+    cd "$1"
+    shift
+  fi
   # Everything else is for the checkout the current directory is in
   checkout="$(git rev-parse --show-toplevel 2>/dev/null)" || die "not inside a git checkout"
   [ -f "$checkout/.devcontainer/env.conf" ] && [ -x "$checkout/bin/de" ] ||
@@ -801,7 +904,7 @@ fi
 case "$command" in
   help | -h | --help) usage; exit ;;
   initialize | new | up | exec | status | code | down | prune) ;;
-  init) die "run de init from the de repository, which bin/de comes from" ;;
+  init | update | upgrade) die "run de $command from the de repository, which bin/de comes from" ;;
   *) usage >&2; die "unknown command: $command" ;;
 esac
 
