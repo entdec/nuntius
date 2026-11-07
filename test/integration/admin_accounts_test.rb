@@ -110,7 +110,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/nuntius/admin/templates/#{@other_template.id}/edit']", count: 0
   end
 
-  test "a cancelled campaign is shown like a sent one, without a form or a publish action" do
+  test "a cancelled campaign is shown like a sent one, without a form or a schedule action" do
     campaign = nuntius_campaigns(:valentines_day)
     campaign.update_columns(transport: "mail")
     campaign.cancel!
@@ -121,8 +121,59 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Valentines day 2020"
 
     get_table "campaigns"
+    assert_not_includes response.body, "Valentines day 2020"
+
+    get_table "campaigns", view: "cancelled"
     assert_includes response.body, "cancelled"
-    assert_not_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/publish"
+    assert_not_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/schedule"
+  end
+
+  test "a draft campaign is scheduled from the admin, and descheduled back to draft" do
+    campaign = nuntius_campaigns(:valentines_day)
+    campaign.update_columns(transport: "mail")
+
+    get_table "campaigns"
+    assert_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/schedule"
+
+    post "/nuntius/admin/campaigns/#{campaign.id}/schedule"
+    assert_redirected_to "/nuntius/admin/campaigns"
+    assert campaign.reload.scheduled?
+
+    get_table "campaigns"
+    assert_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/deschedule"
+    get "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/deschedule']"
+
+    post "/nuntius/admin/campaigns/#{campaign.id}/deschedule"
+    assert_redirected_to "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert campaign.reload.draft?
+  end
+
+  test "the tables show open campaigns, enabled templates and subscribed subscribers by default" do
+    campaign = nuntius_campaigns(:valentines_day)
+    campaign.update_column(:state, "sent")
+    @template.update!(enabled: false)
+    list = nuntius_lists(:valentines)
+    list.subscribers.create!(email: "gone@example.com", unsubscribed_at: 1.day.ago)
+    list.subscribers.create!(email: "here@example.com")
+
+    get_table "campaigns"
+    assert_not_includes response.body, "Valentines day 2020"
+    assert_includes response.body, "Marry XMAS 2020"
+    get_table "campaigns", view: "sent"
+    assert_includes response.body, "Valentines day 2020"
+
+    get_table "templates"
+    assert_not_includes response.body, "Own template"
+    get_table "templates", view: "disabled"
+    assert_includes response.body, "Own template"
+
+    get_table "subscribers", params: {list_id: list.id}
+    assert_includes response.body, "here@example.com"
+    assert_not_includes response.body, "gone@example.com"
+    get_table "subscribers", view: "unsubscribed", params: {list_id: list.id}
+    assert_includes response.body, "gone@example.com"
+    assert_not_includes response.body, "here@example.com"
   end
 
   test "a draft or sending campaign can be cancelled from the admin, another account's not" do
@@ -131,7 +182,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
 
     get "/nuntius/admin/campaigns/#{campaign.id}/edit"
     assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/cancel'][data-turbo-confirm^='Are you sure you want to cancel']"
-    get_table "campaigns"
+    get_table "campaigns", view: "sent"
     assert_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/cancel"
     assert_includes response.body, "Are you sure you want to cancel this campaign?"
 
@@ -151,8 +202,8 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
   private
 
   # The rows of an admin table, which its page loads separately
-  def get_table(name)
-    get "/mensa/tables/nuntius%2F#{name}", params: {turbo_frame_id: "table"}
+  def get_table(name, view: nil, params: {})
+    get "/mensa/tables/nuntius%2F#{name}", params: {turbo_frame_id: "table", table_view_id: view, params: params}.compact
     assert_response :success
   end
 end

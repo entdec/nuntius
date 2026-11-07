@@ -592,7 +592,7 @@ We support multiple lists with many subscribers.
 
 Mail campaigns are designed in the email editor, in a layout, like templates (see [Email designs](#email-designs)). When the campaign's list allows unsubscribing, the campaign must contain the Manage subscription block, which links each subscriber to their own page.
 
-You can manually publish the campaign or have Nuntius publish the campaign after a certain date/time. If you want to have Nuntius publish it for you, add `Nuntius::CampaignPublishJob` to your cron.
+A campaign starts as a draft. Scheduling it (the Schedule action in the admin, or `campaign.schedule!`) hands it to `Nuntius::CampaignPublishJob`, which publishes it at its publish time, or when it has none, within a minute (scheduling runs the job a minute later). Add `Nuntius::CampaignPublishJob` to your cron, every minute or so, to publish campaigns at their publish time. Descheduling a campaign (`campaign.deschedule!`) puts it back in draft, so it can be changed.
 
 ## Development
 

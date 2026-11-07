@@ -40,13 +40,21 @@ module Nuntius
         respond_with :admin, @campaign, action: :edit
       end
 
-      def publish
-        @campaign.publish! if @campaign.can_publish?
+      # CampaignPublishJob publishes it at its publish_at, or within a minute without one
+      def schedule
+        @campaign.schedule! if @campaign.can_schedule?
 
         redirect_to :admin_campaigns, status: :see_other
       end
 
-      # Stops a draft or sending campaign, keeping the messages it sent so far
+      # Back to draft, to change it before it's published
+      def deschedule
+        @campaign.deschedule! if @campaign.can_deschedule?
+
+        redirect_to :edit_admin_campaign, status: :see_other
+      end
+
+      # Stops a draft, scheduled or sending campaign, keeping the messages it sent so far
       def cancel
         @campaign.cancel! if @campaign.can_cancel?
 

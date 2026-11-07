@@ -35,7 +35,8 @@ Nuntius::Engine.routes.draw do
   namespace :admin do
     resources :campaigns do
       member do
-        post "publish", action: "publish"
+        post "schedule", action: "schedule"
+        post "deschedule", action: "deschedule"
         post "cancel", action: "cancel"
         get "media", to: "media#index", defaults: {owner: "campaign"}
         post "media", to: "media#create", defaults: {owner: "campaign"}

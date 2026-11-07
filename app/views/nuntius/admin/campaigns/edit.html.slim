@@ -47,6 +47,9 @@
           = f.attachments :images
 - else
   = sts.card :nuntius_admin_campaigns, title: @campaign.name, icon: 'fal fa-megaphone', content_padding: false do |card|
+    - if @campaign.can_deschedule?
+      - card.with_action
+        = button_to(t(".deschedule"), deschedule_admin_campaign_path(@campaign), class: 'button')
     - if @campaign.can_cancel?
       - card.with_action
         = button_to(t(".cancel"), cancel_admin_campaign_path(@campaign), class: 'button', form: {data: {turbo_confirm: t("campaign_cancel_confirm")}})

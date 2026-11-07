@@ -28,6 +28,21 @@ module Nuntius
 
       order description: :asc
 
+      view :default do
+        name -> { I18n.t("nuntius.tables.templates.views.enabled") }
+        filter :enabled do
+          operator :is
+          value true
+        end
+      end
+      view :disabled do
+        name -> { I18n.t("nuntius.tables.templates.views.disabled") }
+        filter :enabled do
+          operator :is
+          value false
+        end
+      end
+
       link { |template| nuntius.edit_admin_template_path(template) }
     end
 

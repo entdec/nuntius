@@ -1,5 +1,5 @@
 en:
-  campaign_publish_confirm: "Are you sure you want to send out this campaign?"
+  campaign_schedule_confirm: "Are you sure you want to send out this campaign? It's sent at its publish time, or right away without one."
   campaign_cancel_confirm: "Are you sure you want to cancel this campaign? Messages that were sent stay, the rest is not sent."
   choose_files: Choose files
   activerecord:
@@ -57,6 +57,20 @@ en:
       templates:
         new: New template
   nuntius:
+    tables:
+      campaigns:
+        views:
+          open: Open
+          sent: Sent
+          cancelled: Cancelled
+      templates:
+        views:
+          enabled: Enabled
+          disabled: Disabled
+      subscribers:
+        views:
+          subscribed: Subscribed
+          unsubscribed: Unsubscribed
     admin:
       not_saved: "%{resource} could not be saved: %{errors}"
       shared:
@@ -87,6 +101,7 @@ en:
           messages_not_sent: Messages not sent
           messages_opened: Messages opened
           messages_clicked: Messages clicked
+          deschedule: Back to draft
           cancel: Cancel campaign
         index:
           card:

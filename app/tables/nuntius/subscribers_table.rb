@@ -35,7 +35,7 @@ module Nuntius
       column(:tags) do
         render do
           html do |subscriber|
-            subscriber.tags&.join(",")
+            Array(subscriber.tags).join(",")
           end
         end
       end
@@ -51,6 +51,19 @@ module Nuntius
               end
             end
           end
+        end
+      end
+
+      view :default do
+        name -> { I18n.t("nuntius.tables.subscribers.views.subscribed") }
+        filter :unsubscribed_at do
+          operator :is_empty
+        end
+      end
+      view :unsubscribed do
+        name -> { I18n.t("nuntius.tables.subscribers.views.unsubscribed") }
+        filter :unsubscribed_at do
+          operator :isnt_empty
         end
       end
 

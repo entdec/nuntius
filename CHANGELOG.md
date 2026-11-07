@@ -22,12 +22,15 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - `account` on messengers, for the account a messenger sends for when its object doesn't say (`account ->(shipment) { shipment.order.account }`). Without an account to send for, a messenger raises `Nuntius::MissingAccountException`.
 - A warning on templates, campaigns and layouts in the email editor that still read metadata (`{{ template.metadata.logo_url }}`), and before converting a template whose old layout does.
 - The `feedback`, `headers` and `envelope_from` columns on messages, for what was in their metadata.
-- The `cancelled` campaign state, with the `cancel` event and a Cancel action in the admin (in the campaigns table, and on the page of a campaign being sent), for draft or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
+- The `cancelled` campaign state, with the `cancel` event and a Cancel action in the admin (in the campaigns table, and on the page of a campaign that's scheduled or being sent), for draft, scheduled or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
+- The `scheduled` campaign state, with the `schedule` and `deschedule` events and Schedule and Back to draft actions in the admin. `Nuntius::CampaignPublishJob` publishes scheduled campaigns at their `publish_at` (run it from cron), or within a minute without one.
+- Default views in the admin tables: open (draft and scheduled), sent and cancelled campaigns; enabled and disabled templates; subscribed and unsubscribed subscribers of a list.
 
 ### Changed
 
 - Every new mail and LMTP template and campaign needs a layout.
 - Mail campaigns to a list that allows unsubscribing must contain the Manage subscription block.
+- Campaigns are only published by `Nuntius::CampaignPublishJob`, and only once they're scheduled: `publish` goes from `scheduled` to `sending`, no longer from `draft`, and the admin's Publish action (`POST /admin/campaigns/:id/publish`) is replaced by Schedule. The job no longer publishes draft campaigns whose `publish_at` has passed.
 - Templates and campaigns have a preview text.
 - The editor compiles MJML on the server, at `<where Nuntius is mounted>/tess_edit/compile`, behind Nuntius' admin authentication.
 - A messenger picks the templates of the account it sends for and the global ones, then narrows them with its `template_scope`. A global template is left out for a transport the account has its own template for.
@@ -50,6 +53,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 ### Fixed
 
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
+- The subscribers table raised for a subscriber with tags.
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
 
 ### Upgrading from 1.x

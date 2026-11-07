@@ -19,8 +19,18 @@ module Nuntius
     validate :subscription_link, if: -> { email_design? && list&.allow_unsubscribe }
 
     state_machine initial: :draft do
+      # A scheduled campaign is published by CampaignPublishJob at its
+      # publish_at, or within a minute without one
+      event :schedule do
+        transition draft: :scheduled
+      end
+
+      event :deschedule do
+        transition scheduled: :draft
+      end
+
       event :publish do
-        transition draft: :sending
+        transition scheduled: :sending
       end
 
       event :sent do
@@ -30,7 +40,11 @@ module Nuntius
       # Stops a campaign without sending (the rest of) it, keeping the messages
       # it sent so far
       event :cancel do
-        transition [:draft, :sending] => :cancelled
+        transition [:draft, :scheduled, :sending] => :cancelled
+      end
+
+      after_transition(on: :schedule) do |campaign, transition|
+        CampaignPublishJob.set(wait: 1.minute).perform_later
       end
 
       after_transition(on: :publish) do |campaign, transition|
