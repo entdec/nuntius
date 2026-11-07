@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -119,6 +119,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.jsonb "json"
     t.text "mjml"
     t.string "preview_text"
+    t.uuid "account_id", null: false
+    t.index ["account_id"], name: "index_nuntius_campaigns_on_account_id"
     t.index ["layout_id"], name: "index_nuntius_campaigns_on_layout_id"
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
     t.index ["old_layout_id"], name: "index_nuntius_campaigns_on_old_layout_id"
@@ -142,7 +144,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.string "digest"
     t.string "from"
     t.text "html"
-    t.jsonb "metadata"
+    t.jsonb "params"
     t.jsonb "payload"
     t.string "provider"
     t.string "provider_id"
@@ -159,20 +161,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.jsonb "json", default: {}, null: false
     t.text "mjml"
     t.text "html"
-    t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "account_id", null: false
+    t.index ["account_id"], name: "index_nuntius_layouts_on_account_id"
   end
 
   create_table "nuntius_lists", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.boolean "allow_unsubscribe", default: true, null: false
     t.datetime "created_at", null: false
     t.text "description"
-    t.jsonb "metadata", default: {}, null: false
     t.string "name"
     t.string "slug"
     t.integer "subscribers_count"
     t.datetime "updated_at", null: false
+    t.uuid "account_id", null: false
+    t.index ["account_id"], name: "index_nuntius_lists_on_account_id"
     t.index ["slug"], name: "index_nuntius_lists_on_slug", unique: true
   end
 
@@ -180,8 +184,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.datetime "created_at", null: false
     t.jsonb "data"
     t.string "key"
-    t.jsonb "metadata"
     t.datetime "updated_at", null: false
+    t.uuid "account_id", null: false
+    t.index ["account_id"], name: "index_nuntius_locales_on_account_id"
   end
 
   create_table "nuntius_message_trackings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -201,7 +206,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.string "from"
     t.text "html"
     t.datetime "last_sent_at", precision: nil
-    t.jsonb "metadata", default: {}
     t.uuid "nuntiable_id"
     t.string "nuntiable_type"
     t.integer "open_count", default: 0
@@ -220,6 +224,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.string "to"
     t.string "transport"
     t.datetime "updated_at", null: false
+    t.uuid "account_id", null: false
+    t.jsonb "feedback"
+    t.jsonb "headers", default: {}, null: false
+    t.string "envelope_from"
+    t.index ["account_id"], name: "index_nuntius_messages_on_account_id"
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
     t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
@@ -233,6 +242,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.jsonb "metadata", default: {}, null: false
     t.string "name"
     t.datetime "updated_at", null: false
+    t.uuid "account_id", null: false
+    t.index ["account_id"], name: "index_nuntius_old_layouts_on_account_id"
   end
 
   create_table "nuntius_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -276,6 +287,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.text "mjml"
     t.string "preview_text"
     t.jsonb "converted_from"
+    t.uuid "account_id", null: false
+    t.boolean "global", default: false, null: false
+    t.index ["account_id"], name: "index_nuntius_templates_on_account_id"
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
     t.index ["old_layout_id"], name: "index_nuntius_templates_on_old_layout_id"
   end
@@ -296,6 +310,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.string "name"
     t.string "state"
     t.datetime "updated_at", null: false
+    t.uuid "account_id"
+    t.index ["account_id"], name: "index_reports_on_account_id"
   end
 
   create_table "sti_bases", force: :cascade do |t|
@@ -308,6 +324,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
     t.string "name"
     t.string "state"
     t.datetime "updated_at", null: false
+    t.uuid "account_id"
+    t.index ["account_id"], name: "index_users_on_account_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -317,15 +335,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
   add_foreign_key "mensa_table_views", "users"
   add_foreign_key "nuntius_attachments_messages", "nuntius_attachments", column: "attachment_id"
   add_foreign_key "nuntius_attachments_messages", "nuntius_messages", column: "message_id"
+  add_foreign_key "nuntius_campaigns", "accounts"
   add_foreign_key "nuntius_campaigns", "nuntius_layouts", column: "layout_id"
   add_foreign_key "nuntius_campaigns", "nuntius_lists", column: "list_id"
   add_foreign_key "nuntius_campaigns", "nuntius_old_layouts", column: "old_layout_id"
+  add_foreign_key "nuntius_layouts", "accounts"
+  add_foreign_key "nuntius_lists", "accounts"
+  add_foreign_key "nuntius_locales", "accounts"
   add_foreign_key "nuntius_message_trackings", "nuntius_messages", column: "message_id"
+  add_foreign_key "nuntius_messages", "accounts"
   add_foreign_key "nuntius_messages", "nuntius_campaigns", column: "campaign_id"
   add_foreign_key "nuntius_messages", "nuntius_messages", column: "parent_message_id"
   add_foreign_key "nuntius_messages", "nuntius_subscribers", column: "subscriber_id"
   add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"
+  add_foreign_key "nuntius_old_layouts", "accounts"
   add_foreign_key "nuntius_subscribers", "nuntius_lists", column: "list_id"
+  add_foreign_key "nuntius_templates", "accounts"
   add_foreign_key "nuntius_templates", "nuntius_layouts", column: "layout_id"
   add_foreign_key "nuntius_templates", "nuntius_old_layouts", column: "old_layout_id"
+  add_foreign_key "reports", "accounts"
+  add_foreign_key "users", "accounts"
 end

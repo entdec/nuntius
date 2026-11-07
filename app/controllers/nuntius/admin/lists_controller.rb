@@ -41,7 +41,7 @@ module Nuntius
       end
 
       def list_params
-        params.require(:list).permit(:name, :slug, :allow_unsubscribe, :description, :metadata_yaml)
+        params.require(:list).permit(:name, :slug, :allow_unsubscribe, :description)
       end
     end
   end

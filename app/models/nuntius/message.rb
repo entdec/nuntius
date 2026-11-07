@@ -12,7 +12,7 @@ module Nuntius
   #   soft_bounced - temporary delivery failure, the provider will retry
   # Not all transports may provide all states
   class Message < ApplicationRecord
-    include Nuntius::Concerns::MetadataScoped
+    include Nuntius::Concerns::Owned
 
     has_and_belongs_to_many :attachments, class_name: "Attachment"
 

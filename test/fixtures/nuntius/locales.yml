@@ -1,4 +1,5 @@
 nl:
+  account: one
   key: nl
   data:
     nl:
@@ -9,6 +10,7 @@ nl:
             greeting: "Hoi"
 
 en:
+  account: one
   key: en
   data:
     en:

@@ -2,7 +2,7 @@
 
 module Nuntius
   class LayoutDrop < ApplicationDrop
-    delegate :name, :metadata, to: :@object
+    delegate :name, to: :@object
 
     def attachments
       ActiveStorageAttachedManyDrop.new(@object.attachments)

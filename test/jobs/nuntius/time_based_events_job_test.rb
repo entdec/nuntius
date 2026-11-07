@@ -26,23 +26,25 @@ module Nuntius
       assert_includes subject.html, "- 5 days"
     end
 
-    test "uses template metadata to scope timebased templates to the account or allow globals" do
+    test "sends a timebased template only for its own account, and a global one for accounts without their own" do
       account = Account.create!(name: "target", created_at: 5.days.ago)
       other_account = Account.create!(name: "other", created_at: 5.days.ago)
+      root = Account.create!(name: "root", created_at: 1.year.ago)
+      plain_account = Account.create!(name: "plain", created_at: 5.days.ago)
 
-      account_template = Nuntius::Template.create!(description: "account specific", klass: "Account", transport: "mail", event: "after_created", to: "test@example.org", html: "Hello {{name}} - account", interval: "5 days", created_at: 1.month.ago, metadata: {account_id: account.id})
-      global_template = Nuntius::Template.create!(description: "global", klass: "Account", transport: "mail", event: "after_created", to: "test@example.org", html: "Hello {{name}} - global", interval: "5 days", created_at: 1.month.ago, metadata: {global: true})
-      other_account_template = Nuntius::Template.create!(description: "other account", klass: "Account", transport: "mail", event: "after_created", to: "test@example.org", html: "Hello {{name}} - other", interval: "5 days", created_at: 1.month.ago, metadata: {account_id: other_account.id})
+      template = ->(description, owner, global = false) { Nuntius::Template.create!(description: description, klass: "Account", transport: "mail", event: "after_created", to: "test@example.org", html: "Hello {{name}} - #{description}", interval: "5 days", created_at: 1.month.ago, account: owner, global: global) }
+      account_template = template.call("account", account)
+      other_account_template = template.call("other", other_account)
+      global_template = template.call("global", root, true)
 
-      assert_difference -> { Nuntius::Message.count }, 4 do
-        perform_enqueued_jobs only: [Nuntius::MessengerJob, Nuntius::TimebasedEventsJob] do
-          Nuntius::TimebasedEventsJob.perform_now
-        end
+      perform_enqueued_jobs only: [Nuntius::MessengerJob, Nuntius::TimebasedEventsJob] do
+        Nuntius::TimebasedEventsJob.perform_now
       end
 
-      assert_equal [account_template.id, global_template.id].sort, Nuntius::Message.where(nuntiable: account).pluck(:template_id).uniq.sort
-      assert_equal [global_template.id, other_account_template.id].sort, Nuntius::Message.where(nuntiable: other_account).pluck(:template_id).uniq.sort
-      assert_equal 0, Nuntius::Message.where(template: other_account_template).where(nuntiable: account).count
+      assert_equal [account_template.id], Nuntius::Message.where(nuntiable: account).pluck(:template_id)
+      assert_equal [other_account_template.id], Nuntius::Message.where(nuntiable: other_account).pluck(:template_id)
+      assert_equal [global_template.id], Nuntius::Message.where(nuntiable: plain_account).pluck(:template_id)
+      assert_equal plain_account, Nuntius::Message.find_by(nuntiable: plain_account).account
     end
   end
 end

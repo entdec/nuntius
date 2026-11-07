@@ -9,9 +9,7 @@ module Nuntius
     end
 
     test "applies messenger-provided headers to the delivered mail" do
-      message = build_message(metadata: {
-        "mail" => {"headers" => {"Auto-Submitted" => "auto-replied", "Precedence" => "bulk"}}
-      })
+      message = build_message(headers: {"Auto-Submitted" => "auto-replied", "Precedence" => "bulk"})
 
       Nuntius::SmtpMailProvider.new(message).deliver
 
@@ -20,8 +18,27 @@ module Nuntius
       assert_equal "bulk", mail["Precedence"].value
     end
 
+    test "sends the message id as Lettermint metadata when Lettermint's webhook is set up" do
+      original = Nuntius.config.lettermint_webhook_settings
+      Nuntius.config.lettermint_webhook(api_token: "token", project_id: "project", setup_on_boot: false)
+      message = build_message
+      message.id = SecureRandom.uuid
+
+      Nuntius::SmtpMailProvider.new(message).deliver
+
+      assert_equal message.id, Mail::TestMailer.deliveries.last["X-LM-Metadata-nuntius_message_id"].value
+    ensure
+      Nuntius.config.instance_variable_set(:@lettermint_webhook_settings, original)
+    end
+
+    test "sends no Lettermint metadata without Lettermint's webhook" do
+      Nuntius::SmtpMailProvider.new(build_message).deliver
+
+      assert_nil Mail::TestMailer.deliveries.last["X-LM-Metadata-nuntius_message_id"]
+    end
+
     test "uses a null reverse-path when a null envelope sender is requested" do
-      message = build_message(metadata: {"mail" => {"envelope_from" => "<>"}})
+      message = build_message(envelope_from: "<>")
 
       Nuntius::SmtpMailProvider.new(message).deliver
 
@@ -30,7 +47,7 @@ module Nuntius
     end
 
     test "applies a custom (non-null) envelope sender when requested" do
-      message = build_message(metadata: {"mail" => {"envelope_from" => "bounce@example.com"}})
+      message = build_message(envelope_from: "bounce@example.com")
 
       Nuntius::SmtpMailProvider.new(message).deliver
 
@@ -99,14 +116,14 @@ module Nuntius
       end
     end
 
-    def build_message(to: "user@example.com", metadata: {})
+    def build_message(to: "user@example.com", **attributes)
       Nuntius::Message.new(
         transport: "mail",
         provider: "smtp",
         to: to,
         subject: "Test",
         text: "Body",
-        metadata: metadata
+        **attributes
       )
     end
   end

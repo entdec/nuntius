@@ -37,6 +37,13 @@ module Nuntius
         (images.to_a + Array(layout&.email_images)).uniq(&:blob_id)
       end
 
+      # The metadata variables its design still uses, see MetadataVariables
+      def metadata_variables
+        return [] unless email_design?
+
+        MetadataVariables.in(self, subject, preview_text, mjml, text)
+      end
+
       # Whether it is designed in the email editor, rather than an older
       # template or campaign with an old layout or plain HTML.
       def email_design?

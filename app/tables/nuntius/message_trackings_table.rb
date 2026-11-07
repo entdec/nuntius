@@ -15,7 +15,7 @@ module Nuntius
     private
 
     def scope
-      @scope = Nuntius::MessageTracking.where(message_id: params[:message_id])
+      @scope = Nuntius::MessageTracking.where(message_id: Nuntius::Message.visible.where(id: params[:message_id]))
     end
   end
 end

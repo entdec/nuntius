@@ -40,7 +40,7 @@ module Nuntius
       end
 
       def locale_params
-        params.require(:locale).permit(:key, :data, :metadata_yaml, :data_yaml)
+        params.require(:locale).permit(:key, :data, :data_yaml)
       end
     end
   end

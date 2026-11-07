@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  belongs_to :account, default: -> { Current.account }
+
   state_machine initial: :pending do
     event :activate do
       transition %i[disabled pending] => :active

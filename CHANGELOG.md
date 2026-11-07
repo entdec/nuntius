@@ -4,6 +4,8 @@
 
 Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit), a new dependency from RubyGems) instead of written in Markdown or Trix. See [Email designs](README.md#email-designs) in the README.
 
+Every template, campaign, list, layout, locale and message now belongs to an account, through an `account_id` column instead of an `account_id` in its metadata, and templates can be global. See [Accounts](README.md#accounts) in the README.
+
 ### Added
 
 - Layouts designed in the email editor, with one Content block where each template or campaign puts its own content. Templates and draft campaigns follow their layout when it changes, and show it locked in their editor.
@@ -14,6 +16,11 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
 - Converting a template with an old layout to the email editor, from its page in the admin.
 - Lettermint webhooks: Nuntius creates and checks the webhook itself and updates messages from Lettermint's events (see [Lettermint](README.md#lettermint)).
 - The `soft_bounced` message state, for temporary delivery failures the provider retries.
+- Accounts: an `account_id` on templates, campaigns, lists, layouts, old layouts, locales and messages, with the configuration options `account_class`, `current_account`, `account_for` and `can_create_global`, and the scopes `owned_by`, `global` and `available_to`.
+- Global templates, used for every account. Only their own account sees them in the admin.
+- `account` on messengers, for the account a messenger sends for when its object doesn't say (`account ->(shipment) { shipment.order.account }`). Without an account to send for, a messenger raises `Nuntius::MissingAccountException`.
+- A warning on templates, campaigns and layouts in the email editor that still read metadata (`{{ template.metadata.logo_url }}`), and before converting a template whose old layout does.
+- The `feedback`, `headers` and `envelope_from` columns on messages, for what was in their metadata.
 
 ### Changed
 
@@ -21,11 +28,21 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
 - Mail campaigns to a list that allows unsubscribing must contain the Manage subscription block.
 - Templates and campaigns have a preview text.
 - The editor compiles MJML on the server, at `<where Nuntius is mounted>/tess_edit/compile`, behind Nuntius' admin authentication.
+- A messenger picks the templates of the account it sends for and the global ones, then narrows them with its `template_scope`. A global template is left out for a transport the account has its own template for.
+- A message belongs to the account it's sent for, also when the template is global, and no longer copies the template's or campaign's metadata.
+- `visible` (what the admin shows) is the current account's records by default. Records of other accounts give a 404 in the admin, also through campaign messages, message trackings and subscribers. A template's layout, and a campaign's list and layout, must belong to its own account.
+- Timebased templates are only sent for objects whose messenger picks them, so for their own account's objects (and for a global template, other accounts' too). `timebased_scope` blocks get the template instead of its metadata.
+- A template or campaign uses the locales of its own account.
+- The admin only edits the metadata of templates that use an old layout. Layouts, lists, locales and messages have no metadata any more; inbound messages keep the provider's parameters as `params`.
+- Lettermint events are matched on the message id Nuntius sends as Lettermint metadata (`X-LM-Metadata-nuntius_message_id`), and the Lettermint message id is no longer stored.
 
 ### Removed
 
 - Markdown and Trix editing of mail templates and campaigns. Templates with an old layout keep sending as before until you convert them.
 - The `{{ subscriber_link }}` variable and the `subscriber_url_text` translation; use the Manage subscription block. `Subscriber#link` is replaced by `Subscriber#url(message)`.
+- `Nuntius::Concerns::MetadataScoped`, with the jsonb scopes it brought (`metadata_in`, `metadata_eql`, …), and the configuration options `metadata_fields`, `metadata_humanize`, `add_metadata` and `default_template_scope`.
+- The metadata columns in the admin tables, and the metadata editors of campaigns, layouts, lists and locales.
+- `metadata` on the layout drop.
 
 ### Upgrading from 1.x
 
@@ -45,7 +62,31 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
    @import "../builds/tailwind/tess_edit";
    ```
 
-4. **Run the migrations:**
+4. **Configure accounts** in your Nuntius initializer, replacing `metadata_fields`, `metadata_humanize`, `add_metadata`, `default_template_scope` and `visible_scope` (see [Accounts](README.md#accounts)):
+
+   ```ruby
+   # Before
+   config.metadata_fields = {account_id: {collection: -> { Account.all.map { |a| [a.name, a.id] } }, current: -> { Current.account.id }}}
+   config.metadata_humanize = ->(data) { Account.find_by(id: data["account_id"])&.name }
+   config.visible_scope = -> { where("#{table_name}.metadata->>'account_id' = ?", Current.account.id) }
+
+   # After
+   config.account_class = "Account"
+   config.current_account = -> { Current.account }
+   config.can_create_global = -> { Current.account.parent_id.nil? } # if some account makes templates for all
+   ```
+
+   `visible_scope` now defaults to the current account's records; leave it out unless the admin should show something else.
+5. **Check your data.** The migration takes each record's account from `account_id` in its metadata, as `metadata_fields` filled it, and `global` from `global` in a template's metadata (`true` or `"true"`). Messages without one get their template's or campaign's account. To see what would be left without an account:
+
+   ```sql
+   SELECT 'nuntius_templates', COUNT(*) FROM nuntius_templates t
+   WHERE NOT EXISTS (SELECT 1 FROM accounts a WHERE a.id::text = t.metadata->>'account_id');
+   -- and the same for nuntius_campaigns, nuntius_lists, nuntius_layouts, nuntius_locales and nuntius_messages
+   ```
+
+   Layouts, lists and locales lose their metadata. In 1.x it only held the account; when they hold anything else the migration stops, so move it elsewhere first.
+6. **Run the migrations:**
 
    ```sh
    bin/rails nuntius:install:migrations
@@ -53,7 +94,25 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
    ```
 
    The existing layouts become old layouts (`nuntius_old_layouts`, with their attachments), and templates and campaigns keep them as `old_layout_id`. New layouts go in `nuntius_layouts`. The migrations also add inline attachments (for `embed_image`), `converted_from` on templates and `nuntius_webhooks` (for Lettermint).
-5. **Make new layouts and convert your templates.** Create layouts in the admin, then convert each template with an old layout from its page. Until then it keeps sending with its old layout.
+
+   Then every record gets its `account_id` (a foreign key to `config.account_class`'s table, with the same type as its id), templates get `global`, and `account_id` and `global` are taken out of the metadata. Messages get `feedback`, `headers` and `envelope_from` from their metadata, which is dropped with that of layouts, lists and locales. Inbound messages' `metadata` becomes `params`. The account migration updates messages 10,000 at a time.
+
+   When records are left without an account, that migration stops, is rolled back and says how many there are per table. Set an existing `account_id` in their metadata, or give them all one account, as an app with a single account would:
+
+   ```sh
+   NUNTIUS_ACCOUNT_ID=<account id> bin/rails db:migrate
+   ```
+
+   When layouts, lists or locales still have metadata besides their account, that migration stops too. `NUNTIUS_DROP_METADATA=1 bin/rails db:migrate` drops it anyway.
+7. **Update your messengers.**
+   - Drop `template_scope`s that only selected the account's templates, like `where("metadata->>'account_id' = ? or metadata->>'global' = 'true'", screening.account_id)`: that is what a messenger does now.
+   - Rewrite the ones that still need to narrow it down with columns instead of metadata, e.g. `metadata_in("account_id", user.account.self_and_ancestor_ids)` becomes `owned_by(user.account.self_and_ancestor_ids)`.
+   - When a messenger's object doesn't know its account (`object.account`), give the messenger an `account`: `account ->(flow) { Account.find(flow.account_id) }`. An account sends for itself, and an object without an account falls back to `config.current_account`, which usually isn't set in jobs.
+   - `timebased_scope` blocks get the template instead of its metadata: `timebased_scope :after_created do |time_range, template|`. Timebased templates are now only sent for the objects of the account they're for, so drop scopes that filtered on the template's account.
+   - Code that read or wrote `metadata` on messages uses `feedback`, `headers` and `envelope_from`. Direct messages (`Nuntius::Message.new(…)`) need an `account`.
+8. **Make new layouts and convert your templates.** Create layouts in the admin, then convert each template with an old layout from its page. Until then it keeps sending with its old layout.
 
    Translation keys of a template start with its layout's name. A template converted into a layout with another name gets new keys, so give the new layout the old one's name when you rely on them.
-6. **Replace `{{ subscriber_link }}`** in your own templates with the Manage subscription block, or with a link to `{{ subscriber_url }}`.
+
+   Values the old layout read from the template's metadata, like `{{ template.metadata.logo_url }}`, should come from a drop in the new design, like `{{ user.account.logo_url }}`. The template's page shows which ones its old layout reads, and what their value is, before you convert; after converting, it warns about any left in the design.
+9. **Replace `{{ subscriber_link }}`** in your own templates with the Manage subscription block, or with a link to `{{ subscriber_url }}`.

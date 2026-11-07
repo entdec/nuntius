@@ -1,28 +1,33 @@
 one_recipient:
+  account: one
   to: "test@example.com"
   html: <b>Hoi</b>
   text: Hoi
   transport: mail
 
 two_recipients:
+  account: one
   to: "test@example.com,test2@example.com"
   html: <b>Hoi</b>
   text: Hoi
   transport: mail
 
 blocked_recipient:
+  account: one
   to: "piet@kanariepiet.com"
   html: <b>Nee, Piet ken arie niet.</b>
   text: Nee, Piet ken arie niet.
   transport: mail
 
 blocked_and_non_blocked_recipients:
+  account: one
   to: "mark@boxture.com,test@example.com,not-mark@boxture.com"
   html: <b>Hello World</b>
   text: Hello World
   transport: mail
 
 complaint_recipient:
+  account: one
   to: "qux@foobar.com"
   html: <b>Nee, Piet ken arie niet.</b>
   text: Nee, Piet ken arie niet.
@@ -30,6 +35,7 @@ complaint_recipient:
   state: 'complaint'
 
 bounced_recipient:
+  account: one
   to: "baz@foobar.com"
   html: <b>Nee, Piet ken arie niet.</b>
   text: Nee, Piet ken arie niet.

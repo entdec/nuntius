@@ -5,7 +5,7 @@ module Nuntius
   # or campaign goes. Templates and campaigns that aren't converted to the new
   # layouts yet still render with it. Removed in Nuntius 2.1.
   class OldLayout < ApplicationRecord
-    include Nuntius::Concerns::MetadataScoped
+    include Nuntius::Concerns::Owned
     include Nuntius::Concerns::Yamlify
 
     has_many_attached :attachments, service: Nuntius.config.active_storage_service

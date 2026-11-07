@@ -6,10 +6,10 @@
 # Events look like this:
 #  {"id"=>"9b0c4a4e-...", "event"=>"message.delivered", "timestamp"=>"2025-08-08T20:15:12.000Z",
 #   "data"=>{"message_id"=>"f47ac10b-...", "recipient"=>"user@example.com", "response"=>{...},
-#            "headers"=>[{"name"=>"X-Nuntius-Message-Id", "value"=>"..."}], ...}}
+#            "metadata"=>{"nuntius_message_id"=>"..."}, "headers"=>[{"name"=>"X-Nuntius-Message-Id", "value"=>"..."}], ...}}
 #
-# Messages are matched on the X-Nuntius-Message-Id header Nuntius adds to every mail, falling back to the Lettermint
-# message id we stored earlier and the Message-ID header.
+# Messages are matched on the nuntius_message_id Lettermint metadata Nuntius sends with every mail (every event has
+# the metadata), falling back to the X-Nuntius-Message-Id and Message-ID headers.
 module Nuntius
   class LettermintWebhookProcessorService < ApplicationService
     context do
@@ -26,8 +26,6 @@ module Nuntius
         return false
       end
       Nuntius.config.logger.info("Lettermint updating message #{message.id} for #{event_type}")
-
-      message.metadata["lettermint_message_id"] = data["message_id"]
 
       case event_type
       when "message.opened"
@@ -51,7 +49,7 @@ module Nuntius
       return if state == :delivered && (message.bounced? || message.complaint?)
 
       message.send(state)
-      message.metadata["feedback"] = {type: event_type.delete_prefix("message."), info: data.except(:headers, :metadata, :tag, :tags, :subject)}
+      message.feedback = {type: event_type.delete_prefix("message."), info: data.except(:headers, :metadata, :tag, :tags, :subject)}
     end
 
     def process_open
@@ -92,16 +90,11 @@ module Nuntius
     end
 
     def message
-      @message ||= find_by_nuntius_id || find_by_lettermint_id || find_by_message_id_header
+      @message ||= find_by_id(data.dig("metadata", "nuntius_message_id")) || find_by_id(header("X-Nuntius-Message-Id")) || find_by_message_id_header
     end
 
-    def find_by_nuntius_id
-      id = header("X-Nuntius-Message-Id")
+    def find_by_id(id)
       Nuntius::Message.find_by(id: id) if id.present?
-    end
-
-    def find_by_lettermint_id
-      Nuntius::Message.find_by("metadata->>'lettermint_message_id' = ?", data["message_id"]) if data["message_id"].present?
     end
 
     def find_by_message_id_header

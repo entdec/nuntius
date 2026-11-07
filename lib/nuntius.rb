@@ -7,6 +7,7 @@ require "nuntius/active_record_helpers"
 require "nuntius/active_storage_helpers"
 require "nuntius/i18n_store"
 require "nuntius/mail_allow_list"
+require "nuntius/account_backfill"
 
 module Nuntius
   extend Configurable

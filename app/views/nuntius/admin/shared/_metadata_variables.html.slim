@@ -1,0 +1,11 @@
+/ Metadata variables a design still uses (see Nuntius::MetadataVariables), with what to do about them
+- if variables.any?
+  .col-span-12.rounded-md.border.border-amber-200.bg-amber-50.px-3.py-2.text-sm.text-amber-800 role="status"
+    p.mb-1 = message
+    ul.list-disc.pl-5
+      - variables.each do |variable, value|
+        li
+          code = "{{ #{variable} }}"
+          - if value.present?
+            =< t("nuntius.admin.shared.metadata_variables.value_html", value: tag.code(value))
+    p.mt-1 = t("nuntius.admin.shared.metadata_variables.instead")

@@ -5,8 +5,8 @@ require "test_helper"
 module Nuntius
   class PurgeMessageJobTest < ActiveSupport::TestCase
     test "does not purge nuntius message less than 6 month ago" do
-      account_id = SecureRandom.uuid
-      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", metadata: {account_id: account_id}, created_at: 1.month.ago)
+      account_id = Account.create!(name: "purged").id
+      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", account_id: account_id, created_at: 1.month.ago)
 
       PurgeMessageJob.perform_now(account_id, 6)
 
@@ -14,8 +14,8 @@ module Nuntius
     end
 
     test "purges nuntius message more than 6 month ago" do
-      account_id = SecureRandom.uuid
-      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", metadata: {account_id: account_id}, created_at: 7.month.ago)
+      account_id = Account.create!(name: "purged").id
+      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", account_id: account_id, created_at: 7.month.ago)
 
       PurgeMessageJob.perform_now(account_id, 6)
 
@@ -25,8 +25,8 @@ module Nuntius
     end
 
     test "does not purge attachments for message less than 6 months ago" do
-      account_id = SecureRandom.uuid
-      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", metadata: {account_id: account_id}, created_at: 1.month.ago)
+      account_id = Account.create!(name: "purged").id
+      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", account_id: account_id, created_at: 1.month.ago)
 
       attachment = Nuntius::Attachment.create!
       message.attachments << attachment
@@ -38,8 +38,8 @@ module Nuntius
     end
 
     test "purges attachments for message more than 6 months ago" do
-      account_id = SecureRandom.uuid
-      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", metadata: {account_id: account_id}, created_at: 7.months.ago)
+      account_id = Account.create!(name: "purged").id
+      message = Nuntius::Message.create!(transport: "mail", provider: "smtp", state: "sent", account_id: account_id, created_at: 7.months.ago)
 
       attachment = Nuntius::Attachment.create!
       message.attachments << attachment

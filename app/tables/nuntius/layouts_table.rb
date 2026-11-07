@@ -6,14 +6,6 @@ module Nuntius
       model Nuntius::Layout
 
       column(:name)
-      column(:metadata) do
-        render do
-          html do |template|
-            Nuntius.config.metadata_humanize(template.metadata)
-          end
-        end
-      end
-
       action :delete do
         link { |layout| nuntius.admin_layout_url(layout) }
         icon "fa-solid fa-trash"

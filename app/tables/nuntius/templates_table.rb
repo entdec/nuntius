@@ -18,13 +18,7 @@ module Nuntius
         end
       end
 
-      column(:metadata) do
-        render do
-          html do |template|
-            Nuntius.config.metadata_humanize(template.metadata)
-          end
-        end
-      end
+      column(:global)
 
       column(:status) do
         render do

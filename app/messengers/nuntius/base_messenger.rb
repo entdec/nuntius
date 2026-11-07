@@ -10,7 +10,8 @@ module Nuntius
     define_callbacks :action, terminator: ->(_target, result_lambda) { result_lambda.call == false }
 
     attr_reader :attachments, :headers, :event, :object, :params
-    attr_accessor :templates, :smtp_envelope_from
+    attr_writer :templates
+    attr_accessor :smtp_envelope_from
 
     def initialize(object, event, params = {})
       @object = object
@@ -35,7 +36,7 @@ module Nuntius
     def dispatch(filtered_templates)
       filtered_templates.each do |template|
         template.layout = override_layout(template.layout)
-        msg = template.new_message(@object, liquid_context, params)
+        msg = template.new_message(@object, liquid_context, params, account: account)
         next unless msg.present?
 
         @attachments.each do |attachment|
@@ -61,6 +62,23 @@ module Nuntius
     # mail transport). Useful for things like "Auto-Submitted" or "Precedence".
     def header(key, value)
       @headers[key.to_s] = value
+    end
+
+    # The templates for the object and event: see select_templates
+    def templates
+      select_templates
+    end
+
+    # The account the messenger sends for: from the messenger's account proc, or
+    # Nuntius.config.account_for
+    def account
+      @account ||= begin
+        account_proc = self.class.account
+        account = account_proc ? account_proc.call(@object) : Nuntius.config.account_for(@object)
+        raise Nuntius::MissingAccountException, "no account to send #{@event} for #{self.class.class_name_for(@object)} for" unless account
+
+        account
+      end
     end
 
     class << self
@@ -153,6 +171,17 @@ module Nuntius
         @template_scope
       end
 
+      # The account to send for, from the object, when it isn't
+      # Nuntius.config.account_for(object). Subclasses inherit it.
+      #
+      #   account ->(account) { account }
+      def account(account_proc = nil)
+        @account = account_proc if account_proc
+        return @account if @account
+
+        superclass.account if superclass.respond_to?(:account)
+      end
+
       def timebased_scopes
         @timebased_scopes ||= {}
       end
@@ -170,7 +199,7 @@ module Nuntius
         return [] unless timebased_scopes.include?(template.event.to_sym)
 
         timebased_scope(template.event)
-          .call(template.interval_time_range, template.metadata)
+          .call(template.interval_time_range, template)
           .where("#{template.klass.constantize.table_name}.created_at > ?", template.created_at)
           .where.not(
             id: Nuntius::Message.select(:nuntiable_id)
@@ -183,34 +212,37 @@ module Nuntius
 
     # Persists any messenger-provided mail overrides (extra headers and/or a
     # custom SMTP envelope sender) onto the message so they survive the
-    # transport delivery job and can be applied by the provider.
+    # transport delivery job and can be applied by the provider. A blank
+    # envelope sender is the null sender (<>).
     def apply_mail_overrides(message)
-      return if @headers.blank? && @smtp_envelope_from.nil?
-
-      mail = {}
-      mail["headers"] = @headers if @headers.present?
-      mail["envelope_from"] = @smtp_envelope_from unless @smtp_envelope_from.nil?
-
-      message.metadata = (message.metadata || {}).merge("mail" => mail)
+      message.headers = @headers if @headers.present?
+      message.envelope_from = @smtp_envelope_from.presence || Nuntius::AbstractMailProvider::NULL_REVERSE_PATH unless @smtp_envelope_from.nil?
     end
 
-    # Returns the relevant templates for the object / event combination
+    # Returns the relevant templates for the object / event combination: the
+    # account's own and the global ones, narrowed by the messenger's
+    # template_scope. Global templates are left out for a transport the
+    # account has its own template for.
     def select_templates
       return @templates if @templates
 
       @templates = Template.unscoped.where(klass: class_names_for(@object), event: event_name_for(@object, @event)).where(enabled: true)
-      @templates = @templates.instance_exec(@object, &Nuntius.config.default_template_scope)
+      # Without templates there's no account needed
+      return @templates unless @templates.exists?
+
+      @templates = @templates.available_to(account)
 
       # See if we need to do something additional
       template_scope_proc = self.class.template_scope
       @templates = @templates.instance_exec(@object, &template_scope_proc) if template_scope_proc
 
-      @templates
+      own = @templates.owned_by(account)
+      @templates = own.or(@templates.where.not(transport: own.select(:transport)))
     end
 
     def liquid_context
       assigns = @params || {}
-      instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope @headers @smtp_envelope_from].include? i.to_s }.each do |i|
+      instance_variables.reject { |i| %w[@params @object @locale @templates @template_scope @headers @smtp_envelope_from @account].include? i.to_s }.each do |i|
         assigns[i.to_s[1..]] = instance_variable_get(i)
       end
 

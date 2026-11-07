@@ -41,6 +41,11 @@ end
 
 Rails.application.routes.default_url_options[:host] = "localhost:3000"
 
+# Records made in tests belong to the first account, unless a test says otherwise
+class ActiveSupport::TestCase
+  setup { Current.account = accounts(:one) }
+end
+
 class MockIMAPFetchData
   attr_reader :attr, :number
 

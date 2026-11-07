@@ -8,6 +8,7 @@
 
       - card.with_tab :edit, padding: true
         .grid.grid-cols-12.gap-4 data-controller="toggle"
+          = render "nuntius/admin/shared/metadata_variables", variables: @campaign.metadata_variables, message: t(".metadata_variables")
           .col-span-12
             = f.input :name
 
@@ -32,8 +33,6 @@
                 = f.input :open_tracking, as: :switch
               .col-span-4
                 = f.input :publish_at, as: :date_time
-              .col-span-12
-                = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
           template data-toggle-target='toggleable' data-toggle-value='voice'
             .col-span-12

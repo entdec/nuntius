@@ -77,8 +77,9 @@ module Nuntius
       I18n.backend = Thread.current[:nuntius_i18n_store_old_backend]
     end
 
+    # The locales of the account the template or campaign belongs to
     def locales
-      Nuntius::Locale.all
+      template.respond_to?(:account_id) ? Nuntius::Locale.owned_by(template.account_id) : Nuntius::Locale.all
     end
 
     def flat_hash(hash = {})

@@ -66,7 +66,7 @@ module Nuntius
         end
 
         def set_objects
-          @list = List.find(params[:list_id])
+          @list = List.visible.find(params[:list_id])
         end
       end
     end

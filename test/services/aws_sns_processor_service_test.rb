@@ -9,8 +9,8 @@ module Nuntius
       Nuntius::AwsSnsProcessorService.call(notification: bounce_with_dsn_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "bounced", message.state
-      assert_equal "bounce", message.metadata["feedback"]["type"]
-      assert_equal "Permanent", message.metadata["feedback"]["info"]["bounceType"]
+      assert_equal "bounce", message.feedback["type"]
+      assert_equal "Permanent", message.feedback["info"]["bounceType"]
     end
 
     test "Processes a bounce without DSN" do
@@ -18,8 +18,8 @@ module Nuntius
       Nuntius::AwsSnsProcessorService.call(notification: bounce_without_dsn_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "bounced", message.state
-      assert_equal "bounce", message.metadata["feedback"]["type"]
-      assert_equal "Permanent", message.metadata["feedback"]["info"]["bounceType"]
+      assert_equal "bounce", message.feedback["type"]
+      assert_equal "Permanent", message.feedback["info"]["bounceType"]
     end
 
     test "Processes a complaint with Feedback" do
@@ -27,8 +27,8 @@ module Nuntius
       Nuntius::AwsSnsProcessorService.call(notification: complaint_with_feedback_report("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "complaint", message.state
-      assert_equal "complaint", message.metadata["feedback"]["type"]
-      assert_equal "abuse", message.metadata["feedback"]["info"]["complaintFeedbackType"]
+      assert_equal "complaint", message.feedback["type"]
+      assert_equal "abuse", message.feedback["info"]["complaintFeedbackType"]
     end
 
     test "Processes a complaint without Feedback" do
@@ -36,7 +36,7 @@ module Nuntius
       Nuntius::AwsSnsProcessorService.call(notification: complaint_without_feedback_report("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "complaint", message.state
-      assert_equal "complaint", message.metadata["feedback"]["type"]
+      assert_equal "complaint", message.feedback["type"]
     end
 
     test "Processes a delivery notification" do
@@ -44,7 +44,7 @@ module Nuntius
       Nuntius::AwsSnsProcessorService.call(notification: delivery_notification_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "delivered", message.state
-      assert_equal "a8-70.smtp-out.amazonses.com", message.metadata["feedback"]["info"]["reportingMTA"]
+      assert_equal "a8-70.smtp-out.amazonses.com", message.feedback["info"]["reportingMTA"]
     end
 
     private

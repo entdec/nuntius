@@ -67,7 +67,11 @@ module Nuntius
       end
 
       def template_params
-        params.require(:template).permit(:enabled, :klass, :event, :interval, :transport, :description, :metadata_yaml, :payload, :from, :to, :subject, :layout_id, :html, :text, :payload, :link_tracking, :open_tracking)
+        permitted = %i[enabled klass event interval transport description payload from to subject layout_id html text link_tracking open_tracking]
+        permitted << :global if Nuntius.config.can_create_global
+        # Old layouts read their values from the template's metadata
+        permitted << :metadata_yaml if @template&.old_layout
+        params.require(:template).permit(*permitted)
       end
     end
   end

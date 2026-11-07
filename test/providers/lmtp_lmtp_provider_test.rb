@@ -70,14 +70,14 @@ module Nuntius
 
     private
 
-    def build_message(to:, metadata: {})
+    def build_message(to:, **attributes)
       Nuntius::Message.new(
         transport: "lmtp",
         provider: "lmtp",
         to: to,
         subject: "Test",
         text: "Body",
-        metadata: metadata
+        **attributes
       )
     end
   end

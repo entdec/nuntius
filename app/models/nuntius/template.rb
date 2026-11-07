@@ -2,12 +2,13 @@
 
 module Nuntius
   class Template < ApplicationRecord
-    include Nuntius::Concerns::MetadataScoped
+    include Nuntius::Concerns::Owned
     include Nuntius::Concerns::Yamlify
     include Nuntius::Concerns::EmailDesigned
 
     belongs_to :old_layout, class_name: "Nuntius::OldLayout", optional: true
     belongs_to :layout, optional: true
+    validates_same_account :layout
     has_many :messages, class_name: "Nuntius::Message", dependent: :nullify
 
     LIQUID_TAGS = /{%(?:(?!%}).)*%}|{{(?:(?!}}).)*}}/
@@ -23,10 +24,16 @@ module Nuntius
     validates :event, format: {with: /.+#.+/}, if: ->(t) { t.klass == "Custom" }
     validates :interval, format: {allow_blank: true, with: /\A[1-9][0-9]*\s(month|week|day|hour|minute)s?\z/}
 
+    # A global template is used for every account, not only for its own
+    scope :global, -> { where(global: true) }
+    # The templates an account sends with: its own and the global ones
+    scope :available_to, ->(account) { owned_by(account).or(global) }
+
     yamlify :metadata
 
-    def new_message(object, assigns = {}, params = {})
-      message = Nuntius::Message.new(template: self, transport: transport, metadata: metadata)
+    # account is the account the message is sent for, by default the template's own
+    def new_message(object, assigns = {}, params = {}, account: self.account)
+      message = Nuntius::Message.new(template: self, account: account, transport: transport)
       message.nuntiable = object unless object.is_a? Hash
 
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale

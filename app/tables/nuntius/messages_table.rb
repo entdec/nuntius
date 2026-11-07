@@ -27,7 +27,11 @@ module Nuntius
       column(:template_id) do
         render do
           html do |message|
-            link_to message.template&.description, nuntius.edit_admin_template_path(message.template) if message.template
+            next unless message.template
+            # A message from a global template is the account's, the template isn't
+            next message.template.description unless Nuntius::Template.visible.exists?(message.template.id)
+
+            link_to message.template.description, nuntius.edit_admin_template_path(message.template)
           end
         end
       end

@@ -48,8 +48,30 @@ module Nuntius
     option :active_storage_service
     option :host, default: ->(message) {}, proc: true
 
-    attr_accessor :visible_scope, :add_metadata, :metadata_fields, :default_template_scope
-    attr_writer :metadata_humanize, :default_params, :flow_color
+    # Every template, campaign, list, layout, locale and message belongs to an account.
+    #
+    #   account_class:     the model accounts are, its table gets the foreign keys
+    #   current_account:   the account of the current request; new records get it, and the admin shows its records
+    #   account_for:       the account a messenger sends for, for its object; a messenger can override it
+    #                      (see BaseMessenger.account)
+    #   can_create_global: whether the current account may make templates global: templates used for every
+    #                      account, not only its own
+    option :account_class, default: "Account"
+    option :current_account, default: -> {}, proc: true
+    option :account_for, default: lambda { |object|
+      if object.is_a?(account_class.constantize)
+        object
+      elsif object.respond_to?(:account)
+        object.account
+      else
+        current_account
+      end
+    }, proc: true
+    option :can_create_global, default: -> { false }, proc: true
+
+    # The records the admin shows, a scope on each model: by default the current account's
+    attr_accessor :visible_scope
+    attr_writer :default_params, :flow_color
 
     attr_reader :transports, :providers, :lettermint_webhook_settings
 
@@ -60,17 +82,8 @@ module Nuntius
       @nuntiable_class_names = []
       @transports = []
       @providers = {}
-      @visible_scope = -> { all }
-      @add_metadata = -> {}
-      @metadata_fields = {}
-      @metadata_humanize = ->(data) { data.inspect }
-      @default_template_scope = ->(_object) { all }
+      @visible_scope = -> { owned_by(Nuntius.config.current_account) }
       @default_params = {}
-    end
-
-    # Make the part that is important for visible readable for humans
-    def metadata_humanize(metadata)
-      @metadata_humanize.is_a?(Proc) ? instance_exec(metadata, &@metadata_humanize) : @metadata_humanize
     end
 
     def add_nuntiable_class(klass)

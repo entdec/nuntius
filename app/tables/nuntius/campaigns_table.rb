@@ -6,13 +6,6 @@ module Nuntius
       model Nuntius::Campaign
 
       column(:name)
-      column(:metadata) do
-        render do
-          html do |template|
-            Nuntius.config.metadata_humanize(template.metadata)
-          end
-        end
-      end
       column(:transport)
       column(:state)
 

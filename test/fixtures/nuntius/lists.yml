@@ -1,7 +1,9 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 valentines:
+  account: one
   name: Valentines
 
 helpers:
+  account: one
   name: Helpers

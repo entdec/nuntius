@@ -12,9 +12,8 @@ module Nuntius
       Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", response: {status_code: 250}))
       @message.reload
       assert_equal "delivered", @message.state
-      assert_equal "delivered", @message.metadata["feedback"]["type"]
-      assert_equal 250, @message.metadata["feedback"]["info"]["response"]["status_code"]
-      assert_equal "lm-1", @message.metadata["lettermint_message_id"]
+      assert_equal "delivered", @message.feedback["type"]
+      assert_equal 250, @message.feedback["info"]["response"]["status_code"]
     end
 
     test "marks a pending message sent" do
@@ -23,10 +22,14 @@ module Nuntius
       assert_equal "sent", @message.reload.state
     end
 
-    test "matches on a previously stored lettermint message id" do
-      @message.update!(metadata: {"lettermint_message_id" => "lm-1"})
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.hard_bounced", headers: []))
+    test "matches on the nuntius_message_id metadata, also without headers" do
+      Nuntius::LettermintWebhookProcessorService.call(event: event("message.hard_bounced", headers: [], metadata: {nuntius_message_id: @message.id}))
       assert_equal "bounced", @message.reload.state
+    end
+
+    test "matches on the X-Nuntius-Message-Id header without metadata" do
+      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", metadata: {}))
+      assert_equal "delivered", @message.reload.state
     end
 
     test "matches on the Message-ID header" do
@@ -89,7 +92,7 @@ module Nuntius
     end
 
     test "ignores unknown messages" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", message_id: "other", headers: []))
+      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", headers: [], metadata: {nuntius_message_id: SecureRandom.uuid}))
       assert_equal "sent", @message.reload.state
     end
 
@@ -105,7 +108,7 @@ module Nuntius
           subject: "Test",
           recipient: "user@example.com",
           headers: [{name: "x-nuntius-message-id", value: @message.id}],
-          metadata: {},
+          metadata: {nuntius_message_id: @message.id},
           tag: nil,
           tags: []
         }.merge(data)

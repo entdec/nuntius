@@ -24,6 +24,8 @@ module Nuntius
       end
 
       mail.header["X-Nuntius-Message-Id"] = message.id
+      # Lettermint returns its metadata with every webhook event, headers not always
+      mail.header["X-LM-Metadata-nuntius_message_id"] = message.id if Nuntius.config.lettermint_webhook_settings.present?
 
       if message.campaign.present? && message.subscriber.present?
         mail.header["List-Unsubscribe"] = "<" + message.subscriber.unsubscribe_link(message.campaign, message) + ">"
@@ -150,16 +152,13 @@ module Nuntius
     # reverse-path (+MAIL FROM:<>+) was requested, so the caller can pick the
     # delivery method that can actually emit it.
     def apply_mail_overrides(mail)
-      overrides = message.metadata&.dig("mail")
-      return false if overrides.blank?
-
-      (overrides["headers"] || {}).each do |key, value|
+      (message.headers || {}).each do |key, value|
         mail.header[key] = value
       end
 
-      return false unless overrides.key?("envelope_from")
+      envelope_from = message.envelope_from
+      return false if envelope_from.nil?
 
-      envelope_from = overrides["envelope_from"]
       if null_reverse_path?(envelope_from)
         mail.smtp_envelope_from = NULL_REVERSE_PATH
         true

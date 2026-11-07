@@ -6,8 +6,7 @@ module Nuntius
   # Content block marks where the templates and campaigns using it put their
   # own content (see EmailDesign); they follow the layout when it changes.
   class Layout < ApplicationRecord
-    include Nuntius::Concerns::MetadataScoped
-    include Nuntius::Concerns::Yamlify
+    include Nuntius::Concerns::Owned
 
     has_many_attached :attachments, service: Nuntius.config.active_storage_service
     has_many :templates, dependent: :restrict_with_error
@@ -18,7 +17,10 @@ module Nuntius
     before_save :compile, if: :mjml_changed?
     after_save :recompose_emails, if: :saved_change_to_mjml?
 
-    yamlify :metadata
+    # The metadata variables its design uses, see MetadataVariables
+    def metadata_variables
+      MetadataVariables.in(self, mjml)
+    end
 
     # The images among its attachments, for the editor's Image blocks
     def email_images

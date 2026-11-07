@@ -2,6 +2,9 @@ nl:
   campaign_publish_confirm: "Weet je zeker dat je deze campagne wilt verzenden?"
   choose_files: Kies bestanden
   activerecord:
+    errors:
+      messages:
+        other_account: hoort bij een ander account
     attributes:
       nuntius/campaign:
         from: Van
@@ -26,6 +29,7 @@ nl:
         enabled: Ingeschakeld
         event: Gebeurtenis
         from: Van
+        global: Globaal
         klass: Klasse
         subject: Onderwerp
         to: Aan
@@ -66,6 +70,10 @@ nl:
         new: Nieuwe template
   nuntius:
     admin:
+      shared:
+        metadata_variables:
+          value_html: "is hier %{value}"
+          instead: "Gebruik in plaats daarvan een variabele van het object waar het bericht over gaat, zoals {{ user.account.logo_url }}."
       media:
         create:
           only_images: Je kunt alleen afbeeldingen uploaden
@@ -74,10 +82,10 @@ nl:
           card:
             nuntius_admin_campaigns:
               title: Campagne
-          metadata: Metadata
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
           list_hint: "Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
           layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout."
+          metadata_variables: "Het ontwerp van deze campagne leest nog metadata, die gaat verdwijnen:"
           tabs:
             main:
               tab:
@@ -102,18 +110,17 @@ nl:
             nuntius_admin_layouts:
               title: Layouts
           start_from: "Begin met:"
+          metadata_variables: "Deze layout leest nog metadata, wat in layouts niet meer werkt:"
           starting_layouts:
             basic: Eenvoudig
             newsletter: Nieuwsbrief
             transactional: Transactioneel
             empty: Leeg
-          metadata: Metadata
           tabs:
             main:
               tab:
                 edit: Edit
                 media: Media
-                metadata: Metadata
                 templates: Templates
         index:
           card:
@@ -156,7 +163,6 @@ nl:
             nuntius_admin_locales:
               title: Locales
           data: Data
-          metadata: Metadata
         index:
           card:
             nuntius_admin_locales:
@@ -208,6 +214,9 @@ nl:
               title: Template
           metadata: Metadata
           layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
+          global_hint: Gebruikt voor elk account, niet alleen dit
+          metadata_variables: "Het ontwerp van deze template leest nog metadata, die gaat verdwijnen:"
+          old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
           old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
           convert_layout: Omzetten naar layout
           convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."

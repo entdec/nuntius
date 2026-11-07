@@ -53,7 +53,7 @@ module Nuntius
       private
 
       def layout_params
-        params.require(:layout).permit(:name, :metadata_yaml)
+        params.require(:layout).permit(:name)
       end
 
       def assign_layout_design

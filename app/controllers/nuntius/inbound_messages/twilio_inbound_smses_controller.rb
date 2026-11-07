@@ -38,7 +38,7 @@ module Nuntius
         inbound_message.from = params[:From]
         inbound_message.to = params[:To]
         inbound_message.text = params[:Body]
-        inbound_message.metadata = params
+        inbound_message.params = params
         inbound_message.save!
 
         twiml = Nuntius::DeliverInboundMessageService.perform(inbound_message: inbound_message)

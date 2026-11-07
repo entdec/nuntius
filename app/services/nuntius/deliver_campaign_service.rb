@@ -22,7 +22,7 @@ module Nuntius
     end
 
     def new_message(subscriber, assigns = {})
-      message = Nuntius::Message.create!(transport: campaign.transport, campaign: campaign, nuntiable: subscriber.nuntiable, metadata: campaign.metadata, subscriber: subscriber)
+      message = Nuntius::Message.create!(transport: campaign.transport, campaign: campaign, account: campaign.account, nuntiable: subscriber.nuntiable, subscriber: subscriber)
 
       assigns["campaign"] = context.campaign
       assigns["subscriber"] = subscriber

@@ -1,6 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 valentines_day:
+  account: one
   name: Valentines day 2020
   list: valentines
   from: valentine@example.com
@@ -9,6 +10,7 @@ valentines_day:
   html: Valentines day 2020!
 
 xmas:
+  account: one
   name: Marry XMAS 2020
   list: helpers
   from: santa@example.com

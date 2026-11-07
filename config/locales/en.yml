@@ -2,6 +2,9 @@ en:
   campaign_publish_confirm: "Are you sure you want to send out this campaign?"
   choose_files: Choose files
   activerecord:
+    errors:
+      messages:
+        other_account: belongs to another account
     attributes:
       nuntius/campaign:
         from: From
@@ -24,6 +27,7 @@ en:
         description: Description
         enabled: Enabled
         event: Event
+        global: Global
         from: From
         klass: Klass
         subject: Subject
@@ -53,6 +57,10 @@ en:
         new: New template
   nuntius:
     admin:
+      shared:
+        metadata_variables:
+          value_html: "is %{value} here"
+          instead: "Use a variable of the object the message is about instead, like {{ user.account.logo_url }}."
       media:
         create:
           only_images: Only images can be uploaded
@@ -63,8 +71,8 @@ en:
               title: Campaigns
           from_hint: "You can leave this blank, only fill this in if you want to override the default"
           list_hint: "You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
-          metadata: Metadata
           layout_hint: "The email is edited in the Design tab, inside this layout."
+          metadata_variables: "This campaign's design still reads metadata, which is going away:"
           tabs:
             main:
               tab:
@@ -89,18 +97,17 @@ en:
             nuntius_admin_layouts:
               title: Layouts
           start_from: "Start from:"
+          metadata_variables: "This layout still reads metadata, which no longer works in layouts:"
           starting_layouts:
             basic: Basic
             newsletter: Newsletter
             transactional: Transactional
             empty: Empty
-          metadata: Metadata
           tabs:
             main:
               tab:
                 edit: Edit
                 media: Media
-                metadata: Metadata
                 templates: Templates
         index:
           card:
@@ -143,7 +150,6 @@ en:
             nuntius_admin_locales:
               title: Locales
           data: Data
-          metadata: Metadata
         index:
           card:
             nuntius_admin_locales:
@@ -193,6 +199,9 @@ en:
               title: Template
           metadata: Metadata
           layout_hint: "The email is edited in the Design tab, inside this layout. Save after choosing one."
+          global_hint: Used for every account, not only this one
+          metadata_variables: "This template's design still reads metadata, which is going away:"
+          old_layout_metadata_variables: "Its old layout or body reads metadata, which designs in the email editor shouldn't. After converting, put these in the design another way:"
           old_layout: "This template still uses the old layout %{name}. It keeps working until it is converted."
           convert_layout: Convert into layout
           convert_hint: "Its body goes into one HTML block in this layout's Content block, as it is sent now. You then edit it in the Design tab."

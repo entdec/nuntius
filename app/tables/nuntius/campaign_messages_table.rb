@@ -26,7 +26,7 @@ module Nuntius
     private
 
     def scope
-      @scope = Nuntius::Campaign.find(params[:campaign_id]).messages
+      @scope = Nuntius::Campaign.visible.find(params[:campaign_id]).messages
       @scope
     end
   end

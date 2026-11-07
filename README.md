@@ -59,6 +59,10 @@ Nuntius.setup do
   # Enable Slack
   config.transport :slack
 
+  # Every template, campaign, list, layout, locale and message belongs to an account (see Accounts below)
+  config.account_class = "Account"
+  config.current_account = -> { Current.account }
+
   # Configure providers for each of the transports you enabled above.
   # Advised is to either do this using credentials, environment variables, or somewhere in a model (securely stored away).
   config.provider :slack, transport: :slack, settings: lambda { |_message|
@@ -105,6 +109,48 @@ messenger class if they are not defined already.
 Additionally the use_state_machine option will add an after_commit hook to the state machine
 to automatically trigger the event for the state transition.
 
+### Accounts
+
+Every template, campaign, list, layout, locale and message belongs to an account: a record of your app's own account model, by default `Account` (each Nuntius table has an `account_id` foreign key to its table). Subscribers belong to one through their list. Customers can then run their own campaigns, with their own layouts and lists, while you send your own mail with templates they never see.
+
+```ruby
+Nuntius.setup do |config|
+  # Your account model
+  config.account_class = "Account"
+  # The account of the current request: new records get it, and the admin shows its records only
+  config.current_account = -> { Current.account }
+  # The account a messenger sends for, given its object. The default: the object itself when it is an account,
+  # else its account, else the current account.
+  config.account_for = ->(object) { object.account }
+  # Whether the current account may make templates global (default: no account may)
+  config.can_create_global = -> { Current.account.parent_id.nil? }
+  # The records the admin shows, a scope on each model (default: the current account's)
+  config.visible_scope = -> { owned_by(Nuntius.config.current_account) }
+end
+```
+
+The models have the scopes `owned_by(accounts_or_ids)`, `visible`, and on templates `global` and `available_to(account)` (its own templates and the global ones).
+
+**Sending.** A messenger sends for an account, from `config.account_for`, or from its own `account` when its object doesn't say. Subclasses inherit it:
+
+```ruby
+class ShipmentMessenger < ApplicationMessenger
+  account ->(shipment) { shipment.order.account }
+end
+```
+
+It picks the enabled templates for the event that are the account's own or global, then narrows them with its `template_scope`, a scope on the templates given the object. When the account has its own template for a transport, global templates for that transport are left out. The message belongs to the account it's sent for, also when the template is global; a campaign's messages belong to the campaign's account. When there are templates for the event but no account to send for, the messenger raises `Nuntius::MissingAccountException`.
+
+**Global templates.** A global template is used for every account, not only for its own. Only its own account sees it in the admin: the accounts it sends for see its messages, not the template. When your accounts have sub-accounts and a global template should only reach the accounts below its own, say so in `template_scope`:
+
+```ruby
+class UserMessenger < ApplicationMessenger
+  template_scope ->(user) { owned_by(user.account.self_and_ancestor_ids) }
+end
+```
+
+**The admin** shows, creates and changes the `visible` records only: other accounts' records give a 404. New records get the current account. A template's layout, and a campaign's list and layout, must belong to its own account. The template form has a Global switch when `config.can_create_global` allows it.
+
 ## Usage
 
 ### With templates
@@ -124,10 +170,16 @@ When custom events are enabled you can also do the following:
 For the above cases you need to define templates, this is done with the maintenace pages under
 /messaging/admin/templates (/messaging is whatever you have defined in your routes file).
 
-When Nuntius#message is called a message will be sent for every matching template. To allow you to
-send different messages under different circumstances you can specify a template_scope on the messenger
-class that uses the template's metadata in combination with the nuntiable object to determine whether
-or not the template should be used.
+When an event is fired a message is sent for every matching template of the account it's sent for (see
+[Accounts](#accounts)). To send different messages under different circumstances you can specify a
+template_scope on the messenger class, a scope on the templates given the nuntiable object, that
+narrows down which templates are used:
+
+```ruby
+class CarMessenger < Nuntius::BaseMessenger
+  template_scope ->(car) { where(transport: car.owner.prefers_sms? ? "sms" : "mail") }
+end
+```
 
 ### Timebased events
 
@@ -143,10 +195,8 @@ class CarMessenger < Nuntius::BaseMessenger
   # from: today +  10 days - 1 hour 
   # until: today + 10 days
   # So it basically selects all Car's with a tuneup_at within 10 days from now (in a 1 hour window)
-  timebased_scope :before_tuneup do |time_range, metadata|
-    cars = Car.where(tuneup_at: time_range)
-    cars = cars.where(color: metadata['color']) if metadata['color'].present?
-    cars
+  timebased_scope :before_tuneup do |time_range, template|
+    Car.where(tuneup_at: time_range)
   end
 
   # For an after scope the time_range the interval is taken from the current time, the end of the
@@ -156,10 +206,8 @@ class CarMessenger < Nuntius::BaseMessenger
   # from: today -  10 days - 1 hour 
   # until: today - 10 days
   # So it basically selects all Car's with a tuneup_at 10 days since now (in a 1 hour window)
-  timebased_scope :after_tuneup do |time_range, metadata|
-    cars = Car.where(tuneup_at: time_range)
-    cars = cars.where(color: metadata['color']) if metadata['color'].present?
-    cars
+  timebased_scope :after_tuneup do |time_range, template|
+    Car.where(tuneup_at: time_range)
   end
 end
 ```
@@ -177,6 +225,8 @@ following formats:
 To send timebased messages you need to execute Nuntius::TimebasedEventsJob.perform, you could do this
 in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'".
 Beter even is using Sidekiq::Cron or GoodJob
+
+A timebased template is only sent for the objects whose messenger picks it (see [Accounts](#accounts)): those of its own account, and for a global template those of the other accounts too, unless they have their own template for the event and transport.
 
 Nuntius will automatically prevent sending duplicates within the timerange you define. 
 It will also ONLY send messages for objects (the one in template class), created after you created this template, this prevents sending dozens of emails which may make no sense, when you add a new template.
@@ -196,9 +246,15 @@ Then in your template you can do:
 {{'salutation' | t name: {{car.owner}} }}
 ```
 
+Locales belong to an account, like templates. A template uses the locales of its own account, so a global template uses its owner's.
+
 ### Metadata
 
-You can use metadata in your template to guide some text and information in your layout. (This describes the old layouts; for layouts made in the email editor, see [Email designs](#email-designs).)
+Old layouts (from before Nuntius 2) can read values from the template's or campaign's metadata. The admin only edits a template's metadata while it uses an old layout. Designs in the email editor shouldn't read metadata: take the value from a drop instead, like `{{ user.account.logo_url }}`. The edit pages of templates, campaigns and layouts in the email editor warn about metadata variables they still use, with the value the template's metadata has for each; a template's conversion does the same for its old layout. Layouts made in the email editor have no metadata at all, so `{{ layout.metadata.… }}` is always empty.
+
+Subscribers have metadata of their own, like the extra columns of an import, which you can use as `{{ subscriber.metadata.organisation }}`.
+
+How an old layout reads metadata:
 
 Say you need to change the header of an email, based on the template. In your layout you can then do this:
 
@@ -228,15 +284,17 @@ logo_path: "{{car.brand.logo_path}}"
 Another more direct way of using Nuntius is by just instantiating a message:
 
 ```ruby
- Nuntius::Message.new(to: 'tom@boxture.com', subject: 'Test', text: 'Test text', nuntiable: channel).deliver_as(:mail)
+ Nuntius::Message.new(to: 'test@example.com', subject: 'Test', text: 'Test text', nuntiable: channel, account: channel.account).deliver_as(:mail)
 ```
 
 or
 
 ```ruby
 user = User.find(1)
-user.messages.new(to: 'test@example.com', subject: 'Test', text: 'Test text').deliver_as(:mail)
+user.messages.new(to: 'test@example.com', subject: 'Test', text: 'Test text', account: user.account).deliver_as(:mail)
 ```
+
+A message needs an account; without one it gets the current account.
 
 Here we still need a nuntiable object, in case provider settings can differ from object to object.
 
@@ -337,8 +395,8 @@ How it works:
 
 1. **Setting up the webhook.** On every server start (not in tests, consoles or rake tasks) Nuntius enqueues `Nuntius::LettermintWebhookSetupJob`. It looks the webhook up in Lettermint (by the id it stored, or else by its URL), creates it when it's missing, and updates it when its URL, events, scope, project or route changed. When Nuntius has no secret for it yet, it has Lettermint regenerate the secret. The webhook's id and signing secret are stored in `nuntius_webhooks`. An advisory lock makes sure only one process does this when several start at once. You can run it by hand with `bin/rails nuntius:lettermint:setup_webhook`.
 2. **Receiving events.** Lettermint posts events to https://&lt;host&gt;/messaging/feedback/lettermint (depending on where you mount Nuntius). Nuntius checks the `X-Lettermint-Signature` header against the stored secret (HMAC-SHA256 of the timestamp and body) and refuses deliveries without a valid signature or more than 5 minutes old.
-3. **Finding the message.** Nuntius adds an `X-Nuntius-Message-Id` header to every mail and finds the message by it, falling back to the Lettermint message id it stored with an earlier event and to the `Message-ID` header.
-4. **Updating the message.** Events update the message as below, and are stored in its metadata (`feedback`, `lettermint_message_id`). Events can arrive out of order: a `sent` or `soft_bounced` event doesn't undo a later state, and `delivered` doesn't undo a bounce or complaint.
+3. **Finding the message.** Nuntius sends its message id with every mail as Lettermint metadata (an `X-LM-Metadata-nuntius_message_id` header, which Lettermint doesn't pass on), and Lettermint returns it with every event. Nuntius finds the message by it, falling back to the `X-Nuntius-Message-Id` and `Message-ID` headers.
+4. **Updating the message.** Events update the message as below, and are stored in its `feedback`. Events can arrive out of order: a `sent` or `soft_bounced` event doesn't undo a later state, and `delivered` doesn't undo a bounce or complaint.
 
 | Lettermint event         | Message                          |
 |--------------------------|----------------------------------|

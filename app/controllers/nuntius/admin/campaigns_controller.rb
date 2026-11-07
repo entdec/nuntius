@@ -58,7 +58,7 @@ module Nuntius
       def campaign_params
         return unless params[:campaign]
 
-        params.require(:campaign).permit(:name, :transport, :layout_id, :list_id, :from, :subject, :text, :html, :metadata_yaml, :open_tracking, :link_tracking, :publish_at)
+        params.require(:campaign).permit(:name, :transport, :layout_id, :list_id, :from, :subject, :text, :html, :open_tracking, :link_tracking, :publish_at)
       end
     end
   end

@@ -2,7 +2,7 @@
 
 module Nuntius
   class Campaign < ApplicationRecord
-    include Nuntius::Concerns::MetadataScoped
+    include Nuntius::Concerns::Owned
     include Nuntius::Concerns::Yamlify
     include Nuntius::Concerns::EmailDesigned
 
@@ -13,6 +13,7 @@ module Nuntius
 
     belongs_to :old_layout, class_name: "Nuntius::OldLayout", optional: true
     belongs_to :layout, optional: true
+    validates_same_account :list, :layout
     has_many :messages, class_name: "Nuntius::Message"
     validates :name, presence: true
     validate :subscription_link, if: -> { email_design? && list&.allow_unsubscribe }

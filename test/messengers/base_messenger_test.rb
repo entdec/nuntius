@@ -4,7 +4,7 @@ require "test_helper"
 
 module Nuntius
   class BaseMessengerTest < ActiveSupport::TestCase
-    test "persists headers and a null envelope sender onto the message metadata" do
+    test "persists headers and a null envelope sender onto the message" do
       template = create_template
       messenger = AccountMessenger.new(accounts(:one), :created, {})
 
@@ -14,9 +14,9 @@ module Nuntius
       messenger.dispatch([template])
 
       message = Nuntius::Message.where(template: template).last
-      assert_equal "auto-replied", message.metadata.dig("mail", "headers", "Auto-Submitted")
-      assert_equal "bulk", message.metadata.dig("mail", "headers", "Precedence")
-      assert_equal "<>", message.metadata.dig("mail", "envelope_from")
+      assert_equal "auto-replied", message.headers["Auto-Submitted"]
+      assert_equal "bulk", message.headers["Precedence"]
+      assert_equal "<>", message.envelope_from
     end
 
     test "headers/envelope can be supplied through params" do
@@ -29,16 +29,17 @@ module Nuntius
       messenger.dispatch([template])
 
       message = Nuntius::Message.where(template: template).last
-      assert_equal "auto-replied", message.metadata.dig("mail", "headers", "Auto-Submitted")
-      assert_equal "<>", message.metadata.dig("mail", "envelope_from")
+      assert_equal "auto-replied", message.headers["Auto-Submitted"]
+      assert_equal "<>", message.envelope_from
     end
 
-    test "leaves metadata untouched when no overrides are set" do
+    test "sets no headers or envelope sender when none are set" do
       template = create_template
       AccountMessenger.new(accounts(:one), :created, {}).dispatch([template])
 
       message = Nuntius::Message.where(template: template).last
-      assert_nil message.metadata["mail"]
+      assert_equal({}, message.headers)
+      assert_nil message.envelope_from
     end
 
     private
@@ -53,8 +54,7 @@ module Nuntius
         from: "from@example.com",
         subject: "Hi",
         text: "Body",
-        enabled: true,
-        metadata: {}
+        enabled: true
       )
     end
   end

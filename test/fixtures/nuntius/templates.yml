@@ -5,6 +5,7 @@
 # below each fixture, per the syntax in the comments below
 #
 email:
+  account: one
   transport: mail
   klass: Account
   event: created
@@ -12,6 +13,7 @@ email:
   metadata: {}
 #
 sms:
+  account: one
   transport: sms
   klass: Account
   event: welcome
@@ -19,6 +21,7 @@ sms:
   metadata: {}
 
 two_recipients_with_translations:
+  account: one
   transport: mail
   klass: Account
   event: translationtest
@@ -28,6 +31,7 @@ two_recipients_with_translations:
   text: Hoi
 
 user_activate:
+  account: one
   transport: mail
   klass: User
   event: activate
@@ -37,6 +41,7 @@ user_activate:
   text: Hoi
 
 user_create:
+  account: one
   transport: mail
   klass: User
   event: create

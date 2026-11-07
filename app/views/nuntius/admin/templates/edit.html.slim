@@ -9,10 +9,17 @@
 
       - card.with_tab :edit, padding: true
         .grid.grid-cols-12.gap-4
+          = render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables")
           .col-span-1
             = f.input :enabled, as: :switch
-          .col-span-11
-            = f.input :description
+          - if Nuntius.config.can_create_global
+            .col-span-9
+              = f.input :description
+            .col-span-2
+              = f.input :global, as: :switch, hint: t('.global_hint')
+          - else
+            .col-span-11
+              = f.input :description
 
         .grid.grid-cols-12.gap-4 data-controller='toggle'
           .col-span-6
@@ -46,8 +53,10 @@
           .col-span-12
             .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
 
-          .col-span-12
-            = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+          / Old layouts read their values from the template's metadata
+          - if @template.old_layout
+            .col-span-12
+              = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
           - Nuntius::Concerns::EmailDesigned::EMAIL_TRANSPORTS.each do |transport|
             template data-toggle-target='toggleable' data-toggle-value=transport
@@ -58,6 +67,8 @@
               - if @template.old_layout
                 .col-span-12.rounded-md.border.border-gray-200.p-4
                   p.mb-3.text-sm.text-gray-600 = t('.old_layout', name: @template.old_layout.name)
+                  .mb-3.grid.grid-cols-12
+                    = render "nuntius/admin/shared/metadata_variables", variables: Nuntius::MetadataVariables.in(@template, @template.old_layout.data, @template.html), message: t('.old_layout_metadata_variables')
                   - if @template.errors[:base].any?
                     .mb-3.rounded-md.border.border-red-200.bg-red-50.px-3.py-2.text-sm.text-red-700 role="alert"
                       - @template.errors[:base].each do |problem|
