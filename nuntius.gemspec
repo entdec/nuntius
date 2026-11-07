@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "faraday", ">= 2.9"
   s.add_runtime_dependency "faraday-follow_redirects", "~> 0"
   s.add_runtime_dependency "i18n", "~> 1.8.5"
+  s.add_runtime_dependency "image_processing", "~> 1.2"
   s.add_runtime_dependency "importmap-rails", ">= 2"
   s.add_runtime_dependency "labelary", "~> 0.5"
   s.add_runtime_dependency "liquidum", "~> 1.2.1"

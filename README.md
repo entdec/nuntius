@@ -34,6 +34,8 @@ and add the styles of Nuntius and the email editor to your Tailwind CSS:
 @import "../builds/tailwind/tess_edit";
 ```
 
+Images uploaded in the email editor and on the Media tabs are stored with [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html), so your app needs it set up (`bin/rails active_storage:install`). The Media tabs show previews of images through [image_processing](https://github.com/janko/image_processing), which Nuntius depends on; it needs [libvips](https://www.libvips.org) on every server that runs the admin, e.g. `apt-get install libvips` (Debian, Ubuntu) or `brew install vips` (macOS). Without it, opening a Media tab with an image on it fails.
+
 Create an initializer (config/initializers/messaging.rb) and configure as desired:
 
 ```ruby
@@ -266,6 +268,12 @@ Besides TessEdit's blocks, the editor has three Nuntius blocks:
 ### Templates and campaigns
 
 Every new mail or LMTP template and campaign needs a layout. Choose it on the Edit tab and save; the email is then edited on the Design tab, starting with the layout's example content. Choosing another layout moves the content into it.
+
+### Images
+
+Images in the editor (Image blocks, and the background images of heroes, sections and wrappers) are either a URL or an uploaded image. Upload one with the Upload button in Inspect, or drag a file from your desktop onto the canvas. Uploads are stored on the layout, template or campaign being edited, and also show on its Media tab; a template or campaign can use its own images and its layout's.
+
+Images are loaded from Nuntius' host (`config.host`) when the email is opened. An uploaded image in an Image block can be sent with the email instead: turn on **Embed in the email**. That makes emails larger, but the image shows without the reader loading images. Background images are always loaded from their URL, since many mail clients don't show embedded backgrounds.
 
 ### Embedded images
 

@@ -20,15 +20,13 @@ git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 gem "mensa", entdec: "mensa"
 
 # The email editor; from GitHub until it is released on RubyGems
-gem "tess_edit", git: "git@github.com:tdegrunt/tess_edit.git", branch: "image-uploads"
+gem "tess_edit", git: "git@github.com:tdegrunt/tess_edit.git", branch: "main"
 
 gem "sidekiq"
 
 # Dummy app (test/dummy)
 gem "puma"
 gem "propshaft"
-# Previews of images on the Media tabs (Satis attachments)
-gem "image_processing", "~> 1.2"
 gem "satis"
 gem "tailwindcss-rails", "~> 4.0"
 gem "overmind", require: false
