@@ -10,7 +10,7 @@ export default {
   type: "view_in_browser",
   name: "View in browser",
   icon: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><circle cx="6" cy="6.5" r=".5"/>',
-  category: "nuntius",
+  category: "mailing",
   roles: ["content"],
   defaults: () => ({ attributes: { align: "center", padding: "10px 25px", "font-size": "12px" }, data: { before: "", text: "" } }),
   fields: linkFields(TEXT),

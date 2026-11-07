@@ -10,7 +10,7 @@ import content, { CONTENT_END, CONTENT_START } from "nuntius/blocks/content"
 import viewInBrowser from "nuntius/blocks/view_in_browser"
 import subscription from "nuntius/blocks/subscription"
 
-registerCategory({ key: "nuntius", label: "Nuntius", order: 25 })
+registerCategory({ key: "mailing", label: "Mailing", order: 25 })
 ;[content, viewInBrowser, subscription].forEach(registerBlock)
 
 // A layout: a section, then a Content block holding a section with a column.

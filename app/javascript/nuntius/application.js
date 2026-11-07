@@ -7,7 +7,7 @@ import viewInBrowser from "nuntius/blocks/view_in_browser"
 import subscription from "nuntius/blocks/subscription"
 import image from "nuntius/blocks/image"
 
-registerCategory({ key: "nuntius", label: "Nuntius", order: 25 })
+registerCategory({ key: "mailing", label: "Mailing", order: 25 })
 // image replaces TessEdit's own Image block
 ;[content, viewInBrowser, subscription, image].forEach(registerBlock)
 
