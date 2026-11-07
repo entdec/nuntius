@@ -4,19 +4,20 @@
 # it creates the database.
 # Idempotent, records are only created when missing, so Nuntius events (Account#created, User#create) fire once.
 
-%w[Acme Globex Initech].each do |name|
-  Account.find_or_create_by!(name: name)
+accounts = %w[Acme Globex Initech].to_h do |name|
+  [name, Account.find_or_create_by!(name: name)]
 end
 
 [
-  {name: "Alice Admin", email: "alice@example.com", state: "active"},
-  {name: "Bob Builder", email: "bob@example.com", state: "active"},
-  {name: "Carol Pending", email: "carol@example.com", state: "pending"},
-  {name: "Dave Disabled", email: "dave@example.com", state: "disabled"}
+  {name: "Alice Admin", email: "alice@example.com", state: "active", account: "Acme"},
+  {name: "Bob Builder", email: "bob@example.com", state: "active", account: "Acme"},
+  {name: "Carol Pending", email: "carol@example.com", state: "pending", account: "Globex"},
+  {name: "Dave Disabled", email: "dave@example.com", state: "disabled", account: "Initech"}
 ].each do |attributes|
   User.find_or_create_by!(email: attributes[:email]) do |user|
     user.name = attributes[:name]
     user.state = attributes[:state]
+    user.account = accounts.fetch(attributes[:account])
   end
 end
 
