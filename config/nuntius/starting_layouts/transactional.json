@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "id": "bryw7kxf8w",
+  "type": "root",
+  "attributes": {
+    "width": "600px",
+    "background-color": "#f3f4f6"
+  },
+  "data": {
+    "subject": "",
+    "preheader": "",
+    "breakpoint": "480px",
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "fontSize": "14px",
+    "lineHeight": "1.6",
+    "textColor": "#111827",
+    "css": ""
+  },
+  "children": [
+    {
+      "id": "bioazd39oj",
+      "type": "section",
+      "attributes": {
+        "padding": "24px 0px 8px"
+      },
+      "data": {},
+      "children": [
+        {
+          "id": "bnjnt86o23",
+          "type": "column",
+          "attributes": {},
+          "data": {},
+          "children": [
+            {
+              "id": "bi46lnzkbo",
+              "type": "image",
+              "attributes": {
+                "src": "https://placehold.co/240x64/e5e7eb/6b7280.png?text=Logo",
+                "alt": "Logo",
+                "padding": "10px 25px",
+                "width": "120px",
+                "align": "left"
+              },
+              "data": {},
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beuc0tuute",
+      "type": "content",
+      "attributes": {},
+      "data": {},
+      "children": [
+        {
+          "id": "bxhgvvprej",
+          "type": "section",
+          "attributes": {
+            "background-color": "#ffffff",
+            "padding": "20px 0px",
+            "border-radius": "8px"
+          },
+          "data": {},
+          "children": [
+            {
+              "id": "bfls1xvagw",
+              "type": "column",
+              "attributes": {},
+              "data": {},
+              "children": [
+                {
+                  "id": "bkfb6jbzkz",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "heading",
+                          "attrs": {
+                            "level": 2
+                          },
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "Your order is on its way"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                },
+                {
+                  "id": "bfo4nuqpev",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "Hi {{ customer.name }}, thanks for your order. We'll let you know when it has been delivered."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                },
+                {
+                  "id": "blxvk3ceak",
+                  "type": "button",
+                  "attributes": {
+                    "href": "https://example.com/orders",
+                    "background-color": "#2563eb",
+                    "color": "#ffffff",
+                    "border-radius": "6px",
+                    "inner-padding": "12px 24px",
+                    "padding": "10px 25px",
+                    "font-weight": "600"
+                  },
+                  "data": {
+                    "content": "View your order"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "bk1n7pjsee",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px",
+                    "color": "#6b7280"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "Questions? Just reply to this email."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "babm8egpbq",
+      "type": "section",
+      "attributes": {
+        "padding": "20px 0px"
+      },
+      "data": {},
+      "children": [
+        {
+          "id": "bqi3jebxyq",
+          "type": "column",
+          "attributes": {},
+          "data": {},
+          "children": [
+            {
+              "id": "bslzldkfs4",
+              "type": "text",
+              "attributes": {
+                "padding": "4px 25px",
+                "align": "left",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Your company · Street 1 · 1234 AB City"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "children": []
+            },
+            {
+              "id": "b5jky4nhgo",
+              "type": "view_in_browser",
+              "attributes": {
+                "align": "left",
+                "padding": "4px 25px",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "before": "",
+                "text": ""
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

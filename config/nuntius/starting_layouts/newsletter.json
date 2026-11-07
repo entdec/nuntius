@@ -1,0 +1,435 @@
+{
+  "version": 1,
+  "id": "b9hvv8osng",
+  "type": "root",
+  "attributes": {
+    "width": "600px",
+    "background-color": "#f3f4f6"
+  },
+  "data": {
+    "subject": "",
+    "preheader": "",
+    "breakpoint": "480px",
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "fontSize": "14px",
+    "lineHeight": "1.6",
+    "textColor": "#111827",
+    "css": ""
+  },
+  "children": [
+    {
+      "id": "b4y5x3qabt",
+      "type": "section",
+      "attributes": {
+        "background-color": "#ffffff",
+        "padding": "16px 0px 0px"
+      },
+      "data": {},
+      "children": [
+        {
+          "id": "bp6oqqrja5",
+          "type": "column",
+          "attributes": {},
+          "data": {},
+          "children": [
+            {
+              "id": "b7gu0gemcu",
+              "type": "image",
+              "attributes": {
+                "src": "https://placehold.co/240x64/e5e7eb/6b7280.png?text=Logo",
+                "alt": "Logo",
+                "padding": "10px 25px",
+                "width": "120px",
+                "align": "center"
+              },
+              "data": {},
+              "children": []
+            },
+            {
+              "id": "bumf6l4ppv",
+              "type": "navbar",
+              "attributes": {
+                "align": "center"
+              },
+              "data": {
+                "links": [
+                  {
+                    "label": "News",
+                    "href": "https://example.com/news"
+                  },
+                  {
+                    "label": "Events",
+                    "href": "https://example.com/events"
+                  },
+                  {
+                    "label": "Contact",
+                    "href": "https://example.com/contact"
+                  }
+                ],
+                "color": "#111827",
+                "fontSize": "14px",
+                "linkPadding": "10px 15px"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bgqgq4bmsy",
+      "type": "content",
+      "attributes": {},
+      "data": {},
+      "children": [
+        {
+          "id": "bvmz1gwqff",
+          "type": "section",
+          "attributes": {
+            "background-color": "#ffffff",
+            "padding": "0px"
+          },
+          "data": {},
+          "children": [
+            {
+              "id": "bfddeybjit",
+              "type": "column",
+              "attributes": {},
+              "data": {},
+              "children": [
+                {
+                  "id": "b6qedewkx8",
+                  "type": "image",
+                  "attributes": {
+                    "src": "https://placehold.co/1200x500/dbeafe/1e3a8a.png?text=This+month",
+                    "alt": "",
+                    "padding": "0px"
+                  },
+                  "data": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bz5vvidji1",
+          "type": "section",
+          "attributes": {
+            "background-color": "#ffffff",
+            "padding": "20px 0px"
+          },
+          "data": {},
+          "children": [
+            {
+              "id": "bsgodnlbzx",
+              "type": "column",
+              "attributes": {},
+              "data": {},
+              "children": [
+                {
+                  "id": "bz0uccy68j",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "heading",
+                          "attrs": {
+                            "level": 1
+                          },
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "This month's news"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "A short introduction to this edition: what's new, and what's coming up."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bcvxgylumk",
+          "type": "section",
+          "attributes": {
+            "background-color": "#ffffff",
+            "padding": "0px 0px 20px"
+          },
+          "data": {},
+          "children": [
+            {
+              "id": "bxr5ocybkw",
+              "type": "column",
+              "attributes": {},
+              "data": {},
+              "children": [
+                {
+                  "id": "bwsqigtfel",
+                  "type": "image",
+                  "attributes": {
+                    "src": "https://placehold.co/600x400/e5e7eb/6b7280.png?text=Article",
+                    "alt": "",
+                    "padding": "10px 25px"
+                  },
+                  "data": {},
+                  "children": []
+                },
+                {
+                  "id": "bduevhvugw",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "heading",
+                          "attrs": {
+                            "level": 3
+                          },
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "First article"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "A few lines about the first article."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                },
+                {
+                  "id": "b1b7azvjec",
+                  "type": "button",
+                  "attributes": {
+                    "href": "https://example.com/news/1",
+                    "background-color": "#2563eb",
+                    "color": "#ffffff",
+                    "border-radius": "6px",
+                    "inner-padding": "12px 24px",
+                    "padding": "10px 25px",
+                    "font-weight": "600",
+                    "align": "left"
+                  },
+                  "data": {
+                    "content": "Read more"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "bc9tnteugv",
+              "type": "column",
+              "attributes": {},
+              "data": {},
+              "children": [
+                {
+                  "id": "b5kr9kgmqu",
+                  "type": "image",
+                  "attributes": {
+                    "src": "https://placehold.co/600x400/e5e7eb/6b7280.png?text=Article",
+                    "alt": "",
+                    "padding": "10px 25px"
+                  },
+                  "data": {},
+                  "children": []
+                },
+                {
+                  "id": "beq1j8dsqn",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "heading",
+                          "attrs": {
+                            "level": 3
+                          },
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "Second article"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "A few lines about the second article."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                },
+                {
+                  "id": "bum7z5pdpe",
+                  "type": "button",
+                  "attributes": {
+                    "href": "https://example.com/news/2",
+                    "background-color": "#2563eb",
+                    "color": "#ffffff",
+                    "border-radius": "6px",
+                    "inner-padding": "12px 24px",
+                    "padding": "10px 25px",
+                    "font-weight": "600",
+                    "align": "left"
+                  },
+                  "data": {
+                    "content": "Read more"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bgeo1mnkbb",
+      "type": "section",
+      "attributes": {
+        "padding": "20px 0px"
+      },
+      "data": {},
+      "children": [
+        {
+          "id": "bwpon0gykv",
+          "type": "column",
+          "attributes": {},
+          "data": {},
+          "children": [
+            {
+              "id": "bnyxmwkqju",
+              "type": "social",
+              "attributes": {
+                "mode": "horizontal",
+                "align": "center",
+                "icon-size": "24px",
+                "padding": "10px 25px"
+              },
+              "data": {
+                "elements": [
+                  {
+                    "name": "facebook",
+                    "href": "https://facebook.com/",
+                    "label": ""
+                  },
+                  {
+                    "name": "instagram",
+                    "href": "https://instagram.com/",
+                    "label": ""
+                  },
+                  {
+                    "name": "linkedin",
+                    "href": "https://linkedin.com/",
+                    "label": ""
+                  }
+                ]
+              },
+              "children": []
+            },
+            {
+              "id": "buxjodmr9r",
+              "type": "text",
+              "attributes": {
+                "padding": "4px 25px",
+                "align": "center",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Your company · Street 1 · 1234 AB City"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "children": []
+            },
+            {
+              "id": "b49wvfd9at",
+              "type": "view_in_browser",
+              "attributes": {
+                "align": "center",
+                "padding": "4px 25px",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "before": "",
+                "text": ""
+              },
+              "children": []
+            },
+            {
+              "id": "bcg7fe6mrv",
+              "type": "subscription",
+              "attributes": {
+                "align": "center",
+                "padding": "4px 25px",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "before": "",
+                "text": ""
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

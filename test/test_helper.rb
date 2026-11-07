@@ -173,3 +173,5 @@ class BarMessageBox < Nuntius::BaseMessageBox
 
   settings({})
 end
+
+Dir[File.expand_path("support/**/*.rb", __dir__)].each { |file| require file }

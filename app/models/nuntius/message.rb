@@ -148,13 +148,17 @@ module Nuntius
       end
 
       nuntius_attachment = Nuntius::Attachment.new
+      nuntius_attachment.inline = options[:inline].present?
+      nuntius_attachment.content_id = "#{SecureRandom.hex(12)}@nuntius" if nuntius_attachment.inline
       nuntius_attachment.content.attach(io: attachment[:io],
         filename: attachment[:filename],
         content_type: attachment[:content_type])
 
       attachments.push(nuntius_attachment)
+      nuntius_attachment
     rescue => e
       Nuntius.config.logger.error "Message: Could not attach #{attachment[:filename]} #{e.message}"
+      nil
     end
 
     def cleanup_attachments

@@ -7,6 +7,7 @@
 @import "../builds/tailwind/satis";
 @import "../builds/tailwind/mensa";
 @import "../builds/tailwind/nuntius";
+@import "../builds/tailwind/tess_edit";
 
 /* Satis' appearance switcher toggles a dark class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));

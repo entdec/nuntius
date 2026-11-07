@@ -1,6 +1,5 @@
 en:
   campaign_publish_confirm: "Are you sure you want to send out this campaign?"
-  subscriber_url_text: "Click here to unsubscribe"
   choose_files: Choose files
   activerecord:
     attributes:
@@ -54,6 +53,9 @@ en:
         new: New template
   nuntius:
     admin:
+      media:
+        create:
+          only_images: Only images can be uploaded
       campaigns:
         edit:
           card:
@@ -62,9 +64,13 @@ en:
           from_hint: "You can leave this blank, only fill this in if you want to override the default"
           list_hint: "You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
           metadata: Metadata
+          layout_hint: "The email is edited in the Design tab, inside this layout."
           tabs:
             main:
               tab:
+                edit: Edit
+                design: Design
+                media: Media
                 statistics: Statistics
                 messages: Messages
           messages_sent: Messages sent
@@ -82,6 +88,12 @@ en:
           card:
             nuntius_admin_layouts:
               title: Layouts
+          start_from: "Start from:"
+          starting_layouts:
+            basic: Basic
+            newsletter: Newsletter
+            transactional: Transactional
+            empty: Empty
           metadata: Metadata
           tabs:
             main:
@@ -89,6 +101,7 @@ en:
                 edit: Edit
                 media: Media
                 metadata: Metadata
+                templates: Templates
         index:
           card:
             nuntius_admin_layouts:
@@ -179,10 +192,20 @@ en:
             nuntius_admin_templates:
               title: Template
           metadata: Metadata
+          layout_hint: "The email is edited in the Design tab, inside this layout. Save after choosing one."
+          old_layout: "This template still uses the old layout %{name}. It keeps working until it is converted."
+          convert_layout: Convert into layout
+          convert_hint: "Its body goes into one HTML block in this layout's Content block, as it is sent now. You then edit it in the Design tab."
+          convert: Convert to the email editor
+          convert_confirm: "Convert this template? Its old layout and body are kept, but it is edited in the email editor from now on."
+        convert:
+          converted: The template now uses the email editor. Check it in the Design tab.
           tabs:
             main:
               tab:
                 edit: Edit
+                design: Design
+                media: Media
                 messages: Messages
         index:
           card:

@@ -36,9 +36,16 @@ Nuntius::Engine.routes.draw do
     resources :campaigns do
       member do
         post "publish", action: "publish"
+        get "media", to: "media#index", defaults: {owner: "campaign"}
+        post "media", to: "media#create", defaults: {owner: "campaign"}
       end
+      resources :attachments, controller: "satis/attachments"
     end
     resources :layouts do
+      member do
+        get "media", to: "media#index", defaults: {owner: "layout"}
+        post "media", to: "media#create", defaults: {owner: "layout"}
+      end
       resources :attachments, controller: "satis/attachments"
     end
     resources :lists do
@@ -56,7 +63,18 @@ Nuntius::Engine.routes.draw do
     end
     resources :layouts
     resources :locales
-    resources :templates
+    resources :templates do
+      resources :attachments, controller: "satis/attachments"
+      member do
+        get "media", to: "media#index", defaults: {owner: "template"}
+        post "media", to: "media#create", defaults: {owner: "template"}
+        # The conversion button submits the template form, a PATCH
+        match "convert", action: "convert", via: [:post, :patch]
+      end
+    end
   end
   root to: "dashboard#show"
+
+  # The email editor compiles MJML here: tess_edit.compile_path
+  mount TessEdit::Engine => "/tess_edit"
 end

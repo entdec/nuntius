@@ -1,11 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  data: MyText
-  metadata: {}
-
-two:
-  name: MyString
-  data: MyText
+  name: Basic
+  json: {}
   metadata: {}

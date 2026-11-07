@@ -63,6 +63,16 @@ module Nuntius
       yield(presenter) if block_given?
     end
 
+    # A message's HTML for the browser: its embedded images (cid:) come from storage
+    def message_html(message)
+      images = message.attachments.select(&:inline).index_by(&:content_id)
+      html = message.html.to_s.gsub(/cid:([^"'\s)]+)/) do |reference|
+        image = images[Regexp.last_match(1)]
+        image ? main_app.rails_blob_path(image, disposition: "inline") : reference
+      end
+      html.html_safe
+    end
+
     def method_missing(method, *args, &block)
       if main_app.respond_to?(method)
         main_app.send(method, *args)

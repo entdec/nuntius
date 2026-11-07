@@ -9,7 +9,8 @@ Nuntius.setup do |config|
 
   # The dummy app has no users, so no authentication for the admin pages
   config.admin_authentication_module = nil
-  config.host = ->(_message) { "app.nuntius.orb.local" }
+  # The environment's own OrbStack domain, which differs per worktree (bin/de)
+  config.host = ->(_message) { "app.#{ENV.fetch("DEV_ENV_NAME", "nuntius")}.orb.local" }
 
   config.transport :mail
   config.transport :lmtp

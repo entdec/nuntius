@@ -1,6 +1,5 @@
 nl:
   campaign_publish_confirm: "Weet je zeker dat je deze campagne wilt verzenden?"
-  subscriber_url_text: "Klik hier om je uit te schrijven"
   choose_files: Kies bestanden
   activerecord:
     attributes:
@@ -67,6 +66,9 @@ nl:
         new: Nieuwe template
   nuntius:
     admin:
+      media:
+        create:
+          only_images: Je kunt alleen afbeeldingen uploaden
       campaigns:
         edit:
           card:
@@ -75,9 +77,13 @@ nl:
           metadata: Metadata
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
           list_hint: "Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
+          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout."
           tabs:
             main:
               tab:
+                edit: Bewerk
+                design: Ontwerp
+                media: Media
                 statistics: Statistieken
                 messages: Berichten
           messages_sent: Berichten verzonden
@@ -95,6 +101,12 @@ nl:
           card:
             nuntius_admin_layouts:
               title: Layouts
+          start_from: "Begin met:"
+          starting_layouts:
+            basic: Eenvoudig
+            newsletter: Nieuwsbrief
+            transactional: Transactioneel
+            empty: Leeg
           metadata: Metadata
           tabs:
             main:
@@ -195,10 +207,20 @@ nl:
             nuntius_admin_templates:
               title: Template
           metadata: Metadata
+          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
+          old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
+          convert_layout: Omzetten naar layout
+          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
+          convert: Omzetten naar de e-maileditor
+          convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
+        convert:
+          converted: De template gebruikt nu de e-maileditor. Controleer hem in het tabblad Ontwerp.
           tabs:
             main:
               tab:
                 edit: Bewerk
+                design: Ontwerp
+                media: Media
                 messages: Berichten
         index:
           card:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -88,6 +88,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   create_table "nuntius_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "inline", default: false, null: false
+    t.string "content_id"
   end
 
   create_table "nuntius_attachments_messages", id: false, force: :cascade do |t|
@@ -101,7 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
     t.datetime "created_at", null: false
     t.string "from"
     t.text "html"
-    t.uuid "layout_id"
+    t.uuid "old_layout_id"
     t.boolean "link_tracking", default: false
     t.uuid "list_id"
     t.jsonb "metadata", default: {}, null: false
@@ -113,8 +115,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
     t.text "text"
     t.string "transport", default: "mail"
     t.datetime "updated_at", null: false
+    t.uuid "layout_id"
+    t.jsonb "json"
+    t.text "mjml"
+    t.string "preview_text"
     t.index ["layout_id"], name: "index_nuntius_campaigns_on_layout_id"
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
+    t.index ["old_layout_id"], name: "index_nuntius_campaigns_on_old_layout_id"
   end
 
   create_table "nuntius_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -148,10 +155,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   end
 
   create_table "nuntius_layouts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.text "data"
+    t.string "name", null: false
+    t.jsonb "json", default: {}, null: false
+    t.text "mjml"
+    t.text "html"
     t.jsonb "metadata", default: {}, null: false
-    t.string "name"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
@@ -218,6 +227,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
     t.index ["template_id"], name: "index_nuntius_messages_on_template_id"
   end
 
+  create_table "nuntius_old_layouts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "data"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "nuntius_subscribers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
@@ -244,7 +261,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
     t.text "html"
     t.string "interval"
     t.string "klass"
-    t.uuid "layout_id"
+    t.uuid "old_layout_id"
     t.boolean "link_tracking", default: false
     t.jsonb "metadata", default: {}, null: false
     t.boolean "open_tracking", default: false
@@ -254,7 +271,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
     t.string "to"
     t.string "transport"
     t.datetime "updated_at", null: false
+    t.uuid "layout_id"
+    t.jsonb "json"
+    t.text "mjml"
+    t.string "preview_text"
+    t.jsonb "converted_from"
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
+    t.index ["old_layout_id"], name: "index_nuntius_templates_on_old_layout_id"
   end
 
   create_table "nuntius_webhooks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -296,6 +319,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   add_foreign_key "nuntius_attachments_messages", "nuntius_messages", column: "message_id"
   add_foreign_key "nuntius_campaigns", "nuntius_layouts", column: "layout_id"
   add_foreign_key "nuntius_campaigns", "nuntius_lists", column: "list_id"
+  add_foreign_key "nuntius_campaigns", "nuntius_old_layouts", column: "old_layout_id"
   add_foreign_key "nuntius_message_trackings", "nuntius_messages", column: "message_id"
   add_foreign_key "nuntius_messages", "nuntius_campaigns", column: "campaign_id"
   add_foreign_key "nuntius_messages", "nuntius_messages", column: "parent_message_id"
@@ -303,4 +327,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   add_foreign_key "nuntius_messages", "nuntius_templates", column: "template_id"
   add_foreign_key "nuntius_subscribers", "nuntius_lists", column: "list_id"
   add_foreign_key "nuntius_templates", "nuntius_layouts", column: "layout_id"
+  add_foreign_key "nuntius_templates", "nuntius_old_layouts", column: "old_layout_id"
 end

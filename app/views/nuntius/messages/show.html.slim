@@ -1,5 +1,5 @@
-= @message.html.html_safe
-- @message.attachments.each do |attachment|
+= message_html(@message)
+- @message.attachments.reject(&:inline).each do |attachment|
   = link_to(attachment.filename, main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename)
   br
 

@@ -1,0 +1,31 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6">
+    <mj-section padding="20px 0px">
+      <mj-column>
+        <mj-text padding="10px 25px" align="center" font-size="20px"><p style="margin:0">Your name or logo</p></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-raw><!-- nuntius:content --></mj-raw>
+    <mj-section background-color="#ffffff" padding="20px 0px">
+      <mj-column>
+        <mj-text padding="10px 25px"><p style="margin:0">Each template and campaign puts its own content here.</p></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-raw><!-- /nuntius:content --></mj-raw>
+    <mj-section padding="20px 0px">
+      <mj-column>
+        <mj-text align="center" padding="4px 25px" font-size="12px" color="#6b7280"><a href="{% raw %}{{message_url}}{% endraw %}" data-nuntius-tracking="false" style="color:inherit;text-decoration:underline;">View this email in your browser</a></mj-text>
+        <mj-raw>{% if subscriber_url %}</mj-raw>
+        <mj-text align="center" padding="4px 25px" font-size="12px" color="#6b7280"><a href="{{ subscriber_url }}" data-nuntius-tracking="false" style="color:inherit;text-decoration:underline;">Manage your subscription</a></mj-text>
+        <mj-raw>{% endif %}</mj-raw>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

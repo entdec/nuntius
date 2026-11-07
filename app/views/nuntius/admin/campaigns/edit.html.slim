@@ -6,40 +6,46 @@
       - card.with_action
         = f.submit
 
-      .grid.grid-cols-12.gap-4 data-controller="toggle"
-        .col-span-12
-          = f.input :name
+      - card.with_tab :edit, padding: true
+        .grid.grid-cols-12.gap-4 data-controller="toggle"
+          .col-span-12
+            = f.input :name
 
-        .col-span-4
-          = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {data: { 'toggle-target' => 'input'}}
-        .col-span-4
-          = f.association :layout, collection: @layouts
-        .col-span-4
-          = f.association :list, collection: @lists, hint: t(".list_hint")
-
-        .col-span-12
-          = f.input :from, hint: t(".from_hint")
-
-        .col-span-12
-          .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
-
-        template data-toggle-target='toggleable' data-toggle-value='mail'
           .col-span-4
-            = f.input :link_tracking, as: :switch
+            = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {data: { 'toggle-target' => 'input'}}
           .col-span-4
-            = f.input :open_tracking, as: :switch
+            = f.association :layout, collection: @layouts, hint: t(".layout_hint")
           .col-span-4
-            = f.input :publish_at, as: :date_time
-          .col-span-12
-            = f.input :subject
-          .col-span-12
-            = f.rich_text :html
-          .col-span-12
-            = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+            = f.association :list, collection: @lists, hint: t(".list_hint")
 
-        template data-toggle-target='toggleable' data-toggle-value='voice'
           .col-span-12
-            = f.input :text, as: :editor, mode: 'text/plain'
+            = f.input :from, hint: t(".from_hint")
+
+          .col-span-12
+            .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
+
+          - Nuntius::Concerns::EmailDesigned::EMAIL_TRANSPORTS.each do |transport|
+            template data-toggle-target='toggleable' data-toggle-value=transport
+              .col-span-4
+                = f.input :link_tracking, as: :switch
+              .col-span-4
+                = f.input :open_tracking, as: :switch
+              .col-span-4
+                = f.input :publish_at, as: :date_time
+              .col-span-12
+                = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+
+          template data-toggle-target='toggleable' data-toggle-value='voice'
+            .col-span-12
+              = f.input :text, as: :editor, mode: 'text/plain'
+
+      - if @campaign.email? && @campaign.layout
+        - card.with_tab :design, padding: true
+          = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: media_admin_campaign_path(@campaign)
+
+      - if @campaign.persisted? && @campaign.email?
+        - card.with_tab :media, padding: true
+          = f.attachments :images
 - else
   = sts.card :nuntius_admin_campaigns, title: @campaign.name, icon: 'fal fa-megaphone', content_padding: false do |card|
     - card.with_tab :statistics, padding: true do |tab|

@@ -5,6 +5,8 @@ require_dependency "nuntius/application_admin_controller"
 module Nuntius
   module Admin
     class CampaignsController < ApplicationAdminController
+      include Nuntius::EmailDesignParams
+
       before_action :set_objects, except: [:index]
 
       def index
@@ -16,7 +18,8 @@ module Nuntius
       end
 
       def create
-        @campaign.save
+        assign_email_design(@campaign, :campaign) if @campaign.email?
+        @campaign.save(context: :admin)
         respond_with :admin, @campaign, action: :edit
       end
 
@@ -28,7 +31,11 @@ module Nuntius
       end
 
       def update
-        @campaign.update(campaign_params)
+        @campaign.assign_attributes(campaign_params)
+        assign_email_design(@campaign, :campaign) if @campaign.email?
+        # Images uploaded on the Media tab
+        images = Array(params.dig(:campaign, :images)).compact_blank
+        @campaign.images.attach(images) if @campaign.save(context: :admin) && images.any?
 
         respond_with :admin, @campaign, action: :edit
       end

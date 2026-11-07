@@ -1,6 +1,9 @@
 {
   "name": "nuntius",
   "private": true,
+  "scripts": {
+    "test": "TESS_EDIT_PATH=\"$(bundle exec ruby -e 'print Gem.loaded_specs[%q(tess_edit)].full_gem_path')\" node --import ./test/javascript/register.mjs --test 'test/javascript/**/*_test.mjs'"
+  },
   "dependencies": {
     "postcss-advanced-variables": "^3.0.1",
     "postcss-comment": "^2.0.0",

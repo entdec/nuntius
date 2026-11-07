@@ -49,29 +49,28 @@
           .col-span-12
             = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
 
-          template data-toggle-target='toggleable' data-toggle-value='mail'
-            .col-span-6
-              = f.input :link_tracking, as: :switch
-            .col-span-6
-              = f.input :open_tracking, as: :switch
-            .col-span-12
-              = f.input :subject, as: :editor, mode: 'text/plain'
-            .col-span-12
-              = f.association :layout, collection: @layouts, include_blank: true
-            .col-span-12
-              = f.input :html, as: :editor, mode: 'text/markdown', height: '400px'
-
-          template data-toggle-target='toggleable' data-toggle-value='lmtp'
-            .col-span-6
-              = f.input :link_tracking, as: :switch
-            .col-span-6
-              = f.input :open_tracking, as: :switch
-            .col-span-12
-              = f.input :subject, as: :editor, mode: 'text/plain'
-            .col-span-12
-              = f.association :layout, collection: @layouts, include_blank: true
-            .col-span-12
-              = f.input :html, as: :editor, mode: 'text/markdown', height: '400px'
+          - Nuntius::Concerns::EmailDesigned::EMAIL_TRANSPORTS.each do |transport|
+            template data-toggle-target='toggleable' data-toggle-value=transport
+              .col-span-6
+                = f.input :link_tracking, as: :switch
+              .col-span-6
+                = f.input :open_tracking, as: :switch
+              - if @template.old_layout
+                .col-span-12.rounded-md.border.border-gray-200.p-4
+                  p.mb-3.text-sm.text-gray-600 = t('.old_layout', name: @template.old_layout.name)
+                  - if @template.errors[:base].any?
+                    .mb-3.rounded-md.border.border-red-200.bg-red-50.px-3.py-2.text-sm.text-red-700 role="alert"
+                      - @template.errors[:base].each do |problem|
+                        p = problem
+                  = f.association :layout, collection: @layouts, include_blank: true, label: t('.convert_layout'), hint: t('.convert_hint')
+                  button.button.border-transparent.bg-red-600.text-white.hover:bg-red-700 type="submit" formaction=convert_admin_template_path(@template) onclick="return confirm('#{j t('.convert_confirm')}')" = t('.convert')
+                .col-span-12
+                  = f.input :subject, as: :editor, mode: 'text/plain'
+                .col-span-12
+                  = f.input :html, as: :editor, mode: 'text/markdown', height: '400px'
+              - else
+                .col-span-12
+                  = f.association :layout, collection: @layouts, include_blank: true, hint: t('.layout_hint')
 
           template data-toggle-target='toggleable' data-toggle-value='voice'
             .col-span-12
@@ -94,6 +93,14 @@
             .col-span-12
               = f.input :payload, as: :editor, mode: 'application/yaml', hint: 'See here for more information: https://www.adaptivecards.io/designer/', height: '400px'
 
+
+      - if @template.email? && @template.layout && !@template.old_layout
+        - card.with_tab :design, padding: true
+          = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: media_admin_template_path(@template)
+
+      - if @template.persisted? && @template.email?
+        - card.with_tab :media, padding: true
+          = f.attachments :images
 
       - if @template.messages.exists?
         - card.with_tab :messages, padding: false

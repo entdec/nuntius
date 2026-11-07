@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "auxilium"
+require "importmap-rails"
+require "tess_edit"
 require "faraday"
 require "faraday/follow_redirects"
 require "liquidum"
@@ -24,6 +26,21 @@ module Nuntius
       Dir.glob(path).each do |c|
         require_dependency(c)
       end
+    end
+
+    initializer "nuntius.assets" do |app|
+      app.config.assets.paths << root.join("app/javascript") if app.config.respond_to?(:assets)
+    end
+
+    initializer "nuntius.importmap", before: "importmap" do |app|
+      app.config.importmap.paths << root.join("config/importmap.rb")
+      app.config.importmap.cache_sweepers << root.join("app/javascript")
+    end
+
+    # The editor's compile endpoint (mounted in config/routes.rb) sits behind
+    # Nuntius' admin authentication, unless the host app chose a controller itself.
+    initializer "nuntius.tess_edit" do
+      TessEdit.parent_controller = "Nuntius::ApplicationAdminController" if TessEdit.parent_controller == "ActionController::Base"
     end
 
     initializer "nuntius.lettermint_webhook" do |app|

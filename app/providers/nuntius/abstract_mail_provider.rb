@@ -48,15 +48,20 @@ module Nuntius
 
           message.html = message.html.gsub("{{message_url}}") { message_url(message) }
 
-          p.html_part = Mail::Part.new(
+          html_part = Mail::Part.new(
             body: message.html,
             content_type: "text/html",
             charset: "UTF-8"
           )
+          if inline_images.any?
+            p.add_part related_part(html_part)
+          else
+            p.html_part = html_part
+          end
         end
       end
 
-      message.attachments.each do |attachment|
+      message.attachments.reject(&:inline).each do |attachment|
         mail.attachments[attachment.filename.to_s] = {mime_type: attachment.content_type, content: attachment.download}
       end
 
@@ -93,6 +98,26 @@ module Nuntius
     end
 
     private
+
+    # Images the HTML shows through cid: references (the embed_image filter)
+    def inline_images
+      @inline_images ||= message.attachments.select(&:inline)
+    end
+
+    # The HTML together with its images, as multipart/related
+    def related_part(html_part)
+      related = Mail::Part.new(content_type: "multipart/related")
+      related.add_part html_part
+      inline_images.each do |image|
+        part = Mail::Part.new
+        part.content_type = image.content_type
+        part.content_disposition = %(inline; filename="#{image.filename}")
+        part.content_id = "<#{image.content_id}>"
+        part.body = image.download
+        related.add_part part
+      end
+      related
+    end
 
     # The resolved recipient email address. Used for the blank check, allow
     # list, bounce dedup query and the +To:+ header. Subclasses may override

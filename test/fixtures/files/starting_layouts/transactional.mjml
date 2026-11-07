@@ -1,0 +1,32 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6">
+    <mj-section padding="24px 0px 8px">
+      <mj-column>
+        <mj-image src="https://placehold.co/240x64/e5e7eb/6b7280.png?text=Logo" alt="Logo" padding="10px 25px" width="120px" align="left" />
+      </mj-column>
+    </mj-section>
+    <mj-raw><!-- nuntius:content --></mj-raw>
+    <mj-section background-color="#ffffff" padding="20px 0px" border-radius="8px">
+      <mj-column>
+        <mj-text padding="10px 25px"><h2 style="margin:0;font-size:1.5em;line-height:1.25">Your order is on its way</h2></mj-text>
+        <mj-text padding="10px 25px"><p style="margin:0">Hi {{ customer.name }}, thanks for your order. We'll let you know when it has been delivered.</p></mj-text>
+        <mj-button href="https://example.com/orders" background-color="#2563eb" color="#ffffff" border-radius="6px" inner-padding="12px 24px" padding="10px 25px" font-weight="600">View your order</mj-button>
+        <mj-text padding="10px 25px" color="#6b7280"><p style="margin:0">Questions? Just reply to this email.</p></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-raw><!-- /nuntius:content --></mj-raw>
+    <mj-section padding="20px 0px">
+      <mj-column>
+        <mj-text padding="4px 25px" align="left" font-size="12px" color="#6b7280"><p style="margin:0">Your company · Street 1 · 1234 AB City</p></mj-text>
+        <mj-text align="left" padding="4px 25px" font-size="12px" color="#6b7280"><a href="{% raw %}{{message_url}}{% endraw %}" data-nuntius-tracking="false" style="color:inherit;text-decoration:underline;">View this email in your browser</a></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

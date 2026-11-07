@@ -5,6 +5,8 @@ require_dependency "nuntius/application_admin_controller"
 module Nuntius
   module Admin
     class TemplatesController < ApplicationAdminController
+      include Nuntius::EmailDesignParams
+
       before_action :set_objects, except: [:index]
 
       def index
@@ -18,7 +20,8 @@ module Nuntius
 
       def create
         @template = Nuntius::Template.new(template_params)
-        @template.save
+        assign_email_design(@template, :template) if @template.email?
+        @template.save(context: :admin)
         respond_with :admin, @template, action: :edit
       end
 
@@ -32,8 +35,23 @@ module Nuntius
 
       def update
         @template = Nuntius::Template.visible.find(params[:id])
-        @template.update(template_params)
+        @template.assign_attributes(template_params)
+        assign_email_design(@template, :template) if @template.email?
+        # Images uploaded on the Media tab
+        images = Array(params.dig(:template, :images)).compact_blank
+        @template.images.attach(images) if @template.save(context: :admin) && images.any?
         respond_with :admin, @template
+      end
+
+      # Converts a template with an old layout into the email editor
+      def convert
+        @template = Nuntius::Template.visible.find(params[:id])
+        layout = @layouts.find_by(id: params.dig(:template, :layout_id))
+        if Nuntius::TemplateConversion.new(@template, layout).convert
+          redirect_to edit_admin_template_path(@template), notice: t(".converted"), status: :see_other
+        else
+          render :edit, status: :unprocessable_entity
+        end
       end
 
       def destroy

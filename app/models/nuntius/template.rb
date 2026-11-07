@@ -4,7 +4,9 @@ module Nuntius
   class Template < ApplicationRecord
     include Nuntius::Concerns::MetadataScoped
     include Nuntius::Concerns::Yamlify
+    include Nuntius::Concerns::EmailDesigned
 
+    belongs_to :old_layout, class_name: "Nuntius::OldLayout", optional: true
     belongs_to :layout, optional: true
     has_many :messages, class_name: "Nuntius::Message", dependent: :nullify
 
@@ -38,7 +40,7 @@ module Nuntius
 
       message.from = render(:from, assigns, locale, options).split(",").reject(&:empty?).join(",")
       message.subject = render(:subject, assigns, locale, options)
-      message.html = render(:html, assigns, locale, options.merge(layout: layout&.data))
+      message.html = render(:html, assigns, locale, options.merge(layout: old_layout&.data))
       message.text = render(:text, assigns, locale, options)
       message.payload = render(:payload, assigns, locale, options)
 
@@ -47,7 +49,7 @@ module Nuntius
 
     def translation_scope
       scope = %w[]
-      scope << layout.name.underscore.tr(" ", "_") if layout
+      scope << (old_layout || layout).name.underscore.tr(" ", "_") if old_layout || layout
       scope << klass.underscore.tr("/", "_")
       scope << event
       scope << transport
@@ -93,6 +95,9 @@ module Nuntius
       I18n.with_locale(locale) do
         if attr == :payload
           YAML.safe_load(::Liquidum.render(send(attr), {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options)))
+        elsif attr == :html && email_design?
+          # Already a whole email: only Liquid is left to render
+          ::Liquidum.render(send(attr), {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options.except(:layout)))
         elsif attr == :html
           ::Liquidum.render(send(attr), {filter: "markdown", assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options))
         else

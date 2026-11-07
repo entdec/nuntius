@@ -26,7 +26,7 @@ module Nuntius
 
       assigns["campaign"] = context.campaign
       assigns["subscriber"] = subscriber
-      assigns["subscriber_link"] = subscriber.link(campaign, message)
+      assigns["subscriber_url"] = subscriber.url(message)
 
       if subscriber.nuntiable
         name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
@@ -39,7 +39,7 @@ module Nuntius
         locale = instance_exec(subscriber.nuntiable, &locale_proc) if locale_proc
       end
 
-      message.from = render(:from, assigns, locale)
+      message.from = render(:from, assigns, locale, message: message)
       message.to = case campaign.transport
       when "mail"
         subscriber.email
@@ -49,8 +49,8 @@ module Nuntius
         subscriber.phone_number
       end
 
-      message.subject = render(:subject, assigns, locale)
-      message.html = render(:html, assigns, locale, layout: campaign.layout&.data)
+      message.subject = render(:subject, assigns, locale, message: message)
+      message.html = render(:html, assigns, locale, message: message, layout: campaign.old_layout&.data)
 
       message.save!
       message
@@ -58,15 +58,15 @@ module Nuntius
 
     def translation_scope
       scope = %w[nuntius]
-      scope << campaign.layout.name.underscore.tr(" ", "_") if layout
+      scope << (campaign.old_layout || campaign.layout).name.underscore.tr(" ", "_") if campaign.old_layout || campaign.layout
       scope.join(".")
     end
 
     private
 
-    def render(attr, assigns, locale, options = {})
+    def render(attr, assigns, locale, message:, **options)
       I18n.with_locale(locale) do
-        ::Liquidum.render(campaign.public_send(attr), {assigns: assigns.merge("campaign" => campaign), registers: {"campaign" => campaign}}.merge(options))
+        ::Liquidum.render(campaign.public_send(attr), {assigns: assigns.merge("campaign" => campaign), registers: {"campaign" => campaign, "message" => message}}.merge(options))
       end
     end
   end

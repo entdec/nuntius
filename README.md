@@ -4,7 +4,35 @@ Nuntius offers messaging and notifications for ActiveRecord models in Ruby on Ra
 
 ## Setup
 
-Add Nuntius to your Gemfile and run bundle install to install it.
+Add Nuntius to your Gemfile, together with TessEdit, the email editor Nuntius uses. TessEdit isn't on RubyGems yet, so it comes from GitHub, and a gem's own dependencies can't point there; your Gemfile has to:
+
+```ruby
+gem "nuntius"
+gem "tess_edit", git: "https://github.com/tdegrunt/tess_edit.git", branch: "main"
+```
+
+Run bundle install, then copy the migrations and run them:
+
+```sh
+bin/rails nuntius:install:migrations
+bin/rails db:migrate
+```
+
+Nuntius' admin pages need [Satis](https://github.com/entdec/satis), importmap-rails, Propshaft and Tailwind CSS 4 through tailwindcss-rails 4.3 or later (for engine support). Import Nuntius' JavaScript after Satis, whose Stimulus application it uses:
+
+```js
+// app/javascript/application.js
+import "satis"
+import "nuntius"
+```
+
+and add the styles of Nuntius and the email editor to your Tailwind CSS:
+
+```css
+/* app/assets/tailwind/application.css */
+@import "../builds/tailwind/nuntius";
+@import "../builds/tailwind/tess_edit";
+```
 
 Create an initializer (config/initializers/messaging.rb) and configure as desired:
 
@@ -169,7 +197,7 @@ Then in your template you can do:
 
 ### Metadata
 
-You can use metadata in your template to guide some text and information in your layout. 
+You can use metadata in your template to guide some text and information in your layout. (This describes the old layouts; for layouts made in the email editor, see [Email designs](#email-designs).)
 
 Say you need to change the header of an email, based on the template. In your layout you can then do this:
 
@@ -219,13 +247,50 @@ Nuntius.event('packed', packing: {smurrefluts: 'hatseflats'})
 
 The main key of the hash passed will also be the liquid variable.
 
+## Email designs
+
+Mail and LMTP templates and campaigns are designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit)), which builds [MJML](https://mjml.io); Nuntius compiles it to HTML with [MRML](https://github.com/jdrouet/mrml). Liquid works everywhere in the design and is rendered when a message is sent.
+
+### Layouts
+
+A layout is the part every email shares: header, footer, width, fonts, colors and CSS. It has exactly one **Content** block, where each template or campaign puts its own content. A new layout starts from one of the starting layouts Nuntius ships: Basic, Newsletter, Transactional or Empty.
+
+Templates and campaigns follow their layout: when you change a layout, every template and draft campaign that uses it is put together again with the new layout. In their editor the layout's parts are visible but locked; only the Content block, the subject and the preview text are theirs.
+
+Besides TessEdit's blocks, the editor has three Nuntius blocks:
+
+- **Content**, the template's or campaign's own part of the layout
+- **View in browser**, a link to the message online (`{{ message_url }}`)
+- **Manage subscription**, a link to the subscriber's page for the campaign's list (`{{ subscriber_url }}`). Campaigns to a list that allows unsubscribing must contain it.
+
+### Templates and campaigns
+
+Every new mail or LMTP template and campaign needs a layout. Choose it on the Edit tab and save; the email is then edited on the Design tab, starting with the layout's example content. Choosing another layout moves the content into it.
+
+### Embedded images
+
+Images are normally loaded from their URL. To send an image with the email instead, use the `embed_image` filter: it attaches the image and returns a `cid:` reference to it.
+
+```liquid
+{{ 'https://www.example.com/logo.png' | embed_image }}
+{{ template.layout.attachments.first | embed_image }}
+```
+
+It takes a URL or a stored file (Active Storage), such as the files on a layout's Media tab, and attaches each image once, however often an email uses it. The online version of the message shows embedded images from storage.
+
+### Converting old templates
+
+Templates made before Nuntius 2 have an old layout (an HTML layout with `{{ content }}`) and a Markdown or HTML body. They keep working as they are. To move one to the email editor, open it, choose a layout under "Convert into layout" and convert it: its body goes into one HTML block in the layout's Content block, exactly as it is sent now, and its old layout and body are kept in `converted_from`.
+
+Liquid that MJML can't take is written another way that means the same (`a < b` becomes `b > a`; double quotes in Liquid inside an attribute become single quotes). A template with Liquid that compares with `<` or `>` inside an HTML tag, like `<span {% if late > 0 %}style="color: red"{% endif %}>`, isn't converted: put the condition around the tag first.
+
 ## Transports
 
 ### Mail
 
-Outbound mail is handled through SMTP (the `:smtp` provider on the `:mail` transport). LMTP delivery to a mailbox is available through a separate `:lmtp` transport (see below). We've only exposed the HTML of mail, we can create text-versions based on sanitized HTML. HTML allows for [Foundation for Emails](https://get.foundation/emails/docs/index.html). You will have to include the CSS in the layouts.
+Outbound mail is handled through SMTP (the `:smtp` provider on the `:mail` transport). LMTP delivery to a mailbox is available through a separate `:lmtp` transport (see below). Mail is designed in the email editor (see [Email designs](#email-designs)); the text version is made from the HTML.
 
-In the layout you can add `<a href="{{message_url}}">Link to mail</a>` to provide a link to the online version of the message.
+In a layout the View in browser block links to the online version of the message. In old layouts you can add `<a href="{{message_url}}">Link to mail</a>` for that.
 
 Nuntius supports email tracking, to enable this, you need to enable tracking for a template.
 Nuntius will then inject a tracking pixel and track clicks on links.
@@ -246,22 +311,27 @@ Next in AWS SES, configure the SNS topic to receive feedback notifications for B
 
 #### Lettermint
 
-When you send mail through [Lettermint](https://lettermint.co) (e.g. with the `:smtp` provider pointed at Lettermint's SMTP server), Nuntius can receive message status updates through a Lettermint webhook. Nuntius creates the webhook with Lettermint itself:
+When you send mail through [Lettermint](https://lettermint.co) (e.g. with the `:smtp` provider pointed at Lettermint's SMTP server), Nuntius receives message status updates, opens and clicks through a Lettermint webhook. You don't create the webhook in Lettermint yourself, Nuntius does that through Lettermint's API:
 
 ```ruby
 Nuntius.setup do |config|
   config.lettermint_webhook(
-    api_token: ENV["LETTERMINT_TEAM_TOKEN"], # Lettermint Team API token
+    api_token: ENV["LETTERMINT_TEAM_TOKEN"], # Lettermint Team API token, used to manage the webhook
     project_id: "your-project-id",
     route_id: "your-route-id",               # optional, limits the webhook to one route
-    host: "https://app.example.com"          # where Nuntius is reachable, defaults to config.host
+    host: "https://app.example.com",         # where Nuntius is reachable, defaults to config.host
+    name: "Nuntius",                         # optional, the webhook's name in Lettermint
+    setup_on_boot: true                      # optional, check the webhook on server start (the default)
   )
 end
 ```
 
-On every server start Nuntius checks the webhook exists and is configured correctly, and creates or repairs it when needed. You can also do this by hand with `bin/rails nuntius:lettermint:setup_webhook`. The webhook id and its signing secret are stored in `nuntius_webhooks`; webhook deliveries are verified against that secret.
+How it works:
 
-The webhook points at https://<host>/messaging/feedback/lettermint (depending on where you mount Nuntius) and updates messages as follows:
+1. **Setting up the webhook.** On every server start (not in tests, consoles or rake tasks) Nuntius enqueues `Nuntius::LettermintWebhookSetupJob`. It looks the webhook up in Lettermint (by the id it stored, or else by its URL), creates it when it's missing, and updates it when its URL, events, scope, project or route changed. When Nuntius has no secret for it yet, it has Lettermint regenerate the secret. The webhook's id and signing secret are stored in `nuntius_webhooks`. An advisory lock makes sure only one process does this when several start at once. You can run it by hand with `bin/rails nuntius:lettermint:setup_webhook`.
+2. **Receiving events.** Lettermint posts events to https://&lt;host&gt;/messaging/feedback/lettermint (depending on where you mount Nuntius). Nuntius checks the `X-Lettermint-Signature` header against the stored secret (HMAC-SHA256 of the timestamp and body) and refuses deliveries without a valid signature or more than 5 minutes old.
+3. **Finding the message.** Nuntius adds an `X-Nuntius-Message-Id` header to every mail and finds the message by it, falling back to the Lettermint message id it stored with an earlier event and to the `Message-ID` header.
+4. **Updating the message.** Events update the message as below, and are stored in its metadata (`feedback`, `lettermint_message_id`). Events can arrive out of order: a `sent` or `soft_bounced` event doesn't undo a later state, and `delivered` doesn't undo a bounce or complaint.
 
 | Lettermint event         | Message                          |
 |--------------------------|----------------------------------|
@@ -276,7 +346,9 @@ The webhook points at https://<host>/messaging/feedback/lettermint (depending on
 | `message.opened`         | `opened_at` / `open_count`       |
 | `message.clicked`        | `clicked_at` / `click_count` and link tracking |
 
-Opens and clicks require open/click tracking to be enabled on the Lettermint route.
+Opens and clicks require open/click tracking to be enabled on the Lettermint route. Lettermint's test event (`webhook.test`) is accepted and ignored.
+
+When the host or route changes, the webhook is updated on the next server start. If you delete the webhook in Lettermint, it's created again (with a new secret).
 
 ### LMTP
 
@@ -425,6 +497,8 @@ Add `Nuntius::RetrieveMailJob` to your cron.
 
 Campaigns allows you to bulk send many mails to subscribers.
 We support multiple lists with many subscribers.
+
+Mail campaigns are designed in the email editor, in a layout, like templates (see [Email designs](#email-designs)). When the campaign's list allows unsubscribing, the campaign must contain the Manage subscription block, which links each subscriber to their own page.
 
 You can manually publish the campaign or have Nuntius publish the campaign after a certain date/time. If you want to have Nuntius publish it for you, add `Nuntius::CampaignPublishJob` to your cron.
 

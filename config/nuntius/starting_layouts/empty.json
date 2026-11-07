@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "id": "bglm2iotkq",
+  "type": "root",
+  "attributes": {
+    "width": "600px",
+    "background-color": "#ffffff"
+  },
+  "data": {
+    "subject": "",
+    "preheader": "",
+    "breakpoint": "480px",
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "fontSize": "14px",
+    "lineHeight": "1.6",
+    "textColor": "#111827",
+    "css": ""
+  },
+  "children": [
+    {
+      "id": "bgoqxfnfoh",
+      "type": "content",
+      "attributes": {},
+      "data": {},
+      "children": []
+    }
+  ]
+}

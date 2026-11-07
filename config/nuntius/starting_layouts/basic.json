@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "id": "bclbxyqh3g",
+  "type": "root",
+  "attributes": {
+    "width": "600px",
+    "background-color": "#f3f4f6"
+  },
+  "data": {
+    "subject": "",
+    "preheader": "",
+    "breakpoint": "480px",
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "fontSize": "14px",
+    "lineHeight": "1.6",
+    "textColor": "#111827",
+    "css": ""
+  },
+  "children": [
+    {
+      "id": "bqvinry8th",
+      "type": "section",
+      "attributes": {
+        "padding": "20px 0px"
+      },
+      "data": {},
+      "children": [
+        {
+          "id": "bbno1v5vdm",
+          "type": "column",
+          "attributes": {},
+          "data": {},
+          "children": [
+            {
+              "id": "btk9fwq1db",
+              "type": "text",
+              "attributes": {
+                "padding": "10px 25px",
+                "align": "center",
+                "font-size": "20px"
+              },
+              "data": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Your name or logo"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bgzyjxw45j",
+      "type": "content",
+      "attributes": {},
+      "data": {},
+      "children": [
+        {
+          "id": "bnwld9icva",
+          "type": "section",
+          "attributes": {
+            "background-color": "#ffffff",
+            "padding": "20px 0px"
+          },
+          "data": {},
+          "children": [
+            {
+              "id": "bizojj3lzr",
+              "type": "column",
+              "attributes": {},
+              "data": {},
+              "children": [
+                {
+                  "id": "bkggabkpc4",
+                  "type": "text",
+                  "attributes": {
+                    "padding": "10px 25px"
+                  },
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": "Each template and campaign puts its own content here."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bjlnkfnq6m",
+      "type": "section",
+      "attributes": {
+        "padding": "20px 0px"
+      },
+      "data": {},
+      "children": [
+        {
+          "id": "blbff1gweq",
+          "type": "column",
+          "attributes": {},
+          "data": {},
+          "children": [
+            {
+              "id": "biduko0ylo",
+              "type": "view_in_browser",
+              "attributes": {
+                "align": "center",
+                "padding": "4px 25px",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "before": "",
+                "text": ""
+              },
+              "children": []
+            },
+            {
+              "id": "bg4hkvm2zi",
+              "type": "subscription",
+              "attributes": {
+                "align": "center",
+                "padding": "4px 25px",
+                "font-size": "12px",
+                "color": "#6b7280"
+              },
+              "data": {
+                "before": "",
+                "text": ""
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
