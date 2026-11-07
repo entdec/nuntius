@@ -45,6 +45,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - `Nuntius::Concerns::MetadataScoped`, with the jsonb scopes it brought (`metadata_in`, `metadata_eql`, …), and the configuration options `metadata_fields`, `metadata_humanize`, `add_metadata` and `default_template_scope`.
 - The metadata columns in the admin tables, and the metadata editors of campaigns, layouts, lists and locales.
 - `metadata` on the layout drop.
+- The status column (a traffic light) in the templates table, and the `flow_color` configuration option it read. Remove `config.flow_color = …` from your initializer.
 
 ### Fixed
 

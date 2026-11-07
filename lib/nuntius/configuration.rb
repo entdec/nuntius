@@ -71,7 +71,7 @@ module Nuntius
 
     # The records the admin shows, a scope on each model: by default the current account's
     attr_accessor :visible_scope
-    attr_writer :default_params, :flow_color
+    attr_writer :default_params
 
     attr_reader :transports, :providers, :lettermint_webhook_settings
 
@@ -131,10 +131,6 @@ module Nuntius
 
     def default_params(event, record)
       @default_params.is_a?(Proc) ? instance_exec(event, record, &@default_params) : @default_params
-    end
-
-    def flow_color(template_id)
-      @flow_color.is_a?(Proc) ? instance_exec(template_id, &@flow_color) : @flow_color
     end
 
     private
