@@ -39,6 +39,7 @@ Nuntius::Engine.routes.draw do
         post "cancel", action: "cancel"
         get "media", to: "media#index", defaults: {owner: "campaign"}
         post "media", to: "media#create", defaults: {owner: "campaign"}
+        post "media/compile", to: "media#compile", defaults: {owner: "campaign"}
       end
       resources :attachments, controller: "satis/attachments"
     end
@@ -46,6 +47,7 @@ Nuntius::Engine.routes.draw do
       member do
         get "media", to: "media#index", defaults: {owner: "layout"}
         post "media", to: "media#create", defaults: {owner: "layout"}
+        post "media/compile", to: "media#compile", defaults: {owner: "layout"}
       end
       resources :attachments, controller: "satis/attachments"
     end
@@ -69,6 +71,7 @@ Nuntius::Engine.routes.draw do
       member do
         get "media", to: "media#index", defaults: {owner: "template"}
         post "media", to: "media#create", defaults: {owner: "template"}
+        post "media/compile", to: "media#compile", defaults: {owner: "template"}
         # The conversion button submits the template form, a PATCH
         match "convert", action: "convert", via: [:post, :patch]
       end

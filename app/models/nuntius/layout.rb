@@ -15,6 +15,7 @@ module Nuntius
     validates :name, :mjml, presence: true
     validate :one_content_block
     before_save :compile, if: :mjml_changed?
+    before_save :store_image_names, if: :json_changed?
     after_save :recompose_emails, if: :saved_change_to_mjml?
 
     # The metadata variables its design uses, see MetadataVariables
@@ -22,9 +23,10 @@ module Nuntius
       MetadataVariables.in(self, mjml)
     end
 
-    # The images among its attachments, for the editor's Image blocks
+    # The images among its attachments, for the editor's Image blocks: one
+    # per name, the first uploaded (see EmailImages)
     def email_images
-      attachments.select { |attachment| attachment.blob.image? }
+      attachments.select { |attachment| attachment.blob.image? }.sort_by { |attachment| [attachment.created_at, attachment.id] }.uniq { |attachment| attachment.filename.to_s }
     end
 
     STARTING_LAYOUTS = %w[basic newsletter transactional empty].freeze
@@ -49,6 +51,11 @@ module Nuntius
 
     def compile
       self.html = TessEdit.compile(mjml).html
+    end
+
+    # Uploaded images are kept by name only, see EmailImages
+    def store_image_names
+      self.json = EmailImages.new(self).normalize(json)
     end
 
     # Templates and campaigns not sent yet follow the layout. A failure rolls

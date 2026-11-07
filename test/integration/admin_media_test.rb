@@ -36,7 +36,8 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
 
     assert_equal ["banner.png", "logo.png"], names
     image = response.parsed_body["images"].first
-    assert_equal @template.images.first.blob, ActiveStorage::Blob.find_signed(image["id"])
+    # The editor keeps the name, the URL is for its canvas
+    assert_equal "banner.png", image["id"]
     # On Nuntius' public host, whatever port the admin runs on
     assert_match %r{\Ahttps://#{Regexp.escape(Nuntius.config.host(nil))}/rails/active_storage/blobs/.+/banner.png\z}, image["url"]
   end
@@ -53,6 +54,44 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
     assert_response :created
     assert_equal ["photo.png"], @template.reload.images.map { |image| image.filename.to_s }
     assert_equal "photo.png", response.parsed_body["name"]
+  end
+
+  test "an upload gets a name the template's images and its layout's don't have yet" do
+    post "/nuntius/admin/templates/#{@template.id}/media", params: {file: upload}
+    post "/nuntius/admin/templates/#{@template.id}/media", params: {file: upload}
+    post "/nuntius/admin/templates/#{@template.id}/media", params: {file: upload("logo.png")}
+
+    assert_equal ["photo.png", "photo-2.png", "logo-2.png"], @template.reload.images.sort_by(&:created_at).map { |image| image.filename.to_s }
+    assert_equal "logo-2.png", response.parsed_body["id"]
+    assert_equal "logo-2.png", response.parsed_body["name"]
+    assert_match %r{/logo-2.png\z}, response.parsed_body["url"]
+  end
+
+  test "the preview shows the images the design refers to by name" do
+    @template.images.attach(io: StringIO.new(PNG), filename: "banner.png", content_type: "image/png")
+    mjml = %(<mjml><mj-body><mj-section><mj-column><mj-image src="{{ 'banner.png' | image_url }}" /><mj-image src="{{ 'logo.png' | embed_image }}" /><mj-image src="{{ 'gone.png' | image_url }}" /></mj-column></mj-section></mj-body></mjml>)
+
+    post "/nuntius/admin/templates/#{@template.id}/media/compile", params: {mjml: mjml}, as: :json
+
+    assert_response :success
+    html = response.parsed_body["html"]
+    assert_match %r{src="https://[^"]+/rails/active_storage/blobs/redirect/[^"]+/banner.png"}, html
+    assert_match %r{src="https://[^"]+/rails/active_storage/blobs/redirect/[^"]+/logo.png"}, html
+    assert_includes html, "{{ 'gone.png' | image_url }}"
+  end
+
+  test "the editor opens with older image references as names, shown from their URLs, and previews through the media" do
+    signed_id = @layout.attachments.first.blob.signed_id
+    image = {"id" => "bimage", "type" => "image", "attributes" => {"src" => "https://old.example.com/rails/active_storage/blobs/redirect/#{signed_id}/logo.png"}, "data" => {"image" => signed_id, "source" => "upload"}, "children" => []}
+    @template.update_column(:json, [image])
+
+    get "/nuntius/admin/templates/#{@template.id}/edit"
+
+    document = JSON.parse(css_select("input[name='template[design_json]']").first["value"])
+    opened = Nuntius::EmailDesign.content_nodes(document).first
+    assert_equal "logo.png", opened.dig("data", "image")
+    assert_match %r{\Ahttps://#{Regexp.escape(Nuntius.config.host(nil))}/rails/active_storage/blobs/redirect/[^/]+/logo.png\z}, opened.dig("attributes", "src")
+    assert_select "[data-tess-edit-compile-url-value='/nuntius/admin/templates/#{@template.id}/media/compile']"
   end
 
   test "uploading to a layout adds it to its attachments" do

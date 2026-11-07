@@ -1,9 +1,11 @@
-// TessEdit's Image block, which can also send an uploaded image with the
-// email instead of linking to it: its src becomes the embed_image filter
-// with the image's signed id, which attaches it and refers to it by cid:.
+// TessEdit's Image block, with uploaded images referred to by name (see
+// image_names.js). It can also send an uploaded image with the email
+// instead of linking to it: its src becomes the embed_image filter, which
+// attaches it and refers to it by cid:.
 
 import image from "tess_edit/blocks/image"
 import { IMAGE_FIELD, imageSource } from "tess_edit/core/media"
+import { liquidImage, uploadedName } from "nuntius/blocks/image_names"
 
 const embed = {
   key: "data.embed",
@@ -28,10 +30,11 @@ export default {
   render: {
     mjml(node, ctx) {
       // The editor's canvas shows the image from its URL
-      if (ctx.editor || node.data?.embed !== true || !node.data?.image) return image.render.mjml(node, ctx)
+      const name = !ctx.editor && uploadedName(node, IMAGE_FIELD)
+      if (!name) return image.render.mjml(node, ctx)
 
-      const id = String(node.data.image).replace(/'/g, "")
-      return image.render.mjml({ ...node, attributes: { ...node.attributes, src: `{{ '${id}' | embed_image }}` } }, ctx)
+      const filter = node.data?.embed === true ? "embed_image" : "image_url"
+      return image.render.mjml({ ...node, attributes: { ...node.attributes, src: liquidImage(name, filter) } }, ctx)
     }
   }
 }

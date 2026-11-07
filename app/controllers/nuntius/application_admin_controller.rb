@@ -9,5 +9,15 @@ module Nuntius
     include ActiveStorage::SetCurrent
 
     layout Nuntius.config.admin_layout
+    helper_method :image_url_options
+
+    private
+
+    # Where the email editor shows uploaded images from: Nuntius' public host,
+    # as the emails load them, so nothing (like the port) comes from the
+    # admin's request unless there is no host
+    def image_url_options
+      EmailImages.url_options(Nuntius.config.host(nil)).presence || {host: request.host_with_port, protocol: request.protocol}
+    end
   end
 end

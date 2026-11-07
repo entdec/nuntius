@@ -13,6 +13,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - Nuntius blocks in the editor: Content, View in browser and Manage subscription.
 - Images uploaded in the editor, by button or by dragging a file onto the canvas, for Image blocks and the backgrounds of heroes, sections and wrappers. They're stored on the layout, template or campaign, and an Image block's image can be embedded in the email.
 - The `embed_image` Liquid filter, which attaches an image to the email and returns a `cid:` reference.
+- Uploaded images are referred to by a name unique to their layout, template or campaign, not by their URL: the email gets `{{ 'logo.png' | image_url }}` (or `embed_image`), and the `image_url` Liquid filter finds the image in the template's or campaign's images, then its layout's, on the host for the message (`config.host(message)`).
 - Converting a template with an old layout to the email editor, from its page in the admin.
 - Lettermint webhooks: Nuntius creates and checks the webhook itself and updates messages from Lettermint's events (see [Lettermint](README.md#lettermint)).
 - The `soft_bounced` message state, for temporary delivery failures the provider retries.

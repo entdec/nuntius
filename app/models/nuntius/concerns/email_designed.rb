@@ -23,6 +23,7 @@ module Nuntius
         has_many_attached :images, service: Nuntius.config.active_storage_service
 
         validate :design_compiles
+        before_save :store_image_names, if: :json_changed?
         # Every email needs a layout when edited in the admin; the old ones keep
         # their old layout until they are converted.
         validates :layout, presence: true, on: :admin, if: -> { email? && old_layout.nil? }
@@ -32,9 +33,11 @@ module Nuntius
         EMAIL_TRANSPORTS.include?(transport)
       end
 
-      # The images its editor can choose from: its own and its layout's
+      # The images its editor can choose from: its own and its layout's, one
+      # per name (its own first, then the first uploaded, see EmailImages)
       def email_images
-        (images.to_a + Array(layout&.email_images)).uniq(&:blob_id)
+        own = images.sort_by { |image| [image.created_at, image.id] }
+        (own + Array(layout&.email_images)).uniq { |image| image.filename.to_s }
       end
 
       # The metadata variables its design still uses, see MetadataVariables
@@ -107,6 +110,11 @@ module Nuntius
         raise EmailDesign::Error, result.errors.join("; ") unless result.html
 
         self.html = result.html
+      end
+
+      # Uploaded images are kept by name only, see EmailImages
+      def store_image_names
+        self.json = EmailImages.new(self).normalize(json)
       end
 
       def design_compiles

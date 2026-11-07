@@ -354,6 +354,8 @@ Every new mail or LMTP template and campaign needs a layout. Choose it on the Ed
 
 Images in the editor (Image blocks, and the background images of heroes, sections and wrappers) are either a URL or an uploaded image. Upload one with the Upload button in Inspect, or drag a file from your desktop onto the canvas. Uploads are stored on the layout, template or campaign being edited, and also show on its Media tab; a template or campaign can use its own images and its layout's.
 
+The design refers to an uploaded image by its name, which is unique on the layout, template or campaign (a second `logo.png` becomes `logo-2.png`), and the email by Liquid: `{{ 'logo.png' | image_url }}`. The `image_url` filter looks the name up in the template's or campaign's own images, then its layout's, and gives its URL on Nuntius' host for the message (`config.host(message)`), so a design copied to another environment or sent for an account with its own host shows its images from there. Designs from before names still work: their image URLs are left as they are until the design is opened in the editor and saved, which turns them into names.
+
 Images are loaded from Nuntius' host (`config.host`) when the email is opened. An uploaded image in an Image block can be sent with the email instead: turn on **Embed in the email**. That makes emails larger, but the image shows without the reader loading images. Background images are always loaded from their URL, since many mail clients don't show embedded backgrounds.
 
 ### Embedded images
@@ -361,11 +363,12 @@ Images are loaded from Nuntius' host (`config.host`) when the email is opened. A
 Images are normally loaded from their URL. To send an image with the email instead, use the `embed_image` filter: it attaches the image and returns a `cid:` reference to it.
 
 ```liquid
+{{ 'logo.png' | embed_image }}
 {{ 'https://www.example.com/logo.png' | embed_image }}
 {{ template.layout.attachments.first | embed_image }}
 ```
 
-It takes a URL or a stored file (Active Storage), such as the files on a layout's Media tab, and attaches each image once, however often an email uses it. The online version of the message shows embedded images from storage.
+It takes the name of an uploaded image (as `image_url` does), a URL, or a stored file (Active Storage), such as the files on a layout's Media tab, and attaches each image once, however often an email uses it. The online version of the message shows embedded images from storage.
 
 ### Converting old templates
 

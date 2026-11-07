@@ -1,13 +1,15 @@
 // Nuntius' Image block: TessEdit's, with the option to embed an uploaded image.
 import { test } from "node:test"
 import assert from "node:assert/strict"
-import { createDocument, createNode, insert } from "tess_edit/core/document"
+import { createDocument, createNode, find, insert } from "tess_edit/core/document"
 import { createFromPalette } from "tess_edit/core/document"
 import { getBlock, registerBlock } from "tess_edit/core/registry"
 import { toMjml } from "tess_edit/export/mjml"
 import image from "nuntius/blocks/image"
+import { withImageNames } from "nuntius/blocks/image_names"
 
 registerBlock(image)
+;["hero", "section"].forEach((type) => registerBlock(withImageNames(getBlock(type))))
 
 function emailWith(data) {
   const doc = createDocument()
@@ -16,23 +18,43 @@ function emailWith(data) {
   return doc
 }
 
-test("an embedded image is sent with the email through embed_image", () => {
-  const mjml = toMjml(emailWith({ source: "upload", image: "eyJfcmFpbHMi--1f2e", embed: true }))
+test("an embedded image is sent with the email through embed_image, by its name", () => {
+  const mjml = toMjml(emailWith({ source: "upload", image: "logo.png", embed: true }))
 
-  assert.match(mjml, /<mj-image[^>]* src="\{\{ 'eyJfcmFpbHMi--1f2e' \| embed_image \}\}"/)
+  assert.match(mjml, /<mj-image[^>]* src="\{\{ 'logo\.png' \| embed_image \}\}"/)
 })
 
-test("the editor's canvas shows an embedded image from its URL", () => {
-  const mjml = toMjml(emailWith({ source: "upload", image: "eyJfcmFpbHMi--1f2e", embed: true }), { editor: true })
+test("the editor's canvas shows an uploaded image from its URL", () => {
+  const mjml = toMjml(emailWith({ source: "upload", image: "logo.png", embed: true }), { editor: true })
 
   assert.match(mjml, /src="https:\/\/app\.example\.com\/rails\/active_storage\/blobs\/abc\/logo\.png"/)
-  assert.doesNotMatch(mjml, /embed_image/)
+  assert.doesNotMatch(mjml, /embed_image|image_url/)
 })
 
-test("an uploaded image that isn't embedded is linked", () => {
-  const mjml = toMjml(emailWith({ source: "upload", image: "eyJfcmFpbHMi--1f2e" }))
+test("an uploaded image that isn't embedded is linked through image_url, by its name", () => {
+  const mjml = toMjml(emailWith({ source: "upload", image: "logo.png" }))
+
+  assert.match(mjml, /<mj-image[^>]* src="\{\{ 'logo\.png' \| image_url \}\}"/)
+  assert.doesNotMatch(mjml, /active_storage/)
+})
+
+test("a web image keeps its URL", () => {
+  const mjml = toMjml(emailWith({ source: "web", image: "logo.png" }))
 
   assert.match(mjml, /src="https:\/\/app\.example\.com\/rails\/active_storage\/blobs\/abc\/logo\.png"/)
+})
+
+test("an uploaded background is linked through image_url, by its name", () => {
+  const doc = createDocument()
+  const background = { attributes: { "background-url": "https://app.example.com/rails/active_storage/blobs/abc/sky.png" }, data: { background: "sky.png", backgroundSource: "upload" } }
+  insert(doc, doc.id, 0, createNode("hero", background))
+  insert(doc, doc.id, 1, createFromPalette("section-1"))
+  Object.assign(find(doc, doc.children[1].id).node, background)
+
+  const mjml = toMjml(doc)
+  assert.match(mjml, /<mj-hero[^>]* background-url="\{\{ 'sky\.png' \| image_url \}\}"/)
+  assert.match(mjml, /<mj-section[^>]* background-url="\{\{ 'sky\.png' \| image_url \}\}"/)
+  assert.match(toMjml(doc, { editor: true }), /background-url="https:\/\/app\.example\.com/)
 })
 
 test("the embed setting shows only for uploaded images", () => {

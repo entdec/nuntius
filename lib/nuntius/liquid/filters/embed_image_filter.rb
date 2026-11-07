@@ -5,10 +5,12 @@ module EmbedImageFilter
   # the email shows it without loading it from the web.
   #
   # Example:
+  #   <img src="{{ 'logo.png' | embed_image }}">  (an image uploaded in the editor, by
+  #                                                 its name, as its Image block puts it)
   #   <img src="{{ 'https://www.example.com/logo.png' | embed_image }}">
   #   <img src="{{ template.layout.attachments.first | embed_image }}">
   #   <img src="{{ 'eyJfcmFpbHMi…--1f2e3d' | embed_image }}">  (a stored image's signed id,
-  #                                                     as the editor's Image block puts it)
+  #                                                     as older Image blocks put it)
   #
   # Each image is attached once per message, however often it is used.
   # Without a message (a preview) a URL is returned as it is.
@@ -29,13 +31,12 @@ module EmbedImageFilter
 
   private
 
-  URL = %r{\A[a-z][a-z0-9+.-]*://}i
-
-  # The Active Storage blob a signed id (not a URL) refers to
+  # The editor's image a name refers to (see Nuntius::EmailImages), or the
+  # Active Storage blob a signed id (not a URL) refers to
   def stored_image(input)
-    return unless input.is_a?(String) && !input.match?(URL)
+    return unless input.is_a?(String) && !input.match?(Nuntius::EmailImages::URL)
 
-    ActiveStorage::Blob.find_signed(input)
+    Nuntius::EmailImages.in_context(@context).find(input) || ActiveStorage::Blob.find_signed(input)
   end
 end
 

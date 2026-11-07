@@ -66,6 +66,18 @@ module Nuntius
       assert_equal "image/png", image.content_type
     end
 
+    test "attaches an image uploaded in the editor by its name" do
+      layout = logo_layout
+      template = Template.create!(description: "Order", klass: "Custom", event: "order#placed", transport: "mail", layout: layout)
+      message = build_message
+
+      html = ::Liquidum.render(%(<img src="{{ 'logo.png' | embed_image }}">), registers: {"template" => template, "message" => message})
+
+      image = message.attachments.sole
+      assert_equal %(<img src="cid:#{image.content_id}">), html
+      assert_equal "logo.png", image.filename.to_s
+    end
+
     test "leaves a URL as it is without a message" do
       assert_equal "https://example.com/logo.png", ::Liquidum.render(%({{ "https://example.com/logo.png" | embed_image }}))
     end
