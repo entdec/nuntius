@@ -2,7 +2,7 @@
 
 ## 2.0.0 (unreleased)
 
-Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit)) instead of written in Markdown or Trix. See [Email designs](README.md#email-designs) in the README.
+Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit), a new dependency from RubyGems) instead of written in Markdown or Trix. See [Email designs](README.md#email-designs) in the README.
 
 ### Added
 
@@ -30,14 +30,8 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
 ### Upgrading from 1.x
 
 1. **Send or delete draft campaigns first.** The migration refuses to run while campaigns are in draft or sending. Sent campaigns keep the HTML they were sent with.
-2. **Add TessEdit to your Gemfile.** It isn't on RubyGems yet, and a gem can't depend on a git source, so your app has to:
-
-   ```ruby
-   gem "tess_edit", git: "https://github.com/tdegrunt/tess_edit.git", branch: "main"
-   ```
-
-3. **Install libvips** on the servers that run the admin. Nuntius now depends on image_processing for previews of images on the Media tabs, which needs it: e.g. `apt-get install libvips` or `brew install vips`. Active Storage has to be set up as well, as it was for layout attachments.
-4. **Use Propshaft, importmap-rails and Tailwind CSS 4** (tailwindcss-rails 4.3 or later). Import Nuntius' JavaScript after Satis in `app/javascript/application.js`:
+2. **Install libvips** on the servers that run the admin. Nuntius now depends on image_processing for previews of images on the Media tabs, which needs it: e.g. `apt-get install libvips` or `brew install vips`. Active Storage has to be set up as well, as it was for layout attachments.
+3. **Use Propshaft, importmap-rails and Tailwind CSS 4** (tailwindcss-rails 4.3 or later). Import Nuntius' JavaScript after Satis in `app/javascript/application.js`:
 
    ```js
    import "satis"
@@ -51,7 +45,7 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
    @import "../builds/tailwind/tess_edit";
    ```
 
-5. **Run the migrations:**
+4. **Run the migrations:**
 
    ```sh
    bin/rails nuntius:install:migrations
@@ -59,7 +53,7 @@ Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/
    ```
 
    The existing layouts become old layouts (`nuntius_old_layouts`, with their attachments), and templates and campaigns keep them as `old_layout_id`. New layouts go in `nuntius_layouts`. The migrations also add inline attachments (for `embed_image`), `converted_from` on templates and `nuntius_webhooks` (for Lettermint).
-6. **Make new layouts and convert your templates.** Create layouts in the admin, then convert each template with an old layout from its page. Until then it keeps sending with its old layout.
+5. **Make new layouts and convert your templates.** Create layouts in the admin, then convert each template with an old layout from its page. Until then it keeps sending with its old layout.
 
    Translation keys of a template start with its layout's name. A template converted into a layout with another name gets new keys, so give the new layout the old one's name when you rely on them.
-7. **Replace `{{ subscriber_link }}`** in your own templates with the Manage subscription block, or with a link to `{{ subscriber_url }}`.
+6. **Replace `{{ subscriber_link }}`** in your own templates with the Manage subscription block, or with a link to `{{ subscriber_url }}`.

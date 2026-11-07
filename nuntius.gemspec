@@ -47,7 +47,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "servitium", "~> 1"
   s.add_runtime_dependency "slack-ruby-client"
   s.add_runtime_dependency "state_machines-activerecord"
-  s.add_runtime_dependency "tess_edit"
+  s.add_runtime_dependency "tess_edit", "~> 0.1", ">= 0.1.1"
   s.add_runtime_dependency "twilio-ruby", "~> 7.0.2"
   s.add_runtime_dependency "smstools_api", "~> 0.1.7"
   s.add_runtime_dependency "slim-rails", "~> 3.6"

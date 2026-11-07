@@ -4,11 +4,10 @@ Nuntius offers messaging and notifications for ActiveRecord models in Ruby on Ra
 
 ## Setup
 
-Add Nuntius to your Gemfile, together with TessEdit, the email editor Nuntius uses. TessEdit isn't on RubyGems yet, so it comes from GitHub, and a gem's own dependencies can't point there; your Gemfile has to:
+Add Nuntius to your Gemfile. It brings [TessEdit](https://github.com/tdegrunt/tess_edit), the email editor it uses, from RubyGems.
 
 ```ruby
 gem "nuntius"
-gem "tess_edit", git: "https://github.com/tdegrunt/tess_edit.git", branch: "main"
 ```
 
 Run bundle install, then copy the migrations and run them:
