@@ -6,12 +6,12 @@ module Nuntius
   class SmtpMailProvider < AbstractMailProvider
     transport :mail
 
-    setting_reader :from_header, required: true, description: "From header (example: Nuntius Messenger <nuntius@entdec.com>)"
+    setting_reader :from_header, required: true, description: "From header (example: Nuntius Messenger <nuntius@example.com>)"
     setting_reader :host, required: true, description: "Host (example: smtp.soverin.net)"
     setting_reader :port, required: true, description: "Port (example: 578)"
-    setting_reader :username, required: true, description: "Username (nuntius@entdec.com)"
+    setting_reader :username, required: true, description: "Username (nuntius@example.com)"
     setting_reader :password, required: true, description: "Password"
-    setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [example.com, tim@apple.com])"
+    setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [example.com, someone@example.org])"
     setting_reader :ssl, required: false, default: false, description: "Whether to use SSL or not"
 
     private

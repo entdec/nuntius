@@ -2,11 +2,11 @@
 
 ###
 # Process feedback from the amazon mail delivery service. Feedback looks like this:
-#  {"Type"=>"Notification", "MessageId"=>"a00966b6-51a5-53f7-a966-35d0e8f878ce", "TopicArn"=>"arn:aws:sns:eu-west-1:218893591873:localexpress-email-feedback",
-#  "Message"=>"{\"notificationType\":\"Delivery\",\"mail\":{\"timestamp\":\"2018-05-04T19:40:12.637Z\",\"source\":\"do_not_reply@localexpress.nl\",\
-# "sourceArn\":\"arn:aws:ses:eu-west-1:218893591873:identity/localexpress.nl\",\"sourceIp\":\"52.59.100.253\",\"sendingAccountId\":\"218893591873\",
-# \"messageId\":\"010201632cab47dd-924f80f8-4ae2-4ba0-9c8b-050db003711a-000000\",\"destination\":[\"mercedes.tuin@gmail.com\"],
-# \"headersTruncated\":false,\"headers\":[{\"name\":\"Received\",\"value\":\"from localhost.localdomain (ec2-52-59-100-253.eu-central-1.compute.amazonaws.com [52.59.100.253]) by email-smtp.amazonaws.com with SMTP (SimpleEmailService-2762311919) id 4AtiQr5QXc6CZ3uJYW4D for mercedes.tuin@gmail.com; Fri, 04 May 2018 19:40:12 +0000 (UTC)\"},{\"nam
+#  {"Type"=>"Notification", "MessageId"=>"a00966b6-51a5-53f7-a966-35d0e8f878ce", "TopicArn"=>"arn:aws:sns:eu-west-1:123456789012:example-email-feedback",
+#  "Message"=>"{\"notificationType\":\"Delivery\",\"mail\":{\"timestamp\":\"2018-05-04T19:40:12.637Z\",\"source\":\"do_not_reply@example.com\",\
+# "sourceArn\":\"arn:aws:ses:eu-west-1:123456789012:identity/example.com\",\"sourceIp\":\"192.0.2.1\",\"sendingAccountId\":\"123456789012\",
+# \"messageId\":\"010201632cab47dd-924f80f8-4ae2-4ba0-9c8b-050db003711a-000000\",\"destination\":[\"recipient@example.com\"],
+# \"headersTruncated\":false,\"headers\":[{\"name\":\"Received\",\"value\":\"from localhost.localdomain (ec2-192-0-2-1.eu-central-1.compute.amazonaws.com [192.0.2.1]) by email-smtp.amazonaws.com with SMTP (SimpleEmailService-2762311919) id 4AtiQr5QXc6CZ3uJYW4D for recipient@example.com; Fri, 04 May 2018 19:40:12 +0000 (UTC)\"},{\"nam
 #
 #
 

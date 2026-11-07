@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://www.boxture.com/assets/images/logo.png
+    uri: https://www.example.com/assets/images/logo.png
     body:
       encoding: UTF-8
       string: ''
@@ -35,7 +35,7 @@ http_interactions:
       Etag:
       - W/"a05ba3c6d50618a48545f38affcb2111"
       Content-Disposition:
-      - inline; filename="boxture_logo.png"
+      - inline; filename="example_logo.png"
       Content-Transfer-Encoding:
       - binary
       Cache-Control:
@@ -65,7 +65,7 @@ http_interactions:
   recorded_at: Tue, 03 Mar 2020 10:41:53 GMT
 - request:
     method: get
-    uri: https://www.boxture.com/assets/images/logo.png
+    uri: https://www.example.com/assets/images/logo.png
     body:
       encoding: US-ASCII
       string: ''
@@ -91,7 +91,7 @@ http_interactions:
   recorded_at: Mon, 18 Mar 2024 13:27:23 GMT
 - request:
     method: get
-    uri: https://www.boxture.com/assets/images/logo.png
+    uri: https://www.example.com/assets/images/logo.png
     body:
       encoding: US-ASCII
       string: ''

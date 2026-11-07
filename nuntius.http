@@ -5,7 +5,7 @@ Content-Type: application/json
 
 ###
 
-POST https://vorto.dev/nuntius/api/events
+POST https://app.example.com/nuntius/api/events
 Authorization: Basic dfe6296d272e46978df6c90622e3ba78 -
 Content-Type: application/json
 
@@ -14,7 +14,7 @@ Content-Type: application/json
     "event": "shipped",
     "locale": "en",
     "context": {
-        "to": "tom@boxture.com",
+        "to": "test@example.com",
         "customer_ref": "SBL1234567",
         "consignee_name": "Sander Helsloot",
         "name": "Foo",

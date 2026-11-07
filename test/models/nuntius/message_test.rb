@@ -126,7 +126,7 @@ module Nuntius
 
       assert_equal 1, Mail::TestMailer.deliveries.length
 
-      mail = Mail::TestMailer.deliveries.find { |m| m.to == "mark@boxture.com" }
+      mail = Mail::TestMailer.deliveries.find { |m| m.to == "mark@example.net" }
       assert_nil mail
 
       mail = Mail::TestMailer.deliveries.find { |m| m.to.first == "test@example.com" }

@@ -20,10 +20,10 @@ module Nuntius
 
     LMTP_TARGET = /\A(?<email>.+)@(?<host>[^@\s:]+):(?<port>\d+)\z/
 
-    setting_reader :from_header, required: true, description: "From header (example: Nuntius Messenger <nuntius@entdec.com>)"
+    setting_reader :from_header, required: true, description: "From header (example: Nuntius Messenger <nuntius@example.com>)"
     setting_reader :host, required: false, default: nil, description: "Fallback LMTP host, used when not encoded in the recipient (example: 127.0.0.1)"
     setting_reader :port, required: false, default: nil, description: "Fallback LMTP port, used when not encoded in the recipient (example: 24)"
-    setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [example.com, tim@apple.com])"
+    setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [example.com, someone@example.org])"
     setting_reader :ssl, required: false, default: false, description: "Whether to use SSL or not"
 
     private

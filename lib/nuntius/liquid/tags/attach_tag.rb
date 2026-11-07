@@ -3,7 +3,7 @@
 # Attaches files (from URL)
 #
 # == Basic usage:
-#    {%attach 'https://www.boxture.com/assets/images/logo.png'%}
+#    {%attach 'https://www.example.com/assets/images/logo.png'%}
 #
 class AttachTag < LiquidumTag
   def render(context)
