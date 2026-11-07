@@ -21,7 +21,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - `account` on messengers, for the account a messenger sends for when its object doesn't say (`account ->(shipment) { shipment.order.account }`). Without an account to send for, a messenger raises `Nuntius::MissingAccountException`.
 - A warning on templates, campaigns and layouts in the email editor that still read metadata (`{{ template.metadata.logo_url }}`), and before converting a template whose old layout does.
 - The `feedback`, `headers` and `envelope_from` columns on messages, for what was in their metadata.
-- The `cancelled` campaign state, with the `cancel` event, for draft or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
+- The `cancelled` campaign state, with the `cancel` event and a Cancel action in the admin (in the campaigns table, and on the page of a campaign being sent), for draft or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
 
 ### Changed
 

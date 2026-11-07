@@ -21,6 +21,13 @@ module Nuntius
         link_attributes data: {"turbo-confirm": t(".campaign_publish_confirm"), "turbo-method": :post}
       end
 
+      action :cancel do
+        show ->(campaign) { campaign.can_cancel? }
+        link { |campaign| nuntius.cancel_admin_campaign_path(campaign) }
+        icon "fa-solid fa-ban"
+        link_attributes data: {"turbo-confirm": t(".campaign_cancel_confirm"), "turbo-method": :post}
+      end
+
       order name: :asc
 
       link { |campaign| nuntius.edit_admin_campaign_path(campaign) }

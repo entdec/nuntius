@@ -125,6 +125,29 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/publish"
   end
 
+  test "a draft or sending campaign can be cancelled from the admin, another account's not" do
+    campaign = nuntius_campaigns(:valentines_day)
+    campaign.update_column(:state, "sending")
+
+    get "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/cancel'][data-turbo-confirm^='Are you sure you want to cancel']"
+    get_table "campaigns"
+    assert_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/cancel"
+    assert_includes response.body, "Are you sure you want to cancel this campaign?"
+
+    post "/nuntius/admin/campaigns/#{campaign.id}/cancel"
+    assert_redirected_to "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert campaign.reload.cancelled?
+
+    get "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/cancel']", count: 0
+
+    other = Nuntius::Campaign.create!(name: "Other", transport: "sms", list: Nuntius::List.create!(name: "Other list", slug: "other-list", account: @other), account: @other)
+    post "/nuntius/admin/campaigns/#{other.id}/cancel"
+    assert_response :not_found
+    assert other.reload.draft?
+  end
+
   private
 
   # The rows of an admin table, which its page loads separately

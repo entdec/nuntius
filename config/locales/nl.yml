@@ -1,5 +1,6 @@
 nl:
   campaign_publish_confirm: "Weet je zeker dat je deze campagne wilt verzenden?"
+  campaign_cancel_confirm: "Weet je zeker dat je deze campagne wilt annuleren? Verzonden berichten blijven bestaan, de rest wordt niet verzonden."
   choose_files: Kies bestanden
   activerecord:
     errors:
@@ -98,6 +99,7 @@ nl:
           messages_not_sent: Berichten niet verzonden
           messages_opened: Berichten geopend
           messages_clicked: Berichten geklikt
+          cancel: Campagne annuleren
         index:
           card:
             nuntius_admin_campaigns:

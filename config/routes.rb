@@ -36,6 +36,7 @@ Nuntius::Engine.routes.draw do
     resources :campaigns do
       member do
         post "publish", action: "publish"
+        post "cancel", action: "cancel"
         get "media", to: "media#index", defaults: {owner: "campaign"}
         post "media", to: "media#create", defaults: {owner: "campaign"}
       end
