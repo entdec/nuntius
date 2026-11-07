@@ -54,6 +54,12 @@ module Nuntius
       message
     end
 
+    # What its Liquid can use (see Variables): the object it's sent for, under
+    # its messenger's name for it (none for Custom), and itself
+    def variable_roots
+      Variables.for_class(klass).merge("template" => TemplateDrop)
+    end
+
     def translation_scope
       scope = %w[]
       scope << (old_layout || layout).name.underscore.tr(" ", "_") if old_layout || layout

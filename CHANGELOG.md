@@ -24,6 +24,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The `feedback`, `headers` and `envelope_from` columns on messages, for what was in their metadata.
 - The `cancelled` campaign state, with the `cancel` event and a Cancel action in the admin (in the campaigns table, and on the page of a campaign that's scheduled or being sent), for draft, scheduled or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
 - The `scheduled` campaign state, with the `schedule` and `deschedule` events and Schedule and Back to draft actions in the admin. `Nuntius::CampaignPublishJob` publishes scheduled campaigns at their `publish_at` (run it from cron), or within a minute without one.
+- Suggestions of the Liquid variables a design can use in the email editor, from Liquidum's variables endpoint when the host app mounts Liquidum (see [Variables](README.md#variables)). Nuntius's drops are now `Liquidum::Drop`s.
 - Default views in the admin tables: open (draft and scheduled), sent and cancelled campaigns; enabled and disabled templates; subscribed and unsubscribed subscribers of a list.
 
 ### Changed

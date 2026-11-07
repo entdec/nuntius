@@ -18,6 +18,12 @@ module Nuntius
     before_save :store_image_names, if: :json_changed?
     after_save :recompose_emails, if: :saved_change_to_mjml?
 
+    # What its Liquid can use (see Variables): it's rendered as part of a
+    # template or a campaign, with the one that uses it
+    def variable_roots
+      {"template" => TemplateDrop, "campaign" => CampaignDrop}
+    end
+
     # The metadata variables its design uses, see MetadataVariables
     def metadata_variables
       MetadataVariables.in(self, mjml)

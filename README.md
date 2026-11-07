@@ -350,6 +350,19 @@ Besides TessEdit's blocks, the editor has three Nuntius blocks:
 
 Every new mail or LMTP template and campaign needs a layout. Choose it on the Edit tab and save; the email is then edited on the Design tab, starting with the layout's example content. Choosing another layout moves the content into it.
 
+### Variables
+
+The editor suggests the Liquid variables a design can use while typing `{{`, and its `{ }` buttons browse them, when your app mounts [Liquidum](https://github.com/entdec/liquidum)'s engine:
+
+```ruby
+# config/routes.rb
+mount Liquidum::Engine => "/liquidum"
+```
+
+A template's variables are the object it's sent for, by the name its messenger gives it (`account` for a template of class Account), and `template`; a campaign's are `campaign`, `subscriber`, `subscriber_url` and what its list's subscribers are; a layout's are `template` and `campaign`, one of which is there when it's sent. Each is described by its drop: Liquidum lists what a drop exposes, labelled with the model's `human_attribute_name`, and follows its associations. Your drops need to be `Liquidum::Drop`s for that (`class ApplicationDrop < Liquidum::Drop`); see Liquidum's README for `describe`, to add what it can't work out. Variables a messenger sets itself aren't suggested.
+
+The endpoint runs behind your app's `ApplicationController` (Liquidum's `config.parent_controller`), and only describes the variables, never a record's values. The editor's URL carries the variables signed, so it can't be used for other classes.
+
 ### Images
 
 Images in the editor (Image blocks, and the background images of heroes, sections and wrappers) are either a URL or an uploaded image. Upload one with the Upload button in Inspect, or drag a file from your desktop onto the canvas. Uploads are stored on the layout, template or campaign being edited, and also show on its Media tab; a template or campaign can use its own images and its layout's.
