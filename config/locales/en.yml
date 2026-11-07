@@ -58,6 +58,7 @@ en:
         new: New template
   nuntius:
     admin:
+      not_saved: "%{resource} could not be saved: %{errors}"
       shared:
         metadata_variables:
           value_html: "is %{value} here"

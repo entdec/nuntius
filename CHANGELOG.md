@@ -49,6 +49,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 ### Fixed
 
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
+- A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
 
 ### Upgrading from 1.x
 

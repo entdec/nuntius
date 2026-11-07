@@ -107,7 +107,7 @@
 
       - if @template.email? && @template.layout && !@template.old_layout
         - card.with_tab :design, padding: true
-          = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: media_admin_template_path(@template)
+          = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?)
 
       - if @template.persisted? && @template.email?
         - card.with_tab :media, padding: true

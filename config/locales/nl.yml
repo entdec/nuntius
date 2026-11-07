@@ -71,6 +71,7 @@ nl:
         new: Nieuwe template
   nuntius:
     admin:
+      not_saved: "%{resource} kon niet worden opgeslagen: %{errors}"
       shared:
         metadata_variables:
           value_html: "is hier %{value}"

@@ -40,7 +40,7 @@
 
       - if @campaign.email? && @campaign.layout
         - card.with_tab :design, padding: true
-          = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: media_admin_campaign_path(@campaign)
+          = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?)
 
       - if @campaign.persisted? && @campaign.email?
         - card.with_tab :media, padding: true
