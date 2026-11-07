@@ -690,8 +690,10 @@ cmd_exec() {
     remote_env+=(--remote-env "HEADLESS=$HEADLESS")
   fi
 
+  # mise on PATH too: its RubyGems plugin runs `mise reshim` after a gem
+  # install, and without it Bundler crashes (and prints its config).
   devcontainer_cli exec --workspace-folder "$ENV_PATH" ${remote_env[@]+"${remote_env[@]}"} \
-    bash -c 'cd "$1" && shift && exec "$HOME/.local/bin/mise" exec -- "$@"' de-exec "$dir" "$@"
+    bash -c 'cd "$1" && shift && PATH="$HOME/.local/bin:$PATH" exec mise exec -- "$@"' de-exec "$dir" "$@"
 }
 
 cmd_status() {
