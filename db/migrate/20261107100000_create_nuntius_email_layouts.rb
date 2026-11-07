@@ -6,14 +6,11 @@
 # a TessEdit document (json), its MJML and the compiled HTML.
 #
 # Campaigns that are not sent yet would be sent with a layout that no longer
-# applies, so the migration refuses to run while there are any: send or delete
-# them first.
+# applies, so the migration refuses to run while there are any: send, delete
+# or cancel them first.
 class CreateNuntiusEmailLayouts < ActiveRecord::Migration[8.1]
   def up
-    unsent = select_value("SELECT COUNT(*) FROM nuntius_campaigns WHERE state IN ('draft', 'sending')").to_i
-    if unsent.positive?
-      raise ActiveRecord::MigrationError, "Nuntius 2.0 can't be installed while #{unsent} campaign(s) are draft or sending. Send or delete them first, then run the migration again."
-    end
+    refuse_unsent_campaigns
 
     # Foreign keys are named after their table and column, so the new layout_id
     # columns would clash with the old ones: those are dropped and added again.
@@ -58,5 +55,28 @@ class CreateNuntiusEmailLayouts < ActiveRecord::Migration[8.1]
     rename_table :nuntius_old_layouts, :nuntius_layouts
     add_foreign_key :nuntius_templates, :nuntius_layouts, column: :layout_id
     add_foreign_key :nuntius_campaigns, :nuntius_layouts, column: :layout_id
+  end
+
+  private
+
+  def refuse_unsent_campaigns
+    unsent = select_all(<<~SQL).to_a
+      SELECT c.id, c.name, c.state,
+        COUNT(m.id) FILTER (WHERE m.state <> 'pending') AS sent,
+        COUNT(m.id) FILTER (WHERE m.state = 'pending') AS pending
+      FROM nuntius_campaigns c LEFT JOIN nuntius_messages m ON m.campaign_id = c.id
+      WHERE c.state IN ('draft', 'sending')
+      GROUP BY c.id, c.name, c.state
+      ORDER BY c.name
+    SQL
+    return if unsent.empty?
+
+    raise ActiveRecord::MigrationError, <<~MESSAGE
+      Nuntius 2.0 can't be installed while campaigns are draft or sending:
+      #{unsent.map { |c| "- #{c["name"]} (#{c["id"]}, #{c["state"]}): #{c["sent"]} message(s) sent, #{c["pending"]} pending" }.join("\n")}
+      Send or delete them, or cancel them, which keeps the messages a campaign sent so far:
+        UPDATE nuntius_campaigns SET state = 'cancelled' WHERE id IN (#{unsent.map { |c| quote(c["id"]) }.join(", ")});
+      Then run the migration again.
+    MESSAGE
   end
 end

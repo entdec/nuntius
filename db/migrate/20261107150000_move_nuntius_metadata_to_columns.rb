@@ -32,6 +32,7 @@ class MoveNuntiusMetadataToColumns < ActiveRecord::Migration[8.1]
     execute "UPDATE nuntius_messages SET headers = metadata->'mail'->'headers' WHERE jsonb_typeof(metadata->'mail'->'headers') = 'object'"
     # A blank envelope sender meant the null sender
     execute "UPDATE nuntius_messages SET envelope_from = COALESCE(NULLIF(metadata->'mail'->>'envelope_from', ''), '<>') WHERE metadata->'mail' ? 'envelope_from'"
+    report_dropped_message_metadata
     remove_column :nuntius_messages, :metadata
 
     DROPPED.each { |table| remove_column table, :metadata }
@@ -54,5 +55,20 @@ class MoveNuntiusMetadataToColumns < ActiveRecord::Migration[8.1]
     remove_column :nuntius_messages, :feedback
     remove_column :nuntius_messages, :headers
     remove_column :nuntius_messages, :envelope_from
+  end
+
+  private
+
+  # The rest of a message's metadata was a copy of its template's or campaign's,
+  # which they keep
+  def report_dropped_message_metadata
+    keys = select_rows(<<~SQL)
+      SELECT k, COUNT(*) FROM nuntius_messages m, jsonb_object_keys(m.metadata) k
+      WHERE jsonb_typeof(m.metadata) = 'object' AND k NOT IN ('account_id', 'global', 'feedback', 'mail')
+      GROUP BY k ORDER BY 2 DESC, 1
+    SQL
+    return if keys.empty?
+
+    say "Dropping the rest of the messages' metadata, copied from their template or campaign: #{keys.map { |key, count| "#{key} (#{count})" }.join(", ")}"
   end
 end

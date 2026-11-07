@@ -27,6 +27,12 @@ module Nuntius
         transition sending: :sent
       end
 
+      # Stops a campaign without sending (the rest of) it, keeping the messages
+      # it sent so far
+      event :cancel do
+        transition [:draft, :sending] => :cancelled
+      end
+
       after_transition(on: :publish) do |campaign, transition|
         DeliverCampaignService.perform_later(campaign: campaign)
       end

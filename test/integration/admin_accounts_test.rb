@@ -110,6 +110,21 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/nuntius/admin/templates/#{@other_template.id}/edit']", count: 0
   end
 
+  test "a cancelled campaign is shown like a sent one, without a form or a publish action" do
+    campaign = nuntius_campaigns(:valentines_day)
+    campaign.update_columns(transport: "mail")
+    campaign.cancel!
+
+    get "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert_response :success
+    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}']", count: 0
+    assert_includes response.body, "Valentines day 2020"
+
+    get_table "campaigns"
+    assert_includes response.body, "cancelled"
+    assert_not_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/publish"
+  end
+
   private
 
   # The rows of an admin table, which its page loads separately

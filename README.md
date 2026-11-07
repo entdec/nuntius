@@ -33,6 +33,29 @@ and add the styles of Nuntius and the email editor to your Tailwind CSS:
 @import "../builds/tailwind/tess_edit";
 ```
 
+With jsbundling-rails (esbuild) instead of importmap-rails, your build has to find the gems' JavaScript, which imports its own modules by importmap names without `.js`: `nuntius` is the nuntius gem's `app/javascript/nuntius/application.js` and `nuntius/x` its `app/javascript/nuntius/x.js`, `tess_edit` is the tess_edit gem's `app/javascript/tess_edit/index.js` and `tess_edit/x` its `app/javascript/tess_edit/x.js`, except `tess_edit/vendor/tiptap`, which is its `vendor/javascript/tess_edit/tiptap.js`. For example, with a plugin in your esbuild config:
+
+```js
+// esbuild.config.mjs
+import { execSync } from "node:child_process"
+
+const gem = (name) => execSync(`bundle show ${name}`).toString().trim()
+const roots = { nuntius: [gem("nuntius"), "application"], tess_edit: [gem("tess_edit"), "index"] }
+
+const gems = {
+  name: "gems",
+  setup(build) {
+    build.onResolve({ filter: /^tess_edit\/vendor\/tiptap$/ }, () => ({ path: `${roots.tess_edit[0]}/vendor/javascript/tess_edit/tiptap.js` }))
+    build.onResolve({ filter: /^(nuntius|tess_edit)(\/|$)/ }, ({ path }) => {
+      const [name, ...rest] = path.split("/")
+      const [root, index] = roots[name]
+      return { path: `${root}/app/javascript/${name}/${rest.join("/") || index}.js` }
+    })
+  }
+}
+// and plugins: [gems] in your esbuild options
+```
+
 Images uploaded in the email editor and on the Media tabs are stored with [Active Storage](https://guides.rubyonrails.org/active_storage_overview.html), so your app needs it set up (`bin/rails active_storage:install`). The Media tabs show previews of images through [image_processing](https://github.com/janko/image_processing), which Nuntius depends on; it needs [libvips](https://www.libvips.org) on every server that runs the admin, e.g. `apt-get install libvips` (Debian, Ubuntu) or `brew install vips` (macOS). Without it, opening a Media tab with an image on it fails.
 
 Create an initializer (config/initializers/messaging.rb) and configure as desired:
@@ -122,7 +145,8 @@ Nuntius.setup do |config|
   # The account a messenger sends for, given its object. The default: the object itself when it is an account,
   # else its account, else the current account.
   config.account_for = ->(object) { object.account }
-  # Whether the current account may make templates global (default: no account may)
+  # Whether the current account may make templates global (default: no account may), e.g. the root
+  # account of a hierarchy, or one fixed account: -> { Current.account.code == "root" }
   config.can_create_global = -> { Current.account.parent_id.nil? }
   # The records the admin shows, a scope on each model (default: the current account's)
   config.visible_scope = -> { owned_by(Nuntius.config.current_account) }

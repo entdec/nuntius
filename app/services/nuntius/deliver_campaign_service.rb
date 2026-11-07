@@ -11,12 +11,14 @@ module Nuntius
 
     def perform
       deliver
-      campaign.sent!
+      campaign.sent! if campaign.sending?
     end
 
     def deliver
       transporter = BaseTransport.class_from_name(campaign.transport).new
       campaign.list.subscribers.subscribed.each do |subscriber|
+        break if campaign.reload.cancelled?
+
         transporter.deliver(new_message(subscriber))
       end
     end

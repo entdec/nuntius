@@ -21,6 +21,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - `account` on messengers, for the account a messenger sends for when its object doesn't say (`account ->(shipment) { shipment.order.account }`). Without an account to send for, a messenger raises `Nuntius::MissingAccountException`.
 - A warning on templates, campaigns and layouts in the email editor that still read metadata (`{{ template.metadata.logo_url }}`), and before converting a template whose old layout does.
 - The `feedback`, `headers` and `envelope_from` columns on messages, for what was in their metadata.
+- The `cancelled` campaign state, with the `cancel` event, for draft or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
 
 ### Changed
 
@@ -44,9 +45,13 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The metadata columns in the admin tables, and the metadata editors of campaigns, layouts, lists and locales.
 - `metadata` on the layout drop.
 
+### Fixed
+
+- `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
+
 ### Upgrading from 1.x
 
-1. **Send or delete draft campaigns first.** The migration refuses to run while campaigns are in draft or sending. Sent campaigns keep the HTML they were sent with.
+1. **Send, delete or cancel draft campaigns first.** The migration refuses to run while campaigns are in draft or sending, and names them, with how many messages each sent. Campaigns now have a `cancelled` state, for campaigns that won't be sent (any further): cancelling a partly sent campaign keeps the messages it sent, and its statistics, where deleting it would lose them. In 1.x there is no way to cancel, so the migration's message gives the SQL: `UPDATE nuntius_campaigns SET state = 'cancelled' WHERE id IN (…)`. Sent and cancelled campaigns keep the HTML they were sent with.
 2. **Install libvips** on the servers that run the admin. Nuntius now depends on image_processing for previews of images on the Media tabs, which needs it: e.g. `apt-get install libvips` or `brew install vips`. Active Storage has to be set up as well, as it was for layout attachments.
 3. **Use Propshaft, importmap-rails and Tailwind CSS 4** (tailwindcss-rails 4.3 or later). Import Nuntius' JavaScript after Satis in `app/javascript/application.js`:
 
@@ -62,6 +67,8 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
    @import "../builds/tailwind/tess_edit";
    ```
 
+   An app that bundles its JavaScript with jsbundling-rails (esbuild) instead of importmap-rails resolves the gems' JavaScript itself: `nuntius` and `nuntius/*` from the nuntius gem's `app/javascript/nuntius/` (`nuntius` is its `application.js`), `tess_edit` and `tess_edit/*` from the tess_edit gem's `app/javascript/tess_edit/` (`tess_edit` is its `index.js`), and `tess_edit/vendor/tiptap` from its `vendor/javascript/tess_edit/tiptap.js`. The README has an esbuild plugin that does this.
+
 4. **Configure accounts** in your Nuntius initializer, replacing `metadata_fields`, `metadata_humanize`, `add_metadata`, `default_template_scope` and `visible_scope` (see [Accounts](README.md#accounts)):
 
    ```ruby
@@ -75,6 +82,8 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
    config.current_account = -> { Current.account }
    config.can_create_global = -> { Current.account.parent_id.nil? } # if some account makes templates for all
    ```
+
+   `can_create_global` says which account may make templates global: the root of an account hierarchy, as above, or one fixed account, e.g. `-> { Current.account.code == "root" }`.
 
    `visible_scope` now defaults to the current account's records; leave it out unless the admin should show something else.
 5. **Check your data.** The migration takes each record's account from `account_id` in its metadata, as `metadata_fields` filled it, and `global` from `global` in a template's metadata (`true` or `"true"`). Messages without one get their template's or campaign's account. To see what would be left without an account:
@@ -95,7 +104,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
    The existing layouts become old layouts (`nuntius_old_layouts`, with their attachments), and templates and campaigns keep them as `old_layout_id`. New layouts go in `nuntius_layouts`. The migrations also add inline attachments (for `embed_image`), `converted_from` on templates and `nuntius_webhooks` (for Lettermint).
 
-   Then every record gets its `account_id` (a foreign key to `config.account_class`'s table, with the same type as its id), templates get `global`, and `account_id` and `global` are taken out of the metadata. Messages get `feedback`, `headers` and `envelope_from` from their metadata, which is dropped with that of layouts, lists and locales. Inbound messages' `metadata` becomes `params`. The account migration updates messages 10,000 at a time.
+   Then every record gets its `account_id` (a foreign key to `config.account_class`'s table, with the same type as its id), templates get `global`, and `account_id` and `global` are taken out of the metadata. Messages get `feedback`, `headers` and `envelope_from` from their metadata, which is dropped with that of layouts, lists and locales. The rest of a message's metadata is dropped with it: Nuntius 1.x copied the template's or campaign's metadata into each message when it was created, but only read `mail` from it when sending, so this loses nothing that was used, and templates and campaigns keep their own metadata. The migration lists the keys it drops, with how many messages had them. Inbound messages' `metadata` becomes `params`. The account migration updates messages 10,000 at a time.
 
    When records are left without an account, that migration stops, is rolled back and says how many there are per table. Set an existing `account_id` in their metadata, or give them all one account, as an app with a single account would:
 

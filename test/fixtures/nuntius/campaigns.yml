@@ -4,6 +4,7 @@ valentines_day:
   account: one
   name: Valentines day 2020
   list: valentines
+  state: draft
   from: valentine@example.com
   subject: Happy Valentines day 2020
   text: Valentines day 2020!
@@ -13,6 +14,7 @@ xmas:
   account: one
   name: Marry XMAS 2020
   list: helpers
+  state: draft
   from: santa@example.com
   subject: Marry XMAS 2020
   text: Marry XMAS 2020
