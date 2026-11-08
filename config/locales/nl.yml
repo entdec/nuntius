@@ -111,6 +111,12 @@ nl:
       sms: Sms
       teams: Teams
       voice: Spraak
+    translations:
+      source: "Locale %{name}, %{key}"
+      app_source: "Vertalingen van de app, %{key}"
+      invalid_key: "%{key} is geen sleutel: letters, cijfers, _ en -, gescheiden door punten"
+      invalid_locale: "%{locale} is niet een van de talen"
+      taken: "%{key} is deel van de sleutel van een andere vertaling"
     templates:
       custom: Eigen gebeurtenis
     tables:
@@ -130,6 +136,11 @@ nl:
     admin:
       not_saved: "%{resource} kon niet worden opgeslagen: %{errors}"
       shared:
+        translations:
+          intro_html: "Wat de <code>{{ '.key' | t }}</code>-filters in elke taal zeggen, uit de locales van het account. Een sleutel die met een punt begint staat in %{path}, en wordt van daar richting de root opgezocht. Wijzigingen worden meteen bewaard."
+          none_html: "Er wordt nog niets vertaald. Gebruik <code>{{ '.key' | t }}</code> in de teksten, of Vertaalbaar maken in de e-maileditor."
+          key: Sleutel
+          missing: ontbreekt
         metadata_variables:
           value_html: "is hier %{value}"
           instead: "Gebruik in plaats daarvan een variabele van het object waar het bericht over gaat, zoals {{ user.account.logo_url }}."
@@ -151,6 +162,7 @@ nl:
                 edit: Bewerk
                 design: Ontwerp
                 media: Media
+                translations: Vertalingen
                 statistics: Statistieken
                 messages: Berichten
           messages_sent: Berichten verzonden
@@ -188,6 +200,7 @@ nl:
               tab:
                 edit: Edit
                 media: Media
+                translations: Vertalingen
                 templates: Templates
         index:
           card:
@@ -314,6 +327,7 @@ nl:
                 edit: Bewerk
                 design: Ontwerp
                 media: Media
+                translations: Vertalingen
                 messages: Berichten
         index:
           card:

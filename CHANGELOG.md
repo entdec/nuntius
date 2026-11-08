@@ -33,10 +33,13 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The `cancelled` campaign state, with the `cancel` event and a Cancel action in the admin (in the campaigns table, and on the page of a campaign that's scheduled or being sent), for draft, scheduled or sending campaigns that won't be sent (any further). A campaign being sent stops when it's cancelled.
 - The `scheduled` campaign state, with the `schedule` and `deschedule` events and Schedule and Back to draft actions in the admin. `Nuntius::CampaignPublishJob` publishes scheduled campaigns at their `publish_at` (run it from cron), or within a minute without one.
 - Suggestions of the Liquid variables a design can use in the email editor, from Liquidum's variables endpoint when the host app mounts Liquidum (see [Variables](README.md#variables)). Nuntius's drops are now `Liquidum::Drop`s.
+- Translations in the email editor: a `{{ '.greeting' | t }}` shows as its text in a language chosen in the editor, lists every language's text (missing ones marked) when pointed at, each editable there, and selected text can be made translatable under a new key. Typing `{{ '` suggests the keys. Templates, campaigns and layouts get a Translations tab with their keys and texts per language. Texts are saved in the account's locales (see [Locales](README.md#locales)).
 - Default views in the admin tables: open (draft and scheduled), sent and cancelled campaigns; enabled and disabled templates; subscribed and unsubscribed subscribers of a list.
 
 ### Changed
 
+- **A campaign's translation scope is its layout's** (`basic`), no longer `nuntius` and its layout (`nuntius.basic`), the same as the start of its templates' scopes, so a layout's keys work in both. Move the translations of draft campaigns' keys starting with a dot up from under `nuntius` in the locales.
+- An account's locales merge in the order they were created, later ones winning, instead of in no particular order.
 - A template with several addresses in its To renders a message for each, instead of the mail and push transports copying one message. `Template#new_message` is deprecated, and gives only the first, no longer one with every address in its To.
 - Every new mail and LMTP template and campaign needs a layout.
 - Mail campaigns to a list that allows unsubscribing must contain the Manage subscription block.
@@ -174,3 +177,5 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
       config.translation_scope = ->(context) { Nuntius::I18nStore.translation_scope(context) }
     end
     ```
+
+    Campaigns' keys starting with a dot are now in their layout's scope, without `nuntius` (see Changed): move them up in the locales.

@@ -61,11 +61,10 @@ module Nuntius
       DeliverCampaignService.perform(campaign: self, test_only: true).messages
     end
 
-    # The scope of the keys starting with a dot that its Liquid translates (see I18nStore)
+    # The scope of the keys starting with a dot that its Liquid translates
+    # (see I18nStore): its layout's, which a template's starts with too
     def translation_scope
-      scope = %w[nuntius]
-      scope << (old_layout || layout).name.underscore.tr(" ", "_") if old_layout || layout
-      scope.join(".")
+      (old_layout || layout)&.translation_scope.to_s
     end
 
     # What its Liquid can use (see Variables and DeliverCampaignService): itself,

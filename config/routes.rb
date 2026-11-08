@@ -43,6 +43,8 @@ Nuntius::Engine.routes.draw do
         get "media", to: "media#index", defaults: {owner: "campaign"}
         post "media", to: "media#create", defaults: {owner: "campaign"}
         post "media/compile", to: "media#compile", defaults: {owner: "campaign"}
+        get "translations", to: "translations#index", defaults: {owner: "campaign"}
+        patch "translations", to: "translations#update", defaults: {owner: "campaign"}
       end
       resources :attachments, controller: "satis/attachments"
     end
@@ -51,6 +53,8 @@ Nuntius::Engine.routes.draw do
         get "media", to: "media#index", defaults: {owner: "layout"}
         post "media", to: "media#create", defaults: {owner: "layout"}
         post "media/compile", to: "media#compile", defaults: {owner: "layout"}
+        get "translations", to: "translations#index", defaults: {owner: "layout"}
+        patch "translations", to: "translations#update", defaults: {owner: "layout"}
       end
       resources :attachments, controller: "satis/attachments"
     end
@@ -75,6 +79,8 @@ Nuntius::Engine.routes.draw do
         get "media", to: "media#index", defaults: {owner: "template"}
         post "media", to: "media#create", defaults: {owner: "template"}
         post "media/compile", to: "media#compile", defaults: {owner: "template"}
+        get "translations", to: "translations#index", defaults: {owner: "template"}
+        patch "translations", to: "translations#update", defaults: {owner: "template"}
         # The conversion button submits the template form, a PATCH
         match "convert", action: "convert", via: [:post, :patch]
       end

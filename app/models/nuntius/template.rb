@@ -176,9 +176,12 @@ module Nuntius
       Variables.for_class(klass).merge("template" => TemplateDrop)
     end
 
+    # The scope of the keys starting with a dot that its Liquid translates
+    # (see I18nStore): its layout's, then its class, event, transport and
+    # description
     def translation_scope
-      scope = %w[]
-      scope << (old_layout || layout).name.underscore.tr(" ", "_") if old_layout || layout
+      scope = []
+      scope << (old_layout || layout).translation_scope if old_layout || layout
       scope << klass.underscore.tr("/", "_")
       scope << event
       scope << transport

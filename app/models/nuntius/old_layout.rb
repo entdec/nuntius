@@ -13,5 +13,10 @@ module Nuntius
     has_many :campaigns, foreign_key: :old_layout_id, dependent: :restrict_with_error
 
     yamlify :metadata
+
+    # As Layout's
+    def translation_scope
+      name.to_s.underscore.tr(" ", "_")
+    end
   end
 end

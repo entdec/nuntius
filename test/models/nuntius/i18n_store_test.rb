@@ -38,9 +38,10 @@ module Nuntius
       assert_equal "Doei", translate("{{ 'farewell' | t: locale: 'nl' }}", "template" => Template.new(account: other))
     end
 
-    test "a campaign translates with its account's locales" do
+    test "a campaign translates with its account's locales, in its layout's scope" do
       campaign = nuntius_campaigns(:xmas)
-      Locale.create!(account: campaign.account, key: "en-campaign", data: {"en" => {"nuntius" => {"wishes" => "Merry Christmas"}}})
+      campaign.layout = nuntius_layouts(:one)
+      Locale.create!(account: campaign.account, key: "en-campaign", data: {"en" => {"basic" => {"wishes" => "Merry Christmas"}}})
 
       assert_equal "Merry Christmas", translate("{{ '.wishes' | t: locale: 'en' }}", "campaign" => campaign)
     end

@@ -49,11 +49,15 @@
 
       - if @campaign.email? && @campaign.layout
         - card.with_tab :design, padding: true
-          = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?), variables: @campaign.variable_roots
+          = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?), variables: @campaign.variable_roots, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?)
 
       - if @campaign.persisted? && @campaign.email?
         - card.with_tab :media, padding: true
           = f.attachments :images
+
+      - if @campaign.persisted?
+        - card.with_tab :translations, padding: true
+          = render "nuntius/admin/shared/translations", record: @campaign, url: translations_admin_campaign_path(@campaign)
 - else
   = sts.card :nuntius_admin_campaigns, title: @campaign.name, icon: 'fal fa-megaphone', content_padding: false do |card|
     - if @campaign.can_deschedule?

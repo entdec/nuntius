@@ -16,12 +16,16 @@
             - Nuntius::Layout::STARTING_LAYOUTS.each do |key|
               = link_to t(".starting_layouts.#{key}"), new_admin_layout_path(start: key), class: "rounded-md border px-2 py-1 #{(params[:start].presence || 'basic') == key ? 'border-gray-900 font-medium' : 'border-gray-200 text-gray-700'}"
         .col-span-12
-          = render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, media_url: (media_admin_layout_path(@layout) if @layout.persisted?), variables: @layout.variable_roots
+          = render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, media_url: (media_admin_layout_path(@layout) if @layout.persisted?), variables: @layout.variable_roots, translations_url: (translations_admin_layout_path(@layout) if @layout.persisted?)
     - if @layout.persisted?
       - card.with_tab :media, padding: true
         .grid.grid-cols-4.gap-4
           .col-span-4
             = f.attachments :attachments
+
+    - if @layout.persisted?
+      - card.with_tab :translations, padding: true
+        = render "nuntius/admin/shared/translations", record: @layout, url: translations_admin_layout_path(@layout)
 
     - if @layout.templates.exists?
       - card.with_tab :templates, padding: false

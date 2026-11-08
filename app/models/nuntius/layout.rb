@@ -24,6 +24,13 @@ module Nuntius
       {"template" => TemplateDrop, "campaign" => CampaignDrop}
     end
 
+    # The scope of the keys starting with a dot that its Liquid translates
+    # (see I18nStore). The templates and campaigns using it start with it, so
+    # its keys are theirs too.
+    def translation_scope
+      name.to_s.underscore.tr(" ", "_")
+    end
+
     # The metadata variables its design uses, see MetadataVariables
     def metadata_variables
       MetadataVariables.in(self, mjml)

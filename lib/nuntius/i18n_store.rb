@@ -76,7 +76,7 @@ module Nuntius
     private
 
     def translations
-      @translations ||= Nuntius::Locale.owned_by(@owner.account_id).each_with_object({}) do |locale, result|
+      @translations ||= Nuntius::Locale.owned_by(@owner.account_id).in_order.each_with_object({}) do |locale, result|
         result.merge!(flat_hash(locale.data).transform_values { |value| JSON.encode(value) })
       end
     end

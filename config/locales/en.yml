@@ -98,6 +98,12 @@ en:
       sms: SMS
       teams: Teams
       voice: Voice
+    translations:
+      source: "Locale %{name}, %{key}"
+      app_source: "The app's translations, %{key}"
+      invalid_key: "%{key} is not a key: letters, digits, _ and -, separated by dots"
+      invalid_locale: "%{locale} is not one of the languages"
+      taken: "%{key} is part of another translation's key"
     templates:
       custom: Custom event
     tables:
@@ -117,6 +123,11 @@ en:
     admin:
       not_saved: "%{resource} could not be saved: %{errors}"
       shared:
+        translations:
+          intro_html: "What its <code>{{ '.key' | t }}</code> filters say in each language, from the account's locales. A key starting with a dot is in %{path}, and is looked up from there towards the root. Changes are saved straight away."
+          none_html: "It doesn't translate anything yet. Use <code>{{ '.key' | t }}</code> in its texts, or Make translatable in the email editor."
+          key: Key
+          missing: missing
         metadata_variables:
           value_html: "is %{value} here"
           instead: "Use a variable of the object the message is about instead, like {{ user.account.logo_url }}."
@@ -138,6 +149,7 @@ en:
                 edit: Edit
                 design: Design
                 media: Media
+                translations: Translations
                 statistics: Statistics
                 messages: Messages
           messages_sent: Messages sent
@@ -175,6 +187,7 @@ en:
               tab:
                 edit: Edit
                 media: Media
+                translations: Translations
                 templates: Templates
         index:
           card:
@@ -299,6 +312,7 @@ en:
                 edit: Edit
                 design: Design
                 media: Media
+                translations: Translations
                 messages: Messages
         index:
           card:

@@ -1,0 +1,42 @@
+/ The Translations tab: what a template's, campaign's or layout's t filters
+/ ({{ '.greeting' | t }}) say in each language, each editable and saved as
+/ it changes (see Nuntius::Translations and the translations controller).
+/ Locals: record, url (Admin::TranslationsController's)
+- translations = Nuntius::Translations.new(record)
+- keys = translations.keys
+- locales = translations.locales
+p.mb-4.text-sm.text-gray-600.dark:text-gray-300
+  = t("nuntius.admin.shared.translations.intro_html", path: tag.code(record.translation_scope.presence || "–"))
+- if keys.empty?
+  p.text-sm.text-gray-500.dark:text-gray-400 = t("nuntius.admin.shared.translations.none_html")
+- else
+  .overflow-x-auto data-controller="nuntius--translations" data-nuntius--translations-url-value=url
+    table.w-full.text-sm
+      thead
+        tr.border-b.border-gray-200.dark:border-gray-700.text-left.text-xs.font-semibold.uppercase.tracking-wide.text-gray-500.dark:text-gray-400
+          th.py-2.pr-4 = t("nuntius.admin.shared.translations.key")
+          - locales.each do |locale|
+            th.py-2.pr-4 = locale.upcase
+      tbody
+        - keys.each do |key|
+          - texts = translations.lookup(key)
+          tr.border-b.border-gray-100.dark:border-gray-800.align-top
+            td.py-2.pr-4.font-mono.text-xs.text-gray-700.dark:text-gray-200.whitespace-nowrap = key
+            - locales.each do |locale|
+              - text = texts[locale]
+              td.py-2.pr-4.min-w-48
+                input.w-full.rounded-md.border.bg-white.px-2.py-1.text-sm.text-gray-900.dark:bg-gray-800.dark:text-gray-100[
+                  type="text"
+                  value=text&.value
+                  placeholder=t("nuntius.admin.shared.translations.missing")
+                  class=(text ? "border-gray-300 dark:border-gray-600" : "border-red-300 dark:border-red-700 placeholder:text-red-400")
+                  aria-label="#{key} #{locale.upcase}"
+                  data-key=key
+                  data-locale=locale
+                  data-action="change->nuntius--translations#save keydown.enter->nuntius--translations#save:prevent"
+                  data-nuntius--translations-target="input"]
+                p.mt-1.text-xs.text-gray-400.dark:text-gray-500 data-nuntius--translations-target="status"
+                  - if text&.locale_record
+                    = link_to text.source, edit_admin_locale_path(text.locale_record), class: "hover:underline", target: "_blank", rel: "noopener"
+                  - elsif text
+                    = text.source
