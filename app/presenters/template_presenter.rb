@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# The template form reads as a sentence: send via [mail] based on [event]
-# when [Order] [is shipped], or based on [time] when [User] [Born on]
+# The template form reads as a sentence: send via [mail] based on [an event]
+# on [Order] [shipped], or based on [a time] when [User] [Born on]
 # [is in] [4] [weeks] [every year]
 class TemplatePresenter < ApplicationPresenter
   # The classes templates can be sent for, by their names for people.
@@ -32,13 +32,10 @@ class TemplatePresenter < ApplicationPresenter
     options + [[event.to_s.humanize(capitalize: false), event, {"data-chain": klass}]]
   end
 
-  # Every class's timestamps and timebased_scopes, chained to their class.
-  # data-kind says what else they ask: before or after a timestamp, with a
-  # recurrence, or an interval only for a scope.
+  # Every class's timestamps, chained to their class
   def timestamp_options
     chained_options do |messenger, class_name|
-      messenger.timestamps(class_name).map { |timestamp| [messenger.timestamp_label(timestamp.name, class_name), timestamp.name, {"data-kind": "timestamp"}] } +
-        messenger.timebased_scopes.keys.map { |scope| [messenger.event_label(scope, class_name), scope.to_s, {"data-kind": "scope"}] }
+      messenger.timestamps(class_name).map { |timestamp| [messenger.timestamp_label(timestamp.name, class_name), timestamp.name, {}] }
     end
   end
 

@@ -67,7 +67,7 @@ module Nuntius
       end
 
       def template_params
-        permitted = %i[enabled auto_description klass event based_on timestamp direction interval interval_amount interval_unit recurrence transport description payload from to subject layout_id html text link_tracking open_tracking]
+        permitted = %i[enabled auto_description klass event based_on timestamp direction interval interval_amount interval_unit recurrence timebased_limit transport description payload from to subject layout_id html text link_tracking open_tracking]
         permitted << :global if Nuntius.config.can_create_global
         # Old layouts read their values from the template's metadata
         permitted << :metadata_yaml if @template&.old_layout

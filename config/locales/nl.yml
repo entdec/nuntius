@@ -37,6 +37,7 @@ nl:
         timestamp: Datum of tijd
         direction: Voor of na
         recurrence: Herhaling
+        timebased_limit: Limiet per keer
         subject: Onderwerp
         to: Aan
         transport: Versturen via
@@ -77,7 +78,7 @@ nl:
   nuntius:
     based_on:
       event: een gebeurtenis
-      time: tijd
+      time: een tijd
     directions:
       before: is over
       after: was
@@ -266,12 +267,21 @@ nl:
       templates:
         edit:
           send_via: Versturen via
+          due_today:
+            one: Verstuurt vandaag naar 1
+            other: Verstuurt vandaag naar %{count}
+          due_this_hour:
+            one: Verstuurt dit uur naar 1
+            other: Verstuurt dit uur naar %{count}
+          due_over_limit: Zou naar meer dan %{limit} versturen, dus wordt tegengehouden en verstuurt niets
+          limit: "· hoogstens"
           description_auto: Automatisch
           description_if: als
           description_or: "of"
           when: wanneer
           based_on: op basis van
           ago: geleden
+          'on': bij
           card:
             nuntius_admin_templates:
               title: Template

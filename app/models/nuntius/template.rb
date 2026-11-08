@@ -15,8 +15,7 @@ module Nuntius
     attribute :transport, default: -> { Nuntius.config.default_transport }
 
     # The template form's parts of the event and interval (see compose_event):
-    # based on an event, or on time: a timebased_scope, or a timestamp it's
-    # before or after
+    # based on an event, or on time: a timestamp it's before or after
     INTERVAL_UNITS = %w[minutes hours days weeks months].freeze
     attribute :based_on, :string
     attribute :timestamp, :string
@@ -38,6 +37,7 @@ module Nuntius
     validates :event, format: {with: /.+#.+/}, if: ->(t) { t.klass == "Custom" }
     validates :interval, format: {allow_blank: true, with: /\A[0-9]+\s(month|week|day|hour|minute)s?\z/}
     validates :recurrence, inclusion: {in: Timestamp::RECURRENCES.keys, allow_blank: true}
+    validates :timebased_limit, numericality: {only_integer: true, greater_than: 0, allow_nil: true}
 
     # A global template is used for every account, not only for its own
     scope :global, -> { where(global: true) }
@@ -95,9 +95,33 @@ module Nuntius
       super || ((event.present? && timebased) ? "time" : "event")
     end
 
-    # The timestamp, or the timebased_scope, of a time based template
+    # At most how many messages it sends in a run of TimebasedEventsJob: its
+    # own timebased_limit, or config.timebased_limit
+    def send_limit
+      timebased_limit || Nuntius.config.timebased_limit
+    end
+
+    # Whether it's due on a day (a date, or with a recurrence) rather than in
+    # an hour; nil when it isn't time based
+    def due_today?
+      messenger&.timestamp_for(event, klass)&.daily?(self)
+    end
+
+    # How many it would send to now, at most one more than its limit; for a
+    # date (or with a recurrence) today, also before the send hour. Nil when
+    # it isn't time based.
+    def due_count
+      timestamp = messenger&.timestamp_for(event, klass)
+      return unless timestamp && interval.present?
+
+      at = Time.current
+      at = [at, at.change(hour: Nuntius.config.timebased_send_hour)].max if timestamp.daily?(self)
+      messenger.timebased_recipients(self, at: at, max: send_limit + 1).size
+    end
+
+    # The timestamp of a time based template
     def timestamp
-      super || ((timebased == :scope) ? event : messenger&.timestamp_for(event, klass)&.name)
+      super || messenger&.timestamp_for(event, klass)&.name
     end
 
     def direction
@@ -170,8 +194,7 @@ module Nuntius
     end
 
     # From the form's parts: an event has no interval or recurrence; a time
-    # its timebased_scope, or before_ or after_ its timestamp, and an interval
-    # (a recurrence only around a timestamp)
+    # before_ or after_ its timestamp, an interval and a recurrence
     def compose_event
       if based_on == "event"
         self.interval = nil
@@ -180,9 +203,8 @@ module Nuntius
       end
       return if timestamp.blank?
 
-      self.event = messenger&.timebased_scopes&.include?(timestamp.to_sym) ? timestamp : "#{direction}_#{timestamp}"
+      self.event = "#{direction}_#{timestamp}"
       self.interval = "#{interval_amount.to_i} #{interval_unit}" if INTERVAL_UNITS.include?(interval_unit) && interval_amount.present?
-      self.recurrence = nil unless messenger&.timestamp_for(event, klass)
     end
 
     def render(attr, assigns, locale, options = {})

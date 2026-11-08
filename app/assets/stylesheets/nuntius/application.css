@@ -1,3 +1,10 @@
+/* The template form's sentence reads on [User] [activate] for an event, when [User] [Born on] is in
+   for a time: the word for what isn't chosen is hidden */
+.nuntius-sentence:has(select[name="template[based_on]"] option[value="time"]:checked) .nuntius-sentence__on,
+.nuntius-sentence:has(select[name="template[based_on]"] option[value="event"]:checked) .nuntius-sentence__when {
+  display: none;
+}
+
 /* The template form's Auto toggle for its description, on the label's line:
    quiet, beside the field */
 .nuntius-description-auto {

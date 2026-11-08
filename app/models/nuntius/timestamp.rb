@@ -32,16 +32,22 @@ module Nuntius
       [:"before_#{name}", :"after_#{name}"]
     end
 
-    # The objects the template is due for now. A date (a date column, or any
-    # timestamp with a recurrence) is due on its day, from
+    # The objects the template is due for now (or at). A date (a date column,
+    # or any timestamp with a recurrence) is due on its day, from
     # config.timebased_send_hour; a time in the hour up to it.
-    def due(template)
-      target = template.event.to_s.start_with?("before") ? template.interval_duration.from_now : template.interval_duration.ago
+    def due(template, at: Time.current)
+      target = template.event.to_s.start_with?("before") ? at + template.interval_duration : at - template.interval_duration
       recurrence = template.recurrence.presence
-      return due_at(template.interval_time_range) unless date || recurrence
-      return model.none if Time.current.hour < Nuntius.config.timebased_send_hour
+      return due_at((target - 1.hour)..target) unless daily?(template)
+      return model.none if at.hour < Nuntius.config.timebased_send_hour
 
       due_on(target.to_date, recurrence)
+    end
+
+    # Whether it's due on a day (a date, or with a recurrence) rather than in
+    # an hour
+    def daily?(template)
+      date || template.recurrence.present?
     end
 
     private

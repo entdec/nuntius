@@ -3,7 +3,7 @@
 require "test_helper"
 
 module Nuntius
-  # Templates sent around a model's dates and times, without a timebased_scope
+  # Templates sent around a model's dates and times
   class TimestampTest < ActiveSupport::TestCase
     def due(event, interval, recurrence = nil)
       template = Template.new(klass: "User", event: event, interval: interval, recurrence: recurrence)
@@ -28,7 +28,7 @@ module Nuntius
       assert_includes events, :activate
       assert_not_includes events, :after_updated_at
       assert_equal :before, UserMessenger.timebased(:before_born_on, "User")
-      assert_equal :scope, AccountMessenger.timebased(:after_created, "Account")
+      assert_equal :after, AccountMessenger.timebased(:after_created_at, "Account")
       assert_nil UserMessenger.timebased(:activate, "User")
 
       messenger = Class.new(UserMessenger) { hide_timestamps :born_on }
@@ -36,8 +36,17 @@ module Nuntius
       assert_includes messenger.events("User"), :after_activated_at
     end
 
-    test "a timebased_scope wins over a timestamp of the same event" do
-      assert_nil AccountMessenger.timestamp_for(:after_created, "Account")
+    test "a timebased_scope is ignored, with a warning" do
+      messenger = nil
+      _, warning = capture_io do
+        messenger = Class.new(AccountMessenger) do
+          timebased_scope(:after_created_at) { |_time_range, _template| Account.none }
+        end
+      end
+
+      assert_match(/timebased_scope :after_created_at is ignored/, warning)
+      assert_equal "created_at", messenger.timestamp_for(:after_created_at, "Account").name
+      assert_not_includes messenger.instance_methods, :after_created_at
     end
 
     test "their events read as the timestamp is in, or was" do

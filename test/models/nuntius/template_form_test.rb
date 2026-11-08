@@ -9,6 +9,28 @@ module Nuntius
       Template.new(klass: "User", description: "Test", transport: "sms", **attributes).tap(&:validate)
     end
 
+    test "its limit: its own, or the configured one" do
+      assert_equal Nuntius.config.timebased_limit, template.send_limit
+      assert_equal 20, template(timebased_limit: 20).send_limit
+      assert_includes template(timebased_limit: 0).errors.attribute_names, :timebased_limit
+    end
+
+    test "how many it would send to now: a date today, also before the send hour; at most one more than its limit" do
+      travel_to Time.zone.local(2027, 3, 10, 7) do
+        3.times { |i| User.create!(name: "User #{i}", email: "user#{i}@example.org", born_on: Date.new(1990, 3, 10), account: accounts(:one)) }
+        birthday = Template.create!(klass: "User", description: "Birthday", transport: "sms", event: "before_born_on", interval: "0 days", recurrence: "yearly", global: true, account: accounts(:one))
+
+        assert_equal 3, birthday.due_count
+        assert birthday.due_today?
+        birthday.timebased_limit = 1
+        assert_equal 2, birthday.due_count
+
+        activated = Template.new(klass: "User", event: "after_activated_at", interval: "2 hours")
+        assert_not activated.due_today?
+        assert_nil Template.new(klass: "User", event: "activate").due_count
+      end
+    end
+
     test "based on an event: the event, without an interval or recurrence" do
       t = template(based_on: "event", event: "activate", interval: "2 days", recurrence: "yearly")
 
@@ -24,18 +46,12 @@ module Nuntius
       assert_predicate t.recurrence, :blank?
     end
 
-    test "based on time: a timebased_scope, without a recurrence" do
-      t = Template.new(klass: "Account", description: "Test", transport: "sms", based_on: "time", timestamp: "after_created", direction: "before", interval_amount: "5", interval_unit: "days", recurrence: "yearly").tap(&:validate)
-
-      assert_equal ["after_created", "5 days", nil], [t.event, t.interval, t.recurrence]
-    end
-
     test "the parts of a saved template" do
       t = Template.new(klass: "User", event: "before_born_on", interval: "1 week", recurrence: "yearly")
       assert_equal ["time", "born_on", "before", "1", "weeks"], [t.based_on, t.timestamp, t.direction, t.interval_amount, t.interval_unit]
 
-      t = Template.new(klass: "Account", event: "after_created", interval: "5 days")
-      assert_equal ["time", "after_created"], [t.based_on, t.timestamp]
+      t = Template.new(klass: "Account", event: "after_created_at", interval: "5 days")
+      assert_equal ["time", "created_at", "after"], [t.based_on, t.timestamp, t.direction]
 
       t = Template.new(klass: "User", event: "activate")
       assert_equal "event", t.based_on

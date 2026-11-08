@@ -47,6 +47,9 @@ module Nuntius
     option :allow_custom_events, default: false
     # The hour from which templates about a date (a birthday) are sent on it
     option :timebased_send_hour, default: 9
+    # At most this many messages a timebased template sends in a run; one that
+    # would send more is held: disabled and reported (a template can set its own)
+    option :timebased_limit, default: 500
     option :active_storage_service
     option :host, default: ->(message) {}, proc: true
 

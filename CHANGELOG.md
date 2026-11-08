@@ -12,8 +12,9 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - Liquid fields: a template's From, To and its text for SMS, push and Teams (now a plain text field), its code fields (Voice's TwiML, now with Liquid highlighted, Slack's and Teams' payloads, an old layout's subject and body), and a campaign's From and Voice text, suggest the object's variables while typing `{{`, with a `{ }` button to browse them, like the email editor's fields. They follow the class chosen in the form.
 - A template's description is made from its sentence and conditions (*Email when User activate, if User › Active? is true*) while Auto is checked, which it is by default (`auto_description`): when they change, or when there's no description yet. Typing one unchecks it. Copy in the migration with `bin/rails nuntius:install:migrations`.
 - Conditions on templates and campaigns: *If [all] of the following conditions are met: [Screening › Payment needed?] [is] [true]*, with the Liquid variables they render with and Mensa's operators, chosen as pills. A message is only sent when they're met, so an `{% if %}` around the recipient can go. See [Conditions](README.md#conditions). Copy in the migration with `bin/rails nuntius:install:migrations`.
-- Every date and time on a nuntiable object is a timebased event without a `timebased_scope`: when it *is in* or *was* some time *ago*, once or every day, week, month, quarter, half year or year (a birthday). Templates get a `recurrence`; dates are sent from `config.timebased_send_hour`; messengers can `hide_timestamps`. See [Around the object's dates and times](README.md#around-the-objects-dates-and-times). Copy in the migration with `bin/rails nuntius:install:migrations`.
-- The template form reads as a sentence: *Send via [Email] based on [an event] when [Order] [is shipped]*, or based on [time] when [User] [Born on] [is in] [4] [weeks] [every year]. Objects by their model names, events by their names from the messenger's `describe`, `nuntius.events` translations or the state machine (see [Naming events](README.md#naming-events)), and transports by name in alphabetical order. New templates send by mail when it's enabled.
+- Timebased templates send at most `config.timebased_limit` messages in a run (500 by default, or the template's own limit), counted after their conditions. A template that would send more sends nothing, and is disabled and reported (`Nuntius::TimebasedEventsJob::LimitExceeded` through `Rails.error`) until someone checks it. The template's page says whom it sends to today, or this hour. Copy in the migration with `bin/rails nuntius:install:migrations`.
+- Every date and time on a nuntiable object is a timebased event: when it *is in* or *was* some time *ago*, once or every day, week, month, quarter, half year or year (a birthday). Templates get a `recurrence`; dates are sent from `config.timebased_send_hour`; messengers can `hide_timestamps`. See [Timebased events](README.md#timebased-events). Copy in the migration with `bin/rails nuntius:install:migrations`.
+- The template form reads as a sentence: *Send via [Email] based on [an event] on [Order] [shipped]*, or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year]. Objects by their model names, events by their names from the messenger's `describe`, `nuntius.events` translations or the state machine (see [Naming events](README.md#naming-events)), and transports by name in alphabetical order. New templates send by mail when it's enabled.
 - Layouts designed in the email editor, with one Content block where each template or campaign puts its own content. Templates and draft campaigns follow their layout when it changes, and show it locked in their editor.
 - Starting layouts for new layouts: Basic, Newsletter, Transactional and Empty.
 - Nuntius blocks in the editor: Content, View in browser and Manage subscription.
@@ -43,13 +44,15 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - A messenger picks the templates of the account it sends for and the global ones, then narrows them with its `template_scope`. A global template is left out for a transport the account has its own template for.
 - A message belongs to the account it's sent for, also when the template is global, and no longer copies the template's or campaign's metadata.
 - `visible` (what the admin shows) is the current account's records by default. Records of other accounts give a 404 in the admin, also through campaign messages, message trackings and subscribers. A template's layout, and a campaign's list and layout, must belong to its own account.
-- Timebased templates are only sent for objects whose messenger picks them, so for their own account's objects (and for a global template, other accounts' too). `timebased_scope` blocks get the template instead of its metadata.
+- Timebased templates are only sent for objects whose messenger picks them, so for their own account's objects (and for a global template, other accounts' too).
+- A one-off timebased template is also sent for objects older than the template. It used to skip them, to keep a new template from mailing every existing object of a `timebased_scope`; a date is only due on its day and a time in its hour, so nothing from before the template is sent.
 - A template or campaign uses the locales of its own account.
 - The admin only edits the metadata of templates that use an old layout. Layouts, lists, locales and messages have no metadata any more; inbound messages keep the provider's parameters as `params`.
 - Lettermint events are matched on the message id Nuntius sends as Lettermint metadata (`X-LM-Metadata-nuntius_message_id`), and the Lettermint message id is no longer stored.
 
 ### Removed
 
+- **`timebased_scope` no longer works.** A messenger that still calls it gets a warning, and the scope is ignored: no event is made of it, and templates with its event are no longer sent (`Nuntius::TimebasedEventsJob` logs a warning for each). Send around the model's timestamps instead, with conditions for what else the scope selected; see step 10 of [Upgrading from 1.x](#upgrading-from-1x). `Nuntius::MessageMessenger`'s `after_opened`, `after_clicked` and `after_sent` scopes are gone too (they queried screenings); messages' `opened_at`, `clicked_at` and `last_sent_at` are timestamps.
 - Markdown and Trix editing of mail templates and campaigns. Templates with an old layout keep sending as before until you convert them.
 - The `{{ subscriber_link }}` variable and the `subscriber_url_text` translation; use the Manage subscription block. `Subscriber#link` is replaced by `Subscriber#url(message)`.
 - `Nuntius::Concerns::MetadataScoped`, with the jsonb scopes it brought (`metadata_in`, `metadata_eql`, …), and the configuration options `metadata_fields`, `metadata_humanize`, `add_metadata` and `default_template_scope`.
@@ -60,6 +63,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 ### Fixed
 
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
+- `Nuntius::TimebasedEventsJob` runs one at a time (a Postgres advisory lock): a run that started while another one was still going could send the same messages again. It now leaves them to the run that's going.
 - The subscribers table raised for a subscriber with tags.
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
 
@@ -131,7 +135,6 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
    - Drop `template_scope`s that only selected the account's templates, like `where("metadata->>'account_id' = ? or metadata->>'global' = 'true'", screening.account_id)`: that is what a messenger does now.
    - Rewrite the ones that still need to narrow it down with columns instead of metadata, e.g. `metadata_in("account_id", user.account.self_and_ancestor_ids)` becomes `owned_by(user.account.self_and_ancestor_ids)`.
    - When a messenger's object doesn't know its account (`object.account`), give the messenger an `account`: `account ->(flow) { Account.find(flow.account_id) }`. An account sends for itself, and an object without an account falls back to `config.current_account`, which usually isn't set in jobs.
-   - `timebased_scope` blocks get the template instead of its metadata: `timebased_scope :after_created do |time_range, template|`. Timebased templates are now only sent for the objects of the account they're for, so drop scopes that filtered on the template's account.
    - Code that read or wrote `metadata` on messages uses `feedback`, `headers` and `envelope_from`. Direct messages (`Nuntius::Message.new(…)`) need an `account`.
 8. **Make new layouts and convert your templates.** Create layouts in the admin, then convert each template with an old layout from its page. Until then it keeps sending with its old layout.
 
@@ -139,3 +142,23 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
    Values the old layout read from the template's metadata, like `{{ template.metadata.logo_url }}`, should come from a drop in the new design, like `{{ user.account.logo_url }}`. The template's page shows which ones its old layout reads, and what their value is, before you convert; after converting, it warns about any left in the design.
 9. **Replace `{{ subscriber_link }}`** in your own templates with the Manage subscription block, or with a link to `{{ subscriber_url }}`.
+10. **Replace your `timebased_scope`s** with templates around the model's timestamps, before you deploy: templates whose event is a scope's stop sending. For each scope:
+
+    - Find the timestamp it selects on: a date or datetime column, or an `_at` key of a store (`store_accessor :event_stamps, :processed_at`). The events are `before_<timestamp>` (*is in*) and `after_<timestamp>` (*was … ago*).
+    - Make what else it selected conditions on the template.
+    - Change its templates' `event` in a data migration, and add the conditions; then remove the scope from the messenger.
+
+    ```ruby
+    # Before, in ScreeningMessenger
+    timebased_scope :after_processed do |time_range, template|
+      Screening.where("date(event_stamps->>'processed_at') BETWEEN ? AND ?", time_range.first, time_range.last).where(state: "processed")
+    end
+
+    # After, in a data migration
+    Nuntius::Template.where(klass: "Screening", event: "after_processed").find_each do |template|
+      rules = template.conditions.fetch("rules", []) + [{"variable" => "screening.state", "operator" => "is", "value" => "processed"}]
+      template.update!(event: "after_processed_at", conditions: {"match" => "all", "rules" => rules})
+    end
+    ```
+
+    A timestamp that's a time is due in the hour its interval is up, a date (or a template with a recurrence) on its day from `config.timebased_send_hour`.

@@ -36,6 +36,7 @@ en:
         timestamp: Date or time
         direction: Before or after
         recurrence: Recurrence
+        timebased_limit: Limit per run
         subject: Subject
         to: To
         transport: Send via
@@ -64,7 +65,7 @@ en:
   nuntius:
     based_on:
       event: an event
-      time: time
+      time: a time
     directions:
       before: is in
       after: was
@@ -251,12 +252,21 @@ en:
       templates:
         edit:
           send_via: Send via
+          due_today:
+            one: Sends to 1 today
+            other: Sends to %{count} today
+          due_this_hour:
+            one: Sends to 1 this hour
+            other: Sends to %{count} this hour
+          due_over_limit: Would send to more than %{limit}, so it's held and sends nothing
+          limit: "· at most"
           description_auto: Auto
           description_if: if
           description_or: "or"
           when: when
           based_on: based on
           ago: ago
+          'on': 'on'
           card:
             nuntius_admin_templates:
               title: Template

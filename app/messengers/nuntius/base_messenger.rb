@@ -53,6 +53,12 @@ module Nuntius
       end
     end
 
+    # Whether it sends the template: the object's account sends with it, and
+    # its conditions are met
+    def sends?(template)
+      templates.exists?(template.id) && template.conditions_met?(liquid_context.merge("template" => template))
+    end
+
     # Allow messengers to override the selected layout
     def override_layout(selected_layout)
       selected_layout
@@ -224,20 +230,14 @@ module Nuntius
         Timestamp.for(class_name.to_s.safe_constantize).reject { |timestamp| hidden_timestamps.include?(timestamp.name) }
       end
 
-      # The timestamp a before_ or after_ event is about, unless the messenger
-      # has a timebased_scope of that name
+      # The timestamp a before_ or after_ event is about
       def timestamp_for(event, class_name = default_class_name)
-        return if timebased_scopes.include?(event.to_sym)
-
         timestamps(class_name).find { |timestamp| timestamp.events.include?(event.to_sym) }
       end
 
       # Whether templates for the event are sent by TimebasedEventsJob, with an
-      # interval: :scope for a timebased_scope, :before or :after around a
-      # timestamp
+      # interval: :before or :after around a timestamp
       def timebased(event, class_name = default_class_name)
-        return :scope if timebased_scopes.include?(event.to_sym)
-
         timestamp_for(event, class_name) && event.to_s.split("_").first.to_sym
       end
 
@@ -269,38 +269,37 @@ module Nuntius
         described_label(name) || class_name.to_s.constantize.human_attribute_name(name)
       end
 
-      def timebased_scopes
-        @timebased_scopes ||= {}
+      # No longer supported, and ignored: templates are sent around the
+      # model's timestamps (see Timestamp), narrowed by their conditions
+      def timebased_scope(name, &)
+        Nuntius::Deprecator.new.deprecation_warning("timebased_scope",
+          "#{self.name}.timebased_scope :#{name} is ignored: use a template around one of the model's timestamps, with conditions (see the changelog)")
       end
 
-      def timebased_scope(name, &scope_proc)
-        raise ArgumentError, "timebased_scope must start with before or after" unless %w[before after].detect { |prefix| name.to_s.start_with?(prefix) }
-
-        name = name.to_sym
-        timebased_scopes[name] = scope_proc if scope_proc.present?
-        define_method(name) { |object, params = {}| } unless respond_to?(name)
-        timebased_scopes[name] || nil
-      end
-
-      # The objects a timebased template is due for now: from its
-      # timebased_scope or timestamp. Once for each object, and only for those
-      # made after the template; a template with a recurrence once a day, for
-      # all of them.
-      def timebased_scope_for(template)
+      # The objects a timebased template is due for now (or at), around its
+      # timestamp: once for each object, or with a recurrence once a day.
+      # Nothing when its event isn't a timestamp's.
+      def timebased_due(template, at: Time.current)
         timestamp = timestamp_for(template.event, template.klass)
-        scope = if timebased_scopes.include?(template.event.to_sym)
-          timebased_scope(template.event).call(template.interval_time_range, template)
-        elsif timestamp
-          timestamp.due(template)
-        end
-        return [] unless scope
+        return Nuntius::Message.none unless timestamp
 
         sent = Nuntius::Message.select(:nuntiable_id).where(template_id: template.id)
-        if timestamp && template.recurrence.present?
-          scope.where.not(id: sent.where(created_at: Time.current.beginning_of_day..))
-        else
-          scope.where("#{template.klass.constantize.table_name}.created_at > ?", template.created_at).where.not(id: sent)
+        sent = sent.where(created_at: at.beginning_of_day..) if template.recurrence.present?
+        timestamp.due(template, at: at).where.not(id: sent)
+      end
+
+      # The objects a timebased template sends to now (or at): those it's due
+      # for whose account sends with it, and that meet its conditions. At most
+      # max of them, to know whether there are more than a limit.
+      def timebased_recipients(template, at: Time.current, max: nil)
+        recipients = []
+        timebased_due(template, at: at).find_each do |object|
+          next unless new(object, template.event).sends?(template)
+
+          recipients << object
+          break if max && recipients.size >= max
         end
+        recipients
       end
 
       private

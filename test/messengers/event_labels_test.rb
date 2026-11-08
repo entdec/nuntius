@@ -30,19 +30,19 @@ class EventLabelsTest < ActiveSupport::TestCase
 
   test "a messenger describes its events" do
     messenger = Class.new(Nuntius::BaseMessenger) do
-      describe :shipped, label: -> { "is shipped" }
+      describe :shipped, label: -> { "shipped" }
       describe :paid, label: "is paid"
     end
 
-    assert_equal "is shipped", messenger.event_label(:shipped, "Account")
+    assert_equal "shipped", messenger.event_label(:shipped, "Account")
     assert_equal "is paid", messenger.event_label("paid", "Account")
   end
 
   test "a template's class and event, for people" do
-    I18n.backend.store_translations(:en, nuntius: {events: {user: {activate: "is activated"}}})
+    I18n.backend.store_translations(:en, nuntius: {events: {user: {activate: "activated"}}})
 
     assert_equal "User", Nuntius::Template.new(klass: "User").klass_label
-    assert_equal "is activated", Nuntius::Template.new(klass: "User", event: "activate").event_label
+    assert_equal "activated", Nuntius::Template.new(klass: "User", event: "activate").event_label
     assert_equal "Custom event", Nuntius::Template.new(klass: "Custom").klass_label
     assert_equal "order#shipped", Nuntius::Template.new(klass: "Custom", event: "order#shipped").event_label
   end

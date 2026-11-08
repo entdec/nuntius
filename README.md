@@ -208,8 +208,8 @@ end
 
 ### Naming events
 
-The template form reads as a sentence: *Send via [Email] based on [an event] when [Order] [is shipped]*,
-or based on [time] (see [Timebased events](#timebased-events)). The object is
+The template form reads as a sentence: *Send via [Email] based on [an event] on [Order] [shipped]*,
+or based on [a time] (see [Timebased events](#timebased-events)). The object is
 its model's `model_name.human`, the transports are in alphabetical order (new templates send by mail),
 and an event's name comes from the first of:
 
@@ -236,48 +236,17 @@ and an event's name comes from the first of:
    (from state_machines' translations), for the events of `nuntiable use_state_machine: true`;
 4. the event itself, `after shipped`.
 
-Name an event for how it reads after the object: "when Order *is shipped*". The transports' names are
+Name an event for how it reads after the object: "on Order *shipped*". The transports' names are
 `nuntius.transports.<transport>`.
 
 ### Timebased events
 
-If you want to send messages based on time intervals you can add such events to your messenger with the
-timebased_scope class method like so:
-
-```ruby
-class CarMessenger < Nuntius::BaseMessenger
-  # time_range is a range, for a before scope the time_range the interval is added to the current
-  # time, the end of the range is 1 hour from the start.
-  # 
-  # So say the interval is "10 days", the timerange will be: 
-  # from: today +  10 days - 1 hour 
-  # until: today + 10 days
-  # So it basically selects all Car's with a tuneup_at within 10 days from now (in a 1 hour window)
-  timebased_scope :before_tuneup do |time_range, template|
-    Car.where(tuneup_at: time_range)
-  end
-
-  # For an after scope the time_range the interval is taken from the current time, the end of the
-  # range is 1 hour from its start.
-  #
-  # So say the interval is "10 days", the timerange will be: 
-  # from: today -  10 days - 1 hour 
-  # until: today - 10 days
-  # So it basically selects all Car's with a tuneup_at 10 days since now (in a 1 hour window)
-  timebased_scope :after_tuneup do |time_range, template|
-    Car.where(tuneup_at: time_range)
-  end
-end
-```
-
-#### Around the object's dates and times
-
-Without a `timebased_scope`, every date and time on the object is an event already: its date and
-datetime columns, and the `_at` keys of its stores (`store_accessor :event_stamps, :processed_at`).
+Every date and time on the object is an event: its date and datetime columns, and the `_at` keys
+of its stores (`store_accessor :event_stamps, :processed_at`).
 A template is sent when one *is in* or *was* some time *ago*, once or again and again:
 
-- Send via [SMS] based on [time] when [User] [Born on] [is in] [4] [weeks] [every year]
-- Send via [Email] based on [time] when [Screening] [Processed at] [was] [2] [weeks] ago [once]
+- Send via [SMS] based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year]
+- Send via [Email] based on [a time] when [Screening] [Processed at] [was] [2] [weeks] ago [once]
 
 Their events are `before_<name>` and `after_<name>`, so `before_born_on` with the interval
 `4 weeks` and the recurrence `yearly`. A recurrence (every day, week, month, quarter, half year or
@@ -295,27 +264,34 @@ class UserMessenger < ApplicationMessenger
 end
 ```
 
-A `timebased_scope` of the same name (`after_processed_at`) wins, for when there's more to it than
-the date.
+When there's more to it than the date, add conditions: *[Screening] [Processed at] [was] [2] [days]
+ago*, if *[Screening › State] [is] [processed]* (see [Conditions](#conditions)). Messengers'
+`timebased_scope` is no longer supported, and ignored with a warning.
 
-This method also requires you to configure a template using the maintenance pages. When you choose
-a timebased scope as an event you will be prompted to enter an interval, you can enter anything in the
-following formats:
+The interval is a number of minutes, hours, days, weeks or months.
 
-- N minute(s)
-- N hour(s)
-- N day(s)
-- N week(s)
-- N month(s)
-
-To send timebased messages you need to execute Nuntius::TimebasedEventsJob.perform, you could do this
-in a cronjob every 5 minutes with "bundle exec rails runner 'Nuntius::TimebasedEventsJob.perform'".
-Beter even is using Sidekiq::Cron or GoodJob
+To send timebased messages, run `Nuntius::TimebasedEventsJob` every few minutes: with Sidekiq::Cron
+or GoodJob's cron, or a cronjob running `bin/rails runner 'Nuntius::TimebasedEventsJob.perform_now'`.
 
 A timebased template is only sent for the objects whose messenger picks it (see [Accounts](#accounts)): those of its own account, and for a global template those of the other accounts too, unless they have their own template for the event and transport.
 
-Nuntius will automatically prevent sending duplicates within the timerange you define. 
-It will also ONLY send messages for objects (the one in template class), created after you created this template, this prevents sending dozens of emails which may make no sense, when you add a new template.
+A template is sent once for each object, or with a recurrence once a day, also when runs of the
+job overlap: a run while another one is going sends nothing. As a date is only due on its day and a
+time in its hour, a new template is never sent for dates that have passed, also for objects older
+than the template.
+
+A template sends at most `config.timebased_limit` messages in a run (500 by default), counted after
+its conditions; a template can set its own limit. One that would send more sends nothing: it's
+disabled, logged and reported with `Rails.error` (`Nuntius::TimebasedEventsJob::LimitExceeded`), so
+a mistake doesn't mail everyone. Check its event and conditions, or raise its limit, and enable it
+again. The template's page says whom it sends to now: today for a date (or with a recurrence), this
+hour for a time.
+
+```ruby
+Nuntius.setup do
+  config.timebased_limit = 1000
+end
+```
 
 ### Conditions
 

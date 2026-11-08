@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -293,6 +293,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
     t.string "recurrence"
     t.jsonb "conditions", default: {}, null: false
     t.boolean "auto_description", default: true, null: false
+    t.integer "timebased_limit"
     t.index ["account_id"], name: "index_nuntius_templates_on_account_id"
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
     t.index ["old_layout_id"], name: "index_nuntius_templates_on_old_layout_id"
