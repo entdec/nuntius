@@ -1,0 +1,164 @@
+{
+  "id": "bclbxyqh3g",
+  "data": {
+    "css": "",
+    "subject": "Test",
+    "fontSize": "14px",
+    "preheader": "",
+    "textColor": "#111827",
+    "breakpoint": "480px",
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "lineHeight": "1.6"
+  },
+  "type": "root",
+  "version": 1,
+  "children": [
+    {
+      "id": "bqvinry8th",
+      "data": {},
+      "type": "section",
+      "children": [
+        {
+          "id": "bbno1v5vdm",
+          "data": {},
+          "type": "column",
+          "children": [
+            {
+              "id": "btk9fwq1db",
+              "data": {
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "text": "Your name or logo",
+                          "type": "text"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "type": "text",
+              "children": [],
+              "attributes": {
+                "align": "center",
+                "padding": "10px 25px",
+                "font-size": "20px"
+              }
+            }
+          ],
+          "attributes": {}
+        }
+      ],
+      "attributes": {
+        "padding": "20px 0px"
+      }
+    },
+    {
+      "id": "bgzyjxw45j",
+      "data": {},
+      "type": "content",
+      "children": [
+        {
+          "id": "bnwld9icva",
+          "data": {},
+          "type": "section",
+          "children": [
+            {
+              "id": "bizojj3lzr",
+              "data": {},
+              "type": "column",
+              "children": [
+                {
+                  "id": "bkggabkpc4",
+                  "data": {
+                    "content": {
+                      "type": "doc",
+                      "content": [
+                        {
+                          "type": "paragraph",
+                          "content": [
+                            {
+                              "text": "Each template and campaign puts its own content here.",
+                              "type": "text"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "type": "text",
+                  "children": [],
+                  "attributes": {
+                    "padding": "10px 25px"
+                  }
+                }
+              ],
+              "attributes": {}
+            }
+          ],
+          "attributes": {
+            "padding": "20px 0px",
+            "background-color": "#ffffff"
+          }
+        }
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "bjlnkfnq6m",
+      "data": {},
+      "type": "section",
+      "children": [
+        {
+          "id": "blbff1gweq",
+          "data": {},
+          "type": "column",
+          "children": [
+            {
+              "id": "biduko0ylo",
+              "data": {
+                "text": "",
+                "before": ""
+              },
+              "type": "view_in_browser",
+              "children": [],
+              "attributes": {
+                "align": "center",
+                "color": "#6b7280",
+                "padding": "4px 25px",
+                "font-size": "12px"
+              }
+            },
+            {
+              "id": "bg4hkvm2zi",
+              "data": {
+                "text": "",
+                "before": ""
+              },
+              "type": "subscription",
+              "children": [],
+              "attributes": {
+                "align": "center",
+                "color": "#6b7280",
+                "padding": "4px 25px",
+                "font-size": "12px"
+              }
+            }
+          ],
+          "attributes": {}
+        }
+      ],
+      "attributes": {
+        "padding": "20px 0px"
+      }
+    }
+  ],
+  "attributes": {
+    "width": "600px",
+    "background-color": "#f3f4f6"
+  }
+}
