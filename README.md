@@ -319,20 +319,32 @@ The form chooses the variables with Liquidum's endpoint, so your app needs to mo
 
 ### Locales
 
-Nuntius supports locale support in it's mails. You can add locales for your emails per language:
+Translate in a template or campaign with Liquidum's `t` filter. Its translations are the locales of its account: add a locale in the admin for each language, with the language as its top key:
 
-Add a locale with key `en`:
 ```yaml
 en:
-  salutation: "Hello %{name}"
+  greeting: "Hello %{name}"
+  signature: "Kind regards"
 ```
 
-Then in your template you can do:
 ```liquid
-{{'salutation' | t name: {{car.owner}} }}
+{{ 'greeting' | t: name: user.name }}
+{{ 'greeting' | t: name: user.name, locale: 'nl' }}
 ```
 
-Locales belong to an account, like templates. A template uses the locales of its own account, so a global template uses its owner's.
+A template uses the locales of its own account, so a global template uses its owner's; what they don't have comes from your app's own translations. The message's language is its messenger's `locale` (`locale ->(user) { user.locale }`), or the event's `locale:`.
+
+A key that starts with a dot is looked up in the template's scope first, then towards the root, so one template can have its own version of a translation. The scope is the template's layout, class, event, transport and description, like `default.user.created.mail.welcome_email_for_a_new_user`, so `{{ '.greeting' | t }}` uses `default.user.created.mail.welcome_email_for_a_new_user.greeting`, then `default.user.created.mail.greeting`, and so on up to `greeting`. A campaign's scope is `nuntius` and its layout.
+
+Nuntius gives Liquidum (1.4 or later) the translations; configure it in your app:
+
+```ruby
+# config/initializers/liquidum.rb
+Liquidum.setup do |config|
+  config.i18n_store = ->(context) { Nuntius::I18nStore.backend(context) }
+  config.translation_scope = ->(context) { Nuntius::I18nStore.translation_scope(context) }
+end
+```
 
 ### Metadata
 

@@ -21,65 +21,64 @@ module Nuntius
     JSON = ActiveSupport::JSON
   end
 
+  # The translations of a template's or campaign's account (its locales) for
+  # Liquidum's `t` filter, as a store for I18n::Backend::KeyValue
+  # ({"en.greeting" => "\"Hello\""}). Configure Liquidum with:
+  #
+  #   Liquidum.setup do |config|
+  #     config.i18n_store = ->(context) { Nuntius::I18nStore.backend(context) }
+  #     config.translation_scope = ->(context) { Nuntius::I18nStore.translation_scope(context) }
+  #   end
   class I18nStore
-    def initialize
+    # Looks a key up from its scope towards the root
+    class Backend < I18n::Backend::KeyValue
+      include I18n::Backend::Cascade
+    end
+
+    class << self
+      # The account's locales of the template or campaign being rendered, then
+      # the app's own translations
+      def backend(context)
+        owner = owner(context)
+        return I18n.backend unless owner
+
+        I18n::Backend::Chain.new(Backend.new(new(owner)), I18n.backend)
+      end
+
+      # The scope of keys that start with a dot
+      def translation_scope(context)
+        owner(context)&.translation_scope
+      end
+
+      private
+
+      def owner(context)
+        context.registers["template"] || context.registers["campaign"]
+      end
+    end
+
+    def initialize(owner)
+      @owner = owner
     end
 
     def keys
-      return [] unless template
-
-      result = []
-      locales.each do |locale|
-        result += flat_hash(locale.data).keys
-      end
-      result
+      translations.keys
     end
 
     def [](key)
-      return unless template
-
-      result = {}
-      locales.each do |locale|
-        hash = flat_hash(locale.data).transform_values { |v| JSON.encode(v) }
-        result.merge! hash
-      end
-      result[key]
+      translations[key]
     end
 
     def []=(key, value)
       # NOOP
     end
 
-    def with(template)
-      with_custom_backend do
-        self.template = template
-        yield(template)
-        self.template = nil
-      end
-    end
-
-    def template
-      Thread.current[:nuntius_i18n_store_template]
-    end
-
-    def template=(template)
-      Thread.current[:nuntius_i18n_store_template] = template
-    end
-
     private
 
-    def with_custom_backend
-      Thread.current[:nuntius_i18n_store_old_backend] = I18n.backend
-      I18n.backend = I18n::Backend::Chain.new(custom_i18n_backend, I18n.backend)
-
-      yield
-
-      I18n.backend = Thread.current[:nuntius_i18n_store_old_backend]
-    end
-
-    # The locales of the account the template or campaign belongs to
-    def locales
-      template.respond_to?(:account_id) ? Nuntius::Locale.owned_by(template.account_id) : Nuntius::Locale.all
+    def translations
+      @translations ||= Nuntius::Locale.owned_by(@owner.account_id).each_with_object({}) do |locale, result|
+        result.merge!(flat_hash(locale.data).transform_values { |value| JSON.encode(value) })
+      end
     end
 
     def flat_hash(hash = {})
@@ -87,16 +86,6 @@ module Nuntius
         tmp = v.is_a?(Hash) ? flat_hash(v).transform_keys { |k2| "#{k}.#{k2}" } : {k => v}
         a.merge(tmp)
       end
-    end
-
-    # Yield our own custom backend
-    def custom_i18n_backend
-      return @custom_i18n_backend if @custom_i18n_backend
-
-      @custom_i18n_backend = I18n::Backend::KeyValue.new(Nuntius.i18n_store)
-      @custom_i18n_backend.class.send(:include, I18n::Backend::Cascade)
-
-      @custom_i18n_backend
     end
   end
 end

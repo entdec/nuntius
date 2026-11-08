@@ -47,8 +47,6 @@ module Nuntius
     end
 
     test "delivering a mail to multiple recipients with translations should work" do
-      skip "Gives an liquid internal, needs to be investigated"
-
       perform_enqueued_jobs(only: [Nuntius::TransportDeliveryJob, Nuntius::MessengerJob]) do
         Nuntius.event(:translationtest, accounts(:one), locale: "nl")
       end
@@ -57,6 +55,7 @@ module Nuntius
       assert_equal 2, Mail::TestMailer.deliveries.length
       mail = Mail::TestMailer.deliveries.first
       assert_equal "Smurrefluts", mail.subject
+      assert_includes mail.html_part.body.to_s, "<b>Hoi</b>"
       mail = Mail::TestMailer.deliveries.last
       assert_equal "Smurrefluts", mail.subject
       Mail::TestMailer.deliveries.clear

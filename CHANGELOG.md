@@ -67,6 +67,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
 - `Nuntius::TimebasedEventsJob` runs one at a time (a Postgres advisory lock): a run that started while another one was still going could send the same messages again. It now leaves them to the run that's going.
 - The subscribers table raised for a subscriber with tags.
+- The `t` filter raised ("Liquid error: internal") instead of translating with the account's locales, and keys starting with a dot had no scope. It needs Liquidum 1.4 and its configuration (see Upgrading).
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
 
 ### Upgrading from 1.x
@@ -164,3 +165,12 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
     ```
 
     A timestamp that's a time is due in the hour its interval is up, a date (or a template with a recurrence) on its day from `config.timebased_send_hour`.
+11. **Configure Liquidum's translations** (Liquidum 1.4 or later), so the `t` filter translates with the account's locales. `Nuntius.i18n_store` is gone:
+
+    ```ruby
+    # config/initializers/liquidum.rb
+    Liquidum.setup do |config|
+      config.i18n_store = ->(context) { Nuntius::I18nStore.backend(context) }
+      config.translation_scope = ->(context) { Nuntius::I18nStore.translation_scope(context) }
+    end
+    ```

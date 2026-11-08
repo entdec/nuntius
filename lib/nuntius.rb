@@ -17,10 +17,6 @@ module Nuntius
   class Error < StandardError; end
 
   class << self
-    def i18n_store
-      @i18n_store ||= Nuntius::I18nStore.new
-    end
-
     #
     # Fires an event for use with templates with the object
     #

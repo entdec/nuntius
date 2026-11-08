@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "image_processing", "~> 1.2"
   s.add_runtime_dependency "importmap-rails", ">= 2"
   s.add_runtime_dependency "labelary", "~> 0.5"
-  s.add_runtime_dependency "liquidum", "~> 1.3"
+  s.add_runtime_dependency "liquidum", "~> 1.4"
   s.add_runtime_dependency "mail", "~> 2"
   s.add_runtime_dependency "messagebird-rest"
   s.add_runtime_dependency "net-imap"

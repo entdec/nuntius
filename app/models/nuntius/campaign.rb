@@ -61,6 +61,13 @@ module Nuntius
       DeliverCampaignService.perform(campaign: self, test_only: true).messages
     end
 
+    # The scope of the keys starting with a dot that its Liquid translates (see I18nStore)
+    def translation_scope
+      scope = %w[nuntius]
+      scope << (old_layout || layout).name.underscore.tr(" ", "_") if old_layout || layout
+      scope.join(".")
+    end
+
     # What its Liquid can use (see Variables and DeliverCampaignService): itself,
     # the subscriber with its URL, and what the list's subscribers are (their
     # nuntiables), under their messengers' names

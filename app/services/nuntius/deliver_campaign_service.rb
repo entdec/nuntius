@@ -68,12 +68,6 @@ module Nuntius
       message
     end
 
-    def translation_scope
-      scope = %w[nuntius]
-      scope << (campaign.old_layout || campaign.layout).name.underscore.tr(" ", "_") if campaign.old_layout || campaign.layout
-      scope.join(".")
-    end
-
     # The Liquid variables of a subscriber's message, but its subscriber_url:
     # the campaign, the subscriber and its nuntiable (see Campaign#variable_roots)
     def assigns_for(subscriber)
