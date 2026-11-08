@@ -10,6 +10,7 @@ en:
       nuntius/campaign:
         from: From
         layout: Layout
+        layout_name: Layout
         list: List
         name: Name
         state: Staat
@@ -30,6 +31,7 @@ en:
         description: Description
         enabled: Enabled
         event: Event
+        layout_name: Layout
         global: Global
         from: From
         klass: Object

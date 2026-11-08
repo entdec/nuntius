@@ -7,6 +7,15 @@ module Nuntius
 
       column(:description)
       column(:enabled)
+      column(:transport) do
+        render do
+          html { |template| t(template.transport, scope: "nuntius.transports", default: template.transport.to_s.humanize) }
+        end
+      end
+      # Its layout, or the old layout it has until it's converted
+      column(:layout_name) do
+        attribute "coalesce((select name from nuntius_layouts where nuntius_layouts.id = nuntius_templates.layout_id), (select name from nuntius_old_layouts where nuntius_old_layouts.id = nuntius_templates.old_layout_id))"
+      end
       column(:klass) do
         render do
           html { |template| template.klass_label }

@@ -10,6 +10,7 @@ nl:
       nuntius/campaign:
         from: Van
         layout_id: Layout
+        layout_name: Layout
         list_id: Lijst
         list_name: Lijst naam
         name: Naam
@@ -32,6 +33,7 @@ nl:
         enabled: Ingeschakeld
         event: Gebeurtenis
         from: Van
+        layout_name: Layout
         global: Globaal
         klass: Object
         interval: Interval

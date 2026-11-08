@@ -18,6 +18,11 @@ module Nuntius
         attribute "nuntius_lists.name"
       end
 
+      # Its layout, or the old layout it has until it's converted
+      column(:layout_name) do
+        attribute "coalesce((select name from nuntius_layouts where nuntius_layouts.id = nuntius_campaigns.layout_id), (select name from nuntius_old_layouts where nuntius_old_layouts.id = nuntius_campaigns.old_layout_id))"
+      end
+
       action :schedule do
         show ->(campaign) { campaign.transport != "sms" && campaign.can_schedule? }
         link { |campaign| nuntius.schedule_admin_campaign_path(campaign) }
