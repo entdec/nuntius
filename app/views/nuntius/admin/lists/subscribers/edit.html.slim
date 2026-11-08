@@ -13,4 +13,4 @@
       .col-span-12
         = f.input :email
       .col-span-12
-        = f.input :metadata_yaml, as: :editor, mode: 'application/yaml', label: t('.metadata')
+        = entdec_code_editor f, :metadata_yaml, lang: "yaml", label: t('.metadata')

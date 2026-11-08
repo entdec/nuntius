@@ -8,7 +8,7 @@ module Nuntius
 
         messenger_class.timebased_scope_for(template).each do |object|
           messenger = messenger_class.new(object, template.event)
-          next unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(template.event.to_sym)
+          next unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(template.event.to_sym) || messenger_class.timestamp_for(template.event, template.klass)
           # Only for objects whose account sends with the template
           next unless messenger.templates.exists?(template.id)
 

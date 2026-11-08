@@ -14,7 +14,7 @@ en:
         name: Name
         state: Staat
         subject: Subject
-        transport: Transport
+        transport: Send via
         html: Body
       nuntius/layout:
         name: Name
@@ -30,10 +30,15 @@ en:
         event: Event
         global: Global
         from: From
-        klass: Klass
+        klass: Object
+        interval: Interval
+        based_on: Based on
+        timestamp: Date or time
+        direction: Before or after
+        recurrence: Recurrence
         subject: Subject
         to: To
-        transport: Transport
+        transport: Send via
     models:
       campaign: Campaign
       layout: Layout
@@ -57,6 +62,39 @@ en:
       templates:
         new: New template
   nuntius:
+    based_on:
+      event: an event
+      time: time
+    directions:
+      before: is in
+      after: was
+    interval_units:
+      minutes: minutes
+      hours: hours
+      days: days
+      weeks: weeks
+      months: months
+    timestamps:
+      before: "%{attribute} is in"
+      after: "%{attribute} was"
+    recurrences:
+      once: once
+      daily: every day
+      weekly: every week
+      monthly: every month
+      quarterly: every quarter
+      half_yearly: every half year
+      yearly: every year
+    transports:
+      lmtp: LMTP (mailbox)
+      mail: Email
+      push: Push notification
+      slack: Slack
+      sms: SMS
+      teams: Teams
+      voice: Voice
+    templates:
+      custom: Custom event
     tables:
       campaigns:
         views:
@@ -200,7 +238,7 @@ en:
               status: Status
               subject: Subject
               to: To
-              transport: Transport
+              transport: Send via
               click_count: Click Count
               open_count: Open Count
           message: Message
@@ -212,6 +250,13 @@ en:
                 tracking: Tracking
       templates:
         edit:
+          send_via: Send via
+          description_auto: Auto
+          description_if: if
+          description_or: "or"
+          when: when
+          based_on: based on
+          ago: ago
           card:
             nuntius_admin_templates:
               title: Template

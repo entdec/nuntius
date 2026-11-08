@@ -66,5 +66,18 @@ module Nuntius
       assert campaign_in(layout).valid?
       assert campaign_in(blocks_layout, list: nuntius_lists(:helpers)).valid?
     end
+
+    test "a campaign only has messages for the subscribers who meet its conditions" do
+      list = nuntius_lists(:valentines)
+      juliet = list.subscribers.create!(email: "juliet@example.com", first_name: "Juliet")
+      campaign = campaign_in(blocks_layout, list: list)
+      campaign.conditions = {"match" => "all", "rules" => {"0" => {"variable" => "subscriber.first_name", "operator" => "is", "value" => "juliet"}}}
+      campaign.state = "sending"
+      campaign.save!
+
+      perform_enqueued_jobs { DeliverCampaignService.perform(campaign: campaign) }
+
+      assert_equal [juliet], campaign.messages.map(&:subscriber)
+    end
   end
 end

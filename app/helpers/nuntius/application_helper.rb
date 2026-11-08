@@ -2,6 +2,40 @@
 
 module Nuntius
   module ApplicationHelper
+    # The enabled transports by their names for people, alphabetically
+    def nuntius_transport_options
+      Nuntius.config.transports
+        .map { |transport| [t(transport, scope: "nuntius.transports", default: transport.to_s.humanize), transport.to_s] }
+        .sort_by { |label, _| label.downcase }
+    end
+
+    # A template's or campaign's conditions (see Conditions) as rules, with
+    # its Liquid variables to choose from (EntDec::Conditions::Component)
+    def nuntius_conditions(form)
+      record = form.object
+      roots = record.variable_roots
+      conditions = Nuntius::Conditions.new(record.conditions)
+      render EntDec::Conditions::Component.new(name: "#{form.object_name}[conditions]", match: conditions.match,
+        rules: conditions.rules, variables_url: Nuntius::Variables.url(self, roots), describe: Nuntius::Variables.describer(roots))
+    end
+
+    # A field that takes Liquid, with the record's variables suggested while
+    # typing {{ and a { } button to browse them (EntDec::LiquidField::Component)
+    #
+    #   = nuntius_liquid_field f do
+    #     = f.input :to
+    def nuntius_liquid_field(form, &)
+      entdec_liquid_field(url: Nuntius::Variables.url(self, form.object.variable_roots), &)
+    end
+
+    # Data attributes for an element whose variable pickers and Liquid fields
+    # follow the class chosen in a template's form (the nuntius--variables
+    # controller): the variables URL of each of the classes
+    def nuntius_variables_data(form, classes)
+      urls = classes.to_h { |klass| [klass, Nuntius::Variables.url(self, form.object.variable_roots(klass))] }.compact
+      {"data-nuntius--variables-urls-value" => urls.to_json, "data-nuntius--variables-for-value" => "#{form.object_name}[klass]"}
+    end
+
     def nuntius_dashboard_menu
       Satis::Menus::Builder.build(:dashboard) do |m|
         m.item :messages, link: nuntius.admin_messages_path, icon: "fal fa-envelope"

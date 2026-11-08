@@ -5,6 +5,7 @@ module Nuntius
     include Nuntius::Concerns::Owned
     include Nuntius::Concerns::Yamlify
     include Nuntius::Concerns::EmailDesigned
+    include Nuntius::Concerns::Conditional
 
     yamlify :metadata
 

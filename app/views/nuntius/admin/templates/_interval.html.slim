@@ -1,0 +1,3 @@
+/ [4] [weeks]: the template's interval
+= f.number_field :interval_amount, value: template.interval_amount.presence || 1, min: 0, class: 'entdec-pill-input', "aria-label" => Nuntius::Template.human_attribute_name(:interval)
+= entdec_pill_select f, :interval_unit, template.interval_unit_options, selected: template.interval_unit, label: Nuntius::Template.human_attribute_name(:interval)

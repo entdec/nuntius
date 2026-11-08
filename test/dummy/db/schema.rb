@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -120,6 +120,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_150000) do
     t.text "mjml"
     t.string "preview_text"
     t.uuid "account_id", null: false
+    t.jsonb "conditions", default: {}, null: false
     t.index ["account_id"], name: "index_nuntius_campaigns_on_account_id"
     t.index ["layout_id"], name: "index_nuntius_campaigns_on_layout_id"
     t.index ["list_id"], name: "index_nuntius_campaigns_on_list_id"
@@ -289,6 +290,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_150000) do
     t.jsonb "converted_from"
     t.uuid "account_id", null: false
     t.boolean "global", default: false, null: false
+    t.string "recurrence"
+    t.jsonb "conditions", default: {}, null: false
+    t.boolean "auto_description", default: true, null: false
     t.index ["account_id"], name: "index_nuntius_templates_on_account_id"
     t.index ["layout_id"], name: "index_nuntius_templates_on_layout_id"
     t.index ["old_layout_id"], name: "index_nuntius_templates_on_old_layout_id"
@@ -325,6 +329,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_150000) do
     t.string "state"
     t.datetime "updated_at", null: false
     t.uuid "account_id"
+    t.date "born_on"
+    t.jsonb "stamps", default: {}
     t.index ["account_id"], name: "index_users_on_account_id"
   end
 

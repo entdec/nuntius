@@ -46,5 +46,20 @@ module Nuntius
       assert_equal [global_template.id], Nuntius::Message.where(nuntiable: plain_account).pluck(:template_id)
       assert_equal plain_account, Nuntius::Message.find_by(nuntiable: plain_account).account
     end
+
+    test "a birthday every year: for users older than the template, once a day" do
+      travel_to Time.zone.local(2027, 3, 10, 10) do
+        user = User.create!(name: "Juliet", email: "juliet@example.org", born_on: Date.new(1990, 4, 7), created_at: 5.years.ago)
+        Nuntius::Template.create!(description: "birthday", klass: "User", transport: "mail", event: "before_born_on", interval: "4 weeks", recurrence: "yearly", to: "{{ user.email }}", html: "Soon!")
+
+        2.times do
+          perform_enqueued_jobs only: [Nuntius::MessengerJob, Nuntius::TimebasedEventsJob] do
+            Nuntius::TimebasedEventsJob.perform_now
+          end
+        end
+
+        assert_equal 1, Nuntius::Message.where(nuntiable: user).count
+      end
+    end
   end
 end

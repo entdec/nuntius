@@ -3,6 +3,7 @@
 require "auxilium"
 require "importmap-rails"
 require "tess_edit"
+require "entdec/view_components"
 require "faraday"
 require "faraday/follow_redirects"
 require "liquidum"

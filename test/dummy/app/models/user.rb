@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   belongs_to :account, default: -> { Current.account }
+  store_accessor :stamps, :activated_at, :welcomed
 
   state_machine initial: :pending do
     event :activate do

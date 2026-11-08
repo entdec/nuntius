@@ -15,7 +15,7 @@ nl:
         name: Naam
         state: Staat
         subject: Onderwerp
-        transport: Transport
+        transport: Versturen via
         html: Body
       nuntius/layout:
         name: Naam
@@ -31,16 +31,21 @@ nl:
         event: Gebeurtenis
         from: Van
         global: Globaal
-        klass: Klasse
+        klass: Object
+        interval: Interval
+        based_on: Op basis van
+        timestamp: Datum of tijd
+        direction: Voor of na
+        recurrence: Herhaling
         subject: Onderwerp
         to: Aan
-        transport: Transport
+        transport: Versturen via
         messages_count: Aantal berichten
       nuntius/message:
         to: Aan
         from: Van
         subject: Onderwerp
-        transport: Transport
+        transport: Versturen via
         last_sent_at: Laatste keer verzonden
         open_count: Aantal geopend
         click_count: Aantal geklikt
@@ -70,6 +75,39 @@ nl:
       templates:
         new: Nieuwe template
   nuntius:
+    based_on:
+      event: een gebeurtenis
+      time: tijd
+    directions:
+      before: is over
+      after: was
+    interval_units:
+      minutes: minuten
+      hours: uur
+      days: dagen
+      weeks: weken
+      months: maanden
+    timestamps:
+      before: "%{attribute} is over"
+      after: "%{attribute} was"
+    recurrences:
+      once: eenmalig
+      daily: elke dag
+      weekly: elke week
+      monthly: elke maand
+      quarterly: elk kwartaal
+      half_yearly: elk half jaar
+      yearly: elk jaar
+    transports:
+      lmtp: LMTP (mailbox)
+      mail: E-mail
+      push: Pushbericht
+      slack: Slack
+      sms: Sms
+      teams: Teams
+      voice: Spraak
+    templates:
+      custom: Eigen gebeurtenis
     tables:
       campaigns:
         views:
@@ -214,7 +252,7 @@ nl:
               state: Status
               subject: Onderwerp
               to: Aan
-              transport: Transport
+              transport: Versturen via
               click_count: Click Count
               open_count: Open Count
 
@@ -227,6 +265,13 @@ nl:
                 tracking: Tracking
       templates:
         edit:
+          send_via: Versturen via
+          description_auto: Automatisch
+          description_if: als
+          description_or: "of"
+          when: wanneer
+          based_on: op basis van
+          ago: geleden
           card:
             nuntius_admin_templates:
               title: Template

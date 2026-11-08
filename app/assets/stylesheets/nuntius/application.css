@@ -1,0 +1,9 @@
+/* The template form's Auto toggle for its description, on the label's line:
+   quiet, beside the field */
+.nuntius-description-auto {
+  @apply absolute right-0 top-0 z-10 inline-flex cursor-pointer items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300;
+}
+
+.nuntius-description-auto input {
+  @apply size-3 rounded-sm border-gray-300 text-gray-500 focus:ring-0 focus:ring-offset-0 dark:border-gray-600 dark:bg-gray-700;
+}

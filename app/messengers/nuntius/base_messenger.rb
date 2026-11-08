@@ -32,11 +32,15 @@ module Nuntius
       result
     end
 
-    # Turns the templates in messages, and dispatches the messages to transports
+    # Turns the templates in messages, and dispatches the messages to
+    # transports: those whose conditions are met
     def dispatch(filtered_templates)
       filtered_templates.each do |template|
+        assigns = liquid_context
+        next unless template.conditions_met?(assigns.merge("template" => template))
+
         template.layout = override_layout(template.layout)
-        msg = template.new_message(@object, liquid_context, params, account: account)
+        msg = template.new_message(@object, assigns, params, account: account)
         next unless msg.present?
 
         @attachments.each do |attachment|
@@ -182,6 +186,89 @@ module Nuntius
         superclass.account if superclass.respond_to?(:account)
       end
 
+      # Names an event, or a timestamp, for people choosing it in a template:
+      #
+      #   describe :after_processed, label: -> { I18n.t("screenings.after_processed") }
+      #   describe :born_on, label: -> { I18n.t("users.birthday") }
+      #
+      # Without it the label comes from event_label's translations.
+      def describe(event, label:)
+        event_descriptions[event.to_sym] = {label: label}
+      end
+
+      def event_descriptions
+        @event_descriptions ||= {}
+      end
+
+      # The events templates can be sent on: the messenger's own methods, and
+      # before and after each of the model's timestamps
+      def events(class_name = default_class_name)
+        (instance_methods(false) + timestamps(class_name).flat_map(&:events)).uniq
+      end
+
+      # Leaves timestamps out of the events (updated_at always is). Subclasses
+      # inherit it.
+      #
+      #   hide_timestamps :imported_at, :synced_at
+      def hide_timestamps(*names)
+        own_hidden_timestamps.concat(names.map(&:to_s))
+      end
+
+      def hidden_timestamps
+        inherited = superclass.respond_to?(:hidden_timestamps) ? superclass.hidden_timestamps : %w[updated_at]
+        inherited + own_hidden_timestamps
+      end
+
+      # The model's dates and times templates can be sent around (see Timestamp)
+      def timestamps(class_name = default_class_name)
+        Timestamp.for(class_name.to_s.safe_constantize).reject { |timestamp| hidden_timestamps.include?(timestamp.name) }
+      end
+
+      # The timestamp a before_ or after_ event is about, unless the messenger
+      # has a timebased_scope of that name
+      def timestamp_for(event, class_name = default_class_name)
+        return if timebased_scopes.include?(event.to_sym)
+
+        timestamps(class_name).find { |timestamp| timestamp.events.include?(event.to_sym) }
+      end
+
+      # Whether templates for the event are sent by TimebasedEventsJob, with an
+      # interval: :scope for a timebased_scope, :before or :after around a
+      # timestamp
+      def timebased(event, class_name = default_class_name)
+        return :scope if timebased_scopes.include?(event.to_sym)
+
+        timestamp_for(event, class_name) && event.to_s.split("_").first.to_sym
+      end
+
+      # An event's name for people, for the model class it's sent for: from
+      # describe, the nuntius.events.<model>.<event> translation, the model's
+      # state machine event (activerecord.state_machines.<model>.events.<event>),
+      # or the event itself
+      #
+      # A timestamp's events read "<timestamp> is in" and "<timestamp> was",
+      # by the timestamp's describe or human_attribute_name.
+      def event_label(event, class_name = default_class_name)
+        label = described_label(event)
+        return label if label
+
+        model = class_name.to_s.safe_constantize
+        if (timestamp = timestamp_for(event, class_name))
+          return I18n.t(event.to_s.split("_").first, scope: [:nuntius, :timestamps], attribute: timestamp_label(timestamp.name, class_name))
+        end
+
+        key = model.respond_to?(:model_name) ? model.model_name.i18n_key : class_name.to_s.underscore
+        I18n.t(event, scope: [:nuntius, :events, key], default: nil) ||
+          state_machine_event_label(model, event) ||
+          event.to_s.humanize(capitalize: false)
+      end
+
+      # A timestamp's name for people: from describe, or the model's
+      # human_attribute_name
+      def timestamp_label(name, class_name = default_class_name)
+        described_label(name) || class_name.to_s.constantize.human_attribute_name(name)
+      end
+
       def timebased_scopes
         @timebased_scopes ||= {}
       end
@@ -195,16 +282,50 @@ module Nuntius
         timebased_scopes[name] || nil
       end
 
+      # The objects a timebased template is due for now: from its
+      # timebased_scope or timestamp. Once for each object, and only for those
+      # made after the template; a template with a recurrence once a day, for
+      # all of them.
       def timebased_scope_for(template)
-        return [] unless timebased_scopes.include?(template.event.to_sym)
+        timestamp = timestamp_for(template.event, template.klass)
+        scope = if timebased_scopes.include?(template.event.to_sym)
+          timebased_scope(template.event).call(template.interval_time_range, template)
+        elsif timestamp
+          timestamp.due(template)
+        end
+        return [] unless scope
 
-        timebased_scope(template.event)
-          .call(template.interval_time_range, template)
-          .where("#{template.klass.constantize.table_name}.created_at > ?", template.created_at)
-          .where.not(
-            id: Nuntius::Message.select(:nuntiable_id)
-                                .where(template_id: template.id)
-          )
+        sent = Nuntius::Message.select(:nuntiable_id).where(template_id: template.id)
+        if timestamp && template.recurrence.present?
+          scope.where.not(id: sent.where(created_at: Time.current.beginning_of_day..))
+        else
+          scope.where("#{template.klass.constantize.table_name}.created_at > ?", template.created_at).where.not(id: sent)
+        end
+      end
+
+      private
+
+      def default_class_name
+        name.to_s.delete_suffix("Messenger")
+      end
+
+      def own_hidden_timestamps
+        @own_hidden_timestamps ||= []
+      end
+
+      def described_label(name)
+        label = event_descriptions.dig(name.to_sym, :label)
+        label.respond_to?(:call) ? label.call : label
+      end
+
+      def state_machine_event_label(model, event)
+        return unless model.respond_to?(:state_machines)
+
+        model.state_machines.each_value do |machine|
+          found = machine.events[event.to_sym]
+          return found.human_name(model) if found
+        end
+        nil
       end
     end
 

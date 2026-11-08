@@ -7,8 +7,16 @@ module Nuntius
 
       column(:description)
       column(:enabled)
-      column(:klass)
-      column(:event)
+      column(:klass) do
+        render do
+          html { |template| template.klass_label }
+        end
+      end
+      column(:event) do
+        render do
+          html { |template| template.event_label }
+        end
+      end
       column(:messages_count) do
         attribute "(select count(id) from nuntius_messages where nuntius_messages.template_id = nuntius_templates.id)"
         render do

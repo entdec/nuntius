@@ -13,14 +13,19 @@
             = f.input :name
 
           .col-span-4
-            = f.input :transport, collection: Nuntius.config.transports, include_blank: false, input_html: {data: { 'toggle-target' => 'input'}}
+            = f.input :transport, collection: nuntius_transport_options, include_blank: false, input_html: {data: { 'toggle-target' => 'input'}}
           .col-span-4
             = f.association :layout, collection: @layouts, hint: t(".layout_hint")
           .col-span-4
             = f.association :list, collection: @lists, hint: t(".list_hint")
 
           .col-span-12
-            = f.input :from, hint: t(".from_hint")
+            = nuntius_liquid_field f do
+              = f.input :from, hint: t(".from_hint")
+
+          / If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip]
+          .col-span-12
+            = nuntius_conditions f
 
           .col-span-12
             .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
@@ -36,7 +41,8 @@
 
           template data-toggle-target='toggleable' data-toggle-value='voice'
             .col-span-12
-              = f.input :text, as: :editor, mode: 'text/plain'
+              = nuntius_liquid_field f do
+                = entdec_code_editor f, :text, lang: "liquid"
 
       - if @campaign.email? && @campaign.layout
         - card.with_tab :design, padding: true

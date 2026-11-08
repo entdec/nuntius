@@ -45,6 +45,8 @@ module Nuntius
     option :admin_layout, default: "application"
     option :jobs_queue_name, default: "message"
     option :allow_custom_events, default: false
+    # The hour from which templates about a date (a birthday) are sent on it
+    option :timebased_send_hour, default: 9
     option :active_storage_service
     option :host, default: ->(message) {}, proc: true
 
@@ -94,6 +96,7 @@ module Nuntius
     def nuntiable_class_names
       return @nuntiable_class_names if @nuntiable_class_names.present?
 
+      load_nuntiable_classes
       compile_nuntiable_class_names!
     end
 
@@ -108,6 +111,11 @@ module Nuntius
 
     def transport(transport)
       @transports.push(transport) if transport
+    end
+
+    # The transport new templates start with: mail, when it's enabled
+    def default_transport
+      (@transports.map(&:to_s).include?("mail") ? "mail" : @transports.first)&.to_s
     end
 
     # Receive message status updates from Lettermint through a webhook. Nuntius creates (or repairs) the webhook
@@ -146,6 +154,16 @@ module Nuntius
       end
 
       names.sort!
+    end
+
+    # Models are nuntiable once their class is loaded: without eager loading
+    # (development) load the app's models first, or the list has only the ones
+    # used so far
+    def load_nuntiable_classes
+      return unless defined?(Rails) && Rails.application && !Rails.application.config.eager_load
+
+      models = Rails.root.join("app/models")
+      Rails.autoloaders.main.eager_load_dir(models.to_s) if models.exist?
     end
 
     def compile_nuntiable_class_names!

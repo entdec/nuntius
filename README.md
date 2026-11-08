@@ -25,15 +25,16 @@ import "satis"
 import "nuntius"
 ```
 
-and add the styles of Nuntius and the email editor to your Tailwind CSS:
+and add the styles of Nuntius, the email editor and the forms' view components ([entdec-view_components](https://github.com/entdec/view_components), a dependency from GitHub: add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile) to your Tailwind CSS:
 
 ```css
 /* app/assets/tailwind/application.css */
 @import "../builds/tailwind/nuntius";
 @import "../builds/tailwind/tess_edit";
+@import "../builds/tailwind/entdec_view_components";
 ```
 
-With jsbundling-rails (esbuild) instead of importmap-rails, your build has to find the gems' JavaScript, which imports its own modules by importmap names without `.js`: `nuntius` is the nuntius gem's `app/javascript/nuntius/application.js` and `nuntius/x` its `app/javascript/nuntius/x.js`, `tess_edit` is the tess_edit gem's `app/javascript/tess_edit/index.js` and `tess_edit/x` its `app/javascript/tess_edit/x.js`, except `tess_edit/vendor/tiptap`, which is its `vendor/javascript/tess_edit/tiptap.js`. For example, with a plugin in your esbuild config:
+With jsbundling-rails (esbuild) instead of importmap-rails, your build has to find the gems' JavaScript, which imports its own modules by importmap names without `.js`: `nuntius` is the nuntius gem's `app/javascript/nuntius/application.js` and `nuntius/x` its `app/javascript/nuntius/x.js`, `tess_edit` is the tess_edit gem's `app/javascript/tess_edit/index.js` and `tess_edit/x` its `app/javascript/tess_edit/x.js`, except `tess_edit/vendor/tiptap`, which is its `vendor/javascript/tess_edit/tiptap.js`, and `entdec/view_components` is the entdec-view_components gem's `app/javascript/entdec/view_components.js` and `entdec/components/x` its `app/components/entdec/x.js`. For example, with a plugin in your esbuild config:
 
 ```js
 // esbuild.config.mjs
@@ -205,6 +206,39 @@ class CarMessenger < Nuntius::BaseMessenger
 end
 ```
 
+### Naming events
+
+The template form reads as a sentence: *Send via [Email] based on [an event] when [Order] [is shipped]*,
+or based on [time] (see [Timebased events](#timebased-events)). The object is
+its model's `model_name.human`, the transports are in alphabetical order (new templates send by mail),
+and an event's name comes from the first of:
+
+1. the messenger's `describe`:
+
+   ```ruby
+   class OrderMessenger < ApplicationMessenger
+     describe :after_shipped, label: -> { I18n.t("orders.events.after_shipped") }
+   end
+   ```
+
+2. a Nuntius translation, `nuntius.events.<model>.<event>`:
+
+   ```yaml
+   nl:
+     nuntius:
+       events:
+         order:
+           ship: is verzonden
+           after_shipped: na verzending
+   ```
+
+3. the state machine's own name for the event, `activerecord.state_machines.<model>.events.<event>`
+   (from state_machines' translations), for the events of `nuntiable use_state_machine: true`;
+4. the event itself, `after shipped`.
+
+Name an event for how it reads after the object: "when Order *is shipped*". The transports' names are
+`nuntius.transports.<transport>`.
+
 ### Timebased events
 
 If you want to send messages based on time intervals you can add such events to your messenger with the
@@ -236,6 +270,34 @@ class CarMessenger < Nuntius::BaseMessenger
 end
 ```
 
+#### Around the object's dates and times
+
+Without a `timebased_scope`, every date and time on the object is an event already: its date and
+datetime columns, and the `_at` keys of its stores (`store_accessor :event_stamps, :processed_at`).
+A template is sent when one *is in* or *was* some time *ago*, once or again and again:
+
+- Send via [SMS] based on [time] when [User] [Born on] [is in] [4] [weeks] [every year]
+- Send via [Email] based on [time] when [Screening] [Processed at] [was] [2] [weeks] ago [once]
+
+Their events are `before_<name>` and `after_<name>`, so `before_born_on` with the interval
+`4 weeks` and the recurrence `yearly`. A recurrence (every day, week, month, quarter, half year or
+year) sends on each day the date comes round again, a month on from January 31 being February 28;
+once a day, also for objects older than the template. Dates are sent from
+`config.timebased_send_hour` (9 by default), times in the hour they're due. An interval of `0 days`
+is the day itself.
+
+`updated_at` is left out; leave out more in the messenger, and name the ones people see:
+
+```ruby
+class UserMessenger < ApplicationMessenger
+  hide_timestamps :synced_at
+  describe :born_on, label: -> { I18n.t("users.birthday") }  # [birthday] [is in] [4] [weeks]
+end
+```
+
+A `timebased_scope` of the same name (`after_processed_at`) wins, for when there's more to it than
+the date.
+
 This method also requires you to configure a template using the maintenance pages. When you choose
 a timebased scope as an event you will be prompted to enter an interval, you can enter anything in the
 following formats:
@@ -254,6 +316,20 @@ A timebased template is only sent for the objects whose messenger picks it (see 
 
 Nuntius will automatically prevent sending duplicates within the timerange you define. 
 It will also ONLY send messages for objects (the one in template class), created after you created this template, this prevents sending dozens of emails which may make no sense, when you add a new template.
+
+### Conditions
+
+A template or campaign can send only when its conditions are met: *If [all] of the following conditions are met: [Screening › Payment needed?] [is] [true]*. Instead of a Liquid `if` around the recipient,
+
+```liquid
+{% if screening.payment_needed? %}{{ screening.screening_profile.contact.email }}{% endif %}
+```
+
+the template's To is `{{ screening.screening_profile.contact.email }}` with that condition. When they aren't met there's no message.
+
+A condition is one of the Liquid variables the template or campaign renders with (see [Variables](#variables)), compared with *is*, *isn't*, *contains*, *doesn't contain*, *is more than*, *is at least*, *is less than*, *is at most*, *is between*, *is empty* or *isn't empty*: text ignoring case, numbers as numbers, dates and times as dates and times, and true or false as *true*, *yes* or *1*. A list *is* or *contains* a value when one of its elements does. The admin offers the operators for the variable's type, and a variable ending in `?` is true or false.
+
+The form chooses the variables with Liquidum's endpoint, so your app needs to mount it (see [Variables](#variables)); without it they're typed in, like `screening.payment_needed?`. They're stored in a `conditions` column (`{"match" => "all", "rules" => [{"variable", "operator", "value", "value_to"}]}`): copy in the migration with `bin/rails nuntius:install:migrations`. A campaign checks its conditions for each subscriber, with `campaign`, `subscriber` and the subscriber's object.
 
 ### Locales
 

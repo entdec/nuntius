@@ -27,5 +27,20 @@ module Nuntius
 
       routes.liquidum.variables_path(roots: Liquidum::Variables.new(roots).token)
     end
+
+    # For conditions (EntDec::Conditions::Component): a variable's labels from
+    # the root ("User › Name") and its type, from its path; nil when unknown
+    def describer(roots)
+      variables = Liquidum::Variables.new(roots)
+      at = Hash.new { |cache, path| cache[path] = variables.at(path) }
+
+      lambda do |path|
+        names = path.to_s.split(".")
+        found = names.each_with_index.map do |name, index|
+          at[names[0...index].join(".")]&.find { |variable| variable.name == name } or break
+        end
+        [found.map(&:label).join(" › "), found.last.type] if found&.any?
+      end
+    end
   end
 end

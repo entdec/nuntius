@@ -18,6 +18,7 @@ module Nuntius
       transporter = BaseTransport.class_from_name(campaign.transport).new
       campaign.list.subscribers.subscribed.each do |subscriber|
         break if campaign.reload.cancelled?
+        next unless campaign.conditions_met?(assigns_for(subscriber))
 
         transporter.deliver(new_message(subscriber))
       end
@@ -26,14 +27,8 @@ module Nuntius
     def new_message(subscriber, assigns = {})
       message = Nuntius::Message.create!(transport: campaign.transport, campaign: campaign, account: campaign.account, nuntiable: subscriber.nuntiable, subscriber: subscriber)
 
-      assigns["campaign"] = context.campaign
-      assigns["subscriber"] = subscriber
+      assigns = assigns.merge(assigns_for(subscriber))
       assigns["subscriber_url"] = subscriber.url(message)
-
-      if subscriber.nuntiable
-        name = Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)
-        assigns[name] = subscriber.nuntiable
-      end
 
       locale = nil
       if subscriber.nuntiable
@@ -62,6 +57,14 @@ module Nuntius
       scope = %w[nuntius]
       scope << (campaign.old_layout || campaign.layout).name.underscore.tr(" ", "_") if campaign.old_layout || campaign.layout
       scope.join(".")
+    end
+
+    # The Liquid variables of a subscriber's message, but its subscriber_url:
+    # the campaign, the subscriber and its nuntiable (see Campaign#variable_roots)
+    def assigns_for(subscriber)
+      assigns = {"campaign" => campaign, "subscriber" => subscriber}
+      assigns[Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)] = subscriber.nuntiable if subscriber.nuntiable
+      assigns
     end
 
     private
