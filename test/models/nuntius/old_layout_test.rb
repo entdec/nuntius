@@ -8,7 +8,7 @@ module Nuntius
       old_layout = OldLayout.create!(name: "Shop", data: %(<div class="shell">{{ content }}</div><footer>{{ template.layout.name }}</footer>))
       template = Template.new(transport: "mail", klass: "Custom", event: "welcome#x", html: "Hello {{ name }}", to: "test@example.com", old_layout: old_layout)
 
-      message = template.new_message({}, {"name" => "Ann"})
+      message = template.new_messages({}, {"name" => "Ann"}).first
 
       assert_includes message.html, %(<div class="shell"><p>Hello Ann</p>)
       assert_includes message.html, "<footer>Shop</footer>"

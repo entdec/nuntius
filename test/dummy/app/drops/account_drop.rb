@@ -3,6 +3,10 @@
 class AccountDrop < ApplicationDrop
   delegate :name, to: :@object
 
+  def users
+    @object.users.map(&:to_liquid)
+  end
+
   def logo
     ActiveStorageAttachedOneDrop.new(@object.logo)
   end

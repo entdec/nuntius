@@ -8,6 +8,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Added
 
+- A message for each addressee, rendered with the addressee as `to`: a template's To can be drops, like `{{ order.contacts }}`, sent to their email or phone number (see [Addressees](README.md#addressees)). `Template#new_messages` gives them.
 - The forms use view components from [entdec-view_components](https://github.com/entdec/view_components), a new dependency from GitHub (add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile, and `@import "../builds/tailwind/entdec_view_components";` to your Tailwind CSS): pill selects, a variable picker, conditions, Liquid fields and a code editor (CodeMirror 6, replacing Satis's editor in Nuntius's forms).
 - Liquid fields: a template's From, To and its text for SMS, push and Teams (now a plain text field), its code fields (Voice's TwiML, now with Liquid highlighted, Slack's and Teams' payloads, an old layout's subject and body), and a campaign's From and Voice text, suggest the object's variables while typing `{{`, with a `{ }` button to browse them, like the email editor's fields. They follow the class chosen in the form.
 - A template's description is made from its sentence and conditions (*Email when User activate, if User › Active? is true*) while Auto is checked, which it is by default (`auto_description`): when they change, or when there's no description yet. Typing one unchecks it. Copy in the migration with `bin/rails nuntius:install:migrations`.
@@ -36,6 +37,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Changed
 
+- A template with several addresses in its To renders a message for each, instead of the mail and push transports copying one message. `Template#new_message` is deprecated, and gives only the first, no longer one with every address in its To.
 - Every new mail and LMTP template and campaign needs a layout.
 - Mail campaigns to a list that allows unsubscribing must contain the Manage subscription block.
 - Campaigns are only published by `Nuntius::CampaignPublishJob`, and only once they're scheduled: `publish` goes from `scheduled` to `sending`, no longer from `draft`, and the admin's Publish action (`POST /admin/campaigns/:id/publish`) is replaced by Schedule. The job no longer publishes draft campaigns whose `publish_at` has passed.

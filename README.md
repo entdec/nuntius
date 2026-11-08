@@ -206,6 +206,16 @@ class CarMessenger < Nuntius::BaseMessenger
 end
 ```
 
+### Addressees
+
+A template sends a message to each addressee in its To, rendered for that addressee, who the template's Liquid can use as `to`. A To of addresses separated by commas sends a message to each, with the address as `to`. A To of a single variable can also give drops (or hashes), or a list of them, like `{{ order.contacts }}`: each gets its own message, at its `email` for mail and LMTP, or its `phone_number` for SMS and voice, and is the message's `to`, so a template can greet each one:
+
+```liquid
+Dear {{ to.name }},
+```
+
+Drops without an address for the transport are left out.
+
 ### Naming events
 
 The template form reads as a sentence: *Send via [Email] based on [an event] on [Order] [shipped]*,

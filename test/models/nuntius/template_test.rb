@@ -65,7 +65,7 @@ module Nuntius
     test "template with attachment from url" do
       VCR.use_cassette("example_logo_with_content_disposition", match_requests_on: [:body]) do
         t = Template.new(transport: "mail", html: %(Hello {%attach 'https://www.example.com/assets/images/logo.png'%}), to: "test@example.com")
-        m = t.new_message({})
+        m = t.new_messages({}).first
         assert_equal "<p>Hello</p>\n", m.html
         assert_equal 1, m.attachments.size
 
@@ -82,7 +82,7 @@ module Nuntius
       account.logo.attach(io: File.open(Rails.root.join("..", "..", "test", "fixtures", "files", "logo_blue@3x.png")), filename: "logo_blue@3x.png", content_type: "image/png")
 
       t = Template.new(transport: "mail", html: %(Hello {%attach account.logo%}), to: "test@example.com")
-      m = t.new_message({}, {"account" => account})
+      m = t.new_messages({}, {"account" => account}).first
       assert_equal "<p>Hello</p>\n", m.html
       assert_equal 1, m.attachments.size
 
@@ -98,7 +98,7 @@ module Nuntius
       account.attachments.attach(io: File.open(Rails.root.join("..", "..", "test", "fixtures", "files", "logo_blue@3x.png")), filename: "logo_blue@3x.png", content_type: "image/png")
 
       t = Template.new(transport: "mail", html: %(Hello {%assign atts = account.attachments | where: 'filename', 'logo_blue@3x.png'%}{%attach atts.first%}), to: "test@example.com")
-      m = t.new_message({}, {"account" => account})
+      m = t.new_messages({}, {"account" => account}).first
       assert_equal "<p>Hello</p>\n", m.html
       assert_equal 1, m.attachments.size
 

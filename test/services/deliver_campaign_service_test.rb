@@ -49,7 +49,7 @@ module Nuntius
       template.assign_design(**design_in(template.layout, "Your order"))
       template.save!
 
-      html = template.new_message({}).html
+      html = template.new_messages({}).first.html
 
       assert_includes html, "Your order"
       assert_not_includes html, "Had enough?"

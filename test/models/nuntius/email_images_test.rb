@@ -140,7 +140,7 @@ module Nuntius
       @template.save!
 
       assert_includes @template.html, "{{ 'banner.png' | image_url }}"
-      html = @template.new_message({}).html
+      html = @template.new_messages({}).first.html
       assert_match %r{src="https://#{Regexp.escape(Nuntius.config.host(nil))}/rails/active_storage/blobs/redirect/[^/"]+/banner.png"}, html
     end
 
@@ -149,7 +149,7 @@ module Nuntius
       @template.assign_content([image_node({"image" => "eyJfcmFpbHMi--1f2e", "source" => "upload"}, src: url)], %(<mj-section><mj-column><mj-image src="#{url}" /></mj-column></mj-section>))
       @template.save!
 
-      assert_includes @template.new_message({}).html, %(src="#{url}")
+      assert_includes @template.new_messages({}).first.html, %(src="#{url}")
     end
   end
 end

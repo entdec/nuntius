@@ -40,7 +40,7 @@ module Nuntius
     test "sending renders the Liquid in the whole email, without Markdown" do
       template = template_in(create_layout)
 
-      message = template.new_message({}, {"order" => {"number" => "1042"}})
+      message = template.new_messages({}, {"order" => {"number" => "1042"}}).first
 
       assert_includes message.html, "Your order 1042"
       assert_includes message.html, "<title>Order 1042</title>"

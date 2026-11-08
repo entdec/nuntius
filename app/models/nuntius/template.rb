@@ -46,27 +46,60 @@ module Nuntius
 
     yamlify :metadata
 
-    # account is the account the message is sent for, by default the template's own
-    def new_message(object, assigns = {}, params = {}, account: self.account)
-      message = Nuntius::Message.new(template: self, account: account, transport: transport)
-      message.nuntiable = object unless object.is_a? Hash
+    # Where a drop (or hash) in its To is sent to, by transport (see addressees)
+    ADDRESS_ATTRIBUTES = {"mail" => "email", "lmtp" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
 
+    # The messages it sends: one for each addressee in its To (see addressees),
+    # rendered with the addressee as `to`. account is the account they're sent
+    # for, by default the template's own.
+    def new_messages(object, assigns = {}, params = {}, account: self.account)
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
       locale = params[:locale].to_sym if params[:locale]
 
-      options = {registers: {"template" => self, "message" => message}}
+      addressees(assigns, locale).map do |address, to|
+        message = Nuntius::Message.new(template: self, account: account, transport: transport, to: address)
+        message.nuntiable = object unless object.is_a? Hash
 
-      message.to = render(:to, assigns, locale, options).split(",").map(&:strip).reject { |to| to == "Liquid error internal" }.reject(&:empty?).join(",")
-      return unless message.to.present?
+        message_assigns = assigns.merge("to" => to)
+        options = {registers: {"template" => self, "message" => message}}
 
-      message.from = render(:from, assigns, locale, options).split(",").reject(&:empty?).join(",")
-      message.subject = render(:subject, assigns, locale, options)
-      message.html = render(:html, assigns, locale, options.merge(layout: old_layout&.data))
-      message.text = render(:text, assigns, locale, options)
-      message.payload = render(:payload, assigns, locale, options)
+        message.from = render(:from, message_assigns, locale, options).split(",").reject(&:empty?).join(",")
+        message.subject = render(:subject, message_assigns, locale, options)
+        message.html = render(:html, message_assigns, locale, options.merge(layout: old_layout&.data))
+        message.text = render(:text, message_assigns, locale, options)
+        message.payload = render(:payload, message_assigns, locale, options)
 
-      message
+        message
+      end
+    end
+
+    # The first of its messages: deprecated, see new_messages
+    def new_message(...)
+      Nuntius::Deprecator.new.deprecation_warning("Template#new_message",
+        "use Template#new_messages, which gives a message for each addressee")
+      new_messages(...).first
+    end
+
+    # Whom its To sends to, as [address, to] pairs, where to is what a message
+    # to the address renders with as `to`. A To of a single variable, like
+    # {{ order.contacts }}, can give drops or hashes (or a list of them): each
+    # is an addressee, at its address attribute for the transport (see
+    # ADDRESS_ATTRIBUTES), and is the message's `to`. Otherwise each of the
+    # comma separated addresses the To renders to is one, and is its `to`.
+    def addressees(assigns, locale)
+      value = to_value(assigns, locale)
+      value = render(:to, assigns, locale) unless value.present? && !value.is_a?(String)
+
+      Array.wrap(value).flat_map do |to|
+        to = to.to_liquid
+        if to.is_a?(Hash) || to.is_a?(Liquid::Drop)
+          address = address_of(to)
+          address.present? ? [[address, to]] : []
+        else
+          to.to_s.split(",").map(&:strip).reject { |address| address.empty? || address == "Liquid error internal" }.map { |address| [address, address] }
+        end
+      end
     end
 
     # A class templates are sent for, by its name for people
@@ -205,6 +238,27 @@ module Nuntius
 
       self.event = "#{direction}_#{timestamp}"
       self.interval = "#{interval_amount.to_i} #{interval_unit}" if INTERVAL_UNITS.include?(interval_unit) && interval_amount.present?
+    end
+
+    # What a To of only one variable (with filters) is, unrendered: nil for
+    # anything else, or when evaluating it fails (render it instead)
+    def to_value(assigns, locale)
+      nodes = Liquid::Template.parse(to.to_s).root.nodelist.reject { |node| node.is_a?(String) && node.strip.empty? }
+      return unless nodes.one? && nodes.first.is_a?(Liquid::Variable)
+
+      context = Liquid::Context.build(environments: [assigns.merge("template" => self).stringify_keys], registers: {"template" => self})
+      I18n.with_locale(locale) { nodes.first.render(context) }
+    rescue => e
+      Nuntius.config.logger.call.warn "Can't evaluate the To of template #{id}: #{e.message}"
+      nil
+    end
+
+    def address_of(to)
+      attribute = ADDRESS_ATTRIBUTES[transport.to_s]
+      return unless attribute
+
+      value = to.is_a?(Hash) ? to.stringify_keys[attribute] : to.invoke_drop(attribute)
+      value.to_s.strip
     end
 
     def render(attr, assigns, locale, options = {})
