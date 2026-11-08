@@ -15,7 +15,9 @@ module Nuntius
     belongs_to :old_layout, class_name: "Nuntius::OldLayout", optional: true
     belongs_to :layout, optional: true
     validates_same_account :list, :layout
-    has_many :messages, class_name: "Nuntius::Message"
+    has_many :messages, -> { where(test_message: false) }, class_name: "Nuntius::Message"
+    # Sent to the list's test recipients, before the campaign is (see #send_test)
+    has_many :test_messages, -> { where(test_message: true) }, class_name: "Nuntius::Message"
     validates :name, presence: true
     validate :subscription_link, if: -> { email_design? && list&.allow_unsubscribe }
 
@@ -51,6 +53,12 @@ module Nuntius
       after_transition(on: :publish) do |campaign, transition|
         DeliverCampaignService.perform_later(campaign: campaign)
       end
+    end
+
+    # Sends the campaign as it is now to its list's test recipients, as often as
+    # needed; returns their test messages
+    def send_test
+      DeliverCampaignService.perform(campaign: self, test_only: true).messages
     end
 
     # What its Liquid can use (see Variables and DeliverCampaignService): itself,

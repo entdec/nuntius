@@ -3,7 +3,9 @@
 valentines:
   account: one
   name: Valentines
+  slug: valentines
 
 helpers:
   account: one
   name: Helpers
+  slug: helpers

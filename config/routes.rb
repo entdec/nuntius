@@ -38,6 +38,8 @@ Nuntius::Engine.routes.draw do
         post "schedule", action: "schedule"
         post "deschedule", action: "deschedule"
         post "cancel", action: "cancel"
+        # The test button submits the campaign form, a PATCH
+        match "send_test", action: "send_test", via: [:post, :patch]
         get "media", to: "media#index", defaults: {owner: "campaign"}
         post "media", to: "media#create", defaults: {owner: "campaign"}
         post "media/compile", to: "media#compile", defaults: {owner: "campaign"}

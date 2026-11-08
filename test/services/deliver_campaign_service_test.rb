@@ -79,5 +79,22 @@ module Nuntius
 
       assert_equal [juliet], campaign.messages.map(&:subscriber)
     end
+
+    test "a test goes to the list's test recipients, whatever the conditions, as often as needed" do
+      list = nuntius_lists(:valentines)
+      juliet = list.subscribers.create!(email: "juliet@example.com", first_name: "Juliet", test_recipient: true)
+      list.subscribers.create!(email: "tybalt@example.com", first_name: "Tybalt", test_recipient: true, unsubscribed_at: Time.current)
+      campaign = campaign_in(blocks_layout, list: list)
+      campaign.conditions = {"match" => "all", "rules" => {"0" => {"variable" => "subscriber.first_name", "operator" => "is", "value" => "romeo"}}}
+      campaign.save!
+
+      Mail::TestMailer.deliveries.clear
+      perform_enqueued_jobs { 2.times { campaign.send_test } }
+
+      assert_equal [juliet, juliet], campaign.test_messages.map(&:subscriber)
+      assert_equal ["[Test] News for Juliet"] * 2, Mail::TestMailer.deliveries.map(&:subject)
+      assert_empty campaign.messages
+      assert campaign.reload.draft?
+    end
   end
 end

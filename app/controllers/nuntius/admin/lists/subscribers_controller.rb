@@ -58,7 +58,7 @@ module Nuntius
         private
 
         def subscriber_params
-          params.require(:subscriber).permit(:first_name, :last_name, :email, :phone_number, :metadata_yaml, tags: [])
+          params.require(:subscriber).permit(:first_name, :last_name, :email, :phone_number, :test_recipient, :metadata_yaml, tags: [])
         end
 
         def import_params

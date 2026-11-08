@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -229,6 +229,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_130000) do
     t.jsonb "feedback"
     t.jsonb "headers", default: {}, null: false
     t.string "envelope_from"
+    t.boolean "test_message", default: false, null: false
     t.index ["account_id"], name: "index_nuntius_messages_on_account_id"
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
@@ -260,6 +261,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_130000) do
     t.string "tags"
     t.datetime "unsubscribed_at", precision: nil
     t.datetime "updated_at", null: false
+    t.boolean "test_recipient", default: false, null: false
     t.index ["list_id"], name: "index_nuntius_subscribers_on_list_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_subscribers_on_nuntiable_type_and_nuntiable_id"
   end

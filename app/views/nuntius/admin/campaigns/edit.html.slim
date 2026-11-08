@@ -1,6 +1,9 @@
 - if @campaign.draft?
   = sts.form_for [:admin, @campaign] do |f|
     = sts.card :nuntius_admin_campaigns, icon: 'fal fa-megaphone' do |card|
+      - if @campaign.persisted?
+        - card.with_action
+          button.button type="submit" formaction=send_test_admin_campaign_path(@campaign) = t(".send_test")
       - card.with_action
         = f.continue
       - card.with_action

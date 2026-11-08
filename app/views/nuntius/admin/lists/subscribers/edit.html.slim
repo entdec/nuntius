@@ -13,4 +13,6 @@
       .col-span-12
         = f.input :email
       .col-span-12
+        = f.input :test_recipient, as: :switch, hint: t('.test_recipient_hint')
+      .col-span-12
         = entdec_code_editor f, :metadata_yaml, lang: "yaml", label: t('.metadata')

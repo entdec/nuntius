@@ -40,6 +40,20 @@ module Nuntius
         respond_with :admin, @campaign, action: :edit
       end
 
+      # Saves the campaign and sends it to its list's test recipients
+      def send_test
+        @campaign.assign_attributes(campaign_params) if campaign_params
+        assign_email_design(@campaign, :campaign) if @campaign.email?
+        return render(:edit, status: :unprocessable_entity) unless @campaign.save(context: :admin)
+
+        if @campaign.list.subscribers.test_recipients.exists?
+          messages = @campaign.send_test
+          redirect_to :edit_admin_campaign, notice: t(".sent", count: messages.size, to: messages.map(&:to).to_sentence), status: :see_other
+        else
+          redirect_to :edit_admin_campaign, alert: t(".no_test_recipients", list: @campaign.list.name), status: :see_other
+        end
+      end
+
       # CampaignPublishJob publishes it at its publish_at, or within a minute without one
       def schedule
         @campaign.schedule! if @campaign.can_schedule?

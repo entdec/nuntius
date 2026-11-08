@@ -24,6 +24,8 @@ en:
         name: Name
         slug: Slug
         subscribers_count: Subscriber count
+      nuntius/subscriber:
+        test_recipient: Receives test messages
       nuntius/template:
         description: Description
         enabled: Enabled
@@ -142,6 +144,12 @@ en:
           messages_clicked: Messages clicked
           deschedule: Back to draft
           cancel: Cancel campaign
+          send_test: Send test
+        send_test:
+          sent:
+            one: "Saved, and sent a test message to %{to}."
+            other: "Saved, and sent %{count} test messages to %{to}."
+          no_test_recipients: "Saved, but no subscriber of %{list} receives test messages. Turn it on for one in the list."
         index:
           card:
             nuntius_admin_campaigns:
@@ -191,6 +199,7 @@ en:
           edit:
             metadata: Metadata
             subscribers: Subscribers
+            test_recipient_hint: "Receives a campaign's test messages, sent with its Send test button."
           import:
             title: Import subscribers
             file_label: CSV file

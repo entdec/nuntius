@@ -8,6 +8,8 @@ module Nuntius
     belongs_to :nuntiable, polymorphic: true, optional: true
 
     scope :subscribed, -> { where(unsubscribed_at: nil) }
+    # Who receives a campaign's test messages (see Campaign#send_test)
+    scope :test_recipients, -> { subscribed.where(test_recipient: true) }
 
     yamlify :metadata
 

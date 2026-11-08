@@ -4,14 +4,28 @@ module Nuntius
   class DeliverCampaignService < ApplicationService
     context do
       attribute :campaign
+      # Only to the list's test recipients, whatever the conditions, leaving the
+      # campaign as it is
+      attribute :test_only, default: false
+      attribute :messages, default: -> { [] }
       validates :campaign, presence: true
     end
 
-    delegate :campaign, to: :context
+    delegate :campaign, :test_only, :messages, to: :context
 
     def perform
+      return deliver_test if test_only
+
       deliver
       campaign.sent! if campaign.sending?
+    end
+
+    def deliver_test
+      transporter = BaseTransport.class_from_name(campaign.transport).new
+      campaign.list.subscribers.test_recipients.each do |subscriber|
+        messages << new_message(subscriber)
+        transporter.deliver(messages.last)
+      end
     end
 
     def deliver
@@ -25,7 +39,7 @@ module Nuntius
     end
 
     def new_message(subscriber, assigns = {})
-      message = Nuntius::Message.create!(transport: campaign.transport, campaign: campaign, account: campaign.account, nuntiable: subscriber.nuntiable, subscriber: subscriber)
+      message = Nuntius::Message.create!(transport: campaign.transport, campaign: campaign, account: campaign.account, nuntiable: subscriber.nuntiable, subscriber: subscriber, test_message: test_only)
 
       assigns = assigns.merge(assigns_for(subscriber))
       assigns["subscriber_url"] = subscriber.url(message)
@@ -47,6 +61,7 @@ module Nuntius
       end
 
       message.subject = render(:subject, assigns, locale, message: message)
+      message.subject = "[Test] #{message.subject}" if test_only
       message.html = render(:html, assigns, locale, message: message, layout: campaign.old_layout&.data)
 
       message.save!

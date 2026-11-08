@@ -32,6 +32,7 @@ module Nuntius
       column(:email)
       column(:phone_number)
       column(:unsubscribed_at)
+      column(:test_recipient)
       column(:tags) do
         render do
           html do |subscriber|

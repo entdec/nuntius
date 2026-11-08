@@ -25,6 +25,8 @@ nl:
         name: Naam
         slug: Slug
         subscribers_count: Aantal abonnees
+      nuntius/subscriber:
+        test_recipient: Ontvangt testmails
       nuntius/template:
         description: Omschrijving
         enabled: Ingeschakeld
@@ -155,6 +157,12 @@ nl:
           messages_clicked: Berichten geklikt
           deschedule: Terug naar concept
           cancel: Campagne annuleren
+          send_test: Verstuur test
+        send_test:
+          sent:
+            one: "Opgeslagen, en een testmail verstuurd naar %{to}."
+            other: "Opgeslagen, en %{count} testmails verstuurd naar %{to}."
+          no_test_recipients: "Opgeslagen, maar geen abonnee van %{list} ontvangt testmails. Zet het aan bij een abonnee in de lijst."
         index:
           card:
             nuntius_admin_campaigns:
@@ -204,6 +212,7 @@ nl:
           edit:
             metadata: Metadata
             subscribers: Abonnees
+            test_recipient_hint: "Ontvangt de testmails van een campagne, verstuurd met de knop Verstuur test."
           import:
             title: Abonnees importeren
             file_label: CSV-bestand
