@@ -21,7 +21,7 @@ module Nuntius
       end
 
       def show
-        redirect_to :edit_admin_locales, status: :see_other
+        redirect_to :edit_admin_locale, status: :see_other
       end
 
       def edit
