@@ -14,7 +14,13 @@ const embed = {
   on: true,
   off: false,
   hint: "Sends the image with every email instead of linking to it. Larger emails, but it shows without loading images.",
-  visible: (node, editor) => imageSource(node, editor) === "upload"
+  visible: (node, editor) => inEmail(editor) && imageSource(node, editor) === "upload"
+}
+
+// Only an email can embed an image: TessEdit's other kits (e.g. a host app's
+// PDF kit) use this Image block too. An email's root is a "root" block.
+function inEmail(editor) {
+  return !editor?.doc || editor.doc.type === "root"
 }
 
 function withEmbed(group, index) {

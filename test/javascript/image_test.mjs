@@ -66,6 +66,14 @@ test("the embed setting shows only for uploaded images", () => {
   assert.equal(embed.visible(createNode("image", { data: { image: "abc" } }), { media: { enabled: false } }), false)
 })
 
+test("the embed setting shows only in an email, not in another kit's document such as a PDF", () => {
+  const embed = getBlock("image").fields[0].fields.find((field) => field.key === "data.embed")
+  const uploaded = createNode("image", { data: { image: "abc" } })
+
+  assert.equal(embed.visible(uploaded, { media: { enabled: true }, doc: createDocument() }), true)
+  assert.equal(embed.visible(uploaded, { media: { enabled: true }, doc: { type: "pdf", children: [] } }), false)
+})
+
 test("the embed setting comes right after the image", () => {
   const keys = getBlock("image").fields[0].fields.map((field) => field.key)
   assert.equal(keys[keys.indexOf("attributes.src") + 1], "data.embed")
