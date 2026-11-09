@@ -4,6 +4,7 @@
 // attaches it and refers to it by cid:.
 
 import image from "tess_edit/blocks/image"
+import { kitOf } from "tess_edit/core/registry"
 import { IMAGE_FIELD, imageSource } from "tess_edit/core/media"
 import { liquidImage, uploadedName } from "nuntius/blocks/image_names"
 
@@ -18,9 +19,9 @@ const embed = {
 }
 
 // Only an email can embed an image: TessEdit's other kits (e.g. a host app's
-// PDF kit) use this Image block too. An email's root is a "root" block.
+// PDF kit) use this Image block too.
 function inEmail(editor) {
-  return !editor?.doc || editor.doc.type === "root"
+  return !editor?.doc || kitOf(editor.doc)?.key === "email"
 }
 
 function withEmbed(group, index) {

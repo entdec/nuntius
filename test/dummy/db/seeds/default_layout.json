@@ -10,7 +10,7 @@
     "fontFamily": "Helvetica, Arial, sans-serif",
     "lineHeight": "1.6"
   },
-  "type": "root",
+  "type": "email",
   "version": 1,
   "children": [
     {

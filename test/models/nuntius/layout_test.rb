@@ -17,7 +17,7 @@ module Nuntius
         document = Layout.starting_document(key)
         mjml = file_fixture("starting_layouts/#{key}.mjml").read
 
-        assert_equal "root", document["type"]
+        assert_equal "email", document["type"]
         assert(document.to_json.scan(/"id":"([^"]+)"/).flatten.all? { |id| id.start_with?("b") })
         layout = Layout.create!(name: key, json: document, mjml: mjml)
         assert layout.html.present?

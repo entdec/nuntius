@@ -101,7 +101,7 @@ module Nuntius
     test "older references, a signed id or a blob URL, become the image's name" do
       logo = @layout.attachments.first
       host = "https://#{Nuntius.config.host(nil)}"
-      document = {"id" => "broot", "type" => "root", "attributes" => {}, "data" => {}, "children" => [
+      document = {"id" => "broot", "type" => "email", "attributes" => {}, "data" => {}, "children" => [
         image_node({"image" => logo.blob.signed_id, "source" => "upload"}),
         {"id" => "bsection", "type" => "section", "attributes" => {"background-url" => "#{host}/rails/active_storage/blobs/redirect/#{logo.blob.signed_id}/logo.png"}, "data" => {"background" => "#{host}/rails/active_storage/blobs/redirect/#{logo.blob.signed_id}/logo.png"}, "children" => []}
       ]}

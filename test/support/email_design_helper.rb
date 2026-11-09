@@ -25,7 +25,7 @@ module EmailDesignHelper
 
   def layout_json(example: "Example content")
     {
-      "id" => "broot", "type" => "root", "attributes" => {}, "data" => {"subject" => "", "preheader" => ""},
+      "id" => "broot", "type" => "email", "attributes" => {}, "data" => {"subject" => "", "preheader" => ""},
       "children" => [
         {"id" => "bheader", "type" => "section", "attributes" => {}, "data" => {}, "children" => []},
         {"id" => "bcontent", "type" => "content", "attributes" => {}, "data" => {}, "children" => [text_node("bexample", example)]}
