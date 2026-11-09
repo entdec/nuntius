@@ -34,16 +34,57 @@ module Nuntius
 
     attr_reader :owner
 
+    # Moves an account's translations in one scope to another, in every
+    # locale and language: when a template's scope changes, or a layout's
+    # name. Ones already in the new scope stay as they are.
+    def self.move(account_id, from, to)
+      from = from.to_s.split(".")
+      to = to.to_s.split(".")
+      return if from.empty? || to.empty? || from == to || to.first(from.size) == from
+
+      Nuntius::Locale.owned_by(account_id).in_order.each do |record|
+        data = (record.data || {}).deep_dup
+        moved = data.values.select { |translations| translations.is_a?(Hash) }.map { |translations| move_in(translations, from, to) }
+        next unless moved.any?
+
+        record.data = data
+        record.save!(validate: false)
+      end
+    end
+
+    def self.move_in(translations, from, to)
+      *parents, last = from
+      parent = parents.inject(translations) { |level, segment| level.is_a?(Hash) ? level[segment] : nil }
+      return false unless parent.is_a?(Hash) && parent[last].is_a?(Hash)
+
+      *target_parents, target_last = to
+      target = target_parents.inject(translations) do |level, segment|
+        return false unless level[segment].nil? || level[segment].is_a?(Hash)
+        level[segment] ||= {}
+      end
+      return false unless target[target_last].nil? || target[target_last].is_a?(Hash)
+
+      target[target_last] = parent.delete(last).deep_merge(target[target_last] || {})
+      # Removes the levels it leaves empty
+      parents.size.downto(1) do |depth|
+        level = parents.first(depth).inject(translations) { |hash, segment| hash[segment] }
+        break unless level == {}
+
+        parents.first(depth - 1).inject(translations) { |hash, segment| hash[segment] }.delete(parents[depth - 1])
+      end
+      true
+    end
+    private_class_method :move_in
+
     def initialize(owner)
       @owner = owner
     end
 
-    # The languages of the account's locales, the app's default first; the
-    # app's own when it has none
+    # The app's languages and those in the account's locales, the app's
+    # default first
     def locales
       @locales ||= begin
-        found = records.flat_map { |record| (record.data || {}).keys }.map(&:to_s).uniq
-        found = I18n.available_locales.map(&:to_s) if found.empty?
+        found = (I18n.available_locales.map(&:to_s) + records.flat_map { |record| (record.data || {}).keys.map(&:to_s) }).uniq
         default = I18n.default_locale.to_s
         found.sort_by { |locale| [(locale == default) ? 0 : 1, locale] }
       end

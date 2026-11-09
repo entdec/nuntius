@@ -46,6 +46,8 @@ module Nuntius
 
     yamlify :metadata
 
+    after_update :move_translations, if: -> { (saved_changes.keys & %w[old_layout_id layout_id klass event transport description]).any? }
+
     # Where a drop (or hash) in its To is sent to, by transport (see addressees)
     ADDRESS_ATTRIBUTES = {"mail" => "email", "lmtp" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
 
@@ -178,11 +180,16 @@ module Nuntius
 
     # The scope of the keys starting with a dot that its Liquid translates
     # (see I18nStore): its layout's, then its class, event, transport and
-    # description
+    # description. When it changes, its translations move along (see
+    # Translations.move).
     def translation_scope
+      Template.translation_scope(old_layout || layout, klass, event, transport, description)
+    end
+
+    def self.translation_scope(layout, klass, event, transport, description)
       scope = []
-      scope << (old_layout || layout).translation_scope if old_layout || layout
-      scope << klass.underscore.tr("/", "_")
+      scope << layout.translation_scope if layout
+      scope << klass.to_s.underscore.tr("/", "_")
       scope << event
       scope << transport
       scope << description.underscore.gsub(/[^a-z]+/, "_") if description
@@ -222,6 +229,12 @@ module Nuntius
     end
 
     private
+
+    def move_translations
+      layout = OldLayout.find_by(id: old_layout_id_before_last_save) || Layout.find_by(id: layout_id_before_last_save)
+      before = Template.translation_scope(layout, klass_before_last_save, event_before_last_save, transport_before_last_save, description_before_last_save)
+      Translations.move(account_id, before, translation_scope)
+    end
 
     def messenger
       return if klass.blank? || klass == "Custom" || !klass.safe_constantize

@@ -14,6 +14,8 @@ module Nuntius
 
     yamlify :metadata
 
+    after_update -> { Translations.move(account_id, OldLayout.new(name: name_before_last_save).translation_scope, translation_scope) }, if: :saved_change_to_name?
+
     # As Layout's
     def translation_scope
       name.to_s.underscore.tr(" ", "_")

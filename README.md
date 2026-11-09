@@ -334,7 +334,7 @@ en:
 
 A template uses the locales of its own account, so a global template uses its owner's; what they don't have comes from your app's own translations. The message's language is its messenger's `locale` (`locale ->(user) { user.locale }`), or the event's `locale:`.
 
-A key that starts with a dot is looked up in the template's scope first, then towards the root, so one template can have its own version of a translation. The scope is the template's layout, class, event, transport and description, like `default.user.created.mail.welcome_email_for_a_new_user`, so `{{ '.greeting' | t }}` uses `default.user.created.mail.welcome_email_for_a_new_user.greeting`, then `default.user.created.mail.greeting`, and so on up to `greeting`. A campaign's scope, and a layout's, is the layout's name (`default`), so a layout's keys work in its templates and campaigns too. Changing a template's layout, class, event, transport or description (also when Auto makes it) changes its scope, and the translations of its keys stay behind.
+A key that starts with a dot is looked up in the template's scope first, then towards the root, so one template can have its own version of a translation. The scope is the template's layout, class, event, transport and description, like `default.user.created.mail.welcome_email_for_a_new_user`, so `{{ '.greeting' | t }}` uses `default.user.created.mail.welcome_email_for_a_new_user.greeting`, then `default.user.created.mail.greeting`, and so on up to `greeting`. A campaign's scope, and a layout's, is the layout's name (`default`), so a layout's keys work in its templates and campaigns too. Changing a template's layout, class, event, transport or description (also when Auto makes it, or converting it to a new layout) changes its scope, and the translations in its old scope move along, in every locale of its account; ones already in the new scope stay. Renaming a layout moves the translations in its scope the same way. A global template's translations are in other accounts' locales too, and stay behind.
 
 If an account has several locales for a language, they're merged in the order they were created, later ones winning.
 
@@ -699,3 +699,9 @@ With OrbStack the dummy app is available on http://app.nuntius.orb.local.
 Credentials for the dummy app (e.g. Lettermint) live in test/dummy/config/credentials/development.yml.enc, edit them with
 `bin/rails credentials:edit --environment development` from test/dummy (not from the root). The key is not checked in, put it in
 test/dummy/config/credentials/development.key or set `RAILS_MASTER_KEY` (e.g. in your mise.toml), which takes precedence.
+
+## Backlog
+
+- Machine translation in the email editor: fill a missing language from another one with DeepL or an LLM, as a suggestion to accept, keeping the placeholders.
+- A translation block in the email editor: a block whose text is a translation key, edited per language in its settings, instead of selecting text and making it translatable.
+- A unique database index on a locale's account and key, now that the model validates it. Existing duplicates need merging first.

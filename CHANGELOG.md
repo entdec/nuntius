@@ -34,6 +34,8 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The `scheduled` campaign state, with the `schedule` and `deschedule` events and Schedule and Back to draft actions in the admin. `Nuntius::CampaignPublishJob` publishes scheduled campaigns at their `publish_at` (run it from cron), or within a minute without one.
 - Suggestions of the Liquid variables a design can use in the email editor, from Liquidum's variables endpoint when the host app mounts Liquidum (see [Variables](README.md#variables)). Nuntius's drops are now `Liquidum::Drop`s.
 - Translations in the email editor: a `{{ '.greeting' | t }}` shows as its text in a language chosen in the editor, lists every language's text (missing ones marked) when pointed at, each editable there, and selected text can be made translatable under a new key. Typing `{{ '` suggests the keys. Templates, campaigns and layouts get a Translations tab with their keys and texts per language. Texts are saved in the account's locales (see [Locales](README.md#locales)).
+- A template's translations move along when its scope changes (its layout, class, event, transport or description, also when converted to a new layout), and a layout's when it's renamed.
+- A locale's key is unique in its account, and its data must start with languages (`en`, `pt-BR`), each with its translations under it. YAML that can't be read is a validation error instead of an exception.
 - Default views in the admin tables: open (draft and scheduled), sent and cancelled campaigns; enabled and disabled templates; subscribed and unsubscribed subscribers of a list.
 
 ### Changed
@@ -144,7 +146,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
    - Code that read or wrote `metadata` on messages uses `feedback`, `headers` and `envelope_from`. Direct messages (`Nuntius::Message.new(…)`) need an `account`.
 8. **Make new layouts and convert your templates.** Create layouts in the admin, then convert each template with an old layout from its page. Until then it keeps sending with its old layout.
 
-   Translation keys of a template start with its layout's name. A template converted into a layout with another name gets new keys, so give the new layout the old one's name when you rely on them.
+   Translation keys of a template start with its layout's name. Converting it to a layout with another name moves its translations to the new layout's scope.
 
    Values the old layout read from the template's metadata, like `{{ template.metadata.logo_url }}`, should come from a drop in the new design, like `{{ user.account.logo_url }}`. The template's page shows which ones its old layout reads, and what their value is, before you convert; after converting, it warns about any left in the design.
 9. **Replace `{{ subscriber_link }}`** in your own templates with the Manage subscription block, or with a link to `{{ subscriber_url }}`.
@@ -179,3 +181,5 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
     ```
 
     Campaigns' keys starting with a dot are now in their layout's scope, without `nuntius` (see Changed): move them up in the locales.
+
+12. **Check your locales.** A locale that has the same key as another of its account, or data that doesn't start with languages, can't be saved any more. Find them with `Nuntius::Locale.all.reject(&:valid?)`, and merge or fix them.

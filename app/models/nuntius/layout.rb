@@ -17,6 +17,8 @@ module Nuntius
     before_save :compile, if: :mjml_changed?
     before_save :store_image_names, if: :json_changed?
     after_save :recompose_emails, if: :saved_change_to_mjml?
+    # Its templates' and campaigns' translations are in its scope
+    after_update -> { Translations.move(account_id, Layout.new(name: name_before_last_save).translation_scope, translation_scope) }, if: :saved_change_to_name?
 
     # What its Liquid can use (see Variables): it's rendered as part of a
     # template or a campaign, with the one that uses it

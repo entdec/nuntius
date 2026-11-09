@@ -5,7 +5,15 @@ nl:
   activerecord:
     errors:
       messages:
+        invalid_yaml: "is geen geldige YAML: %{problem}"
         other_account: hoort bij een ander account
+      models:
+        nuntius/locale:
+          attributes:
+            data:
+              not_by_language: "moet met de talen beginnen, zoals en: of nl:"
+              not_a_language: "begint met %{key}, wat geen taal is zoals en, nl of pt-BR"
+              not_by_key: "moet vertalingen per sleutel hebben onder %{key}:"
     attributes:
       nuntius/campaign:
         from: Van

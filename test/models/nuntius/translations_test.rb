@@ -6,15 +6,20 @@ module Nuntius
   # What a template's t filters say in each language, and saving them (see
   # test/fixtures/nuntius/locales.yml)
   class TranslationsTest < ActiveSupport::TestCase
+    include EmailDesignHelper
+
     setup do
       @template = nuntius_templates(:two_recipients_with_translations)
       @translations = Translations.new(@template)
     end
 
-    test "the languages of the account's locales, the default first" do
+    test "the app's languages and those of the account's locales, the default first" do
       Locale.create!(account: accounts(:one), key: "de", data: {"de" => {"hello" => "Hallo"}})
 
       assert_equal %w[en de nl], @translations.locales
+      I18n.stub(:available_locales, %i[en nl fr]) do
+        assert_equal %w[en de fr nl], Translations.new(@template).locales
+      end
     end
 
     test "the keys its Liquid translates" do
@@ -101,6 +106,34 @@ module Nuntius
       assert_equal "slimme_groep", layout.translation_scope
       assert_equal "slimme_groep.user.activate.mail.welcome", template.translation_scope
       assert_equal "slimme_groep", campaign.translation_scope
+    end
+
+    test "a template's translations move along when its scope changes" do
+      @template.update!(event: "welcome", description: "Hi")
+
+      assert_equal "Hoi", nuntius_locales(:nl).reload.data.dig("nl", "account", "welcome", "mail", "hi", "greeting")
+      assert_nil nuntius_locales(:nl).data.dig("nl", "account", "translationtest")
+      assert_equal "Hello", Liquidum.render("{{ '.greeting' | t }}", registers: {"template" => @template})
+    end
+
+    test "ones already in the new scope stay, and other keys aren't moved" do
+      Locale.create!(account: accounts(:one), key: "nl-welcome", data: {"nl" => {"account" => {"welcome" => {"mail" => {"greeting" => "Welkom"}}}}})
+
+      Translations.move(accounts(:one).id, "account.translationtest", "account.welcome")
+      Translations.move(accounts(:one).id, "account.unknown", "account.other")
+
+      assert_equal({"subject" => "Smurrefluts", "greeting" => "Hoi"}, nuntius_locales(:nl).reload.data.dig("nl", "account", "welcome", "mail"))
+      assert_equal "Welkom", Locale.find_by!(key: "nl-welcome").data.dig("nl", "account", "welcome", "mail", "greeting")
+      assert_nil nuntius_locales(:en).reload.data.dig("en", "account", "other")
+    end
+
+    test "a layout's translations move along with its name" do
+      layout = Layout.create!(account: accounts(:one), name: "Brand", json: layout_json, mjml: layout_mjml)
+      @template.update!(layout: layout, description: "Hi")
+      layout.update!(name: "Shop")
+
+      assert_equal "Hello", nuntius_locales(:en).reload.data.dig("en", "shop", "account", "translationtest", "mail", "hi", "greeting")
+      assert_equal %w[shop], nuntius_locales(:en).data["en"].keys
     end
   end
 end
