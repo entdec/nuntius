@@ -27,3 +27,11 @@
   --color-primary-800: rgb(30, 64, 175);
   --color-primary-900: rgb(30, 58, 138);
 }
+
+/* Satis' sidebar collapse arrow is a Font Awesome Pro icon (fa-light), which
+   the free icons here don't have: draw it as a character. Satis mirrors it
+   while the sidebar is open. */
+.sidebar .arrow .fa-light:empty::before {
+  content: "⇥";
+  font-style: normal;
+}

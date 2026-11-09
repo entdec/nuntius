@@ -21,8 +21,9 @@
 
   - page.with_sidebar_mobile do |sidebar|
 
+  / Satis's sidebar, with the arrow that collapses it to icons (as in Slimmegroep)
   - page.with_sidebar do |sidebar|
-    = sts.sidebar_menu(sidebar_menu)
+    = render Satis::Sidebar::Component.new(sidebar_menu)
 
   - page.with_body
     = yield
