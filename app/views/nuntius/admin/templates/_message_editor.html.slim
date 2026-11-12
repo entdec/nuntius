@@ -1,0 +1,14 @@
+/ The editor of an SMS, Push, Teams, Slack or Voice template: TessEdit with
+/ the kit of its transport (app/javascript/nuntius/kits/messages.js), its
+/ preview in the middle (TemplatesController#preview, with sample values)
+/ and its settings in Inspect. TemplatesController#assign_design takes the
+/ document. Locals: slots, the form's own fields for its slot fields.
+- problems = %i[text payload from to].flat_map { |attribute| @template.errors.full_messages_for(attribute) }
+- if problems.any?
+  .mb-3.rounded-md.border.border-red-200.bg-red-50.px-3.py-2.text-sm.text-red-700 role="alert"
+    - problems.each do |problem|
+      p = problem
+/ An empty variables URL when its class has none, so the variables controller can point it at another
+div class="h-[80vh]" data-controller="tess-edit" data-tess-edit-kit-value=@template.transport data-tess-edit-sample-value="false" data-tess-edit-variables-url-value=(Nuntius::Variables.url(self, @template.variable_roots) || "") data-tess-edit-translations-url-value=(translations_admin_template_path(@template) if @template.persisted?) data-tess-edit-options-value={template: true, previewUrl: preview_admin_templates_path}.to_json
+  = hidden_field_tag "template[design_json]", @template.message_document.to_json, id: nil, data: {tess_edit_target: "jsonInput"}
+  = slots

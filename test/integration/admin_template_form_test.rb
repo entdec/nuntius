@@ -18,7 +18,7 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
 
     assert_select "input[type=hidden][name='template[transport]'][value='sms']"
     assert_select ".nuntius-sentence span", text: "SMS"
-    assert_select "textarea[name='template[text]']"
+    assert_select "[data-controller='tess-edit'][data-tess-edit-kit-value='sms']"
     assert_select "select[name='template[layout_id]']", count: 0
     assert_select "a.button[href='/nuntius/admin/templates/new']", text: "Back"
   end

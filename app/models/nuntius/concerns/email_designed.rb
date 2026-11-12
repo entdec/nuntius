@@ -58,7 +58,7 @@ module Nuntius
       def editor_document
         return nil unless layout
 
-        EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text, data: design_attributes.to_h { |key, attribute| [key, public_send(attribute)] })
+        EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text, data: design_data)
       end
 
       # Takes the document and MJML the editor submits. Only the Content
@@ -69,8 +69,7 @@ module Nuntius
         self.json = EmailDesign.content_nodes(document) || []
         self.subject = document.dig("data", "subject")
         self.preview_text = document.dig("data", "preheader")
-        data = document["data"] || {}
-        design_attributes.each { |key, attribute| public_send(:"#{attribute}=", data[key]) if data.key?(key) }
+        assign_design_data(document["data"] || {})
         compose(EmailDesign.content_of(mjml))
       rescue ::JSON::ParserError, EmailDesign::Error => e
         @design_error = e.message
@@ -107,6 +106,15 @@ module Nuntius
       # (see app/javascript/nuntius/blocks/email.js)
       def design_attributes
         {}
+      end
+
+      def design_data
+        design_attributes.to_h { |key, attribute| [key, public_send(attribute)] }
+      end
+
+      # The ones the data has
+      def assign_design_data(data)
+        design_attributes.each { |key, attribute| public_send(:"#{attribute}=", data[key]) if data.key?(key) }
       end
 
       def compose(content)

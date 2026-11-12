@@ -98,7 +98,8 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     patch "/nuntius/admin/templates/#{@template.id}", params: {template: {metadata_yaml: "logo_url: logo.png"}}
     assert_equal({}, @template.reload.metadata)
 
-    @template.update!(old_layout: nuntius_old_layouts(:one))
+    # Only mail had old layouts
+    @template.update!(transport: "mail", old_layout: nuntius_old_layouts(:one))
     get "/nuntius/admin/templates/#{@template.id}/edit"
     assert_select "[name='template[metadata_yaml]']"
 

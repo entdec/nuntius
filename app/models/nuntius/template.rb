@@ -51,6 +51,17 @@ module Nuntius
     # Where a drop (or hash) in its To is sent to, by transport (see addressees)
     ADDRESS_ATTRIBUTES = {"mail" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
 
+    # Besides From and To, what its editor's root has of it, by transport
+    # (app/javascript/nuntius/blocks/email.js and kits/messages.js)
+    DESIGN_ATTRIBUTES = {
+      "mail" => {"linkTracking" => :link_tracking, "openTracking" => :open_tracking},
+      "sms" => {"text" => :text},
+      "push" => {"text" => :text, "payload" => :payload},
+      "teams" => {"text" => :text, "payload" => :payload},
+      "slack" => {"text" => :text, "payload" => :payload},
+      "voice" => {"text" => :text}
+    }.freeze
+
     # The messages it sends: one for each addressee in its To (see addressees),
     # rendered with the addressee as `to`. account is the account they're sent
     # for, by default the template's own.
@@ -228,11 +239,28 @@ module Nuntius
       (start - 1.hour)..start
     end
 
+    # Whether it is edited in the editor for its transport's messages: SMS,
+    # Push, Teams, Slack and Voice (app/javascript/nuntius/kits/messages.js)
+    def message_design?
+      !email? && DESIGN_ATTRIBUTES.key?(transport.to_s)
+    end
+
+    # The document that editor opens: a root of its transport, with its settings
+    def message_document
+      {"id" => "broot", "type" => transport.to_s, "attributes" => {}, "data" => design_data, "children" => []}
+    end
+
+    # Takes its settings from the document that editor submits
+    def assign_message_design(document)
+      document = ::JSON.parse(document) if document.is_a?(String)
+      assign_design_data(document["data"] || {})
+    end
+
     private
 
-    # From, To and the tracking are edited in the email editor's root
+    # From, To and the rest of DESIGN_ATTRIBUTES are edited in its editor's root
     def design_attributes
-      {"from" => :from, "to" => :to, "linkTracking" => :link_tracking, "openTracking" => :open_tracking}
+      {"from" => :from, "to" => :to}.merge(DESIGN_ATTRIBUTES.fetch(transport.to_s, {}))
     end
 
     def move_translations

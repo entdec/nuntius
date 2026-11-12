@@ -27,21 +27,26 @@ export function triggerSummary(element) {
 // Open at first when it has to be filled in or has errors
 const open = (element) => element.hasAttribute("data-open") || Boolean(element.querySelector("[role=alert]"))
 
+// Also the editors of the other transports' messages (kits/messages.js)
+export const when = (before) => ({
+  title: "When",
+  before,
+  fields: [{ key: "trigger", label: "Sends", type: "slot", slot: "trigger", summary: triggerSummary, open }]
+})
+
+export const recipient = (before) => ({
+  title: "Recipient",
+  before,
+  fields: [
+    { key: "data.from", label: "From", type: "text", liquid: "output", visible: template, hint: "The provider's sender when empty." },
+    { key: "data.to", label: "To", type: "text", liquid: "output", visible: template }
+  ]
+})
+
 extendBlock("email", {
   fields: [
-    {
-      title: "When",
-      before: "Message",
-      fields: [{ key: "trigger", label: "Sends", type: "slot", slot: "trigger", summary: triggerSummary, open }]
-    },
-    {
-      title: "Recipient",
-      before: "Message",
-      fields: [
-        { key: "data.from", label: "From", type: "text", liquid: "output", visible: template, hint: "The provider's sender when empty." },
-        { key: "data.to", label: "To", type: "text", liquid: "output", visible: template }
-      ]
-    },
+    when("Message"),
+    recipient("Message"),
     {
       title: "Tracking",
       before: "Layout",

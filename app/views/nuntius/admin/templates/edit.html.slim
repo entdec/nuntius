@@ -1,7 +1,10 @@
 - present(@template, TemplatePresenter) do |template|
-  / An email in the editor has everything in its root's Inspect (app/javascript/nuntius/blocks/email.js),
-  / the trigger and its layout as slots; the others, and an email still on an old layout, have the Edit tab.
-  - designed = @template.email? && @template.layout && !@template.old_layout
+  / A template is edited in an editor with everything in its root's Inspect, the trigger as a slot:
+  / an email in the email editor (app/javascript/nuntius/blocks/email.js), with its layout as a slot too,
+  / and the others in the editor for their messages (kits/messages.js). An email on an old layout,
+  / or without a layout, has the Edit tab.
+  - editor = if @template.email? && @template.layout && !@template.old_layout then :email elsif @template.message_design? then :message end
+  - designed = editor.present?
   = sts.form_for([:admin, @template]) do |f|
     / The description is made from the trigger's sentence and conditions, until one is typed (see the description controller).
     / Variable pickers, Liquid fields and the email editor follow the class chosen (see the variables controller).
@@ -43,9 +46,13 @@
                   = f.input :enabled, as: :switch, input_html: {name: nil, id: "template_enabled_when"}
                 - if Nuntius.config.can_create_global
                   .mt-4 = f.input :global, as: :switch, hint: t('.global_hint')
-              div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden=true
-                = f.association :layout, collection: @layouts, include_blank: false, label: false, hint: t('.layout_moves')
-            = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots
+              - if editor == :email
+                div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden=true
+                  = f.association :layout, collection: @layouts, include_blank: false, label: false, hint: t('.layout_moves')
+            - if editor == :email
+              = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots
+            - else
+              = render "message_editor", slots: slots
 
         - else
           - card.with_tab :edit, padding: true
@@ -105,34 +112,6 @@
                   .col-span-12
                     = f.association :layout, collection: @layouts, include_blank: true, hint: t('.layout_hint')
 
-              / TwiML, see Voice in the README
-              - if @template.transport == 'voice'
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = entdec_code_editor f, :text, lang: "liquid", height: "400px"
-              - if @template.transport == 'slack'
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = entdec_code_editor f, :text, lang: "liquid", height: "400px"
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = entdec_code_editor f, :payload, lang: "yaml", hint: 'See here for more information: https://app.slack.com/block-kit-builder/', height: "400px"
-
-              - if @template.transport == 'sms'
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = f.input :text, as: :text, input_html: {rows: 4}
-              - if @template.transport == 'push'
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = f.input :text, as: :text, input_html: {rows: 4}
-              - if @template.transport == 'teams'
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = f.input :text, as: :text, input_html: {rows: 10}
-                .col-span-12
-                  = nuntius_liquid_field f do
-                    = entdec_code_editor f, :payload, lang: "yaml", hint: 'See here for more information: https://www.adaptivecards.io/designer/', height: "400px"
 
         - if @template.persisted? && @template.email?
           - card.with_tab :media, padding: true

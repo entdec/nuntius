@@ -38,7 +38,7 @@ module Nuntius
 
       def create
         @template = Nuntius::Template.new(template_params)
-        assign_email_design(@template, :template) if @template.email?
+        assign_design
         @template.save(context: :admin)
         respond_with :admin, @template, action: :edit
       end
@@ -54,7 +54,7 @@ module Nuntius
       def update
         @template = Nuntius::Template.visible.find(params[:id])
         @template.assign_attributes(template_params)
-        assign_email_design(@template, :template) if @template.email?
+        assign_design
         # Images uploaded on the Media tab
         images = Array(params.dig(:template, :images)).compact_blank
         @template.images.attach(images) if @template.save(context: :admin) && images.any?
@@ -72,6 +72,13 @@ module Nuntius
         end
       end
 
+      # The preview in the editor of an SMS, Push, Teams, Slack or Voice
+      # template, with sample values (TemplatePreview)
+      def preview
+        template = Nuntius::Template.new(params.require(:template).permit(:transport, :klass, :text, :payload))
+        render json: Nuntius::TemplatePreview.new(template).to_h
+      end
+
       def destroy
         @template = Nuntius::Template.visible.find(params[:id])
         @template.destroy
@@ -79,6 +86,15 @@ module Nuntius
       end
 
       private
+
+      # What its editor submits: the email editor's, or the message editor's document
+      def assign_design
+        if @template.email?
+          assign_email_design(@template, :template)
+        elsif @template.message_design? && (document = params.dig(:template, :design_json)).present?
+          @template.assign_message_design(document)
+        end
+      end
 
       def set_objects
         @layouts = Nuntius::Layout.visible

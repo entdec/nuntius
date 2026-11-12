@@ -75,6 +75,7 @@ Nuntius::Engine.routes.draw do
     resources :locales
     resources :templates do
       resources :attachments, controller: "satis/attachments"
+      post "preview", on: :collection
       member do
         get "media", to: "media#index", defaults: {owner: "template"}
         post "media", to: "media#create", defaults: {owner: "template"}

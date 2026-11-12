@@ -165,6 +165,12 @@ in a slot in the Layout group.
 
 ## 4. Editors for SMS, Push, Teams, Slack and Voice
 
+Done, as a TessEdit kit per transport without blocks
+(app/javascript/nuntius/kits/messages.js). The sample values are each
+variable's name, ‹User › Name› (Nuntius::TemplatePreview), not a record's,
+so no account's data shows. Push has no Title: its providers send none yet.
+The links to the designers are in the preview (TessEdit's data-tess-open).
+
 TessEdit's frame: a preview in the middle, the same Inspect partial (When,
 Recipient) on the side, plus a Message group per transport.
 
