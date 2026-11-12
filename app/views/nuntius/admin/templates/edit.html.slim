@@ -38,6 +38,9 @@
             - slots = capture do
               div data-tess-edit-target="slot" data-tess-edit-slot="trigger" data-open=(@template.new_record? || nil) hidden=true
                 = render "trigger", f: f, template: template
+                / The card's Enabled again, in step with it
+                .mt-4 data-controller="nuntius--mirror" data-nuntius--mirror-for-value="template[enabled]"
+                  = f.input :enabled, as: :switch, input_html: {name: nil, id: "template_enabled_when"}
                 - if Nuntius.config.can_create_global
                   .mt-4 = f.input :global, as: :switch, hint: t('.global_hint')
               div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden=true

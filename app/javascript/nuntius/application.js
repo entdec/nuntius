@@ -13,6 +13,7 @@ import { withImageNames } from "nuntius/blocks/image_names"
 import ChainedSelectController from "nuntius/controllers/chained_select_controller"
 import VariablesController from "nuntius/controllers/variables_controller"
 import DescriptionController from "nuntius/controllers/description_controller"
+import MirrorController from "nuntius/controllers/mirror_controller"
 import TranslationsController from "nuntius/controllers/translations_controller"
 import { registerViewComponents } from "entdec/view_components"
 
@@ -30,4 +31,5 @@ registerViewComponents(window.Stimulus)
 window.Stimulus.register("nuntius--chained-select", ChainedSelectController)
 window.Stimulus.register("nuntius--variables", VariablesController)
 window.Stimulus.register("nuntius--description", DescriptionController)
+window.Stimulus.register("nuntius--mirror", MirrorController)
 window.Stimulus.register("nuntius--translations", TranslationsController)

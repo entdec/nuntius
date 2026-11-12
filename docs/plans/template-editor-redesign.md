@@ -127,10 +127,10 @@ editor.
 
 ## 3. Everything in root Inspect; the Edit tab goes
 
-Done. Enabled is in the card's actions only, not also in When: one switch
-always in view, rather than two kept in step. The Message group is
-TessEdit's own, still called Email. The layout is chosen in a slot in the
-Layout group.
+Done. Enabled's second switch, in When, is kept in step with the card's by
+the `nuntius--mirror` controller (only the card's is submitted). TessEdit
+calls its subject and preview text group Message now. The layout is chosen
+in a slot in the Layout group.
 
 **TessEdit** (on a branch in its own repository):
 

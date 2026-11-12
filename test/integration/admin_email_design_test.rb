@@ -130,6 +130,7 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     assert_select ".nuntius-title input[name='template[description]'][value='Order']"
     assert_select ".nuntius-enabled [name='template[enabled]']"
     assert_select "[data-controller='tess-edit'] [name='template[enabled]']", count: 0
+    assert_select "[data-tess-edit-slot='trigger'] [data-controller='nuntius--mirror'][data-nuntius--mirror-for-value='template[enabled]'] input[type=hidden]#template_enabled_when:not([name])"
     assert_select "input[name='template[to]'], input[name='template[from]'], input[name='template[link_tracking]']", count: 0
     assert_equal({"template" => true}, JSON.parse(editor_value("options")))
     assert_match %r{/liquidum/variables}, editor_value("variables-url")
