@@ -112,7 +112,6 @@ nl:
       half_yearly: elk half jaar
       yearly: elk jaar
     transports:
-      lmtp: LMTP (mailbox)
       mail: E-mail
       push: Pushbericht
       slack: Slack

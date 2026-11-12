@@ -21,13 +21,10 @@ Nuntius.setup do |config|
     }
   }
 
-  # LMTP delivery to a mailbox, on its own `:lmtp` transport. Enable the
-  # transport and provider, then give such templates `transport: "lmtp"`. The
-  # recipient and per-message LMTP server are inline-encoded in the template
-  # `to` as `<email>@<host>:<port>`, e.g. `user@example.com@mx.internal:24`.
-  # `host`/`port` here are optional fallbacks for plain addresses.
-  # config.transport :lmtp
-  # config.provider :lmtp, transport: :lmtp, settings: {
+  # LMTP delivery to a mailbox. Mail to an address with its LMTP server in it,
+  # `<email>@<host>:<port>` (e.g. `user@example.com@mx.internal:24`), goes to
+  # this provider instead of to SMTP.
+  # config.provider :lmtp, transport: :mail, settings: {
   #   from_header: "Example <example@example.com>",
   #   allow_list: ["example.com"]
   # }

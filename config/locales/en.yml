@@ -99,7 +99,6 @@ en:
       half_yearly: every half year
       yearly: every year
     transports:
-      lmtp: LMTP (mailbox)
       mail: Email
       push: Push notification
       slack: Slack

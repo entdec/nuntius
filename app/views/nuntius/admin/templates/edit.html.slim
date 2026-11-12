@@ -96,32 +96,31 @@
               .col-span-12
                 = entdec_code_editor f, :metadata_yaml, lang: "yaml", label: t('.metadata')
 
-            - Nuntius::Concerns::EmailDesigned::EMAIL_TRANSPORTS.each do |transport|
-              template data-toggle-target='toggleable' data-toggle-value=transport
-                .col-span-6
-                  = f.input :link_tracking, as: :switch
-                .col-span-6
-                  = f.input :open_tracking, as: :switch
-                - if @template.old_layout
-                  .col-span-12.rounded-md.border.border-gray-200.p-4
-                    p.mb-3.text-sm.text-gray-600 = t('.old_layout', name: @template.old_layout.name)
-                    .mb-3.grid.grid-cols-12
-                      = render "nuntius/admin/shared/metadata_variables", variables: Nuntius::MetadataVariables.in(@template, @template.old_layout.data, @template.html), message: t('.old_layout_metadata_variables')
-                    - if @template.errors[:base].any?
-                      .mb-3.rounded-md.border.border-red-200.bg-red-50.px-3.py-2.text-sm.text-red-700 role="alert"
-                        - @template.errors[:base].each do |problem|
-                          p = problem
-                    = f.association :layout, collection: @layouts, include_blank: true, label: t('.convert_layout'), hint: t('.convert_hint')
-                    button.button.border-transparent.bg-red-600.text-white.hover:bg-red-700 type="submit" formaction=convert_admin_template_path(@template) onclick="return confirm('#{j t('.convert_confirm')}')" = t('.convert')
-                  .col-span-12
-                    = nuntius_liquid_field f do
-                      = entdec_code_editor f, :subject, lang: "liquid"
-                  .col-span-12
-                    = nuntius_liquid_field f do
-                      = entdec_code_editor f, :html, lang: "markdown", height: "400px"
-                - else
-                  .col-span-12
-                    = f.association :layout, collection: @layouts, include_blank: true, hint: t('.layout_hint')
+            template data-toggle-target='toggleable' data-toggle-value='mail'
+              .col-span-6
+                = f.input :link_tracking, as: :switch
+              .col-span-6
+                = f.input :open_tracking, as: :switch
+              - if @template.old_layout
+                .col-span-12.rounded-md.border.border-gray-200.p-4
+                  p.mb-3.text-sm.text-gray-600 = t('.old_layout', name: @template.old_layout.name)
+                  .mb-3.grid.grid-cols-12
+                    = render "nuntius/admin/shared/metadata_variables", variables: Nuntius::MetadataVariables.in(@template, @template.old_layout.data, @template.html), message: t('.old_layout_metadata_variables')
+                  - if @template.errors[:base].any?
+                    .mb-3.rounded-md.border.border-red-200.bg-red-50.px-3.py-2.text-sm.text-red-700 role="alert"
+                      - @template.errors[:base].each do |problem|
+                        p = problem
+                  = f.association :layout, collection: @layouts, include_blank: true, label: t('.convert_layout'), hint: t('.convert_hint')
+                  button.button.border-transparent.bg-red-600.text-white.hover:bg-red-700 type="submit" formaction=convert_admin_template_path(@template) onclick="return confirm('#{j t('.convert_confirm')}')" = t('.convert')
+                .col-span-12
+                  = nuntius_liquid_field f do
+                    = entdec_code_editor f, :subject, lang: "liquid"
+                .col-span-12
+                  = nuntius_liquid_field f do
+                    = entdec_code_editor f, :html, lang: "markdown", height: "400px"
+              - else
+                .col-span-12
+                  = f.association :layout, collection: @layouts, include_blank: true, hint: t('.layout_hint')
 
             / TwiML, see Voice in the README
             template data-toggle-target='toggleable' data-toggle-value='voice'

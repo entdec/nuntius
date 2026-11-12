@@ -33,14 +33,13 @@
           .col-span-12
             .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
 
-          - Nuntius::Concerns::EmailDesigned::EMAIL_TRANSPORTS.each do |transport|
-            template data-toggle-target='toggleable' data-toggle-value=transport
-              .col-span-4
-                = f.input :link_tracking, as: :switch
-              .col-span-4
-                = f.input :open_tracking, as: :switch
-              .col-span-4
-                = f.input :publish_at, as: :date_time
+          template data-toggle-target='toggleable' data-toggle-value='mail'
+            .col-span-4
+              = f.input :link_tracking, as: :switch
+            .col-span-4
+              = f.input :open_tracking, as: :switch
+            .col-span-4
+              = f.input :publish_at, as: :date_time
 
           template data-toggle-target='toggleable' data-toggle-value='voice'
             .col-span-12

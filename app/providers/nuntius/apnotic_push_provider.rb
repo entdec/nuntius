@@ -18,8 +18,16 @@ module Nuntius
       default: :production,
       description: "Development or production, defaults to production"
 
+    # APNs device tokens: 64 hexadecimal characters
+    TOKEN = /\A\h{64}\z/
+
+    # Other push tokens go to Firebase
+    def self.handles?(to)
+      TOKEN.match?(to.to_s)
+    end
+
     def deliver
-      return message if message.to.size != 64
+      return message unless self.class.handles?(message.to)
 
       connection = if environment.to_sym == :development
         Apnotic::Connection.development(cert_path: StringIO.new(certificate), cert_pass: passphrase)

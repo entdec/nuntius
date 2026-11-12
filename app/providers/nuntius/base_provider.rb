@@ -29,6 +29,13 @@ module Nuntius
         @states
       end
 
+      # Whether it delivers to +to+. A transport only gives a message to its
+      # providers that do, so one transport can have providers for different
+      # kinds of addresses, like SMTP and LMTP for mail.
+      def handles?(_to)
+        true
+      end
+
       def class_from_name(name, transport)
         Nuntius.const_get("#{name}_#{transport}_provider".camelize)
       rescue

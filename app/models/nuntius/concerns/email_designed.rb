@@ -13,7 +13,6 @@ module Nuntius
     module EmailDesigned
       extend ActiveSupport::Concern
 
-      EMAIL_TRANSPORTS = %w[mail lmtp].freeze
       # In the editor only the Content block, the subject and the preview text
       # are its own; the rest belongs to the layout.
       EDITOR_LOCK = {except: ["content"], fields: ["data.subject", "data.preheader"]}.freeze
@@ -30,7 +29,7 @@ module Nuntius
       end
 
       def email?
-        EMAIL_TRANSPORTS.include?(transport)
+        transport.to_s == "mail"
       end
 
       # The images its editor can choose from: its own and its layout's, one

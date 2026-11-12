@@ -43,7 +43,9 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - **A campaign's translation scope is its layout's** (`basic`), no longer `nuntius` and its layout (`nuntius.basic`), the same as the start of its templates' scopes, so a layout's keys work in both. Move the translations of draft campaigns' keys starting with a dot up from under `nuntius` in the locales.
 - An account's locales merge in the order they were created, later ones winning, instead of in no particular order.
 - A template with several addresses in its To renders a message for each, instead of the mail and push transports copying one message. `Template#new_message` is deprecated, and gives only the first, no longer one with every address in its To.
-- Every new mail and LMTP template and campaign needs a layout.
+- **LMTP is a provider on the `:mail` transport**, no longer a transport of its own: mail to an LMTP address (`<email>@<host>:<port>`) goes to it, other mail to SMTP. Templates and campaigns send by mail, and the migration moves LMTP templates (with their translations), campaigns and messages to `mail`. The LMTP provider is now `Nuntius::LmtpMailProvider`, and its `host` and `port` settings are gone: a plain address goes over SMTP. See [LMTP](README.md#lmtp) and step 13 of [Upgrading from 1.x](#upgrading-from-1x).
+- A transport only gives a message to the providers that handle its address (`BaseProvider.handles?`): APNs gets APNs device tokens and Firebase the other push tokens, where both used to get every token. A message no provider handles has no recipient (`no_recipient`). Priorities after a gap (1, then 3) are no longer skipped.
+- Every new mail template and campaign needs a layout.
 - Mail campaigns to a list that allows unsubscribing must contain the Manage subscription block.
 - Campaigns are only published by `Nuntius::CampaignPublishJob`, and only once they're scheduled: `publish` goes from `scheduled` to `sending`, no longer from `draft`, and the admin's Publish action (`POST /admin/campaigns/:id/publish`) is replaced by Schedule. The job no longer publishes draft campaigns whose `publish_at` has passed.
 - Templates and campaigns have a preview text.
@@ -183,3 +185,14 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
     Campaigns' keys starting with a dot are now in their layout's scope, without `nuntius` (see Changed): move them up in the locales.
 
 12. **Check your locales.** A locale that has the same key as another of its account, or data that doesn't start with languages, can't be saved any more. Find them with `Nuntius::Locale.all.reject(&:valid?)`, and merge or fix them.
+
+13. **Move LMTP to the mail transport** in your Nuntius initializer, if you use it: remove `config.transport :lmtp`, give the LMTP provider `transport: :mail`, and drop its `host` and `port` settings:
+
+    ```ruby
+    config.provider :lmtp, transport: :mail, settings: {
+      from_header: "Example <example@example.com>",
+      allow_list: ["example.com"]
+    }
+    ```
+
+    LMTP templates need a To that renders to LMTP addresses (`<email>@<host>:<port>`): a plain address now goes over SMTP.

@@ -8,6 +8,11 @@ module Nuntius
 
     setting_reader :server_key, required: true, description: "Server key for the project, see Firebase console"
 
+    # APNs device tokens go to APNs
+    def self.handles?(to)
+      !ApnoticPushProvider.handles?(to)
+    end
+
     def deliver
       fcm = FCM.new(server_key)
 

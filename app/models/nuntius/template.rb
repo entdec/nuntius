@@ -49,7 +49,7 @@ module Nuntius
     after_update :move_translations, if: -> { (saved_changes.keys & %w[old_layout_id layout_id klass event transport description]).any? }
 
     # Where a drop (or hash) in its To is sent to, by transport (see addressees)
-    ADDRESS_ATTRIBUTES = {"mail" => "email", "lmtp" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
+    ADDRESS_ATTRIBUTES = {"mail" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
 
     # The messages it sends: one for each addressee in its To (see addressees),
     # rendered with the addressee as `to`. account is the account they're sent
