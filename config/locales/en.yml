@@ -26,6 +26,7 @@ en:
         transport: Send via
         html: Body
       nuntius/layout:
+        description: Description
         name: Name
       nuntius/list:
         allow_unsubscribe: unsubscribe allowed
@@ -98,6 +99,13 @@ en:
       quarterly: every quarter
       half_yearly: every half year
       yearly: every year
+    transport_hints:
+      mail: Designed, with a layout
+      push: A notification on a phone
+      slack: A message in a channel
+      sms: A short text message
+      teams: A message in a channel
+      voice: A phone call that speaks
     transports:
       mail: Email
       push: Push notification
@@ -189,6 +197,12 @@ en:
             newsletter: Newsletter
             transactional: Transactional
             empty: Empty
+          starting_layout_descriptions:
+            basic: A header, the content and a footer.
+            newsletter: A header with columns for articles, and a footer with the subscription link.
+            transactional: Plain and to the point, for receipts, notifications and confirmations.
+            empty: Only the content, to design everything yourself.
+          description_hint: Shown under its preview when choosing a layout for a new template.
           tabs:
             main:
               tab:
@@ -281,6 +295,13 @@ en:
                 preview: Preview
                 tracking: Tracking
       templates:
+        new:
+          title: New template
+          what: What do you want to send?
+          which_layout: Which layout do you want to start from?
+          back: Back
+          no_layouts: There are no layouts yet
+          create_layout: Create a layout first
         edit:
           send_via: Send via
           due_today:
@@ -322,6 +343,8 @@ en:
                 translations: Translations
                 messages: Messages
         index:
+          all: All
+          transports: Transports
           card:
             nuntius_admin_templates:
               tab:

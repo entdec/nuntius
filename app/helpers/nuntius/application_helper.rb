@@ -9,6 +9,29 @@ module Nuntius
         .sort_by { |label, _| label.downcase }
     end
 
+    # The enabled transports, the common ones first
+    def nuntius_transports
+      order = %w[mail sms push teams slack voice]
+      Nuntius.config.transports.map(&:to_s).uniq.sort_by { |transport| [order.index(transport) || order.size, transport] }
+    end
+
+    # A transport's name for people
+    def nuntius_transport_name(transport)
+      t(transport, scope: "nuntius.transports", default: transport.to_s.humanize)
+    end
+
+    # A transport's icon: Font Awesome's, or the product's logo for Slack and
+    # Teams (Font Awesome has none for Teams)
+    def nuntius_transport_icon(transport, css_class = "")
+      case transport.to_s
+      when "teams"
+        render "nuntius/admin/shared/teams_logo", css_class: css_class
+      else
+        icon = {"mail" => "fa-solid fa-envelope", "sms" => "fa-solid fa-comment-sms", "push" => "fa-solid fa-bell", "voice" => "fa-solid fa-phone", "slack" => "fa-brands fa-slack"}
+        tag.i(class: [icon.fetch(transport.to_s, "fa-solid fa-paper-plane"), css_class], "aria-hidden": true)
+      end
+    end
+
     # A template's or campaign's conditions (see Conditions) as rules, with
     # its Liquid variables to choose from (EntDec::Conditions::Component)
     def nuntius_conditions(form)

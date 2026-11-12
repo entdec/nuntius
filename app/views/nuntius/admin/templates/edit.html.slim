@@ -2,6 +2,9 @@
 - present(@template, TemplatePresenter) do |template|
   = sts.form_for([:admin, @template]) do |f|
     = sts.card :nuntius_admin_templates, icon: 'fal fa-file' do |card|
+      - if @template.new_record? && @back_path
+        - card.with_action
+          = link_to t('nuntius.admin.templates.new.back'), @back_path, class: "button"
       - card.with_action
         = f.continue
       - card.with_action
@@ -17,10 +20,12 @@
           / Reads as a sentence of pills (see TemplatePresenter): send via [mail] based on [an event] on [Order] [shipped],
           / or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year]
           / Variable pickers and Liquid fields follow the class chosen (see the variables controller)
-          .grid.grid-cols-12.gap-4 data-controller='toggle nuntius--variables' *nuntius_variables_data(f, template.klass_options.map(&:last))
+          .grid.grid-cols-12.gap-4 data-controller='nuntius--variables' *nuntius_variables_data(f, template.klass_options.map(&:last))
             .nuntius-sentence.col-span-12.flex.flex-wrap.items-center.gap-x-2.gap-y-2.text-sm.text-gray-700 data-nuntius--description-target="sentence"
               span data-description-skip=true = t('.send_via')
-              = entdec_pill_select f, :transport, nuntius_transport_options, select_html: { "data-toggle-target" => 'input' }
+              / What it sends is chosen when it's made (see new)
+              span.font-medium.text-gray-900 = nuntius_transport_name(@template.transport)
+              = f.hidden_field :transport
               span data-description-skip=true = t('.based_on')
               / contents: the nested toggles' fields wrap as part of the sentence
               .contents data-controller='toggle'
@@ -88,15 +93,12 @@
               = nuntius_liquid_field f do
                 = f.input :to
 
-            .col-span-12
-              .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
-
             / Old layouts read their values from the template's metadata
             - if @template.old_layout
               .col-span-12
                 = entdec_code_editor f, :metadata_yaml, lang: "yaml", label: t('.metadata')
 
-            template data-toggle-target='toggleable' data-toggle-value='mail'
+            - if @template.transport == 'mail'
               .col-span-6
                 = f.input :link_tracking, as: :switch
               .col-span-6
@@ -123,11 +125,11 @@
                   = f.association :layout, collection: @layouts, include_blank: true, hint: t('.layout_hint')
 
             / TwiML, see Voice in the README
-            template data-toggle-target='toggleable' data-toggle-value='voice'
+            - if @template.transport == 'voice'
               .col-span-12
                 = nuntius_liquid_field f do
                   = entdec_code_editor f, :text, lang: "liquid", height: "400px"
-            template data-toggle-target='toggleable' data-toggle-value='slack'
+            - if @template.transport == 'slack'
               .col-span-12
                 = nuntius_liquid_field f do
                   = entdec_code_editor f, :text, lang: "liquid", height: "400px"
@@ -135,15 +137,15 @@
                 = nuntius_liquid_field f do
                   = entdec_code_editor f, :payload, lang: "yaml", hint: 'See here for more information: https://app.slack.com/block-kit-builder/', height: "400px"
 
-            template data-toggle-target='toggleable' data-toggle-value='sms'
+            - if @template.transport == 'sms'
               .col-span-12
                 = nuntius_liquid_field f do
                   = f.input :text, as: :text, input_html: {rows: 4}
-            template data-toggle-target='toggleable' data-toggle-value='push'
+            - if @template.transport == 'push'
               .col-span-12
                 = nuntius_liquid_field f do
                   = f.input :text, as: :text, input_html: {rows: 4}
-            template data-toggle-target='toggleable' data-toggle-value='teams'
+            - if @template.transport == 'teams'
               .col-span-12
                 = nuntius_liquid_field f do
                   = f.input :text, as: :text, input_html: {rows: 10}

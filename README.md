@@ -426,7 +426,9 @@ Besides TessEdit's blocks, the editor has three Nuntius blocks:
 
 ### Templates and campaigns
 
-Every new mail template and campaign needs a layout. Choose it on the Edit tab and save; the email is then edited on the Design tab, starting with the layout's example content. Choosing another layout moves the content into it.
+A new template starts with what it sends: Email, SMS, Push and so on, as cards, one for each enabled transport. That stays as it's chosen. An email then starts from a layout, chosen by its preview, name and description (give layouts a description that says what they're for). A card opens the template's editor, and it's created when it's saved. The email is edited on the Design tab, starting with the layout's example content. Choosing another layout on the Edit tab moves the content into it.
+
+Every new mail template and campaign needs a layout. A campaign's layout is chosen on its Edit tab; save, and the email is edited on the Design tab.
 
 ### Variables
 

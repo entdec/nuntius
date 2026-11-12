@@ -33,6 +33,16 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/nuntius/admin/layouts/new?start=transactional']"
     document = JSON.parse(css_select("input[name='layout[design_json]']").first["value"])
     assert_equal Nuntius::Layout.starting_document("newsletter"), document
+    assert_select "textarea[name='layout[description]']", text: /columns for articles/
+  end
+
+  test "a layout's description is saved, and its preview has its images and no Liquid" do
+    post "/nuntius/admin/layouts", params: {layout: {name: "Newsletter", description: "For news", design_json: layout_json.to_json, design_mjml: layout_mjml(header: "NEWS {{ template.description }}")}}
+
+    layout = Nuntius::Layout.find_by!(name: "Newsletter")
+    assert_equal "For news", layout.description
+    assert_includes layout.preview_html, "NEWS"
+    assert_not_includes layout.preview_html, "{{"
   end
 
   test "saving a layout takes the design from the editor" do

@@ -67,6 +67,9 @@ module Nuntius
 
     def scope
       @scope = Nuntius::Template.visible
+      @scope = @scope.where(transport: params[:transport]) if params[:transport].present?
+      @scope = @scope.where(layout_id: params[:layout_id]) if params[:layout_id].present?
+      @scope
       # @scope = Nuntius::Template.visible.select("nuntius_templates.*, (select count(id) from nuntius_messages where nuntius_messages.template_id = nuntius_templates.id) as message_count")
     end
   end

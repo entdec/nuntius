@@ -13,8 +13,26 @@ module Nuntius
         @templates = Nuntius::Template.visible.order(:description)
       end
 
+      # What to send, and for an email which layout to start from, as cards
+      # (new.html.slim); once chosen, the editor for a new template, which its
+      # first save creates. Only one to choose from is chosen already.
       def new
-        @template = Nuntius::Template.new
+        @transports = helpers.nuntius_transports
+        transport = params[:transport].presence_in(@transports) || (@transports.first if @transports.one?)
+        layout = @layouts.find_by(id: params[:layout_id]) || (@layouts.first if @layouts.one?)
+        if transport.nil? || (transport == "mail" && layout.nil?)
+          @transport = transport
+          return render(:new)
+        end
+
+        @template = Nuntius::Template.new(transport: transport, layout: (layout if transport == "mail"))
+        @template.start_design
+        # Back to the choice it was made from, when there was one
+        @back_path = if transport == "mail" && @layouts.many?
+          new_admin_template_path(transport: "mail")
+        elsif @transports.many?
+          new_admin_template_path
+        end
         render :edit
       end
 
@@ -69,6 +87,8 @@ module Nuntius
       def template_params
         permitted = %i[enabled auto_description klass event based_on timestamp direction interval interval_amount interval_unit recurrence timebased_limit transport description payload from to subject layout_id html text link_tracking open_tracking]
         permitted << :global if Nuntius.config.can_create_global
+        # What it sends is chosen when it's made (see new)
+        permitted.delete(:transport) if @template&.persisted?
         # Old layouts read their values from the template's metadata
         permitted << :metadata_yaml if @template&.old_layout
         params.require(:template).permit(*permitted, conditions: [:match, rules: %i[variable operator value value_to]])

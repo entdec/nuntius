@@ -9,6 +9,8 @@ Each step is its own commit (or series of commits).
 
 ## 1. LMTP as a provider on `:mail`
 
+Done.
+
 Within a transport, every provider gets every message, as interchangeable
 fallbacks (`BaseTransport#deliver`). SMTP and LMTP aren't interchangeable,
 which is the only reason LMTP has its own transport. Providers will say
@@ -40,24 +42,26 @@ which addresses they deliver to instead.
 
 ## 2. The New template page
 
-One page, two stages, with cards of equal size in one grid. A card is
-selected by clicking it (one at a time); nothing is created until the
-template is saved in its editor.
+Done.
+
+One page, two stages, with cards of equal size in one grid. The cards are
+links: nothing is created until the template is saved in its editor, so
+there's no button to confirm a choice.
 
 **Stage 1: what to send.** A card per enabled transport: Email, SMS, Push,
 Teams, Slack, Voice, each with an icon, its name and one line about it.
 
 ```
  New template
+ What do you want to send?
  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
  │      ✉       │ │      💬      │ │      🔔      │
- │    Email     │ │     SMS ✓    │ │     Push     │
+ │    Email     │ │     SMS      │ │     Push     │
  └──────────────┘ └──────────────┘ └──────────────┘
  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
  │   [Teams]    │ │   [Slack]    │ │      ☎       │
  │    Teams     │ │    Slack     │ │    Voice     │
  └──────────────┘ └──────────────┘ └──────────────┘
-                                          [ Start ]
 ```
 
 - Every card has an icon. Email, SMS, Push and Voice use Font Awesome, like
@@ -68,52 +72,58 @@ Teams, Slack, Voice, each with an icon, its name and one line about it.
   helper, by transport, so the index's filter tabs and the editors use the
   same ones.
 
-- The button is disabled until a card is selected. It reads "Next" when
-  Email is selected and "Start" for the others.
-- Start opens the transport's editor; Next goes to stage 2.
+- The question is the page card's description, under its title.
+- A card opens the transport's editor; Email goes to stage 2.
 - With one transport enabled, this stage is skipped.
 
 **Stage 2: which layout (Email).** The transport cards make way for the
-layouts: a preview, the name and the description. Selecting one enables
-Start.
+layouts: a preview, the name and the description. A layout opens the
+editor.
 
 ```
- New template › Email                                ← back
+ New template                                       [ Back ]
+ Email › Which layout do you want to start from?
  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
  │  [preview]   │ │  [preview]   │ │  [preview]   │
  ├──────────────┤ ├──────────────┤ ├──────────────┤
- │ Default      │ │ Newsletter ✓ │ │ Event        │
+ │ Default      │ │ Newsletter   │ │ Event        │
  │ Plain trans… │ │ Header, col… │ │ Date and lo… │
  └──────────────┘ └──────────────┘ └──────────────┘
-                                          [ Start ]
 ```
 
 - The preview is the layout's compiled HTML in a scaled-down
   `iframe srcdoc` (`loading="lazy"`, no pointer events, so the whole card is
   clickable), with its Liquid rendered without values. Its Content block
   shows the layout's example content.
-- With one layout, it's selected already. With none, stage 2 shows a
-  "Create a layout first" card linking to New layout, and no Start.
-- Back is a link, and the browser's Back button too (`history.pushState`).
+- With one layout, it's chosen already. With none, stage 2 shows a
+  "Create a layout first" card linking to New layout.
+- The question is the page card's description, and Back a button in its
+  header, to the transport cards (none when Email is the only transport).
+  The browser's Back button works too.
 
 **Details**
 
-- Start is a GET to `new` with `transport` (and `layout_id`): the editor
+- A card links to `new` with `transport` (and `layout_id`): the editor
   opens with a new, unsaved template, and its first Save creates it. So
   nothing is left behind when someone picks the wrong card or leaves.
-- Until that first Save, the parts that need a record say "Save first": the
-  Media tab and image uploads (attached to the template) and the
-  translations (they follow its `translation_scope`). Uploading images
-  before saving, as loose blobs attached on Save, can come later; the Image
-  block already works with blob signed ids.
-- A small Stimulus controller selects the cards, switches the stages and
-  sets the button. No wizard state: a refresh shows stage 1 again.
+- Until that first Save, the editor of the new template has a Back button
+  in its header, to the choice it was made from: the layout cards for an
+  email (with more than one layout), else the transport cards. None when
+  there was nothing to choose.
+- Until that first Save, the parts that need a record aren't there, as
+  before: the Media and Translations tabs, and image uploads (attached to
+  the template). Uploading images before saving, as loose blobs attached on
+  Save, can come later; the Image block already works with blob signed ids.
+- The server renders each stage, so no JavaScript and no wizard state.
 - Layouts get a `description`: a migration, a field on the layout form, and
   descriptions for the starting layouts (Basic, Newsletter, Transactional),
   copied when a layout is created from one.
-- The transport is fixed once created: the "Send via" pill goes.
+- The transport is fixed once created: the "Send via" pill becomes text,
+  and the form renders only that transport's fields.
 - The templates index gets filter tabs (All, Email, SMS, Push, …) instead of
-  submenus, as the host app owns the sidebar.
+  submenus, as the host app owns the sidebar. The templates table filters
+  on `transport` and `layout_id` (the layout page's Templates tab passed
+  `layout_id`, but the table ignored it).
 
 ## 3. Everything in root Inspect; the Edit tab goes
 

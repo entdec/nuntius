@@ -27,6 +27,7 @@ nl:
         transport: Versturen via
         html: Body
       nuntius/layout:
+        description: Omschrijving
         name: Naam
       nuntius/list:
         allow_unsubscribe: Uitschrijven toestaan
@@ -111,6 +112,13 @@ nl:
       quarterly: elk kwartaal
       half_yearly: elk half jaar
       yearly: elk jaar
+    transport_hints:
+      mail: Ontworpen, met een layout
+      push: Een melding op een telefoon
+      slack: Een bericht in een kanaal
+      sms: Een kort tekstbericht
+      teams: Een bericht in een kanaal
+      voice: Een telefoongesprek dat spreekt
     transports:
       mail: E-mail
       push: Pushbericht
@@ -202,6 +210,12 @@ nl:
             newsletter: Nieuwsbrief
             transactional: Transactioneel
             empty: Leeg
+          starting_layout_descriptions:
+            basic: Een kop, de inhoud en een voet.
+            newsletter: Een kop met kolommen voor artikelen, en een voet met de link naar het abonnement.
+            transactional: Eenvoudig en to the point, voor bonnen, meldingen en bevestigingen.
+            empty: Alleen de inhoud, om alles zelf te ontwerpen.
+          description_hint: Staat onder de voorbeeldweergave bij het kiezen van een layout voor een nieuwe template.
           tabs:
             main:
               tab:
@@ -296,6 +310,13 @@ nl:
                 preview: Preview
                 tracking: Tracking
       templates:
+        new:
+          title: Nieuwe template
+          what: Wat wil je versturen?
+          which_layout: Met welke layout wil je beginnen?
+          back: Terug
+          no_layouts: Er zijn nog geen layouts
+          create_layout: Maak eerst een layout
         edit:
           send_via: Versturen via
           due_today:
@@ -337,6 +358,8 @@ nl:
                 translations: Vertalingen
                 messages: Berichten
         index:
+          all: Alle
+          transports: Soorten berichten
           card:
             nuntius_admin_templates:
               tab:
