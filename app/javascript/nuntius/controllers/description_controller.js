@@ -4,7 +4,9 @@ import { Controller } from "@hotwired/stimulus"
 // they read: "Email when User activate, if User › State is active", while
 // auto (its auto_description) is checked: when they change, or when there's
 // no description yet. Typing one unchecks it, checking it makes it again.
-// Parts of the sentence with data-description-skip are left out.
+// Parts of the sentence with data-description-skip are left out. While the
+// sentence is hidden (collapsed in the email editor's Inspect) it can't be
+// read, so it's left as it is.
 export default class extends Controller {
   static targets = ["field", "auto", "sentence"]
   static values = { if: String, and: String, or: String }
@@ -14,6 +16,8 @@ export default class extends Controller {
     ;["change", "input", "click", "entdec--variable-picker:change"].forEach((type) => this.element.addEventListener(type, this.schedule))
     // The sentence's toggles put in their parts as they connect
     setTimeout(() => {
+      if (!this.readable) return
+
       this.composed = this.compose()
       if (!this.fieldTarget.value) this.fill()
     })
@@ -30,6 +34,8 @@ export default class extends Controller {
     }
     // After the pills show what was chosen, when they read differently
     setTimeout(() => {
+      if (!this.readable) return
+
       const composed = this.compose()
       if (composed === this.composed) return
 
@@ -39,7 +45,11 @@ export default class extends Controller {
   }
 
   fill() {
-    if (this.autoTarget.checked) this.fieldTarget.value = this.compose()
+    if (this.autoTarget.checked && this.readable) this.fieldTarget.value = this.compose()
+  }
+
+  get readable() {
+    return this.sentenceTarget.getClientRects().length > 0
   }
 
   compose() {

@@ -19,6 +19,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - Layouts designed in the email editor, with one Content block where each template or campaign puts its own content. Templates and draft campaigns follow their layout when it changes, and show it locked in their editor.
 - Starting layouts for new layouts: Basic, Newsletter, Transactional and Empty.
 - A new template starts on a page of cards: what it sends (Email, SMS, Push, …, one for each enabled transport), then for an email which layout to start from, by its preview, name and description. The cards open the editor, and the template is created when it's saved. What a template sends can't be changed afterwards. With one transport, or one layout, it's chosen already.
+- An email template is edited in its editor only, without an Edit tab: with the email selected, Inspect has when it sends (its sentence and conditions, as the template form's own fields), its From and To, its subject and preview text, its link and open tracking, and its layout. Its description is the page's title, editable in place, with Enabled beside it. It needs TessEdit's `slot` fields.
 - Layouts have a description, saying what they're for. A layout made from a starting layout gets the starting layout's. Copy in the migration with `bin/rails nuntius:install:migrations`.
 - The templates page shows the templates of one transport, or all.
 - Nuntius blocks in the editor: Content, View in browser and Manage subscription.
@@ -78,6 +79,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - `Nuntius::TimebasedEventsJob` runs one at a time (a Postgres advisory lock): a run that started while another one was still going could send the same messages again. It now leaves them to the run that's going.
 - The subscribers table raised for a subscriber with tags.
 - The `t` filter raised ("Liquid error: internal") instead of translating with the account's locales, and keys starting with a dot had no scope. It needs Liquidum 1.4 and its configuration (see Upgrading).
+- Liquid that doesn't parse in a template's From, To, subject, body or text (`validates …, liquid: true`) is a validation error. The validator added its error in a way Rails no longer keeps, so such templates saved.
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
 
 ### Upgrading from 1.x

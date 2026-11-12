@@ -61,10 +61,11 @@ module Nuntius
 
     # The layout's document with these nodes in its Content block, and this
     # subject and preview text on its root.
-    def document_with(layout_document, nodes, subject: nil, preview_text: nil)
+    # data: more of the root's data, such as a template's From and To
+    def document_with(layout_document, nodes, subject: nil, preview_text: nil, data: {})
       document = layout_document.deep_dup
       content_node(document)["children"] = nodes || []
-      document["data"] = (document["data"] || {}).merge("subject" => subject.to_s, "preheader" => preview_text.to_s)
+      document["data"] = (document["data"] || {}).merge("subject" => subject.to_s, "preheader" => preview_text.to_s).merge(data)
       document
     end
 

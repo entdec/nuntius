@@ -6,6 +6,6 @@ class LiquidValidator < ActiveModel::EachValidator
 
     Liquid::Template.parse(value)
   rescue Liquid::SyntaxError => e
-    record.errors[attribute] << (options[:message] || "is not valid liquid: #{e.message}")
+    record.errors.add(attribute, options[:message] || "is not valid liquid: #{e.message}")
   end
 end

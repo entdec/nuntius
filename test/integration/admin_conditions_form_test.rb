@@ -50,7 +50,7 @@ class AdminConditionsFormTest < ActionDispatch::IntegrationTest
     end
     assert_select "[data-controller='entdec--liquid-field'] textarea[name='template[text]']"
     assert_select "[data-controller='entdec--code-editor']", count: 0
-    assert_select "[data-controller='nuntius--description'] input[name='template[description]'][data-nuntius--description-target='field']"
+    assert_select "[data-controller~='nuntius--description'] input[name='template[description]'][data-nuntius--description-target='field']"
     assert_select "input[type=checkbox][name='template[auto_description]'][data-nuntius--description-target='auto']"
     assert_select "[data-nuntius--description-target='sentence'] [data-description-skip]", minimum: 2
   end

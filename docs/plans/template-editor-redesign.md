@@ -127,6 +127,11 @@ editor.
 
 ## 3. Everything in root Inspect; the Edit tab goes
 
+Done. Enabled is in the card's actions only, not also in When: one switch
+always in view, rather than two kept in step. The Message group is
+TessEdit's own, still called Email. The layout is chosen in a slot in the
+Layout group.
+
 **TessEdit** (on a branch in its own repository):
 
 - A `slot` field type: the host renders the element server-side, and the

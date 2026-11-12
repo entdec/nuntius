@@ -8,16 +8,23 @@
 / them, when the host app mounts Liquidum (Nuntius::Variables.url).
 / translations_url (optional: Admin::TranslationsController's) shows and
 / edits its t filters' translations.
+/ options (optional): the editor's options, e.g. {template: true} for a
+/ template's own root fields (app/javascript/nuntius/blocks/email.js).
+/ attributes (optional): the record's attributes edited in the editor, whose
+/ errors show above it. slots (optional): the form's own fields for the
+/ editor's slot fields, as data-tess-edit-target="slot" elements.
 - lock = local_assigns[:lock]
 - media_url = local_assigns[:media_url]
-- variables_url = Nuntius::Variables.url(self, local_assigns[:variables]) if local_assigns[:variables]
+/ (an empty one when its class has none, so the variables controller can point it at another)
+- variables_url = (Nuntius::Variables.url(self, local_assigns[:variables]) || "") if local_assigns.key?(:variables)
 - document = Nuntius::EmailImages.new(record).normalize(document, **image_url_options) if media_url && document
 - compile_url = media_url ? "#{media_url}/compile" : tess_edit.compile_path
-- problems = record.errors[:base] + record.errors[:mjml].map { |message| record.errors.full_message(:mjml, message) }
+- problems = record.errors[:base] + [:mjml, *local_assigns[:attributes]].flat_map { |attribute| record.errors.full_messages_for(attribute) }
 - if problems.any?
   .mb-3.rounded-md.border.border-red-200.bg-red-50.px-3.py-2.text-sm.text-red-700 role="alert"
     - problems.each do |problem|
       p = problem
-div class="h-[80vh]" data-controller="tess-edit" data-tess-edit-sample-value="false" data-tess-edit-compile-url-value=compile_url data-tess-edit-lock-value=(lock&.to_json) data-tess-edit-media-url-value=media_url data-tess-edit-variables-url-value=variables_url data-tess-edit-translations-url-value=local_assigns[:translations_url]
+div class="h-[80vh]" data-controller="tess-edit" data-tess-edit-sample-value="false" data-tess-edit-compile-url-value=compile_url data-tess-edit-lock-value=(lock&.to_json) data-tess-edit-media-url-value=media_url data-tess-edit-variables-url-value=variables_url data-tess-edit-translations-url-value=local_assigns[:translations_url] data-tess-edit-options-value=local_assigns[:options]&.to_json
   = hidden_field_tag "#{name}[design_json]", document.to_json, id: nil, data: {tess_edit_target: "jsonInput"}
   = hidden_field_tag "#{name}[design_mjml]", "", id: nil, data: {tess_edit_target: "mjmlInput"}
+  = local_assigns[:slots]

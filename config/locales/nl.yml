@@ -318,6 +318,24 @@ nl:
           no_layouts: Er zijn nog geen layouts
           create_layout: Maak eerst een layout
         edit:
+          description_auto: Automatisch
+          description_if: als
+          description_or: "of"
+          card:
+            nuntius_admin_templates:
+              title: Template
+          metadata: Metadata
+          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
+          layout_moves: "De eigen inhoud verhuist bij opslaan naar de gekozen layout."
+          global_hint: Gebruikt voor elk account, niet alleen dit
+          metadata_variables: "Het ontwerp van deze template leest nog metadata, die gaat verdwijnen:"
+          old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
+          old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
+          convert_layout: Omzetten naar layout
+          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
+          convert: Omzetten naar de e-maileditor
+          convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
+        trigger:
           send_via: Versturen via
           due_today:
             one: Verstuurt vandaag naar 1
@@ -327,26 +345,10 @@ nl:
             other: Verstuurt dit uur naar %{count}
           due_over_limit: Zou naar meer dan %{limit} versturen, dus wordt tegengehouden en verstuurt niets
           limit: "· hoogstens"
-          description_auto: Automatisch
-          description_if: als
-          description_or: "of"
           when: wanneer
           based_on: op basis van
           ago: geleden
           'on': bij
-          card:
-            nuntius_admin_templates:
-              title: Template
-          metadata: Metadata
-          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
-          global_hint: Gebruikt voor elk account, niet alleen dit
-          metadata_variables: "Het ontwerp van deze template leest nog metadata, die gaat verdwijnen:"
-          old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
-          old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
-          convert_layout: Omzetten naar layout
-          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
-          convert: Omzetten naar de e-maileditor
-          convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
         convert:
           converted: De template gebruikt nu de e-maileditor. Controleer hem in het tabblad Ontwerp.
           tabs:

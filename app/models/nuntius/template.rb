@@ -230,6 +230,11 @@ module Nuntius
 
     private
 
+    # From, To and the tracking are edited in the email editor's root
+    def design_attributes
+      {"from" => :from, "to" => :to, "linkTracking" => :link_tracking, "openTracking" => :open_tracking}
+    end
+
     def move_translations
       layout = OldLayout.find_by(id: old_layout_id_before_last_save) || Layout.find_by(id: layout_id_before_last_save)
       before = Template.translation_scope(layout, klass_before_last_save, event_before_last_save, transport_before_last_save, description_before_last_save)

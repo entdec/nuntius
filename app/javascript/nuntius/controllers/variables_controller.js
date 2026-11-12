@@ -2,9 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 // The variables of the class chosen in a form (a template's): urls has the
 // variables URL for each class, for the form field named by for. Choosing
-// another class points the variable pickers and Liquid fields inside it at
-// that class's variables, also those in templates still to be added.
-const URLS = ["data-entdec--variable-picker-url-value", "data-entdec--liquid-field-url-value"]
+// another class points the variable pickers, Liquid fields and email editor
+// inside it at that class's variables, also those in templates still to be added.
+const URLS = ["data-entdec--variable-picker-url-value", "data-entdec--liquid-field-url-value", "data-tess-edit-variables-url-value"]
 
 export default class extends Controller {
   static values = { urls: Object, for: String }

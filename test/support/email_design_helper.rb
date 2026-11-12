@@ -42,8 +42,9 @@ module EmailDesignHelper
   end
 
   # What the editor submits for a template in this layout.
-  def submitted_design(layout, text:, subject: "Order {{ order.number }}", preview_text: "Thanks", header: "ACME")
-    document = Nuntius::EmailDesign.document_with(layout.json, [text_node("bmine", text)], subject: subject, preview_text: preview_text)
+  # data: more of its root's data, such as a template's From and To
+  def submitted_design(layout, text:, subject: "Order {{ order.number }}", preview_text: "Thanks", header: "ACME", data: {})
+    document = Nuntius::EmailDesign.document_with(layout.json, [text_node("bmine", text)], subject: subject, preview_text: preview_text, data: data)
     {document: document.to_json, mjml: layout_mjml(header: header, example: text)}
   end
 end

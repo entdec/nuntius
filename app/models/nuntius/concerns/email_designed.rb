@@ -14,8 +14,9 @@ module Nuntius
       extend ActiveSupport::Concern
 
       # In the editor only the Content block, the subject and the preview text
-      # are its own; the rest belongs to the layout.
-      EDITOR_LOCK = {except: ["content"], fields: ["data.subject", "data.preheader"]}.freeze
+      # are its own, and a template's settings in its root (DESIGN_ATTRIBUTES);
+      # the rest belongs to the layout.
+      EDITOR_LOCK = {except: ["content"], fields: ["data.subject", "data.preheader", "data.from", "data.to", "data.linkTracking", "data.openTracking"]}.freeze
 
       included do
         # Images for the editor's Image blocks, besides the layout's own (attachments)
@@ -57,7 +58,7 @@ module Nuntius
       def editor_document
         return nil unless layout
 
-        EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text)
+        EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text, data: design_attributes.to_h { |key, attribute| [key, public_send(attribute)] })
       end
 
       # Takes the document and MJML the editor submits. Only the Content
@@ -68,6 +69,8 @@ module Nuntius
         self.json = EmailDesign.content_nodes(document) || []
         self.subject = document.dig("data", "subject")
         self.preview_text = document.dig("data", "preheader")
+        data = document["data"] || {}
+        design_attributes.each { |key, attribute| public_send(:"#{attribute}=", data[key]) if data.key?(key) }
         compose(EmailDesign.content_of(mjml))
       rescue ::JSON::ParserError, EmailDesign::Error => e
         @design_error = e.message
@@ -99,6 +102,12 @@ module Nuntius
       end
 
       private
+
+      # Its attributes edited in the editor's root, by their keys in its data
+      # (see app/javascript/nuntius/blocks/email.js)
+      def design_attributes
+        {}
+      end
 
       def compose(content)
         @design_error = nil
