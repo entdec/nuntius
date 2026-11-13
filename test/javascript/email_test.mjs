@@ -4,9 +4,10 @@ import assert from "node:assert/strict"
 import { getBlock } from "tess_edit/core/registry"
 import "nuntius/blocks/email"
 
-test("the root has a template's trigger, recipient and tracking, around TessEdit's groups", () => {
+test("the root has a template's trigger, recipient and tracking, and a layout's details, around TessEdit's groups", () => {
   const groups = getBlock("email").fields
-  assert.deepEqual(groups.map((group) => group.title), ["When", "Recipient", "Message", "Tracking", "Layout", "Theme", "Custom CSS"])
+  assert.deepEqual(groups.map((group) => group.title), ["When", "Recipient", "Details", "Message", "Tracking", "Layout", "Theme", "Custom CSS"])
+  assert.deepEqual(groups.find((group) => group.title === "Details").fields.map((field) => field.slot), ["name", "description"])
   assert.deepEqual(groups.find((group) => group.title === "When").fields.map((field) => [field.type, field.slot]), [["slot", "trigger"]])
   assert.equal(groups.find((group) => group.title === "Layout").fields.at(-1).slot, "layout")
 })

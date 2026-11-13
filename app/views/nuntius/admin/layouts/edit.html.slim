@@ -1,24 +1,32 @@
 = sts.form_for([:admin, @layout]) do |f|
-  = sts.card :nuntius_admin_layouts, icon: 'fal fa-table-layout' do |card|
+  / The name is the card's title, edited in place, and in the root's Inspect too, in step with it
+  - title = capture do
+    .nuntius-title
+      = f.text_field :name, class: "nuntius-title__input", placeholder: Nuntius::Layout.human_attribute_name(:name), "aria-label" => Nuntius::Layout.human_attribute_name(:name)
+    - if @layout.errors[:name].any?
+      p.mt-1.text-sm.font-normal.text-red-600 role="alert" = @layout.errors.full_messages_for(:name).to_sentence
+  = sts.card :nuntius_admin_layouts, icon: 'fal fa-table-layout', title: title do |card|
     - card.with_action
       = f.continue
     - card.with_action
       = f.submit
 
-    - card.with_tab :edit, padding: true
-      .grid.grid-cols-12.gap-4
-        = render "nuntius/admin/shared/metadata_variables", variables: @layout.metadata_variables, message: t(".metadata_variables")
-        .col-span-12
-          = f.input :name
-        .col-span-12
-          = f.input :description, as: :text, input_html: {rows: 2}, hint: t('.description_hint')
-        - if @layout.new_record?
-          .col-span-12.flex.flex-wrap.items-center.gap-2.text-sm
-            span.text-gray-600 = t('.start_from')
-            - Nuntius::Layout::STARTING_LAYOUTS.each do |key|
-              = link_to t(".starting_layouts.#{key}"), new_admin_layout_path(start: key), class: "rounded-md border px-2 py-1 #{(params[:start].presence || 'basic') == key ? 'border-gray-900 font-medium' : 'border-gray-200 text-gray-700'}"
-        .col-span-12
-          = render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, media_url: (media_admin_layout_path(@layout) if @layout.persisted?), variables: @layout.variable_roots, translations_url: (translations_admin_layout_path(@layout) if @layout.persisted?)
+    / The editor fills the tab
+    - card.with_tab :edit, padding: false
+      - if @layout.metadata_variables.any?
+        .m-4.grid.grid-cols-12.gap-4
+          = render "nuntius/admin/shared/metadata_variables", variables: @layout.metadata_variables, message: t(".metadata_variables")
+      - if @layout.new_record?
+        .m-4.flex.flex-wrap.items-center.gap-2.text-sm
+          span.text-gray-600 = t('.start_from')
+          - Nuntius::Layout::STARTING_LAYOUTS.each do |key|
+            = link_to t(".starting_layouts.#{key}"), new_admin_layout_path(start: key), class: "rounded-md border px-2 py-1 #{(params[:start].presence || 'basic') == key ? 'border-gray-900 font-medium' : 'border-gray-200 text-gray-700'}"
+      - slots = capture do
+        div data-tess-edit-target="slot" data-tess-edit-slot="name" hidden=true data-controller="nuntius--mirror" data-nuntius--mirror-for-value="layout[name]"
+          = f.input :name, label: false, input_html: {name: nil, id: "layout_name_inspect"}
+        div data-tess-edit-target="slot" data-tess-edit-slot="description" hidden=true
+          = f.input :description, as: :text, label: false, input_html: {rows: 3}, hint: t('.description_hint')
+      = render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, media_url: (media_admin_layout_path(@layout) if @layout.persisted?), variables: @layout.variable_roots, translations_url: (translations_admin_layout_path(@layout) if @layout.persisted?), attributes: %i[name description], slots: slots, frame: false
     - if @layout.persisted?
       - card.with_tab :media, padding: true
         .grid.grid-cols-4.gap-4

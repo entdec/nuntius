@@ -1,37 +1,41 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A second switch for a field of its form, kept in step with it both ways:
-// a template's Enabled, in the card's actions and in the email editor's When.
-// Its own hidden input has no name, so only the form's field is submitted.
-// Satis's switch says it changed with a change event on its hidden input.
+// A second input for a field of its form, kept in step with it both ways:
+// a layout's name, as its card's title and in the email editor's Inspect.
+// Its own input has no name, so only the form's field is submitted.
+// A Satis switch says it changed with a change event on its hidden input.
 //
-//   <div data-controller="nuntius--mirror" data-nuntius--mirror-for-value="template[enabled]">
-//     …a Satis switch whose hidden input has no name…
+//   <div data-controller="nuntius--mirror" data-nuntius--mirror-for-value="layout[name]">
+//     …an input, or a Satis switch, without a name…
 //   </div>
 export default class extends Controller {
   static values = { for: String }
 
   connect() {
-    this.own = this.element.querySelector("input[type=hidden]:not([name])")
+    this.own = this.element.querySelector("input:not([name]):not([type=checkbox])")
     this.field = this.element.closest("form")?.elements.namedItem(this.forValue)
     if (!this.own || !this.field) return
 
-    this.fromOwn = () => this.copy(this.own, this.field)
-    this.fromField = () => this.copy(this.field, this.own)
-    this.own.addEventListener("change", this.fromOwn)
-    this.field.addEventListener("change", this.fromField)
-    this.fromField()
+    this.fromOwn = (event) => this.copy(this.own, this.field, event.type)
+    this.fromField = (event) => this.copy(this.field, this.own, event.type)
+    for (const type of ["input", "change"]) {
+      this.own.addEventListener(type, this.fromOwn)
+      this.field.addEventListener(type, this.fromField)
+    }
+    this.copy(this.field, this.own, "change")
   }
 
   disconnect() {
-    this.own?.removeEventListener("change", this.fromOwn)
-    this.field?.removeEventListener("change", this.fromField)
+    for (const type of ["input", "change"]) {
+      this.own?.removeEventListener(type, this.fromOwn)
+      this.field?.removeEventListener(type, this.fromField)
+    }
   }
 
-  copy(from, to) {
+  copy(from, to, type) {
     if (to.value === from.value) return
 
     to.value = from.value
-    to.dispatchEvent(new Event("change"))
+    to.dispatchEvent(new Event(type))
   }
 }
