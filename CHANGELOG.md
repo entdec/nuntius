@@ -25,6 +25,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The templates table has a view for each transport, and All, each showing the enabled templates through a filter that can be taken off. The layouts table shows their descriptions.
 - A layout's name is its page's title, and in its editor's Inspect with its description.
 - A new campaign starts on the same cards as a template (Email, SMS or Voice, then for an email its layout), and a draft campaign is edited in the editor for what it sends, like a template: its name is the page's title, and Inspect has when it's published, its list and conditions, its From, and for an email its subject, preview text, tracking and layout. Only a campaign on an old layout keeps the Edit tab.
+- A campaign can be designed without a list; it can't be scheduled, or sent as a test, until it has one.
 - Nuntius blocks in the editor: Content, View in browser and Manage subscription.
 - Images uploaded in the editor, by button or by dragging a file onto the canvas, for Image blocks and the backgrounds of heroes, sections and wrappers. They're stored on the layout, template or campaign, and an Image block's image can be embedded in the email.
 - The `embed_image` Liquid filter, which attaches an image to the email and returns a `cid:` reference.

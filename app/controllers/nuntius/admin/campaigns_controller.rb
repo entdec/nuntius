@@ -65,7 +65,9 @@ module Nuntius
         assign_design
         return render(:edit, status: :unprocessable_entity) unless @campaign.save(context: :admin)
 
-        if @campaign.list.subscribers.test_recipients.exists?
+        if @campaign.list.nil?
+          redirect_to :edit_admin_campaign, alert: t(".no_list"), status: :see_other
+        elsif @campaign.list.subscribers.test_recipients.exists?
           messages = @campaign.send_test
           redirect_to :edit_admin_campaign, notice: t(".sent", count: messages.size, to: messages.map(&:to).to_sentence), status: :see_other
         else

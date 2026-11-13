@@ -20,7 +20,8 @@ module Nuntius
       "voice" => {"text" => :text}
     }.freeze
 
-    belongs_to :list
+    # Designed without one, but it isn't sent without one (see schedule)
+    belongs_to :list, optional: true
     accepts_nested_attributes_for :list, reject_if: :all_blank
 
     belongs_to :old_layout, class_name: "Nuntius::OldLayout", optional: true
@@ -36,7 +37,7 @@ module Nuntius
       # A scheduled campaign is published by CampaignPublishJob at its
       # publish_at, or within a minute without one
       event :schedule do
-        transition draft: :scheduled
+        transition draft: :scheduled, if: :list
       end
 
       event :deschedule do

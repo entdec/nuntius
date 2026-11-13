@@ -162,7 +162,7 @@ en:
             nuntius_admin_campaigns:
               title: Campaigns
           from_hint: "You can leave this blank, only fill this in if you want to override the default"
-          list_hint: "You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
+          list_hint: "Needed to send it, not to design it. You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
           layout_hint: "The email is edited in the Design tab, inside this layout."
           metadata_variables: "This campaign's design still reads metadata, which is going away:"
           tabs:
@@ -185,6 +185,7 @@ en:
           sent:
             one: "Saved, and sent a test message to %{to}."
             other: "Saved, and sent %{count} test messages to %{to}."
+          no_list: "Saved, but it has no list to send a test to yet."
           no_test_recipients: "Saved, but no subscriber of %{list} receives test messages. Turn it on for one in the list."
         index:
           card:

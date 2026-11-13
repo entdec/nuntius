@@ -39,7 +39,7 @@
             div data-tess-edit-target="slot" data-tess-edit-slot="trigger" hidden=true
               = f.input :publish_at, as: :date_time
             div data-tess-edit-target="slot" data-tess-edit-slot="audience" hidden=true
-              = f.association :list, collection: @lists, include_blank: false, hint: t(".list_hint")
+              = f.association :list, collection: @lists, include_blank: true, hint: t(".list_hint")
               / If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip]
               .mt-4 = nuntius_conditions f
             - if editor == :email
@@ -60,7 +60,7 @@
             .col-span-6
               = f.association :layout, collection: @layouts, hint: t(".layout_hint")
             .col-span-6
-              = f.association :list, collection: @lists, hint: t(".list_hint")
+              = f.association :list, collection: @lists, include_blank: true, hint: t(".list_hint")
 
             .col-span-12
               = nuntius_liquid_field f do

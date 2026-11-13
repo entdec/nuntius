@@ -175,7 +175,7 @@ nl:
             nuntius_admin_campaigns:
               title: Campagne
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
-          list_hint: "Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
+          list_hint: "Nodig om te versturen, niet om te ontwerpen. Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
           layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout."
           metadata_variables: "Het ontwerp van deze campagne leest nog metadata, die gaat verdwijnen:"
           tabs:
@@ -198,6 +198,7 @@ nl:
           sent:
             one: "Opgeslagen, en een testmail verstuurd naar %{to}."
             other: "Opgeslagen, en %{count} testmails verstuurd naar %{to}."
+          no_list: "Opgeslagen, maar er is nog geen lijst om een test naar te sturen."
           no_test_recipients: "Opgeslagen, maar geen abonnee van %{list} ontvangt testmails. Zet het aan bij een abonnee in de lijst."
         index:
           card:
