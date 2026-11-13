@@ -34,9 +34,10 @@
           = f.submit
 
         - if designed
-          - card.with_tab :design, padding: true
+          / The editor fills the tab
+          - card.with_tab :design, padding: false
             - if @template.metadata_variables.any?
-              .mb-4.grid.grid-cols-12.gap-4
+              .m-4.grid.grid-cols-12.gap-4
                 = render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables")
             - slots = capture do
               div data-tess-edit-target="slot" data-tess-edit-slot="trigger" data-open=(@template.new_record? || nil) hidden=true
@@ -50,7 +51,7 @@
                 div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden=true
                   = f.association :layout, collection: @layouts, include_blank: false, label: false, hint: t('.layout_moves')
             - if editor == :email
-              = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots
+              = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots, frame: false
             - else
               = render "message_editor", slots: slots
 
