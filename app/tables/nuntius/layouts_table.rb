@@ -6,6 +6,7 @@ module Nuntius
       model Nuntius::Layout
 
       column(:name)
+      column(:description)
       action :delete do
         link { |layout| nuntius.admin_layout_url(layout) }
         icon "fa-solid fa-trash"

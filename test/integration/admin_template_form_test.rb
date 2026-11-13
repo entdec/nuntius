@@ -73,11 +73,12 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
     assert_equal "Hi", template.text
   end
 
-  test "the templates of one transport, or all" do
-    get "/nuntius/admin/templates", params: {transport: "sms"}
+  test "the enabled templates, of all transports or one, as the table's views" do
+    views = Nuntius::TemplatesTable.new.all_views
 
-    assert_select "nav[aria-label=Transports] a[aria-current=page]", text: "SMS"
-    assert_select "nav a[href='/nuntius/admin/templates']", text: "All"
+    assert_equal ["All", "Email", "SMS", "Push notification", "Voice"], views.map(&:name)
+    views.each { |view| assert_equal true, view.config.dig(:filters, :enabled, :value) }
+    assert_equal "sms", views.find { |view| view.name == "SMS" }.config.dig(:filters, :transport, :value)
   end
 
   test "the classes and events by their names for people" do

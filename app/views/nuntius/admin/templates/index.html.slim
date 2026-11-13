@@ -1,14 +1,2 @@
-- transports = nuntius_transports
-- transport = params[:transport].presence_in(transports)
 = sts.card :nuntius_admin_templates, icon: 'fad fa-file', content_padding: false, menu: nuntius_templates_menu do |card|
-  / The templates of one transport, or all
-  - if transports.many?
-    nav.flex.flex-wrap.gap-1.border-b.border-gray-200.px-4.py-2 aria-label=t('.transports')
-      - [nil, *transports].each do |option|
-        = link_to admin_templates_path(transport: option), class: "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm #{option == transport ? 'bg-gray-100 font-medium text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}", "aria-current": (option == transport ? "page" : nil) do
-          - if option
-            = nuntius_transport_icon(option, "text-gray-500")
-            = nuntius_transport_name(option)
-          - else
-            = t('.all')
-  = sts.table :"nuntius/templates", params: {transport: transport}.compact
+  = sts.table :"nuntius/templates"

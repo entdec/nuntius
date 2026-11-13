@@ -142,8 +142,7 @@ nl:
           cancelled: Geannuleerd
       templates:
         views:
-          enabled: Ingeschakeld
-          disabled: Uitgeschakeld
+          all: Alle
       subscribers:
         views:
           subscribed: Geabonneerd
@@ -360,8 +359,6 @@ nl:
                 translations: Vertalingen
                 messages: Berichten
         index:
-          all: Alle
-          transports: Soorten berichten
           card:
             nuntius_admin_templates:
               tab:

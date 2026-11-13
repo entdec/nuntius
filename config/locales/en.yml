@@ -129,8 +129,7 @@ en:
           cancelled: Cancelled
       templates:
         views:
-          enabled: Enabled
-          disabled: Disabled
+          all: All
       subscribers:
         views:
           subscribed: Subscribed
@@ -345,8 +344,6 @@ en:
                 translations: Translations
                 messages: Messages
         index:
-          all: All
-          transports: Transports
           card:
             nuntius_admin_templates:
               tab:
