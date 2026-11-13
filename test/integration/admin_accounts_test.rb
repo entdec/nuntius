@@ -52,7 +52,12 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
   end
 
   test "the layout picker offers the account's own layouts, and another account's can't be chosen" do
-    get "/nuntius/admin/templates/new"
+    get "/nuntius/admin/templates/new", params: {transport: "mail", layout_id: @other_layout.id}
+
+    assert_select "a[href*='layout_id=#{@layout.id}']"
+    assert_select "a[href*='layout_id=#{@other_layout.id}']", count: 0
+
+    get "/nuntius/admin/templates/new", params: {transport: "mail", layout_id: @layout.id}
 
     assert_select "select[name='template[layout_id]'] option[value='#{@layout.id}']"
     assert_select "select[name='template[layout_id]'] option[value='#{@other_layout.id}']", count: 0
@@ -71,7 +76,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
   end
 
   test "a global switch is there only when the account may make templates global" do
-    get "/nuntius/admin/templates/new"
+    get "/nuntius/admin/templates/new", params: {transport: "sms"}
     assert_select "input[name='template[global]']", count: 0
 
     patch "/nuntius/admin/templates/#{@template.id}", params: {template: {global: "1"}}
@@ -79,7 +84,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
 
     Nuntius.config.can_create_global = -> { true }
 
-    get "/nuntius/admin/templates/new"
+    get "/nuntius/admin/templates/new", params: {transport: "sms"}
     assert_select "input[name='template[global]']"
 
     patch "/nuntius/admin/templates/#{@template.id}", params: {template: {global: "1"}}
@@ -93,7 +98,8 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     patch "/nuntius/admin/templates/#{@template.id}", params: {template: {metadata_yaml: "logo_url: logo.png"}}
     assert_equal({}, @template.reload.metadata)
 
-    @template.update!(old_layout: nuntius_old_layouts(:one))
+    # Only mail had old layouts
+    @template.update!(transport: "mail", old_layout: nuntius_old_layouts(:one))
     get "/nuntius/admin/templates/#{@template.id}/edit"
     assert_select "[name='template[metadata_yaml]']"
 

@@ -45,18 +45,27 @@ module Nuntius
 
       order description: :asc
 
-      view :default do
-        name -> { I18n.t("nuntius.tables.templates.views.enabled") }
+      # Enabled ones, as a filter that can be taken off
+      partial :enabled do
         filter :enabled do
           operator :is
           value true
         end
       end
-      view :disabled do
-        name -> { I18n.t("nuntius.tables.templates.views.disabled") }
-        filter :enabled do
-          operator :is
-          value false
+      view :default do
+        name -> { I18n.t("nuntius.tables.templates.views.all") }
+        include :enabled
+      end
+      # The templates of each transport made from the new template's cards
+      %w[mail sms push voice].each do |transport|
+        view transport.to_sym do
+          name -> { I18n.t(transport, scope: "nuntius.transports") }
+          include :enabled
+
+          filter :transport do
+            operator :is
+            value transport
+          end
         end
       end
 
@@ -67,6 +76,8 @@ module Nuntius
 
     def scope
       @scope = Nuntius::Template.visible
+      @scope = @scope.where(layout_id: params[:layout_id]) if params[:layout_id].present?
+      @scope
       # @scope = Nuntius::Template.visible.select("nuntius_templates.*, (select count(id) from nuntius_messages where nuntius_messages.template_id = nuntius_templates.id) as message_count")
     end
   end

@@ -35,26 +35,17 @@ class AdminConditionsFormTest < ActionDispatch::IntegrationTest
     assert_includes urls.keys, "Account"
     assert_equal({"account" => "AccountDrop", "template" => "Nuntius::TemplateDrop"},
       Liquidum::Variables.from_token(Rack::Utils.parse_query(URI(urls["Account"]).query)["roots"]).roots.transform_values(&:name))
-    # with the conditions and Liquid fields inside it
+    # with the conditions and the editor inside it
     assert_select "[data-controller~='nuntius--variables'] .entdec-conditions"
-    assert_select "[data-controller~='nuntius--variables'] [data-controller='entdec--liquid-field'] input[name='template[to]']"
+    assert_select "[data-controller~='nuntius--variables'] [data-controller='tess-edit'][data-tess-edit-variables-url-value*='/liquidum/variables']"
   end
 
-  test "From, To and an SMS's text are Liquid fields, and the description has its Auto toggle" do
+  test "the description has its Auto toggle, and reads the sentence" do
     template = template_with([])
 
     get "/nuntius/admin/templates/#{template.id}/edit"
 
-    %w[from to].each do |field|
-      assert_select "[data-controller='entdec--liquid-field'][data-entdec--liquid-field-url-value*='/liquidum/variables'] input[name='template[#{field}]']"
-    end
-    assert_select "template[data-toggle-value='sms'] [data-controller='entdec--liquid-field'] textarea[name='template[text]']"
-    assert_select "template[data-toggle-value='teams'] [data-controller='entdec--liquid-field'] textarea[name='template[text]']"
-    # and the code editors, Voice's TwiML with Liquid highlighted
-    assert_select "template[data-toggle-value='voice'] [data-controller='entdec--liquid-field'] [data-controller='entdec--code-editor'][data-entdec--code-editor-lang-value='liquid'] input[type=hidden][name='template[text]']"
-    assert_select "template[data-toggle-value='slack'] [data-controller='entdec--liquid-field'] [data-controller='entdec--code-editor']", count: 2
-    assert_select "template[data-toggle-value='slack'] [data-entdec--code-editor-lang-value='yaml'] input[name='template[payload]']"
-    assert_select "[data-controller='nuntius--description'] input[name='template[description]'][data-nuntius--description-target='field']"
+    assert_select "[data-controller~='nuntius--description'] input[name='template[description]'][data-nuntius--description-target='field']"
     assert_select "input[type=checkbox][name='template[auto_description]'][data-nuntius--description-target='auto']"
     assert_select "[data-nuntius--description-target='sentence'] [data-description-skip]", minimum: 2
   end
@@ -76,7 +67,7 @@ class AdminConditionsFormTest < ActionDispatch::IntegrationTest
   test "a description made by hand stays when Auto is unchecked" do
     template = template_with([])
     assert template.auto_description
-    get "/nuntius/admin/templates/new"
+    get "/nuntius/admin/templates/new", params: {transport: "sms"}
     assert_select "input[type=checkbox][name='template[auto_description]'][checked]"
 
     patch "/nuntius/admin/templates/#{template.id}", params: {template: {description: "Mine", auto_description: "0"}}

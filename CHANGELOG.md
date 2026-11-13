@@ -15,9 +15,17 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - Conditions on templates and campaigns: *If [all] of the following conditions are met: [Screening › Payment needed?] [is] [true]*, with the Liquid variables they render with and Mensa's operators, chosen as pills. A message is only sent when they're met, so an `{% if %}` around the recipient can go. See [Conditions](README.md#conditions). Copy in the migration with `bin/rails nuntius:install:migrations`.
 - Timebased templates send at most `config.timebased_limit` messages in a run (500 by default, or the template's own limit), counted after their conditions. A template that would send more sends nothing, and is disabled and reported (`Nuntius::TimebasedEventsJob::LimitExceeded` through `Rails.error`) until someone checks it. The template's page says whom it sends to today, or this hour. Copy in the migration with `bin/rails nuntius:install:migrations`.
 - Every date and time on a nuntiable object is a timebased event: when it *is in* or *was* some time *ago*, once or every day, week, month, quarter, half year or year (a birthday). Templates get a `recurrence`; dates are sent from `config.timebased_send_hour`; messengers can `hide_timestamps`. See [Timebased events](README.md#timebased-events). Copy in the migration with `bin/rails nuntius:install:migrations`.
-- The template form reads as a sentence: *Send via [Email] based on [an event] on [Order] [shipped]*, or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year]. Objects by their model names, events by their names from the messenger's `describe`, `nuntius.events` translations or the state machine (see [Naming events](README.md#naming-events)), and transports by name in alphabetical order. New templates send by mail when it's enabled.
+- The template form reads as a sentence: *Send via Email based on [an event] on [Order] [shipped]*, or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year]. Objects by their model names, and events by their names from the messenger's `describe`, `nuntius.events` translations or the state machine (see [Naming events](README.md#naming-events)).
 - Layouts designed in the email editor, with one Content block where each template or campaign puts its own content. Templates and draft campaigns follow their layout when it changes, and show it locked in their editor.
 - Starting layouts for new layouts: Basic, Newsletter, Transactional and Empty.
+- A new template starts on a page of cards: what it sends (Email, SMS, Push, …, one for each enabled transport), then for an email which layout to start from, by its preview, name and description. The cards open the editor, and the template is created when it's saved. What a template sends can't be changed afterwards. With one transport, or one layout, it's chosen already.
+- An email template is edited in its editor only, without an Edit tab: with the email selected, Inspect has when it sends (its sentence and conditions, as the template form's own fields), its From and To, its subject and preview text, its link and open tracking, and its layout. Its description is the page's title, editable in place, and Enabled is under when it sends. It needs TessEdit 0.5's `slot` fields.
+- SMS, Push, Teams, Slack and Voice templates are edited in an editor too, with the same When and Recipient in Inspect, their text and payload under Message, and a preview of the message with sample values in the middle (`POST <admin>/templates/preview`). An SMS shows its length and number of parts as it's typed.
+- Layouts have a description, saying what they're for. A layout made from a starting layout gets the starting layout's. Copy in the migration with `bin/rails nuntius:install:migrations`.
+- The templates table has a view for each transport, and All, each showing the enabled templates through a filter that can be taken off. The layouts table shows their descriptions.
+- A layout's name is its page's title, and in its editor's Inspect with its description.
+- A new campaign starts on the same cards as a template (Email, SMS or Voice, then for an email its layout), and a draft campaign is edited in the editor for what it sends, like a template: its name is the page's title, and Inspect has when it's published, its list and conditions, its From, and for an email its subject, preview text, tracking and layout. Only a campaign on an old layout keeps the Edit tab.
+- A campaign can be designed without a list; it can't be scheduled, or sent as a test, until it has one.
 - Nuntius blocks in the editor: Content, View in browser and Manage subscription.
 - Images uploaded in the editor, by button or by dragging a file onto the canvas, for Image blocks and the backgrounds of heroes, sections and wrappers. They're stored on the layout, template or campaign, and an Image block's image can be embedded in the email.
 - The `embed_image` Liquid filter, which attaches an image to the email and returns a `cid:` reference.
@@ -43,7 +51,9 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - **A campaign's translation scope is its layout's** (`basic`), no longer `nuntius` and its layout (`nuntius.basic`), the same as the start of its templates' scopes, so a layout's keys work in both. Move the translations of draft campaigns' keys starting with a dot up from under `nuntius` in the locales.
 - An account's locales merge in the order they were created, later ones winning, instead of in no particular order.
 - A template with several addresses in its To renders a message for each, instead of the mail and push transports copying one message. `Template#new_message` is deprecated, and gives only the first, no longer one with every address in its To.
-- Every new mail and LMTP template and campaign needs a layout.
+- **LMTP is a provider on the `:mail` transport**, no longer a transport of its own: mail to an LMTP address (`<email>@<host>:<port>`) goes to it, other mail to SMTP. Templates and campaigns send by mail, and the migration moves LMTP templates (with their translations), campaigns and messages to `mail`. The LMTP provider is now `Nuntius::LmtpMailProvider`, and its `host` and `port` settings are gone: a plain address goes over SMTP. See [LMTP](README.md#lmtp) and step 13 of [Upgrading from 1.x](#upgrading-from-1x).
+- A transport only gives a message to the providers that handle its address (`BaseProvider.handles?`): APNs gets APNs device tokens and Firebase the other push tokens, where both used to get every token. A message no provider handles has no recipient (`no_recipient`). Priorities after a gap (1, then 3) are no longer skipped.
+- Every new mail template and campaign needs a layout.
 - Mail campaigns to a list that allows unsubscribing must contain the Manage subscription block.
 - Campaigns are only published by `Nuntius::CampaignPublishJob`, and only once they're scheduled: `publish` goes from `scheduled` to `sending`, no longer from `draft`, and the admin's Publish action (`POST /admin/campaigns/:id/publish`) is replaced by Schedule. The job no longer publishes draft campaigns whose `publish_at` has passed.
 - Templates and campaigns have a preview text.
@@ -70,9 +80,11 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 ### Fixed
 
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
+- An SMS or Voice campaign sent its messages without their text: its text is now rendered for each subscriber.
 - `Nuntius::TimebasedEventsJob` runs one at a time (a Postgres advisory lock): a run that started while another one was still going could send the same messages again. It now leaves them to the run that's going.
 - The subscribers table raised for a subscriber with tags.
 - The `t` filter raised ("Liquid error: internal") instead of translating with the account's locales, and keys starting with a dot had no scope. It needs Liquidum 1.4 and its configuration (see Upgrading).
+- Liquid that doesn't parse in a template's From, To, subject, body or text (`validates …, liquid: true`) is a validation error. The validator added its error in a way Rails no longer keeps, so such templates saved.
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
 
 ### Upgrading from 1.x
@@ -183,3 +195,14 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
     Campaigns' keys starting with a dot are now in their layout's scope, without `nuntius` (see Changed): move them up in the locales.
 
 12. **Check your locales.** A locale that has the same key as another of its account, or data that doesn't start with languages, can't be saved any more. Find them with `Nuntius::Locale.all.reject(&:valid?)`, and merge or fix them.
+
+13. **Move LMTP to the mail transport** in your Nuntius initializer, if you use it: remove `config.transport :lmtp`, give the LMTP provider `transport: :mail`, and drop its `host` and `port` settings:
+
+    ```ruby
+    config.provider :lmtp, transport: :mail, settings: {
+      from_header: "Example <example@example.com>",
+      allow_list: ["example.com"]
+    }
+    ```
+
+    LMTP templates need a To that renders to LMTP addresses (`<email>@<host>:<port>`): a plain address now goes over SMTP.

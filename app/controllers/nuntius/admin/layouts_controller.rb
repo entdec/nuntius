@@ -12,7 +12,8 @@ module Nuntius
       end
 
       def new
-        @layout = Nuntius::Layout.new(json: Nuntius::Layout.starting_document(params[:start]))
+        start = params[:start].presence_in(Nuntius::Layout::STARTING_LAYOUTS) || "basic"
+        @layout = Nuntius::Layout.new(json: Nuntius::Layout.starting_document(start), description: t("nuntius.admin.layouts.edit.starting_layout_descriptions.#{start}"))
         render :edit
       end
 
@@ -53,7 +54,7 @@ module Nuntius
       private
 
       def layout_params
-        params.require(:layout).permit(:name)
+        params.require(:layout).permit(:name, :description)
       end
 
       def assign_layout_design

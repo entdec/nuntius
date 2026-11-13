@@ -14,7 +14,6 @@ Nuntius.setup do |config|
   config.host = ->(_message) { "app.#{ENV.fetch("DEV_ENV_NAME", "nuntius")}.orb.local" }
 
   config.transport :mail
-  config.transport :lmtp
   config.transport :push
   config.transport :sms
   config.transport :voice
@@ -52,11 +51,9 @@ Nuntius.setup do |config|
     )
   end
 
-  # LMTP delivery to a mailbox, on its own transport. The recipient and
-  # per-message LMTP server are inline-encoded in the template `to` as
-  # `<email>@<host>:<port>`; `host`/`port` are optional fallbacks for plain
-  # addresses.
-  config.provider :lmtp, transport: :lmtp, settings: {
+  # LMTP delivery to a mailbox: mail to an address with its LMTP server in
+  # it, `<email>@<host>:<port>`, goes here instead of to SMTP.
+  config.provider :lmtp, transport: :mail, settings: {
     from_header: "Example <example@example.com>",
     allow_list: ["example.com"]
   }

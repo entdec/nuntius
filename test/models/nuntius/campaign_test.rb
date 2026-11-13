@@ -23,6 +23,14 @@ module Nuntius
       assert campaign.reload.sent?
     end
 
+    test "a campaign is designed without a list, but not scheduled without one" do
+      campaign = Campaign.create!(name: "News", transport: "sms", text: "Hi", account: accounts(:one))
+
+      assert_not campaign.can_schedule?
+      campaign.update!(list: nuntius_lists(:valentines))
+      assert campaign.can_schedule?
+    end
+
     test "a cancelled campaign stops sending" do
       campaign = nuntius_campaigns(:valentines_day)
       campaign.update_column(:state, "cancelled")

@@ -27,6 +27,7 @@ nl:
         transport: Versturen via
         html: Body
       nuntius/layout:
+        description: Omschrijving
         name: Naam
       nuntius/list:
         allow_unsubscribe: Uitschrijven toestaan
@@ -111,8 +112,14 @@ nl:
       quarterly: elk kwartaal
       half_yearly: elk half jaar
       yearly: elk jaar
+    transport_hints:
+      mail: Ontworpen, met een layout
+      push: Een melding op een telefoon
+      slack: Een bericht in een kanaal
+      sms: Een kort tekstbericht
+      teams: Een bericht in een kanaal
+      voice: Een telefoongesprek dat spreekt
     transports:
-      lmtp: LMTP (mailbox)
       mail: E-mail
       push: Pushbericht
       slack: Slack
@@ -135,8 +142,7 @@ nl:
           cancelled: Geannuleerd
       templates:
         views:
-          enabled: Ingeschakeld
-          disabled: Uitgeschakeld
+          all: Alle
       subscribers:
         views:
           subscribed: Geabonneerd
@@ -144,6 +150,12 @@ nl:
     admin:
       not_saved: "%{resource} kon niet worden opgeslagen: %{errors}"
       shared:
+        new:
+          what: Wat wil je versturen?
+          which_layout: Met welke layout wil je beginnen?
+          back: Terug
+          no_layouts: Er zijn nog geen layouts
+          create_layout: Maak eerst een layout
         translations:
           intro_html: "Wat de <code>{{ '.key' | t }}</code>-filters in elke taal zeggen, uit de locales van het account. Een sleutel die met een punt begint staat in %{path}, en wordt van daar richting de root opgezocht. Wijzigingen worden meteen bewaard."
           none_html: "Er wordt nog niets vertaald. Gebruik <code>{{ '.key' | t }}</code> in de teksten, of Vertaalbaar maken in de e-maileditor."
@@ -156,12 +168,14 @@ nl:
         create:
           only_images: Je kunt alleen afbeeldingen uploaden
       campaigns:
+        new:
+          title: Nieuwe campagne
         edit:
           card:
             nuntius_admin_campaigns:
               title: Campagne
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
-          list_hint: "Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
+          list_hint: "Nodig om te versturen, niet om te ontwerpen. Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
           layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout."
           metadata_variables: "Het ontwerp van deze campagne leest nog metadata, die gaat verdwijnen:"
           tabs:
@@ -184,6 +198,7 @@ nl:
           sent:
             one: "Opgeslagen, en een testmail verstuurd naar %{to}."
             other: "Opgeslagen, en %{count} testmails verstuurd naar %{to}."
+          no_list: "Opgeslagen, maar er is nog geen lijst om een test naar te sturen."
           no_test_recipients: "Opgeslagen, maar geen abonnee van %{list} ontvangt testmails. Zet het aan bij een abonnee in de lijst."
         index:
           card:
@@ -203,6 +218,12 @@ nl:
             newsletter: Nieuwsbrief
             transactional: Transactioneel
             empty: Leeg
+          starting_layout_descriptions:
+            basic: Een kop, de inhoud en een voet.
+            newsletter: Een kop met kolommen voor artikelen, en een voet met de link naar het abonnement.
+            transactional: Eenvoudig en to the point, voor bonnen, meldingen en bevestigingen.
+            empty: Alleen de inhoud, om alles zelf te ontwerpen.
+          description_hint: Staat onder de voorbeeldweergave bij het kiezen van een layout voor een nieuwe template.
           tabs:
             main:
               tab:
@@ -297,7 +318,27 @@ nl:
                 preview: Preview
                 tracking: Tracking
       templates:
+        new:
+          title: Nieuwe template
         edit:
+          description_auto: Automatisch
+          description_if: als
+          description_or: "of"
+          card:
+            nuntius_admin_templates:
+              title: Template
+          metadata: Metadata
+          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
+          layout_moves: "De eigen inhoud verhuist bij opslaan naar de gekozen layout."
+          global_hint: Gebruikt voor elk account, niet alleen dit
+          metadata_variables: "Het ontwerp van deze template leest nog metadata, die gaat verdwijnen:"
+          old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
+          old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
+          convert_layout: Omzetten naar layout
+          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
+          convert: Omzetten naar de e-maileditor
+          convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
+        trigger:
           send_via: Versturen via
           due_today:
             one: Verstuurt vandaag naar 1
@@ -307,26 +348,10 @@ nl:
             other: Verstuurt dit uur naar %{count}
           due_over_limit: Zou naar meer dan %{limit} versturen, dus wordt tegengehouden en verstuurt niets
           limit: "· hoogstens"
-          description_auto: Automatisch
-          description_if: als
-          description_or: "of"
           when: wanneer
           based_on: op basis van
           ago: geleden
           'on': bij
-          card:
-            nuntius_admin_templates:
-              title: Template
-          metadata: Metadata
-          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
-          global_hint: Gebruikt voor elk account, niet alleen dit
-          metadata_variables: "Het ontwerp van deze template leest nog metadata, die gaat verdwijnen:"
-          old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
-          old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
-          convert_layout: Omzetten naar layout
-          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
-          convert: Omzetten naar de e-maileditor
-          convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
         convert:
           converted: De template gebruikt nu de e-maileditor. Controleer hem in het tabblad Ontwerp.
           tabs:

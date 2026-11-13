@@ -74,7 +74,8 @@ module Nuntius
     private
 
     def scope
-      @scope = Nuntius::Campaign.visible.joins(:list)
+      # A campaign without a list too (see Campaign#list)
+      @scope = Nuntius::Campaign.visible.left_joins(:list)
     end
   end
 end

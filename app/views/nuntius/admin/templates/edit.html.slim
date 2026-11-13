@@ -1,103 +1,88 @@
-
 - present(@template, TemplatePresenter) do |template|
+  / A template is edited in an editor with everything in its root's Inspect, the trigger as a slot:
+  / an email in the email editor (app/javascript/nuntius/blocks/email.js), with its layout as a slot too,
+  / and the others in the editor for their messages (kits/messages.js). An email on an old layout,
+  / or without a layout, has the Edit tab.
+  - editor = if @template.email? && @template.layout && !@template.old_layout then :email elsif @template.message_design? then :message end
+  - designed = editor.present?
   = sts.form_for([:admin, @template]) do |f|
-    = sts.card :nuntius_admin_templates, icon: 'fal fa-file' do |card|
-      - card.with_action
-        = f.continue
-      - card.with_action
-        = f.submit
+    / The description is made from the trigger's sentence and conditions, until one is typed (see the description controller).
+    / Variable pickers, Liquid fields and the email editor follow the class chosen (see the variables controller).
+    div data-controller="nuntius--description nuntius--variables" data-nuntius--description-if-value=t(".description_if") data-nuntius--description-and-value=t("entdec.conditions.and") data-nuntius--description-or-value=t(".description_or") *nuntius_variables_data(f, template.klass_options.map(&:last))
+      / The description is the card's title, editable in place
+      - title = capture do
+        - if designed
+          .nuntius-title
+            = f.text_field :description, class: "nuntius-title__input", placeholder: Nuntius::Template.human_attribute_name(:description), "aria-label" => Nuntius::Template.human_attribute_name(:description), data: {"nuntius--description-target" => "field"}
+            label.nuntius-description-auto.nuntius-title__auto
+              = f.check_box :auto_description, data: {"nuntius--description-target" => "auto", action: "nuntius--description#fill"}
+              span = t(".description_auto")
+          - if @template.errors[:description].any?
+            p.mt-1.text-sm.font-normal.text-red-600 role="alert" = @template.errors.full_messages_for(:description).to_sentence
+        - else
+          = t(".card.nuntius_admin_templates.title")
+      = sts.card :nuntius_admin_templates, icon: 'fal fa-file', title: title do |card|
+        - if @template.new_record? && @back_path
+          - card.with_action
+            = link_to t('nuntius.admin.shared.new.back'), @back_path, class: "button"
+        - card.with_action
+          = f.continue
+        - card.with_action
+          = f.submit
 
-      - card.with_tab :edit, padding: true
-        / The description is made from the sentence and conditions below, until one is typed (see the description controller)
-        div data-controller="nuntius--description" data-nuntius--description-if-value=t(".description_if") data-nuntius--description-and-value=t("entdec.conditions.and") data-nuntius--description-or-value=t(".description_or")
-          - if @template.metadata_variables.any?
-            .mb-6.grid.grid-cols-12.gap-4
-              = render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables")
+        - if designed
+          / The editor fills the tab
+          - card.with_tab :design, padding: false
+            - if @template.metadata_variables.any?
+              .m-4.grid.grid-cols-12.gap-4
+                = render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables")
+            - slots = capture do
+              div data-tess-edit-target="slot" data-tess-edit-slot="trigger" data-open=(@template.new_record? || nil) hidden=true
+                = render "trigger", f: f, template: template
+                .mt-4 = f.input :enabled, as: :switch
+                - if Nuntius.config.can_create_global
+                  .mt-4 = f.input :global, as: :switch, hint: t('.global_hint')
+              - if editor == :email
+                div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden=true
+                  = f.association :layout, collection: @layouts, include_blank: false, label: false, hint: t('.layout_moves')
+            - if editor == :email
+              = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots, frame: false
+            - else
+              = render "nuntius/admin/shared/message_editor", record: @template, name: "template", options: {template: true}, translations_url: (translations_admin_template_path(@template) if @template.persisted?), slots: slots
 
-          / Reads as a sentence of pills (see TemplatePresenter): send via [mail] based on [an event] on [Order] [shipped],
-          / or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year]
-          / Variable pickers and Liquid fields follow the class chosen (see the variables controller)
-          .grid.grid-cols-12.gap-4 data-controller='toggle nuntius--variables' *nuntius_variables_data(f, template.klass_options.map(&:last))
-            .nuntius-sentence.col-span-12.flex.flex-wrap.items-center.gap-x-2.gap-y-2.text-sm.text-gray-700 data-nuntius--description-target="sentence"
-              span data-description-skip=true = t('.send_via')
-              = entdec_pill_select f, :transport, nuntius_transport_options, select_html: { "data-toggle-target" => 'input' }
-              span data-description-skip=true = t('.based_on')
-              / contents: the nested toggles' fields wrap as part of the sentence
-              .contents data-controller='toggle'
-                .contents data-description-skip=true
-                  = entdec_pill_select f, :based_on, template.based_on_options, tone: :operator, select_html: { "data-toggle-target" => 'input' }
-                / on [User] [activate], or when [User] [Born on] is in: by what it's based on (see nuntius-sentence)
-                span.nuntius-sentence__on = t('.on')
-                span.nuntius-sentence__when = t('.when')
-                = entdec_pill_select f, :klass, template.klass_options, selected: @template.klass, tone: :neutral
-                .contents data-toggle-target="insertion"
+        - else
+          - card.with_tab :edit, padding: true
+            - if @template.metadata_variables.any?
+              .mb-6.grid.grid-cols-12.gap-4
+                = render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables")
 
-                / [shipped], or a Custom event's scope#event
-                template data-toggle-target='toggleable' data-toggle-value='event'
-                  .contents data-controller='nuntius--chained-select' data-nuntius--chained-select-to-value='template[klass]'
-                    .contents data-nuntius--chained-select-target='list'
-                      = entdec_pill_select f, :event, template.event_options
-                    .contents data-nuntius--chained-select-target='text'
-                      = f.text_field :event, class: 'entdec-pill-input entdec-pill-input--wide', placeholder: 'scope#event', "aria-label" => Nuntius::Template.human_attribute_name(:event)
+            = render "trigger", f: f, template: template
 
-                / [Born on] [is in] [4] [weeks] [every year]
-                template data-toggle-target='toggleable' data-toggle-value='time'
-                  .contents data-controller='nuntius--chained-select' data-nuntius--chained-select-to-value='template[klass]'
-                    .contents data-nuntius--chained-select-target='list'
-                      = entdec_pill_select f, :timestamp, template.timestamp_options, tone: :neutral
-                  .contents data-controller='toggle'
-                    = entdec_pill_select f, :direction, template.direction_options, tone: :operator, select_html: { "data-toggle-target" => 'input' }
-                    = render "interval", f: f, template: template
-                    .contents data-toggle-target="insertion"
-                    template data-toggle-target='toggleable' data-toggle-value='after'
-                      span = t('.ago')
-                  = entdec_pill_select f, :recurrence, template.recurrence_options
-            - sentence_errors = %i[klass event interval recurrence].flat_map { |attribute| @template.errors.full_messages_for(attribute) }
-            - if sentence_errors.any?
-              .col-span-12.text-sm.text-red-600 role="alert" = sentence_errors.to_sentence
+            .mt-4.grid.grid-cols-12.gap-4
+              .col-span-1
+                = f.input :enabled, as: :switch
+              div class=(Nuntius.config.can_create_global ? "col-span-9 relative" : "col-span-11 relative")
+                label.nuntius-description-auto
+                  = f.check_box :auto_description, data: {"nuntius--description-target" => "auto", action: "nuntius--description#fill"}
+                  span = t(".description_auto")
+                = f.input :description, input_html: {data: {"nuntius--description-target" => "field"}}
+              - if Nuntius.config.can_create_global
+                .col-span-2
+                  = f.input :global, as: :switch, hint: t('.global_hint')
 
-            / If [all] of the following conditions are met: [Order › State] [is] [shipped]
-            .col-span-12
-              = nuntius_conditions f
+              .col-span-6
+                = nuntius_liquid_field f do
+                  = f.input :from
+              .col-span-6
+                = nuntius_liquid_field f do
+                  = f.input :to
 
-            / Whom a time based template sends to now, and its limit (see TimebasedEventsJob)
-            - if @template.persisted? && (due_count = @template.due_count)
-              .col-span-12.flex.flex-wrap.items-center.gap-x-2.text-sm.text-gray-500 role="status"
-                - if due_count > @template.send_limit
-                  span.text-red-600 = t(".due_over_limit", limit: @template.send_limit)
-                - else
-                  span = t(@template.due_today? ? ".due_today" : ".due_this_hour", count: due_count)
-                span = t(".limit")
-                = f.number_field :timebased_limit, min: 1, placeholder: Nuntius.config.timebased_limit, class: "entdec-pill-input", "aria-label" => Nuntius::Template.human_attribute_name(:timebased_limit)
+              / Old layouts read their values from the template's metadata
+              - if @template.old_layout
+                .col-span-12
+                  = entdec_code_editor f, :metadata_yaml, lang: "yaml", label: t('.metadata')
 
-            .col-span-1
-              = f.input :enabled, as: :switch
-            div class=(Nuntius.config.can_create_global ? "col-span-9 relative" : "col-span-11 relative")
-              label.nuntius-description-auto
-                = f.check_box :auto_description, data: {"nuntius--description-target" => "auto", action: "nuntius--description#fill"}
-                span = t(".description_auto")
-              = f.input :description, input_html: {data: {"nuntius--description-target" => "field"}}
-            - if Nuntius.config.can_create_global
-              .col-span-2
-                = f.input :global, as: :switch, hint: t('.global_hint')
-
-            .col-span-6
-              = nuntius_liquid_field f do
-                = f.input :from
-            .col-span-6
-              = nuntius_liquid_field f do
-                = f.input :to
-
-            .col-span-12
-              .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
-
-            / Old layouts read their values from the template's metadata
-            - if @template.old_layout
-              .col-span-12
-                = entdec_code_editor f, :metadata_yaml, lang: "yaml", label: t('.metadata')
-
-            - Nuntius::Concerns::EmailDesigned::EMAIL_TRANSPORTS.each do |transport|
-              template data-toggle-target='toggleable' data-toggle-value=transport
+              - if @template.transport == 'mail'
                 .col-span-6
                   = f.input :link_tracking, as: :switch
                 .col-span-6
@@ -123,48 +108,15 @@
                   .col-span-12
                     = f.association :layout, collection: @layouts, include_blank: true, hint: t('.layout_hint')
 
-            / TwiML, see Voice in the README
-            template data-toggle-target='toggleable' data-toggle-value='voice'
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = entdec_code_editor f, :text, lang: "liquid", height: "400px"
-            template data-toggle-target='toggleable' data-toggle-value='slack'
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = entdec_code_editor f, :text, lang: "liquid", height: "400px"
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = entdec_code_editor f, :payload, lang: "yaml", hint: 'See here for more information: https://app.slack.com/block-kit-builder/', height: "400px"
 
-            template data-toggle-target='toggleable' data-toggle-value='sms'
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = f.input :text, as: :text, input_html: {rows: 4}
-            template data-toggle-target='toggleable' data-toggle-value='push'
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = f.input :text, as: :text, input_html: {rows: 4}
-            template data-toggle-target='toggleable' data-toggle-value='teams'
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = f.input :text, as: :text, input_html: {rows: 10}
-              .col-span-12
-                = nuntius_liquid_field f do
-                  = entdec_code_editor f, :payload, lang: "yaml", hint: 'See here for more information: https://www.adaptivecards.io/designer/', height: "400px"
+        - if @template.persisted? && @template.email?
+          - card.with_tab :media, padding: true
+            = f.attachments :images
 
+        - if @template.persisted?
+          - card.with_tab :translations, padding: true
+            = render "nuntius/admin/shared/translations", record: @template, url: translations_admin_template_path(@template)
 
-      - if @template.email? && @template.layout && !@template.old_layout
-        - card.with_tab :design, padding: true
-          = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?)
-
-      - if @template.persisted? && @template.email?
-        - card.with_tab :media, padding: true
-          = f.attachments :images
-
-      - if @template.persisted?
-        - card.with_tab :translations, padding: true
-          = render "nuntius/admin/shared/translations", record: @template, url: translations_admin_template_path(@template)
-
-      - if @template.messages.exists?
-        - card.with_tab :messages, padding: false
-          = sts.table :"nuntius/messages", params: { template_id: @template.id }
+        - if @template.messages.exists?
+          - card.with_tab :messages, padding: false
+            = sts.table :"nuntius/messages", params: { template_id: @template.id }

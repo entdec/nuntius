@@ -27,11 +27,11 @@ module Nuntius
       end
     end
 
-    test "delivering an lmtp message routes through the lmtp transport and provider" do
-      message = Nuntius::Message.create!(transport: "lmtp", to: "user@example.com@mx.internal:24", html: "Hi", text: "Hi")
+    test "delivering mail to an LMTP address goes to the LMTP provider only" do
+      message = Nuntius::Message.create!(transport: "mail", to: "user@example.com@mx.internal:24", html: "Hi", text: "Hi")
 
       perform_enqueued_jobs do
-        message.deliver_as(:lmtp)
+        message.deliver_as(:mail)
 
         assert_equal "lmtp", message.reload.provider
         assert message.reload.delivered?
@@ -41,6 +41,18 @@ module Nuntius
         assert_equal ["user@example.com"], mail.to
         assert_equal ["user@example.com"], mail.smtp_envelope_to
       end
+      # No copy of it for SMTP (see TransportDeliveryJob)
+      assert_equal 1, Nuntius::Message.where(to: message.to).count
+    end
+
+    test "delivering a message no provider handles leaves it without a recipient" do
+      message = Nuntius::Message.create!(transport: "mail", to: "user@example.com", html: "Hi", text: "Hi")
+
+      Nuntius::SmtpMailProvider.stub(:handles?, false) do
+        assert_no_enqueued_jobs { message.deliver_as(:mail) }
+      end
+
+      assert message.reload.no_recipient?
     end
 
     test "delivering a message that does not match the allow list will block it" do

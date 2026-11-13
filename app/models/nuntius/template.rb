@@ -49,7 +49,18 @@ module Nuntius
     after_update :move_translations, if: -> { (saved_changes.keys & %w[old_layout_id layout_id klass event transport description]).any? }
 
     # Where a drop (or hash) in its To is sent to, by transport (see addressees)
-    ADDRESS_ATTRIBUTES = {"mail" => "email", "lmtp" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
+    ADDRESS_ATTRIBUTES = {"mail" => "email", "sms" => "phone_number", "voice" => "phone_number"}.freeze
+
+    # Besides From and To, what its editor's root has of it, by transport
+    # (app/javascript/nuntius/blocks/email.js and kits/messages.js)
+    DESIGN_ATTRIBUTES = {
+      "mail" => {"linkTracking" => :link_tracking, "openTracking" => :open_tracking},
+      "sms" => {"text" => :text},
+      "push" => {"text" => :text, "payload" => :payload},
+      "teams" => {"text" => :text, "payload" => :payload},
+      "slack" => {"text" => :text, "payload" => :payload},
+      "voice" => {"text" => :text}
+    }.freeze
 
     # The messages it sends: one for each addressee in its To (see addressees),
     # rendered with the addressee as `to`. account is the account they're sent
@@ -229,6 +240,11 @@ module Nuntius
     end
 
     private
+
+    # From, To and the rest of DESIGN_ATTRIBUTES are edited in its editor's root
+    def design_attributes
+      {"from" => :from, "to" => :to}.merge(DESIGN_ATTRIBUTES.fetch(transport.to_s, {}))
+    end
 
     def move_translations
       layout = OldLayout.find_by(id: old_layout_id_before_last_save) || Layout.find_by(id: layout_id_before_last_save)

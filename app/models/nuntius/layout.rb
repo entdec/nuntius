@@ -33,6 +33,15 @@ module Nuntius
       name.to_s.underscore.tr(" ", "_")
     end
 
+    # Its HTML to look at, as when choosing a layout for a new template: its
+    # Liquid rendered without values, its images on this host
+    def preview_html
+      ::Liquidum.render(html.to_s, assigns: {}, registers: {"template" => self})
+    rescue => e
+      Nuntius.config.logger.call.warn "Can't render the preview of layout #{id}: #{e.message}"
+      html.to_s
+    end
+
     # The metadata variables its design uses, see MetadataVariables
     def metadata_variables
       MetadataVariables.in(self, mjml)

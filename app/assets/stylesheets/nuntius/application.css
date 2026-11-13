@@ -14,3 +14,17 @@
 .nuntius-description-auto input {
   @apply size-3 rounded-sm border-gray-300 text-gray-500 focus:ring-0 focus:ring-offset-0 dark:border-gray-600 dark:bg-gray-700;
 }
+
+/* An email template's description as its card's title, edited in place,
+   with its Auto toggle beside it */
+.nuntius-title {
+  @apply flex items-center gap-3;
+}
+
+.nuntius-title__input {
+  @apply -mx-1.5 w-full min-w-0 rounded-md border border-transparent bg-transparent px-1.5 py-0.5 text-lg font-medium text-gray-900 shadow-none hover:border-gray-300 focus:border-gray-400 focus:ring-0 dark:text-white dark:hover:border-gray-600;
+}
+
+.nuntius-title__auto {
+  @apply static shrink-0;
+}

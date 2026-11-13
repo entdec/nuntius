@@ -4,7 +4,9 @@ module Nuntius
   module Concerns
     # A template or campaign designed in the email editor: its own blocks go
     # into the Content block of its layout, which it follows when the layout
-    # changes.
+    # changes. Its other transports' messages are edited in an editor too
+    # (message_design?), with their settings in its root, by the class's
+    # DESIGN_ATTRIBUTES.
     #
     #   json          its own blocks (the Content block's children)
     #   mjml          the whole email, layout included
@@ -13,10 +15,10 @@ module Nuntius
     module EmailDesigned
       extend ActiveSupport::Concern
 
-      EMAIL_TRANSPORTS = %w[mail lmtp].freeze
       # In the editor only the Content block, the subject and the preview text
-      # are its own; the rest belongs to the layout.
-      EDITOR_LOCK = {except: ["content"], fields: ["data.subject", "data.preheader"]}.freeze
+      # are its own, and a template's settings in its root (DESIGN_ATTRIBUTES);
+      # the rest belongs to the layout.
+      EDITOR_LOCK = {except: ["content"], fields: ["data.subject", "data.preheader", "data.from", "data.to", "data.linkTracking", "data.openTracking"]}.freeze
 
       included do
         # Images for the editor's Image blocks, besides the layout's own (attachments)
@@ -30,7 +32,7 @@ module Nuntius
       end
 
       def email?
-        EMAIL_TRANSPORTS.include?(transport)
+        transport.to_s == "mail"
       end
 
       # The images its editor can choose from: its own and its layout's, one
@@ -58,7 +60,7 @@ module Nuntius
       def editor_document
         return nil unless layout
 
-        EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text)
+        EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text, data: design_data)
       end
 
       # Takes the document and MJML the editor submits. Only the Content
@@ -69,6 +71,7 @@ module Nuntius
         self.json = EmailDesign.content_nodes(document) || []
         self.subject = document.dig("data", "subject")
         self.preview_text = document.dig("data", "preheader")
+        assign_design_data(document["data"] || {})
         compose(EmailDesign.content_of(mjml))
       rescue ::JSON::ParserError, EmailDesign::Error => e
         @design_error = e.message
@@ -82,6 +85,23 @@ module Nuntius
         compose(EmailDesign.content_of(layout.mjml))
       rescue EmailDesign::Error => e
         @design_error = e.message
+      end
+
+      # Whether it is edited in the editor for its transport's messages: SMS,
+      # Push, Teams, Slack and Voice (app/javascript/nuntius/kits/messages.js)
+      def message_design?
+        !email? && self.class::DESIGN_ATTRIBUTES.key?(transport.to_s)
+      end
+
+      # The document that editor opens: a root of its transport, with its settings
+      def message_document
+        {"id" => "broot", "type" => transport.to_s, "attributes" => {}, "data" => design_data, "children" => []}
+      end
+
+      # Takes its settings from the document that editor submits
+      def assign_message_design(document)
+        document = ::JSON.parse(document) if document.is_a?(String)
+        assign_design_data(document["data"] || {})
       end
 
       # Its own blocks, and their MJML, put into its layout
@@ -100,6 +120,21 @@ module Nuntius
       end
 
       private
+
+      # Its attributes edited in the editor's root, by their keys in its data
+      # (see app/javascript/nuntius/blocks/email.js)
+      def design_attributes
+        {}
+      end
+
+      def design_data
+        design_attributes.to_h { |key, attribute| [key, public_send(attribute)] }
+      end
+
+      # The ones the data has
+      def assign_design_data(data)
+        design_attributes.each { |key, attribute| public_send(:"#{attribute}=", data[key]) if data.key?(key) }
+      end
 
       def compose(content)
         @design_error = nil

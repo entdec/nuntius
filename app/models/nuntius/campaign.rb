@@ -9,7 +9,19 @@ module Nuntius
 
     yamlify :metadata
 
-    belongs_to :list
+    # What a campaign sends: to its subscribers' email addresses or phone numbers
+    TRANSPORTS = %w[mail sms voice].freeze
+
+    # Besides From, what its editor's root has of it, by transport
+    # (app/javascript/nuntius/blocks/email.js and kits/messages.js)
+    DESIGN_ATTRIBUTES = {
+      "mail" => {"linkTracking" => :link_tracking, "openTracking" => :open_tracking},
+      "sms" => {"text" => :text},
+      "voice" => {"text" => :text}
+    }.freeze
+
+    # Designed without one, but it isn't sent without one (see schedule)
+    belongs_to :list, optional: true
     accepts_nested_attributes_for :list, reject_if: :all_blank
 
     belongs_to :old_layout, class_name: "Nuntius::OldLayout", optional: true
@@ -25,7 +37,7 @@ module Nuntius
       # A scheduled campaign is published by CampaignPublishJob at its
       # publish_at, or within a minute without one
       event :schedule do
-        transition draft: :scheduled
+        transition draft: :scheduled, if: :list
       end
 
       event :deschedule do
@@ -77,6 +89,11 @@ module Nuntius
     end
 
     private
+
+    # From and the rest of DESIGN_ATTRIBUTES are edited in its editor's root
+    def design_attributes
+      {"from" => :from}.merge(DESIGN_ATTRIBUTES.fetch(transport.to_s, {}))
+    end
 
     # The Manage subscription block renders this link
     def subscription_link

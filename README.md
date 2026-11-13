@@ -208,7 +208,7 @@ end
 
 ### Addressees
 
-A template sends a message to each addressee in its To, rendered for that addressee, who the template's Liquid can use as `to`. A To of addresses separated by commas sends a message to each, with the address as `to`. A To of a single variable can also give drops (or hashes), or a list of them, like `{{ order.contacts }}`: each gets its own message, at its `email` for mail and LMTP, or its `phone_number` for SMS and voice, and is the message's `to`, so a template can greet each one:
+A template sends a message to each addressee in its To, rendered for that addressee, who the template's Liquid can use as `to`. A To of addresses separated by commas sends a message to each, with the address as `to`. A To of a single variable can also give drops (or hashes), or a list of them, like `{{ order.contacts }}`: each gets its own message, at its `email` for mail, or its `phone_number` for SMS and voice, and is the message's `to`, so a template can greet each one:
 
 ```liquid
 Dear {{ to.name }},
@@ -410,7 +410,7 @@ The main key of the hash passed will also be the liquid variable.
 
 ## Email designs
 
-Mail and LMTP templates and campaigns are designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit)), which builds [MJML](https://mjml.io); Nuntius compiles it to HTML with [MRML](https://github.com/jdrouet/mrml). Liquid works everywhere in the design and is rendered when a message is sent.
+Mail templates and campaigns are designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit)), which builds [MJML](https://mjml.io); Nuntius compiles it to HTML with [MRML](https://github.com/jdrouet/mrml). Liquid works everywhere in the design and is rendered when a message is sent.
 
 ### Layouts
 
@@ -426,7 +426,9 @@ Besides TessEdit's blocks, the editor has three Nuntius blocks:
 
 ### Templates and campaigns
 
-Every new mail or LMTP template and campaign needs a layout. Choose it on the Edit tab and save; the email is then edited on the Design tab, starting with the layout's example content. Choosing another layout moves the content into it.
+A new template starts with what it sends: Email, SMS, Push and so on, as cards, one for each enabled transport. That stays as it's chosen. An email then starts from a layout, chosen by its preview, name and description (give layouts a description that says what they're for). A card opens the template's editor, and it's created when it's saved. The email starts with the layout's example content, and everything about it is in its editor: with the email selected, Inspect has when it sends (the sentence and conditions, collapsed to *Account · created* until you edit them), its From and To, its subject and preview text, its tracking and its layout. Choosing another layout there moves the content into it when it's saved. Its description is the page's title, made from when it sends while Auto is checked, and Enabled is beside it (and under when it sends). SMS, Push, Teams, Slack and Voice templates are edited the same way, with a preview of the message in the middle: an SMS on a phone with its length and number of parts, a push notification on a lock screen, Teams' card and Slack's blocks as JSON (with links to the Adaptive Cards Designer and Block Kit Builder), and Voice's TwiML per path. The preview renders the Liquid with sample values, each variable showing as its name (‹User › Name›), never with someone's data. Only emails on an old layout, or without one, keep the Edit tab.
+
+Every new mail template and campaign needs a layout. A campaign's layout is chosen on its Edit tab; save, and the email is edited on the Design tab.
 
 ### Variables
 
@@ -471,7 +473,7 @@ Liquid that MJML can't take is written another way that means the same (`a < b` 
 
 ### Mail
 
-Outbound mail is handled through SMTP (the `:smtp` provider on the `:mail` transport). LMTP delivery to a mailbox is available through a separate `:lmtp` transport (see below). Mail is designed in the email editor (see [Email designs](#email-designs)); the text version is made from the HTML.
+Outbound mail is handled through SMTP (the `:smtp` provider on the `:mail` transport), and mail to a mailbox through LMTP (the `:lmtp` provider, see below). Mail is designed in the email editor (see [Email designs](#email-designs)); the text version is made from the HTML.
 
 In a layout the View in browser block links to the online version of the message. In old layouts you can add `<a href="{{message_url}}">Link to mail</a>` for that.
 
@@ -535,25 +537,26 @@ When the host or route changes, the webhook is updated on the next server start.
 
 ### LMTP
 
-LMTP (RFC 2033) delivers a message directly to a mailbox. It is its own transport, so it never interferes with `:mail`/SMTP delivery. Enable the transport and provider, and give the relevant templates `transport: "lmtp"`:
+LMTP (RFC 2033) delivers a message directly to a mailbox. It's a provider on the `:mail` transport, next to SMTP:
 
 ```ruby
-config.transport :lmtp
-config.provider :lmtp, transport: :lmtp, settings: {
+config.provider :lmtp, transport: :mail, settings: {
   from_header: "Example <example@example.com>",
   allow_list: ["example.com"]
 }
 ```
 
-With LMTP both the recipient email address and the target LMTP server are provided by the template, inline-encoded in the `to` field as:
+Mail to an LMTP address goes to it, other mail to SMTP. An LMTP address has the recipient's email and the LMTP server to deliver it to:
 
 ```
 <email>@<host>:<port>
 ```
 
-For example a template `to` of `{{user.email}}@mx.internal:24` renders to `user@example.com@mx.internal:24`. The provider uses the email (`user@example.com`) for the `To:` header and the envelope `RCPT TO`, and connects to the LMTP server at `mx.internal:24`. A plain address (without an inline `@host:port`) falls back to the optional `host`/`port` settings.
+For example a template `to` of `{{user.email}}@mx.internal:24` renders to `user@example.com@mx.internal:24`. The provider uses the email (`user@example.com`) for the `To:` header and the envelope `RCPT TO`, and connects to the LMTP server at `mx.internal:24`.
 
-LMTP templates use the same fields as mail templates (subject, html, layout, tracking). Delivery is synchronous: the server confirms delivery in its reply, so the message is marked `delivered` straight away and no refresh is needed.
+Delivery is synchronous: the server confirms delivery in its reply, so the message is marked `delivered` straight away and no refresh is needed.
+
+A transport only gives a message to the providers that handle its address (`handles?` on the provider class), so SMTP never gets an LMTP address and LMTP never gets a plain one. In the same way APNs gets APNs device tokens and Firebase the other push tokens.
 
 ### Slack
 

@@ -15,7 +15,13 @@ export default class extends Controller {
 
   connect() {
     this.select = this.listTarget.querySelector("select")
-    this.options = Array.from(this.select.options)
+    // All of them, also after it has been filtered: kept on the element, as
+    // its markup can be copied (a toggle reinserting it, or moving it in the
+    // email editor's Inspect) and it then connects with fewer
+    this.element.dataset.options ||= this.select.innerHTML
+    const all = document.createElement("select")
+    all.innerHTML = this.element.dataset.options
+    this.options = Array.from(all.options)
     this.source = this.element.closest("form")?.querySelector(`[name="${this.toValue}"]`)
     this.boundChange = () => this.update(true)
     this.source?.addEventListener("change", this.boundChange)

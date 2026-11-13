@@ -21,6 +21,17 @@ class AdminCampaignTestMessagesTest < ActionDispatch::IntegrationTest
     assert_equal "Saved, and sent a test message to 1.", flash[:notice]
   end
 
+  test "without a list nothing is sent" do
+    campaign.update!(list: nil)
+
+    patch "/nuntius/admin/campaigns/#{campaign.id}/send_test", params: {campaign: {name: "Newer"}}
+
+    assert_redirected_to "/nuntius/admin/campaigns/#{campaign.id}/edit"
+    assert_equal "Newer", campaign.reload.name
+    assert_equal "Saved, but it has no list to send a test to yet.", flash[:alert]
+    assert_empty campaign.test_messages
+  end
+
   test "without test recipients nothing is sent" do
     patch "/nuntius/admin/campaigns/#{campaign.id}/send_test", params: {campaign: {name: "News"}}
 

@@ -44,6 +44,15 @@ module Nuntius
       assert campaign.reload.sent?
     end
 
+    test "an SMS campaign's message has its text, rendered for the subscriber" do
+      campaign = Campaign.create!(name: "News", transport: "sms", list: nuntius_lists(:valentines), text: "Hi {{ subscriber.first_name }}")
+
+      message = DeliverCampaignService.send(:new, campaign: campaign).new_message(nuntius_subscribers(:romeo))
+
+      assert_equal "Hi Romeo", message.text
+      assert_equal nuntius_subscribers(:romeo).phone_number, message.to
+    end
+
     test "a template has no subscriber, so its Manage subscription block shows nothing" do
       template = Template.new(description: "Order", klass: "Custom", event: "order#placed", transport: "mail", to: "test@example.com", layout: blocks_layout)
       template.assign_design(**design_in(template.layout, "Your order"))

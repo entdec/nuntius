@@ -26,6 +26,7 @@ en:
         transport: Send via
         html: Body
       nuntius/layout:
+        description: Description
         name: Name
       nuntius/list:
         allow_unsubscribe: unsubscribe allowed
@@ -98,8 +99,14 @@ en:
       quarterly: every quarter
       half_yearly: every half year
       yearly: every year
+    transport_hints:
+      mail: Designed, with a layout
+      push: A notification on a phone
+      slack: A message in a channel
+      sms: A short text message
+      teams: A message in a channel
+      voice: A phone call that speaks
     transports:
-      lmtp: LMTP (mailbox)
       mail: Email
       push: Push notification
       slack: Slack
@@ -122,8 +129,7 @@ en:
           cancelled: Cancelled
       templates:
         views:
-          enabled: Enabled
-          disabled: Disabled
+          all: All
       subscribers:
         views:
           subscribed: Subscribed
@@ -131,6 +137,12 @@ en:
     admin:
       not_saved: "%{resource} could not be saved: %{errors}"
       shared:
+        new:
+          what: What do you want to send?
+          which_layout: Which layout do you want to start from?
+          back: Back
+          no_layouts: There are no layouts yet
+          create_layout: Create a layout first
         translations:
           intro_html: "What its <code>{{ '.key' | t }}</code> filters say in each language, from the account's locales. A key starting with a dot is in %{path}, and is looked up from there towards the root. Changes are saved straight away."
           none_html: "It doesn't translate anything yet. Use <code>{{ '.key' | t }}</code> in its texts, or Make translatable in the email editor."
@@ -143,12 +155,14 @@ en:
         create:
           only_images: Only images can be uploaded
       campaigns:
+        new:
+          title: New campaign
         edit:
           card:
             nuntius_admin_campaigns:
               title: Campaigns
           from_hint: "You can leave this blank, only fill this in if you want to override the default"
-          list_hint: "You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
+          list_hint: "Needed to send it, not to design it. You can re-use a list from a previous campaign, for the same purpose. Unsubscribes happen against the list."
           layout_hint: "The email is edited in the Design tab, inside this layout."
           metadata_variables: "This campaign's design still reads metadata, which is going away:"
           tabs:
@@ -171,6 +185,7 @@ en:
           sent:
             one: "Saved, and sent a test message to %{to}."
             other: "Saved, and sent %{count} test messages to %{to}."
+          no_list: "Saved, but it has no list to send a test to yet."
           no_test_recipients: "Saved, but no subscriber of %{list} receives test messages. Turn it on for one in the list."
         index:
           card:
@@ -190,6 +205,12 @@ en:
             newsletter: Newsletter
             transactional: Transactional
             empty: Empty
+          starting_layout_descriptions:
+            basic: A header, the content and a footer.
+            newsletter: A header with columns for articles, and a footer with the subscription link.
+            transactional: Plain and to the point, for receipts, notifications and confirmations.
+            empty: Only the content, to design everything yourself.
+          description_hint: Shown under its preview when choosing a layout for a new template.
           tabs:
             main:
               tab:
@@ -282,7 +303,27 @@ en:
                 preview: Preview
                 tracking: Tracking
       templates:
+        new:
+          title: New template
         edit:
+          description_auto: Auto
+          description_if: if
+          description_or: "or"
+          card:
+            nuntius_admin_templates:
+              title: Template
+          metadata: Metadata
+          layout_hint: "The email is edited in the Design tab, inside this layout. Save after choosing one."
+          layout_moves: "Its own content moves into the layout chosen when it is saved."
+          global_hint: Used for every account, not only this one
+          metadata_variables: "This template's design still reads metadata, which is going away:"
+          old_layout_metadata_variables: "Its old layout or body reads metadata, which designs in the email editor shouldn't. After converting, put these in the design another way:"
+          old_layout: "This template still uses the old layout %{name}. It keeps working until it is converted."
+          convert_layout: Convert into layout
+          convert_hint: "Its body goes into one HTML block in this layout's Content block, as it is sent now. You then edit it in the Design tab."
+          convert: Convert to the email editor
+          convert_confirm: "Convert this template? Its old layout and body are kept, but it is edited in the email editor from now on."
+        trigger:
           send_via: Send via
           due_today:
             one: Sends to 1 today
@@ -292,26 +333,10 @@ en:
             other: Sends to %{count} this hour
           due_over_limit: Would send to more than %{limit}, so it's held and sends nothing
           limit: "· at most"
-          description_auto: Auto
-          description_if: if
-          description_or: "or"
           when: when
           based_on: based on
           ago: ago
           'on': 'on'
-          card:
-            nuntius_admin_templates:
-              title: Template
-          metadata: Metadata
-          layout_hint: "The email is edited in the Design tab, inside this layout. Save after choosing one."
-          global_hint: Used for every account, not only this one
-          metadata_variables: "This template's design still reads metadata, which is going away:"
-          old_layout_metadata_variables: "Its old layout or body reads metadata, which designs in the email editor shouldn't. After converting, put these in the design another way:"
-          old_layout: "This template still uses the old layout %{name}. It keeps working until it is converted."
-          convert_layout: Convert into layout
-          convert_hint: "Its body goes into one HTML block in this layout's Content block, as it is sent now. You then edit it in the Design tab."
-          convert: Convert to the email editor
-          convert_confirm: "Convert this template? Its old layout and body are kept, but it is edited in the email editor from now on."
         convert:
           converted: The template now uses the email editor. Check it in the Design tab.
           tabs:

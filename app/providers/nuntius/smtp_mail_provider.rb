@@ -14,6 +14,11 @@ module Nuntius
     setting_reader :allow_list, required: false, default: [], description: "Allow list (example: [example.com, someone@example.org])"
     setting_reader :ssl, required: false, default: false, description: "Whether to use SSL or not"
 
+    # Mail to LMTP addresses goes to the LMTP provider
+    def self.handles?(to)
+      !LmtpAddress.match?(to)
+    end
+
     private
 
     def configure_delivery_method(mail, null_sender)

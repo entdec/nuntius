@@ -33,6 +33,16 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/nuntius/admin/layouts/new?start=transactional']"
     document = JSON.parse(css_select("input[name='layout[design_json]']").first["value"])
     assert_equal Nuntius::Layout.starting_document("newsletter"), document
+    assert_select "textarea[name='layout[description]']", text: /columns for articles/
+  end
+
+  test "a layout's description is saved, and its preview has its images and no Liquid" do
+    post "/nuntius/admin/layouts", params: {layout: {name: "Newsletter", description: "For news", design_json: layout_json.to_json, design_mjml: layout_mjml(header: "NEWS {{ template.description }}")}}
+
+    layout = Nuntius::Layout.find_by!(name: "Newsletter")
+    assert_equal "For news", layout.description
+    assert_includes layout.preview_html, "NEWS"
+    assert_not_includes layout.preview_html, "{{"
   end
 
   test "saving a layout takes the design from the editor" do
@@ -106,6 +116,59 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     assert_includes template.html, "Example content"
   end
 
+  test "an email template is edited in its editor only: its trigger and layout as slots, From, To and tracking in its root" do
+    post "/nuntius/admin/templates", params: {template: template_attributes(link_tracking: "1")}
+    template = Nuntius::Template.find_by!(description: "Order")
+
+    get "/nuntius/admin/templates/#{template.id}/edit"
+
+    assert_response :success
+    assert_select "[data-tess-edit-target='slot'][data-tess-edit-slot='trigger'][hidden] select[name='template[klass]']"
+    assert_select "[data-tess-edit-slot='trigger'][data-open]", count: 0
+    assert_select "[data-tess-edit-target='slot'][data-tess-edit-slot='layout'] select[name='template[layout_id]'] option[selected][value='#{@layout.id}']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot]", count: 2
+    assert_select ".nuntius-title input[name='template[description]'][value='Order']"
+    assert_select "[data-tess-edit-slot='trigger'] input[type=hidden][name='template[enabled]']"
+    assert_select "input[type=hidden][name='template[enabled]']", count: 1
+    assert_select "input[name='template[to]'], input[name='template[from]'], input[name='template[link_tracking]']", count: 0
+    assert_equal({"template" => true}, JSON.parse(editor_value("options")))
+    assert_match %r{/liquidum/variables}, editor_value("variables-url")
+    document = JSON.parse(css_select("input[name='template[design_json]']").first["value"])
+    assert_equal({"from" => nil, "to" => "{{ order.email }}", "linkTracking" => true, "openTracking" => false}, document["data"].slice("from", "to", "linkTracking", "openTracking"))
+  end
+
+  test "a new email template opens its trigger" do
+    get "/nuntius/admin/templates/new", params: {transport: "mail", layout_id: @layout.id}
+
+    assert_select "[data-tess-edit-slot='trigger'][data-open]"
+  end
+
+  test "saving an email template takes From, To and the tracking from its editor" do
+    post "/nuntius/admin/templates", params: {template: template_attributes}
+    template = Nuntius::Template.find_by!(description: "Order")
+    design = submitted_design(@layout, text: "Shipped", data: {"from" => "Shop <shop@example.com>", "to" => "{{ order.customer.email }}", "linkTracking" => true, "openTracking" => true})
+
+    patch "/nuntius/admin/templates/#{template.id}", params: {template: {description: "Order", design_json: design[:document], design_mjml: design[:mjml]}}
+
+    template.reload
+    assert_equal "Shop <shop@example.com>", template.from
+    assert_equal "{{ order.customer.email }}", template.to
+    assert template.link_tracking
+    assert template.open_tracking
+  end
+
+  test "an email template's errors in its editor show above it" do
+    post "/nuntius/admin/templates", params: {template: template_attributes}
+    template = Nuntius::Template.find_by!(description: "Order")
+    design = submitted_design(@layout, text: "Shipped", data: {"to" => "{% if order %}{{ order.email }}"})
+
+    patch "/nuntius/admin/templates/#{template.id}", params: {template: {description: "", design_json: design[:document], design_mjml: design[:mjml]}}
+
+    assert_response :unprocessable_entity
+    assert_select "[role='alert']", /To/
+    assert_select ".nuntius-title + [role='alert'], [role='alert']", /Description/
+  end
+
   test "a template with an old layout keeps its old fields" do
     template = Nuntius::Template.create!(template_attributes(layout_id: nil, old_layout: nuntius_old_layouts(:one), subject: "Hi", html: "# Hello"))
 
@@ -127,6 +190,40 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes campaign.html, "Example content"
     assert_equal Nuntius::Concerns::EmailDesigned::EDITOR_LOCK.as_json, JSON.parse(editor_value("lock"))
+    assert_equal({"campaign" => true}, JSON.parse(editor_value("options")))
+    assert_select ".nuntius-title input[name='campaign[name]'][value='Spring']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='trigger'] [name='campaign[publish_at]']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='audience'] select[name='campaign[list_id]'] option[selected][value='#{list.id}']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='audience'] [name^='campaign[conditions]']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='layout'] select[name='campaign[layout_id]']"
+    assert_select "[name='campaign[transport]'], input[name='campaign[from]'], [name='campaign[link_tracking]']", count: 0
+    assert_select "#edit-content", count: 0
+  end
+
+  test "a campaign's From and tracking are saved from its editor's root" do
+    campaign = Nuntius::Campaign.create!(name: "Spring", transport: "mail", list: nuntius_lists(:valentines), layout: @layout)
+    design = submitted_design(@layout, text: "Spring is here", data: {"from" => "news@example.com", "linkTracking" => true, "openTracking" => true})
+
+    patch "/nuntius/admin/campaigns/#{campaign.id}", params: {campaign: {transport: "sms", design_json: design[:document], design_mjml: design[:mjml]}}
+
+    campaign.reload
+    assert_equal ["news@example.com", true, true, "mail"], [campaign.from, campaign.link_tracking, campaign.open_tracking, campaign.transport]
+  end
+
+  test "a new campaign starts from what it sends, and for an email its layout" do
+    Nuntius::Layout.create!(name: "Other", json: layout_json, mjml: layout_mjml)
+
+    get "/nuntius/admin/campaigns/new"
+    assert_select "a[href='/nuntius/admin/campaigns/new?transport=mail']"
+    assert_select "a[href='/nuntius/admin/campaigns/new?transport=push']", count: 0
+
+    get "/nuntius/admin/campaigns/new", params: {transport: "mail"}
+    assert_select "a[href='/nuntius/admin/campaigns/new?layout_id=#{@layout.id}&transport=mail']"
+
+    get "/nuntius/admin/campaigns/new", params: {transport: "mail", layout_id: @layout.id}
+    assert_select "[data-controller='tess-edit']"
+    assert_select "input[type=hidden][name='campaign[transport]'][value=mail]"
+    assert_select "a[href='/nuntius/admin/campaigns/new?transport=mail']", text: "Back"
   end
 
   test "converting a template with an old layout from its page" do
