@@ -9,6 +9,17 @@ module Nuntius
 
     yamlify :metadata
 
+    # What a campaign sends: to its subscribers' email addresses or phone numbers
+    TRANSPORTS = %w[mail sms voice].freeze
+
+    # Besides From, what its editor's root has of it, by transport
+    # (app/javascript/nuntius/blocks/email.js and kits/messages.js)
+    DESIGN_ATTRIBUTES = {
+      "mail" => {"linkTracking" => :link_tracking, "openTracking" => :open_tracking},
+      "sms" => {"text" => :text},
+      "voice" => {"text" => :text}
+    }.freeze
+
     belongs_to :list
     accepts_nested_attributes_for :list, reject_if: :all_blank
 
@@ -77,6 +88,11 @@ module Nuntius
     end
 
     private
+
+    # From and the rest of DESIGN_ATTRIBUTES are edited in its editor's root
+    def design_attributes
+      {"from" => :from}.merge(DESIGN_ATTRIBUTES.fetch(transport.to_s, {}))
+    end
 
     # The Manage subscription block renders this link
     def subscription_link

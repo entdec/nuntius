@@ -239,23 +239,6 @@ module Nuntius
       (start - 1.hour)..start
     end
 
-    # Whether it is edited in the editor for its transport's messages: SMS,
-    # Push, Teams, Slack and Voice (app/javascript/nuntius/kits/messages.js)
-    def message_design?
-      !email? && DESIGN_ATTRIBUTES.key?(transport.to_s)
-    end
-
-    # The document that editor opens: a root of its transport, with its settings
-    def message_document
-      {"id" => "broot", "type" => transport.to_s, "attributes" => {}, "data" => design_data, "children" => []}
-    end
-
-    # Takes its settings from the document that editor submits
-    def assign_message_design(document)
-      document = ::JSON.parse(document) if document.is_a?(String)
-      assign_design_data(document["data"] || {})
-    end
-
     private
 
     # From, To and the rest of DESIGN_ATTRIBUTES are edited in its editor's root

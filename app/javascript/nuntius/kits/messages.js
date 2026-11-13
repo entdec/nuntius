@@ -1,15 +1,16 @@
-// The editors of a template's messages for SMS, Push, Teams, Slack and
-// Voice: a TessEdit kit for each transport, of its root alone (blocks:
-// false). Its Inspect has the email's When and Recipient groups
-// (blocks/email.js) and a Message group of its own; the canvas previews the
-// message, rendered by Nuntius with sample values (TemplatesController#preview,
-// at the editor's previewUrl option), for the class chosen in the form.
-// The template takes the root's data (Template#assign_message_design).
+// The editors of a template's or campaign's messages for SMS, Push, Teams,
+// Slack and Voice: a TessEdit kit for each transport, of its root alone
+// (blocks: false). Its Inspect has the email's When, Audience and Recipient
+// groups (blocks/email.js) and a Message group of its own; the canvas
+// previews the message, rendered by Nuntius with sample values
+// (TemplatesController#preview, at the editor's previewUrl option), for a
+// template's class chosen in the form. The template or campaign takes the
+// root's data (Concerns::EmailDesigned#assign_message_design).
 
 import { registerBlock, registerKit } from "tess_edit/core/registry"
 import { createDocument } from "tess_edit/core/document"
 import { highlightHtml } from "tess_edit/ui/code_input"
-import { recipient, when } from "nuntius/blocks/email"
+import { audience, recipient, when } from "nuntius/blocks/email"
 
 const escape = (text) => String(text ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
 
@@ -192,7 +193,7 @@ for (const [key, name] of Object.entries(NAMES)) {
     icon: "root",
     kits: [key],
     defaults: () => ({ data: { text: "", ...(MESSAGE[key].some((field) => field.key === "data.payload") ? { payload: "" } : {}) } }),
-    fields: [when(), recipient(), { title: "Message", fields: MESSAGE[key] }],
+    fields: [when(), audience(), recipient(), { title: "Message", fields: MESSAGE[key] }],
     render: { [key]: () => "" }
   })
 }

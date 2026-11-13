@@ -19,10 +19,12 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - Layouts designed in the email editor, with one Content block where each template or campaign puts its own content. Templates and draft campaigns follow their layout when it changes, and show it locked in their editor.
 - Starting layouts for new layouts: Basic, Newsletter, Transactional and Empty.
 - A new template starts on a page of cards: what it sends (Email, SMS, Push, …, one for each enabled transport), then for an email which layout to start from, by its preview, name and description. The cards open the editor, and the template is created when it's saved. What a template sends can't be changed afterwards. With one transport, or one layout, it's chosen already.
-- An email template is edited in its editor only, without an Edit tab: with the email selected, Inspect has when it sends (its sentence and conditions, as the template form's own fields), its From and To, its subject and preview text, its link and open tracking, and its layout. Its description is the page's title, editable in place, with Enabled beside it. It needs TessEdit's `slot` fields.
+- An email template is edited in its editor only, without an Edit tab: with the email selected, Inspect has when it sends (its sentence and conditions, as the template form's own fields), its From and To, its subject and preview text, its link and open tracking, and its layout. Its description is the page's title, editable in place, and Enabled is under when it sends. It needs TessEdit's `slot` fields.
 - SMS, Push, Teams, Slack and Voice templates are edited in an editor too, with the same When and Recipient in Inspect, their text and payload under Message, and a preview of the message with sample values in the middle (`POST <admin>/templates/preview`). An SMS shows its length and number of parts as it's typed.
 - Layouts have a description, saying what they're for. A layout made from a starting layout gets the starting layout's. Copy in the migration with `bin/rails nuntius:install:migrations`.
-- The templates page shows the templates of one transport, or all.
+- The templates table has a view for each transport, and All, each showing the enabled templates through a filter that can be taken off. The layouts table shows their descriptions.
+- A layout's name is its page's title, and in its editor's Inspect with its description.
+- A new campaign starts on the same cards as a template (Email, SMS or Voice, then for an email its layout), and a draft campaign is edited in the editor for what it sends, like a template: its name is the page's title, and Inspect has when it's published, its list and conditions, its From, and for an email its subject, preview text, tracking and layout. Only a campaign on an old layout keeps the Edit tab.
 - Nuntius blocks in the editor: Content, View in browser and Manage subscription.
 - Images uploaded in the editor, by button or by dragging a file onto the canvas, for Image blocks and the backgrounds of heroes, sections and wrappers. They're stored on the layout, template or campaign, and an Image block's image can be embedded in the email.
 - The `embed_image` Liquid filter, which attaches an image to the email and returns a `cid:` reference.
@@ -77,6 +79,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 ### Fixed
 
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
+- An SMS or Voice campaign sent its messages without their text: its text is now rendered for each subscriber.
 - `Nuntius::TimebasedEventsJob` runs one at a time (a Postgres advisory lock): a run that started while another one was still going could send the same messages again. It now leaves them to the run that's going.
 - The subscribers table raised for a subscriber with tags.
 - The `t` filter raised ("Liquid error: internal") instead of translating with the account's locales, and keys starting with a dot had no scope. It needs Liquidum 1.4 and its configuration (see Upgrading).

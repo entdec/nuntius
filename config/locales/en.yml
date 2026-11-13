@@ -137,6 +137,12 @@ en:
     admin:
       not_saved: "%{resource} could not be saved: %{errors}"
       shared:
+        new:
+          what: What do you want to send?
+          which_layout: Which layout do you want to start from?
+          back: Back
+          no_layouts: There are no layouts yet
+          create_layout: Create a layout first
         translations:
           intro_html: "What its <code>{{ '.key' | t }}</code> filters say in each language, from the account's locales. A key starting with a dot is in %{path}, and is looked up from there towards the root. Changes are saved straight away."
           none_html: "It doesn't translate anything yet. Use <code>{{ '.key' | t }}</code> in its texts, or Make translatable in the email editor."
@@ -149,6 +155,8 @@ en:
         create:
           only_images: Only images can be uploaded
       campaigns:
+        new:
+          title: New campaign
         edit:
           card:
             nuntius_admin_campaigns:
@@ -296,11 +304,6 @@ en:
       templates:
         new:
           title: New template
-          what: What do you want to send?
-          which_layout: Which layout do you want to start from?
-          back: Back
-          no_layouts: There are no layouts yet
-          create_layout: Create a layout first
         edit:
           description_auto: Auto
           description_if: if

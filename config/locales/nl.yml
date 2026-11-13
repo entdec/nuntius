@@ -150,6 +150,12 @@ nl:
     admin:
       not_saved: "%{resource} kon niet worden opgeslagen: %{errors}"
       shared:
+        new:
+          what: Wat wil je versturen?
+          which_layout: Met welke layout wil je beginnen?
+          back: Terug
+          no_layouts: Er zijn nog geen layouts
+          create_layout: Maak eerst een layout
         translations:
           intro_html: "Wat de <code>{{ '.key' | t }}</code>-filters in elke taal zeggen, uit de locales van het account. Een sleutel die met een punt begint staat in %{path}, en wordt van daar richting de root opgezocht. Wijzigingen worden meteen bewaard."
           none_html: "Er wordt nog niets vertaald. Gebruik <code>{{ '.key' | t }}</code> in de teksten, of Vertaalbaar maken in de e-maileditor."
@@ -162,6 +168,8 @@ nl:
         create:
           only_images: Je kunt alleen afbeeldingen uploaden
       campaigns:
+        new:
+          title: Nieuwe campagne
         edit:
           card:
             nuntius_admin_campaigns:
@@ -311,11 +319,6 @@ nl:
       templates:
         new:
           title: Nieuwe template
-          what: Wat wil je versturen?
-          which_layout: Met welke layout wil je beginnen?
-          back: Terug
-          no_layouts: Er zijn nog geen layouts
-          create_layout: Maak eerst een layout
         edit:
           description_auto: Automatisch
           description_if: als

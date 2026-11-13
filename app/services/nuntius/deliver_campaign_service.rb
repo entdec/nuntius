@@ -63,6 +63,8 @@ module Nuntius
       message.subject = render(:subject, assigns, locale, message: message)
       message.subject = "[Test] #{message.subject}" if test_only
       message.html = render(:html, assigns, locale, message: message, layout: campaign.old_layout&.data)
+      # An SMS's or a call's
+      message.text = render(:text, assigns, locale, message: message) if campaign.text.present?
 
       message.save!
       message

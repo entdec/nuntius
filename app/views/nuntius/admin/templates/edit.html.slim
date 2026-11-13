@@ -24,7 +24,7 @@
       = sts.card :nuntius_admin_templates, icon: 'fal fa-file', title: title do |card|
         - if @template.new_record? && @back_path
           - card.with_action
-            = link_to t('nuntius.admin.templates.new.back'), @back_path, class: "button"
+            = link_to t('nuntius.admin.shared.new.back'), @back_path, class: "button"
         - card.with_action
           = f.continue
         - card.with_action
@@ -48,7 +48,7 @@
             - if editor == :email
               = render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots, frame: false
             - else
-              = render "message_editor", slots: slots
+              = render "nuntius/admin/shared/message_editor", record: @template, name: "template", options: {template: true}, translations_url: (translations_admin_template_path(@template) if @template.persisted?), slots: slots
 
         - else
           - card.with_tab :edit, padding: true

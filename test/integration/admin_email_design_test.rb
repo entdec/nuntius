@@ -190,6 +190,40 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes campaign.html, "Example content"
     assert_equal Nuntius::Concerns::EmailDesigned::EDITOR_LOCK.as_json, JSON.parse(editor_value("lock"))
+    assert_equal({"campaign" => true}, JSON.parse(editor_value("options")))
+    assert_select ".nuntius-title input[name='campaign[name]'][value='Spring']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='trigger'] [name='campaign[publish_at]']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='audience'] select[name='campaign[list_id]'] option[selected][value='#{list.id}']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='audience'] [name^='campaign[conditions]']"
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='layout'] select[name='campaign[layout_id]']"
+    assert_select "[name='campaign[transport]'], input[name='campaign[from]'], [name='campaign[link_tracking]']", count: 0
+    assert_select "#edit-content", count: 0
+  end
+
+  test "a campaign's From and tracking are saved from its editor's root" do
+    campaign = Nuntius::Campaign.create!(name: "Spring", transport: "mail", list: nuntius_lists(:valentines), layout: @layout)
+    design = submitted_design(@layout, text: "Spring is here", data: {"from" => "news@example.com", "linkTracking" => true, "openTracking" => true})
+
+    patch "/nuntius/admin/campaigns/#{campaign.id}", params: {campaign: {transport: "sms", design_json: design[:document], design_mjml: design[:mjml]}}
+
+    campaign.reload
+    assert_equal ["news@example.com", true, true, "mail"], [campaign.from, campaign.link_tracking, campaign.open_tracking, campaign.transport]
+  end
+
+  test "a new campaign starts from what it sends, and for an email its layout" do
+    Nuntius::Layout.create!(name: "Other", json: layout_json, mjml: layout_mjml)
+
+    get "/nuntius/admin/campaigns/new"
+    assert_select "a[href='/nuntius/admin/campaigns/new?transport=mail']"
+    assert_select "a[href='/nuntius/admin/campaigns/new?transport=push']", count: 0
+
+    get "/nuntius/admin/campaigns/new", params: {transport: "mail"}
+    assert_select "a[href='/nuntius/admin/campaigns/new?layout_id=#{@layout.id}&transport=mail']"
+
+    get "/nuntius/admin/campaigns/new", params: {transport: "mail", layout_id: @layout.id}
+    assert_select "[data-controller='tess-edit']"
+    assert_select "input[type=hidden][name='campaign[transport]'][value=mail]"
+    assert_select "a[href='/nuntius/admin/campaigns/new?transport=mail']", text: "Back"
   end
 
   test "converting a template with an old layout from its page" do

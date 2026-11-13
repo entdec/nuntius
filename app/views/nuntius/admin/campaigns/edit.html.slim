@@ -1,6 +1,24 @@
+/ A draft campaign is edited like a template (templates/edit.html.slim): in an
+/ editor with its settings in the root's Inspect, when it's published, its list
+/ and conditions as slots. An email in the email editor, with its layout as a
+/ slot too, an SMS or call in the editor for its messages (kits/messages.js).
+/ An email on an old layout, or without a layout, has the Edit tab.
 - if @campaign.draft?
+  - editor = if @campaign.email? && @campaign.layout && !@campaign.old_layout then :email elsif @campaign.message_design? then :message end
   = sts.form_for [:admin, @campaign] do |f|
-    = sts.card :nuntius_admin_campaigns, icon: 'fal fa-megaphone' do |card|
+    / The name is the card's title, edited in place
+    - title = capture do
+      - if editor
+        .nuntius-title
+          = f.text_field :name, class: "nuntius-title__input", placeholder: Nuntius::Campaign.human_attribute_name(:name), "aria-label" => Nuntius::Campaign.human_attribute_name(:name)
+        - if @campaign.errors[:name].any?
+          p.mt-1.text-sm.font-normal.text-red-600 role="alert" = @campaign.errors.full_messages_for(:name).to_sentence
+      - else
+        = t(".card.nuntius_admin_campaigns.title")
+    = sts.card :nuntius_admin_campaigns, icon: 'fal fa-megaphone', title: title do |card|
+      - if @campaign.new_record? && @back_path
+        - card.with_action
+          = link_to t('nuntius.admin.shared.new.back'), @back_path, class: "button"
       - if @campaign.persisted?
         - card.with_action
           button.button type="submit" formaction=send_test_admin_campaign_path(@campaign) = t(".send_test")
@@ -9,46 +27,56 @@
       - card.with_action
         = f.submit
 
-      - card.with_tab :edit, padding: true
-        .grid.grid-cols-12.gap-4 data-controller="toggle"
-          = render "nuntius/admin/shared/metadata_variables", variables: @campaign.metadata_variables, message: t(".metadata_variables")
-          .col-span-12
-            = f.input :name
-
-          .col-span-4
-            = f.input :transport, collection: nuntius_transport_options, include_blank: false, input_html: {data: { 'toggle-target' => 'input'}}
-          .col-span-4
-            = f.association :layout, collection: @layouts, hint: t(".layout_hint")
-          .col-span-4
-            = f.association :list, collection: @lists, hint: t(".list_hint")
-
-          .col-span-12
-            = nuntius_liquid_field f do
-              = f.input :from, hint: t(".from_hint")
-
-          / If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip]
-          .col-span-12
-            = nuntius_conditions f
-
-          .col-span-12
-            .grid.grid-cols-12.gap-4 data-toggle-target="insertion"
-
-          template data-toggle-target='toggleable' data-toggle-value='mail'
-            .col-span-4
-              = f.input :link_tracking, as: :switch
-            .col-span-4
-              = f.input :open_tracking, as: :switch
-            .col-span-4
+      - if editor
+        / The editor fills the tab
+        - card.with_tab :design, padding: false
+          - if @campaign.metadata_variables.any?
+            .m-4.grid.grid-cols-12.gap-4
+              = render "nuntius/admin/shared/metadata_variables", variables: @campaign.metadata_variables, message: t(".metadata_variables")
+          - slots = capture do
+            / What it sends is chosen when it's made (see new)
+            = f.hidden_field :transport if @campaign.new_record?
+            div data-tess-edit-target="slot" data-tess-edit-slot="trigger" hidden=true
               = f.input :publish_at, as: :date_time
+            div data-tess-edit-target="slot" data-tess-edit-slot="audience" hidden=true
+              = f.association :list, collection: @lists, include_blank: false, hint: t(".list_hint")
+              / If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip]
+              .mt-4 = nuntius_conditions f
+            - if editor == :email
+              div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden=true
+                = f.association :layout, collection: @layouts, include_blank: false, label: false, hint: t('nuntius.admin.templates.edit.layout_moves')
+          - if editor == :email
+            = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?), variables: @campaign.variable_roots, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), options: {campaign: true}, attributes: %i[from subject list], slots: slots, frame: false
+          - else
+            = render "nuntius/admin/shared/message_editor", record: @campaign, name: "campaign", options: {campaign: true}, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), slots: slots
 
-          template data-toggle-target='toggleable' data-toggle-value='voice'
+      - else
+        - card.with_tab :edit, padding: true
+          .grid.grid-cols-12.gap-4
+            = render "nuntius/admin/shared/metadata_variables", variables: @campaign.metadata_variables, message: t(".metadata_variables")
+            .col-span-12
+              = f.input :name
+
+            .col-span-6
+              = f.association :layout, collection: @layouts, hint: t(".layout_hint")
+            .col-span-6
+              = f.association :list, collection: @lists, hint: t(".list_hint")
+
             .col-span-12
               = nuntius_liquid_field f do
-                = entdec_code_editor f, :text, lang: "liquid"
+                = f.input :from, hint: t(".from_hint")
 
-      - if @campaign.email? && @campaign.layout
-        - card.with_tab :design, padding: false
-          = render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?), variables: @campaign.variable_roots, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), frame: false
+            / If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip]
+            .col-span-12
+              = nuntius_conditions f
+
+            - if @campaign.email?
+              .col-span-4
+                = f.input :link_tracking, as: :switch
+              .col-span-4
+                = f.input :open_tracking, as: :switch
+            .col-span-4
+              = f.input :publish_at, as: :date_time
 
       - if @campaign.persisted? && @campaign.email?
         - card.with_tab :media, padding: true

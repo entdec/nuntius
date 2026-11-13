@@ -16,7 +16,7 @@ test("an SMS is 160 GSM characters, or 70 with Unicode, and longer ones go in pa
   assert.equal(smsLength("ł".repeat(71)).parts, 2)
 })
 
-test("each transport is a kit of its root alone, with When, Recipient and its Message", () => {
+test("each transport is a kit of its root alone, with When, Audience, Recipient and its Message", () => {
   const messages = { sms: ["data.text"], push: ["data.text", "data.payload"], teams: ["data.text", "data.payload"], slack: ["data.text", "data.payload"], voice: ["data.text"] }
   for (const [key, fields] of Object.entries(messages)) {
     const kit = getKit(key)
@@ -24,10 +24,10 @@ test("each transport is a kit of its root alone, with When, Recipient and its Me
     assert.equal(kit.root, key)
     assert.equal(createDocument(key).type, key)
     const groups = getBlock(key).fields
-    assert.deepEqual(groups.map((group) => group.title), ["When", "Recipient", "Message"])
-    assert.deepEqual(groups[2].fields.map((field) => field.key), fields)
+    assert.deepEqual(groups.map((group) => group.title), ["When", "Audience", "Recipient", "Message"])
+    assert.deepEqual(groups[3].fields.map((field) => field.key), fields)
   }
-  assert.match(getBlock("sms").fields[2].fields[0].hint("Hi"), /^2 \/ 160 · 1 SMS/)
+  assert.match(getBlock("sms").fields[3].fields[0].hint("Hi"), /^2 \/ 160 · 1 SMS/)
 })
 
 test("without a preview URL the canvas shows the message as typed", async () => {

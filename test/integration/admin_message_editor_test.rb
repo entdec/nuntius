@@ -73,4 +73,21 @@ class AdminMessageEditorTest < ActionDispatch::IntegrationTest
     assert_match(/isn't valid YAML/, response.parsed_body["errors"].first)
     assert_nil response.parsed_body["payload"]
   end
+
+  test "an SMS campaign opens the editor of its messages, and saves its text from it" do
+    campaign = Nuntius::Campaign.create!(name: "News", transport: "sms", list: nuntius_lists(:valentines), text: "Hi")
+
+    get "/nuntius/admin/campaigns/#{campaign.id}/edit"
+
+    assert_equal "sms", editor["data-tess-edit-kit-value"]
+    assert_equal({"campaign" => true, "previewUrl" => "/nuntius/admin/templates/preview"}, JSON.parse(editor["data-tess-edit-options-value"]))
+    document = JSON.parse(css_select("input[name='campaign[design_json]']").first["value"])
+    assert_equal({"from" => nil, "text" => "Hi"}, document["data"])
+    assert_select "[data-controller='tess-edit'] [data-tess-edit-slot='audience'] select[name='campaign[list_id]']"
+
+    document["data"]["text"] = "Hi {{ subscriber.first_name }}"
+    patch "/nuntius/admin/campaigns/#{campaign.id}", params: {campaign: {design_json: document.to_json}}
+
+    assert_equal "Hi {{ subscriber.first_name }}", campaign.reload.text
+  end
 end
