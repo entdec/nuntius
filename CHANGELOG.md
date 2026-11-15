@@ -79,6 +79,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Fixed
 
+- A state machine event could be sent twice when its object was committed again while the event was being dispatched, for example by a job that attaches a file to it while the messenger still renders its attachments. The events are now claimed before they're dispatched, so only one commit sends them.
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
 - An SMS or Voice campaign sent its messages without their text: its text is now rendered for each subscriber.
 - `Nuntius::TimebasedEventsJob` runs one at a time (a Postgres advisory lock): a run that started while another one was still going could send the same messages again. It now leaves them to the run that's going.

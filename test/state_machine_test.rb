@@ -68,6 +68,30 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     assert_equal 0, Nuntius::Event.count
   end
 
+  test "an event is dispatched once when the object is committed again while dispatching" do
+    user = User.create!(name: "test", email: "test@example.com")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+
+    # Like a job that saves the object while the messenger is still rendering its attachments
+    nuntius_event = Nuntius.method(:event)
+    committed_again = false
+    Nuntius.stub(:event, ->(*args, **kwargs) {
+      if args.first == :activate && !committed_again
+        committed_again = true
+        User.find(user.id).dispatch_nuntius_events
+      end
+      nuntius_event.call(*args, **kwargs)
+    }) do
+      perform_enqueued_jobs(only: [Nuntius::MessengerJob]) do
+        User.transaction do
+          user.activate!
+        end
+      end
+    end
+    assert_performed_jobs 1
+    assert_equal 0, Nuntius::Event.count
+  end
+
   test "firing multiple event in single transaction multiple obj creates nuntius-events " do
     user = User.create!(name: "test", email: "test@example.com")
     report = Report.create!(name: "test report", email: "test@example.com")
