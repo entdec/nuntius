@@ -9,3 +9,6 @@ Gemfile.lock
 node_modules
 .vscode
 vendor/bundle
+# Written by bin/de for each checkout
+.devcontainer/.env
+.devcontainer/de-host/

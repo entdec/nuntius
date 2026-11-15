@@ -21,6 +21,9 @@ gem "mensa", entdec: "mensa"
 
 gem "sidekiq"
 
+# Dummy app (test/dummy)
+gem "propshaft"
+
 group :test do
   gem "vcr", "~> 6.0", require: false
   gem "webmock", "~> 3.3", require: false
