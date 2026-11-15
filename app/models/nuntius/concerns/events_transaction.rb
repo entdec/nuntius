@@ -34,12 +34,14 @@ module Nuntius
           .where(transitionable_type: self.class.name, transitionable_id: id)
           .includes(:transitionable)
           .select(:transition_event, :transition_attribute, :transitionable_type, :transitionable_id).distinct.each do |event|
-          Nuntius.event(event.transition_event.to_sym, event.transitionable)
-
-          # Immediately cleanup the events after dispatching
-          Nuntius::Event.where(transitionable_type: self.class.name, transitionable_id: id,
+          # Claim the events before dispatching: another commit of this object, in this process or
+          # another, may be dispatching them as well, and only the one that deletes them sends
+          claimed = Nuntius::Event.where(transitionable_type: self.class.name, transitionable_id: id,
             transition_event: event.transition_event.to_s,
             transition_attribute: event.transition_attribute).delete_all
+          next if claimed.zero?
+
+          Nuntius.event(event.transition_event.to_sym, event.transitionable)
         end
       end
     end
