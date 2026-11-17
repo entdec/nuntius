@@ -41,4 +41,4 @@ class AttachTag < LiquidumTag
   end
 end
 
-Liquid::Template.register_tag("attach", AttachTag)
+Liquid::Environment.default.register_tag("attach", AttachTag)

@@ -18,4 +18,4 @@ module ImageUrlFilter
   end
 end
 
-Liquid::Template.register_filter(ImageUrlFilter)
+Liquid::Environment.default.register_filter(ImageUrlFilter)

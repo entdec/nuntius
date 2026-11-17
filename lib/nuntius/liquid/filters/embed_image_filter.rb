@@ -40,4 +40,4 @@ module EmbedImageFilter
   end
 end
 
-Liquid::Template.register_filter(EmbedImageFilter)
+Liquid::Environment.default.register_filter(EmbedImageFilter)
