@@ -1,0 +1,155 @@
+<% present(@template, TemplatePresenter) do |template| %>
+  <%# A template is edited in an editor with everything in its root's Inspect, the trigger as a slot: an email in the
+      email editor (app/javascript/nuntius/blocks/email.js), with its layout as a slot too, and the others in the
+      editor for their messages (kits/messages.js). An email on an old layout, or without a layout, has the Edit tab. %>
+  <% editor = if @template.email? && @template.layout && !@template.old_layout then :email elsif @template.message_design? then :message end %>
+  <% designed = editor.present? %>
+  <%= form_with model: [:admin, @template], builder: FormComponents::FormBuilder do |f| %>
+    <% plain = nuntius_plain_form(f) %>
+    <%# The description is made from the trigger's sentence and conditions, until one is typed (see the description
+        controller). Variable pickers, Liquid fields and the email editor follow the class chosen (see the variables
+        controller). %>
+    <%= tag.div(**{"data-controller" => "nuntius--description nuntius--variables", "data-nuntius--description-if-value" => t(".description_if"), "data-nuntius--description-and-value" => t("entdec.conditions.and"), "data-nuntius--description-or-value" => t(".description_or")}.merge(nuntius_variables_data(f, template.klass_options.map(&:last)))) do %>
+      <%# The description is the page's title, editable in place %>
+      <% title = capture do %>
+        <% if designed %>
+          <div class="nuntius-title">
+            <%= plain.text_field :description, class: "nuntius-title__input", placeholder: Nuntius::Template.human_attribute_name(:description), "aria-label": Nuntius::Template.human_attribute_name(:description), data: {"nuntius--description-target" => "field"} %>
+            <label class="nuntius-description-auto nuntius-title__auto">
+              <%= plain.check_box :auto_description, data: {"nuntius--description-target" => "auto", action: "nuntius--description#fill"} %>
+              <span><%= t(".description_auto") %></span>
+            </label>
+          </div>
+          <% if @template.errors[:description].any? %>
+            <p class="mt-1 text-sm font-normal text-red-600" role="alert"><%= @template.errors.full_messages_for(:description).to_sentence %></p>
+          <% end %>
+        <% else %>
+          <%= t(".card.nuntius_admin_templates.title") %>
+        <% end %>
+      <% end %>
+      <%= nuntius_page :nuntius_admin_templates, title: title, icon: nuntius_icon(:template), form: f, back: (@back_path if @template.new_record?) do |page| %>
+        <% if designed %>
+          <%# The editor fills the tab %>
+          <% page.tab :design, padding: false do %>
+            <% if @template.metadata_variables.any? %>
+              <div class="m-4 grid grid-cols-12 gap-4">
+                <%= render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables") %>
+              </div>
+            <% end %>
+            <% slots = capture do %>
+              <div data-tess-edit-target="slot" data-tess-edit-slot="trigger" <%= tag.attributes("data-open": (true if @template.new_record?)) %> hidden>
+                <%= render "trigger", f: plain, template: template %>
+                <div class="mt-4"><%= f.check_box :enabled, switch: true %></div>
+                <% if Nuntius.config.can_create_global %>
+                  <div class="mt-4"><%= f.check_box :global, description: t(".global_hint") %></div>
+                <% end %>
+              </div>
+              <% if editor == :email %>
+                <div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden>
+                  <%= f.collection_select :layout_id, @layouts, :id, :name, {include_blank: false, label: false, description: t(".layout_moves")} %>
+                </div>
+              <% end %>
+            <% end %>
+            <% if editor == :email %>
+              <%= render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots, frame: false %>
+            <% else %>
+              <%= render "nuntius/admin/shared/message_editor", record: @template, name: "template", options: {template: true}, translations_url: (translations_admin_template_path(@template) if @template.persisted?), slots: slots %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <% page.tab :edit do %>
+            <% if @template.metadata_variables.any? %>
+              <div class="mb-6 grid grid-cols-12 gap-4">
+                <%= render "nuntius/admin/shared/metadata_variables", variables: @template.metadata_variables, message: t(".metadata_variables") %>
+              </div>
+            <% end %>
+
+            <%= render "trigger", f: plain, template: template %>
+
+            <div class="mt-4 grid grid-cols-12 gap-4">
+              <div class="col-span-2 sm:col-span-1"><%= f.check_box :enabled, switch: true %></div>
+              <div class="<%= Nuntius.config.can_create_global ? "col-span-10 sm:col-span-9" : "col-span-10 sm:col-span-11" %> relative">
+                <label class="nuntius-description-auto">
+                  <%= plain.check_box :auto_description, data: {"nuntius--description-target" => "auto", action: "nuntius--description#fill"} %>
+                  <span><%= t(".description_auto") %></span>
+                </label>
+                <%= f.text_field :description, data: {"nuntius--description-target" => "field"} %>
+              </div>
+              <% if Nuntius.config.can_create_global %>
+                <div class="col-span-12 sm:col-span-2"><%= f.check_box :global, description: t(".global_hint") %></div>
+              <% end %>
+
+              <div class="col-span-12 sm:col-span-6">
+                <%= nuntius_liquid_field f do %>
+                  <%= f.text_field :from %>
+                <% end %>
+              </div>
+              <div class="col-span-12 sm:col-span-6">
+                <%= nuntius_liquid_field f do %>
+                  <%= f.text_field :to %>
+                <% end %>
+              </div>
+
+              <%# Old layouts read their values from the template's metadata %>
+              <% if @template.old_layout %>
+                <div class="col-span-12"><%= f.code_editor :metadata_yaml, lang: "yaml", label: t(".metadata") %></div>
+              <% end %>
+
+              <% if @template.transport == "mail" %>
+                <div class="col-span-12 sm:col-span-6"><%= f.check_box :link_tracking, switch: true %></div>
+                <div class="col-span-12 sm:col-span-6"><%= f.check_box :open_tracking, switch: true %></div>
+                <% if @template.old_layout %>
+                  <div class="col-span-12 rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                    <p class="mb-3 text-sm text-gray-600 dark:text-gray-400"><%= t(".old_layout", name: @template.old_layout.name) %></p>
+                    <div class="mb-3 grid grid-cols-12">
+                      <%= render "nuntius/admin/shared/metadata_variables", variables: Nuntius::MetadataVariables.in(@template, @template.old_layout.data, @template.html), message: t(".old_layout_metadata_variables") %>
+                    </div>
+                    <% if @template.errors[:base].any? %>
+                      <div class="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+                        <% @template.errors[:base].each do |problem| %>
+                          <p><%= problem %></p>
+                        <% end %>
+                      </div>
+                    <% end %>
+                    <div class="mb-3"><%= f.collection_select :layout_id, @layouts, :id, :name, {include_blank: true, label: t(".convert_layout"), description: t(".convert_hint")} %></div>
+                    <button class="button border-transparent bg-red-600 text-white hover:bg-red-700" type="submit" formaction="<%= convert_admin_template_path(@template) %>" onclick="return confirm('<%= j t(".convert_confirm") %>')"><%= t(".convert") %></button>
+                  </div>
+                  <div class="col-span-12">
+                    <%= nuntius_liquid_field f do %>
+                      <%= entdec_code_editor plain, :subject, lang: "liquid" %>
+                    <% end %>
+                  </div>
+                  <div class="col-span-12">
+                    <%= nuntius_liquid_field f do %>
+                      <%= entdec_code_editor plain, :html, lang: "markdown", height: "400px" %>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="col-span-12"><%= f.collection_select :layout_id, @layouts, :id, :name, {include_blank: true, description: t(".layout_hint")} %></div>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+
+        <% if @template.persisted? && @template.email? %>
+          <% page.tab :media do %>
+            <%= render "nuntius/admin/shared/attachments", form: f, attribute: :images, delete: ->(attachment) { delete_media_admin_template_path(@template, attachment) } %>
+          <% end %>
+        <% end %>
+
+        <% if @template.persisted? %>
+          <% page.tab :translations do %>
+            <%= render "nuntius/admin/shared/translations", record: @template, url: translations_admin_template_path(@template) %>
+          <% end %>
+        <% end %>
+
+        <% if @template.messages.exists? %>
+          <% page.tab :messages, padding: false do %>
+            <%= table :"nuntius/messages", params: {template_id: @template.id} %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -132,4 +132,17 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
       Nuntius::Campaign.create!(name: "Spring", transport: "mail", layout: @layout, list: list)
     end
   end
+
+  test "the Media tab deletes one of the record's own images, and goes back to it" do
+    banner = @template.images.attach(io: StringIO.new(PNG), filename: "banner.png", content_type: "image/png").attachments.last
+
+    delete "/nuntius/admin/templates/#{@template.id}/media/#{banner.id}"
+
+    assert_redirected_to "/nuntius/admin/templates/#{@template.id}/edit"
+    assert_empty @template.reload.images
+    # Not its layout's, which isn't the template's to delete
+    delete "/nuntius/admin/templates/#{@template.id}/media/#{@layout.attachments.first.id}"
+    assert_response :not_found
+    assert_equal 2, @layout.reload.attachments.count
+  end
 end

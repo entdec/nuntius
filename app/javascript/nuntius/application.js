@@ -1,6 +1,8 @@
-// Entry point. The host app imports it after satis, whose Stimulus
-// application (window.Stimulus) it registers the email editor and the view
-// components (entdec-view_components) with.
+// Entry point. It registers the email editor, the view components
+// (entdec-view_components) and its controllers with the host app's Stimulus
+// application (window.Stimulus), which it starts if nothing has yet.
+
+import { Application } from "@hotwired/stimulus"
 
 import { getBlock, blockTypes, registerBlock, registerCategory, registerTessEdit } from "tess_edit"
 import { imageFields } from "tess_edit/core/media"
@@ -16,6 +18,8 @@ import VariablesController from "nuntius/controllers/variables_controller"
 import DescriptionController from "nuntius/controllers/description_controller"
 import MirrorController from "nuntius/controllers/mirror_controller"
 import TranslationsController from "nuntius/controllers/translations_controller"
+import TabsController from "nuntius/controllers/tabs_controller"
+import ToggleController from "nuntius/controllers/toggle_controller"
 import { registerViewComponents } from "entdec/view_components"
 
 registerCategory({ key: "mailing", label: "Mailing", order: 25 })
@@ -27,6 +31,8 @@ blockTypes()
   .filter((definition) => definition.type !== "image" && imageFields(definition).length)
   .forEach((definition) => registerBlock(withImageNames(definition)))
 
+window.Stimulus ||= Application.start()
+
 registerTessEdit(window.Stimulus)
 registerViewComponents(window.Stimulus)
 window.Stimulus.register("nuntius--chained-select", ChainedSelectController)
@@ -34,3 +40,5 @@ window.Stimulus.register("nuntius--variables", VariablesController)
 window.Stimulus.register("nuntius--description", DescriptionController)
 window.Stimulus.register("nuntius--mirror", MirrorController)
 window.Stimulus.register("nuntius--translations", TranslationsController)
+window.Stimulus.register("nuntius--tabs", TabsController)
+window.Stimulus.register("nuntius--toggle", ToggleController)

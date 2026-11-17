@@ -1,0 +1,8 @@
+<%= form_with model: [:admin, @locale], builder: FormComponents::FormBuilder do |f| %>
+  <%= nuntius_page :nuntius_admin_locales, title: t(".card.nuntius_admin_locales.title"), icon: nuntius_icon(:locale), form: f do %>
+    <div class="grid gap-4">
+      <%= f.text_field :key %>
+      <%= f.code_editor :data_yaml, lang: "yaml", label: t(".data"), height: "65vh" %>
+    </div>
+  <% end %>
+<% end %>

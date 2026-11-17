@@ -1,0 +1,42 @@
+<%# What to send, then for an email which layout to start from, as cards linking to the editor for a new one
+    (TemplatesController#new, CampaignsController#new).
+    Locals: card (its page's name), icon, title, transport (chosen), transports, layouts, path (the new one's path for
+    its params) %>
+<% card_class = "flex h-full flex-col rounded-lg border border-gray-200 bg-white transition hover:border-primary-600 hover:ring-2 hover:ring-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 dark:border-gray-700 dark:bg-gray-900" %>
+<% email = transport == "mail" %>
+<%= nuntius_page card, title: title, icon: icon, back: (path.call if email && !transports.one?) do %>
+  <p class="mb-4 text-sm text-gray-500 dark:text-gray-400"><%= email ? "#{nuntius_transport_name("mail")} › #{t("nuntius.admin.shared.new.which_layout")}" : t("nuntius.admin.shared.new.what") %></p>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <% if email %>
+      <% layouts = layouts.order(:name).to_a %>
+      <% if layouts.empty? %>
+        <%= link_to new_admin_layout_path, class: "flex h-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-12 text-center hover:border-gray-400" do %>
+          <span class="text-sm text-gray-500"><%= t("nuntius.admin.shared.new.no_layouts") %></span>
+          <span class="font-medium text-primary-600"><%= t("nuntius.admin.shared.new.create_layout") %></span>
+        <% end %>
+      <% end %>
+      <% layouts.each do |layout| %>
+        <%= link_to path.call(transport: "mail", layout_id: layout.id), class: "#{card_class} overflow-hidden" do %>
+          <%# The email at half its size, centred; looked at, not used %>
+          <div class="pointer-events-none relative h-64 overflow-hidden border-b border-gray-200 bg-gray-50 dark:border-gray-700">
+            <iframe class="absolute top-0 border-0" srcdoc="<%= layout.preview_html %>" sandbox="" loading="lazy" tabindex="-1" title="<%= layout.name %>" style="left: 50%; width: 600px; height: 1000px; margin-left: -150px; transform: scale(0.5); transform-origin: top left;"></iframe>
+          </div>
+          <div class="flex flex-col gap-1 px-4 py-3">
+            <span class="font-medium text-gray-900 dark:text-white"><%= layout.name %></span>
+            <% if layout.description.present? %>
+              <span class="text-sm text-gray-500 dark:text-gray-400"><%= layout.description %></span>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% else %>
+      <% transports.each do |option| %>
+        <%= link_to path.call(transport: option), class: "#{card_class} items-center gap-2 px-4 py-8 text-center" do %>
+          <span class="text-3xl text-gray-700 dark:text-gray-300"><%= nuntius_transport_icon(option) %></span>
+          <span class="font-medium text-gray-900 dark:text-white"><%= nuntius_transport_name(option) %></span>
+          <span class="text-sm text-gray-500 dark:text-gray-400"><%= t(option, scope: "nuntius.transport_hints", default: "") %></span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

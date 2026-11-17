@@ -1,0 +1,76 @@
+<%# When a template sends: a sentence of pills (see TemplatePresenter) and its conditions.
+    Send via [mail] based on [an event] on [Order] [shipped],
+    or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year].
+    The description controller reads it, around it in edit. f is Rails' own builder (nuntius_plain_form): its fields are pills. %>
+<div class="grid grid-cols-12 gap-4">
+  <div class="nuntius-sentence col-span-12 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-gray-700" data-nuntius--description-target="sentence">
+    <span data-description-skip><%= t(".send_via") %></span>
+    <%# What it sends is chosen when it's made (see new) %>
+    <span class="font-medium text-gray-900"><%= nuntius_transport_name(template.transport) %></span>
+    <%= f.hidden_field :transport %>
+    <span data-description-skip><%= t(".based_on") %></span>
+    <%# contents: the nested toggles' fields wrap as part of the sentence %>
+    <div class="contents" data-controller="nuntius--toggle">
+      <div class="contents" data-description-skip>
+        <%= entdec_pill_select f, :based_on, template.based_on_options, tone: :operator, select_html: {"data-nuntius--toggle-target" => "input"} %>
+      </div>
+      <%# on [User] [activate], or when [User] [Born on] is in: by what it's based on (see nuntius-sentence) %>
+      <span class="nuntius-sentence__on"><%= t(".on") %></span>
+      <span class="nuntius-sentence__when"><%= t(".when") %></span>
+      <%= entdec_pill_select f, :klass, template.klass_options, selected: template.klass, tone: :neutral %>
+      <div class="contents" data-nuntius--toggle-target="insertion"></div>
+
+      <%# [shipped], or a Custom event's scope#event %>
+      <template data-nuntius--toggle-target="toggleable" data-toggle-value="event">
+        <div class="contents" data-controller="nuntius--chained-select" data-nuntius--chained-select-to-value="template[klass]">
+          <div class="contents" data-nuntius--chained-select-target="list">
+            <%= entdec_pill_select f, :event, template.event_options %>
+          </div>
+          <div class="contents" data-nuntius--chained-select-target="text">
+            <%= f.text_field :event, class: "entdec-pill-input entdec-pill-input--wide", placeholder: "scope#event", "aria-label" => Nuntius::Template.human_attribute_name(:event) %>
+          </div>
+        </div>
+      </template>
+
+      <%# [Born on] [is in] [4] [weeks] [every year] %>
+      <template data-nuntius--toggle-target="toggleable" data-toggle-value="time">
+        <div class="contents" data-controller="nuntius--chained-select" data-nuntius--chained-select-to-value="template[klass]">
+          <div class="contents" data-nuntius--chained-select-target="list">
+            <%= entdec_pill_select f, :timestamp, template.timestamp_options, tone: :neutral %>
+          </div>
+        </div>
+        <div class="contents" data-controller="nuntius--toggle">
+          <%= entdec_pill_select f, :direction, template.direction_options, tone: :operator, select_html: {"data-nuntius--toggle-target" => "input"} %>
+          <%= render "nuntius/admin/templates/interval", f: f, template: template %>
+          <div class="contents" data-nuntius--toggle-target="insertion"></div>
+          <template data-nuntius--toggle-target="toggleable" data-toggle-value="after">
+            <span><%= t(".ago") %></span>
+          </template>
+        </div>
+        <%= entdec_pill_select f, :recurrence, template.recurrence_options %>
+      </template>
+    </div>
+  </div>
+  <% sentence_errors = %i[klass event interval recurrence].flat_map { |attribute| template.errors.full_messages_for(attribute) } %>
+  <% if sentence_errors.any? %>
+    <div class="col-span-12 text-sm text-red-600" role="alert"><%= sentence_errors.to_sentence %></div>
+  <% end %>
+
+  <%# If [all] of the following conditions are met: [Order › State] [is] [shipped] %>
+  <div class="col-span-12">
+    <%= nuntius_conditions f %>
+  </div>
+
+  <%# Whom a time based template sends to now, and its limit (see TimebasedEventsJob) %>
+  <% if template.persisted? && (due_count = template.due_count) %>
+    <div class="col-span-12 flex flex-wrap items-center gap-x-2 text-sm text-gray-500" role="status">
+      <% if due_count > template.send_limit %>
+        <span class="text-red-600"><%= t(".due_over_limit", limit: template.send_limit) %></span>
+      <% else %>
+        <span><%= t(template.due_today? ? ".due_today" : ".due_this_hour", count: due_count) %></span>
+      <% end %>
+      <span><%= t(".limit") %></span>
+      <%= f.number_field :timebased_limit, min: 1, placeholder: Nuntius.config.timebased_limit, class: "entdec-pill-input", "aria-label" => Nuntius::Template.human_attribute_name(:timebased_limit) %>
+    </div>
+  <% end %>
+</div>

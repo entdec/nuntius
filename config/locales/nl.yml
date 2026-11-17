@@ -150,6 +150,13 @@ nl:
     admin:
       not_saved: "%{resource} kon niet worden opgeslagen: %{errors}"
       shared:
+        page:
+          back: Terug
+          save: Opslaan
+        attachments:
+          add: Afbeeldingen toevoegen
+          delete: Verwijderen
+          delete_confirm: "%{name} verwijderen?"
         new:
           what: Wat wil je versturen?
           which_layout: Met welke layout wil je beginnen?
@@ -242,7 +249,7 @@ nl:
           card:
             nuntius_admin_lists:
               title: Lijsten
-          description_hint: Omschrijf de list in detail voor abonnees, leg uit of ze kunnen uitschrijven, hoe veel en hoe vaak berichten ze berichten ontvangen, etc.
+          description_hint: "Wat abonnees over de lijst lezen: waar het over gaat en hoe vaak ze berichten krijgen."
           tabs:
             main:
               tab:
@@ -338,6 +345,14 @@ nl:
           convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
           convert: Omzetten naar de e-maileditor
           convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
+          tabs:
+            main:
+              tab:
+                design: Ontwerp
+                edit: Bewerk
+                media: Media
+                translations: Vertalingen
+                messages: Berichten
         trigger:
           send_via: Versturen via
           due_today:

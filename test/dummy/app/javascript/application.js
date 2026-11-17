@@ -2,3 +2,6 @@
 import "satis"
 import "mensa"
 import "nuntius"
+import { registerFormComponents } from "form_components"
+
+registerFormComponents(window.Stimulus)

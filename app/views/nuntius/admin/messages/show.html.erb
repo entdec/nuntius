@@ -1,0 +1,57 @@
+<% title = [t(".message"), @message.template&.description || @message.campaign&.name].compact_blank.join(" · ") %>
+<% actions = [Nuntius::PageAction.new(id: :resend, label: t("nuntius.context_menu.resend"), link: resend_admin_message_path(@message), method: :post)] %>
+<%= nuntius_page :nuntius_admin_messages, title: title, icon: nuntius_icon(:message), actions: actions do |page| %>
+  <%# What's about the message, beside whichever tab is shown %>
+  <% page.aside do %>
+    <dl class="nuntius-info nuntius-info--stacked">
+      <% %i[state transport provider provider_id request_id refreshes].each do |key| %>
+        <%= nuntius_info_item(key, @message.public_send(key)) %>
+      <% end %>
+      <%= nuntius_info_item(:last_sent_at, (l(@message.last_sent_at, format: :long) if @message.last_sent_at), icon: nuntius_icon(:sent_at)) %>
+      <%= nuntius_info_item(:created_at, l(@message.created_at, format: :long), icon: nuntius_icon(:created_at)) %>
+      <% if @message.link_tracking_enabled? %>
+        <%= nuntius_info_item(:click_count, @message.click_count) %>
+      <% end %>
+      <% if @message.open_tracking_enabled? %>
+        <%= nuntius_info_item(:open_count, @message.open_count) %>
+      <% end %>
+    </dl>
+  <% end %>
+  <% page.tab :preview do %>
+    <dl class="nuntius-info">
+      <%= nuntius_info_item(:to, @message.to) %>
+      <%= nuntius_info_item(:from, @message.from) %>
+      <% if @message.transport == "mail" %>
+        <%= nuntius_info_item(:subject, @message.subject, wide: true) %>
+        <% if @message.attachments.any? %>
+          <%= nuntius_info_item(:attachments, wide: true) do %>
+            <% @message.attachments.each do |attachment| %>
+              <%= link_to main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename, class: "block" do %>
+                <i class="<%= nuntius_icon(:attachment) %>"></i>
+                <span><%= attachment.filename %></span>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% if @message.transport.in?(%w[sms slack]) %>
+        <%= nuntius_info_item(:text, @message.text, wide: true) %>
+      <% end %>
+      <% if @message.transport == "slack" %>
+        <%= nuntius_info_item(:payload, wide: true) do %>
+          <pre><%= YAML.dump(@message.payload) %></pre>
+        <% end %>
+      <% end %>
+      <% if @message.transport == "mail" && @message.html.present? %>
+        <%= nuntius_info_item(:html, wide: true) do %>
+          <iframe class="w-full rounded-lg border border-gray-200" src="<%= message_path(@message.id) %>" style="height: 600px;"></iframe>
+        <% end %>
+      <% end %>
+    </dl>
+  <% end %>
+  <% if @message.link_tracking_enabled? || @message.open_tracking_enabled? %>
+    <% page.tab :tracking, padding: false do %>
+      <%= table :"nuntius/message_trackings", params: {message_id: @message.id} %>
+    <% end %>
+  <% end %>
+<% end %>

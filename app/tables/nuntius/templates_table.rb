@@ -39,7 +39,7 @@ module Nuntius
 
       action :delete do
         link { |template| nuntius.admin_template_path(template) }
-        icon "fa-solid fa-trash"
+        icon Nuntius.config.icons[:delete]
         link_attributes data: {"turbo-confirm": "Are you sure you want to delete the template?", "turbo-method": :delete}
       end
 

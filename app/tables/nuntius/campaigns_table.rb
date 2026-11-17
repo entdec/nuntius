@@ -26,21 +26,21 @@ module Nuntius
       action :schedule do
         show ->(campaign) { campaign.transport != "sms" && campaign.can_schedule? }
         link { |campaign| nuntius.schedule_admin_campaign_path(campaign) }
-        icon "fa-solid fa-paper-plane"
+        icon Nuntius.config.icons[:schedule]
         link_attributes data: {"turbo-confirm": t(".campaign_schedule_confirm"), "turbo-method": :post}
       end
 
       action :deschedule do
         show ->(campaign) { campaign.can_deschedule? }
         link { |campaign| nuntius.deschedule_admin_campaign_path(campaign) }
-        icon "fa-solid fa-calendar-xmark"
+        icon Nuntius.config.icons[:deschedule]
         link_attributes data: {"turbo-method": :post}
       end
 
       action :cancel do
         show ->(campaign) { campaign.can_cancel? }
         link { |campaign| nuntius.cancel_admin_campaign_path(campaign) }
-        icon "fa-solid fa-ban"
+        icon Nuntius.config.icons[:cancel]
         link_attributes data: {"turbo-confirm": t(".campaign_cancel_confirm"), "turbo-method": :post}
       end
 

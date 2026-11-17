@@ -43,20 +43,20 @@ Nuntius::Engine.routes.draw do
         get "media", to: "media#index", defaults: {owner: "campaign"}
         post "media", to: "media#create", defaults: {owner: "campaign"}
         post "media/compile", to: "media#compile", defaults: {owner: "campaign"}
+        delete "media/:attachment_id", to: "media#destroy", defaults: {owner: "campaign"}, as: :delete_media
         get "translations", to: "translations#index", defaults: {owner: "campaign"}
         patch "translations", to: "translations#update", defaults: {owner: "campaign"}
       end
-      resources :attachments, controller: "satis/attachments"
     end
     resources :layouts do
       member do
         get "media", to: "media#index", defaults: {owner: "layout"}
         post "media", to: "media#create", defaults: {owner: "layout"}
         post "media/compile", to: "media#compile", defaults: {owner: "layout"}
+        delete "media/:attachment_id", to: "media#destroy", defaults: {owner: "layout"}, as: :delete_media
         get "translations", to: "translations#index", defaults: {owner: "layout"}
         patch "translations", to: "translations#update", defaults: {owner: "layout"}
       end
-      resources :attachments, controller: "satis/attachments"
     end
     resources :lists do
       resources :subscribers, controller: "lists/subscribers" do
@@ -74,12 +74,12 @@ Nuntius::Engine.routes.draw do
     resources :layouts
     resources :locales
     resources :templates do
-      resources :attachments, controller: "satis/attachments"
       post "preview", on: :collection
       member do
         get "media", to: "media#index", defaults: {owner: "template"}
         post "media", to: "media#create", defaults: {owner: "template"}
         post "media/compile", to: "media#compile", defaults: {owner: "template"}
+        delete "media/:attachment_id", to: "media#destroy", defaults: {owner: "template"}, as: :delete_media
         get "translations", to: "translations#index", defaults: {owner: "template"}
         patch "translations", to: "translations#update", defaults: {owner: "template"}
         # The conversion button submits the template form, a PATCH

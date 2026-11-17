@@ -19,6 +19,7 @@ git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 
 gem "mensa", entdec: "mensa"
 gem "entdec-view_components", entdec: "view_components"
+gem "form_components", entdec: "form_components"
 
 gem "sidekiq"
 

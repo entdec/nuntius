@@ -1,0 +1,12 @@
+<%= form_with model: @subscriber, url: @subscriber.new_record? ? admin_list_subscribers_path(@list) : admin_list_subscriber_path(@list, @subscriber), builder: FormComponents::FormBuilder do |f| %>
+  <%= nuntius_page :nuntius_admin_lists_subscribers, title: t(".subscribers"), icon: nuntius_icon(:subscriber), form: f, back: edit_admin_list_path(@list) do %>
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 sm:col-span-6"><%= f.text_field :first_name %></div>
+      <div class="col-span-12 sm:col-span-6"><%= f.text_field :last_name %></div>
+      <div class="col-span-12"><%= f.text_field :phone_number %></div>
+      <div class="col-span-12"><%= f.email_field :email %></div>
+      <div class="col-span-12"><%= f.check_box :test_recipient, description: t(".test_recipient_hint") %></div>
+      <div class="col-span-12"><%= f.code_editor :metadata_yaml, lang: "yaml", label: t(".metadata") %></div>
+    </div>
+  <% end %>
+<% end %>

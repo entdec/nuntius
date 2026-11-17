@@ -1,0 +1,14 @@
+<%# Subscribing to a list, on the app's public layout (Nuntius.config.layout) %>
+<%= form_with model: @subscriber, url: @subscriber.new_record? ? subscribers_path(@list) : subscriber_path(@subscriber), builder: FormComponents::FormBuilder, class: "nuntius-public" do |f| %>
+  <%= f.hidden_field :list_id %>
+  <h1 class="nuntius-public__title"><%= t(".subscribe_to_list", list: @subscriber.list.name) %></h1>
+  <div class="grid grid-cols-12 gap-4">
+    <div class="col-span-12 sm:col-span-6"><%= f.text_field :first_name %></div>
+    <div class="col-span-12 sm:col-span-6"><%= f.text_field :last_name %></div>
+    <div class="col-span-12"><%= f.text_field :phone_number %></div>
+    <div class="col-span-12"><%= f.email_field :email %></div>
+  </div>
+  <div class="nuntius-public__actions">
+    <%= f.button @subscriber.new_record? ? t(".create") : t(".update"), class: "button primary" %>
+  </div>
+<% end %>

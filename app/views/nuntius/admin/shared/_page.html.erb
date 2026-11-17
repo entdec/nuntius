@@ -1,0 +1,45 @@
+<%# A page's frame: its title, its actions and its form's Save (which stays on the record) over its tabs or its
+    content, on a card. An app draws it its own way by having app/views/nuntius/admin/shared/_page.html.erb itself.
+    Locals: name (the page's, as nuntius_admin_layouts), title (a text, or HTML: a field to edit it in place), icon,
+    form (the page's form's builder, for a page that is a form), actions (Nuntius::PageAction), back (where a new
+    record's page goes back to), tabs (Nuntius::Page::Tab), aside (what's beside them, or nil), body (the content
+    of a page without tabs) %>
+<div class="nuntius-page" id="<%= name %>" data-controller="nuntius--tabs">
+  <div class="nuntius-page__header">
+    <% if icon %>
+      <i class="nuntius-page__icon <%= icon %>"></i>
+    <% end %>
+    <div class="nuntius-page__title"><%= title %></div>
+    <div class="nuntius-page__actions">
+      <% if back %>
+        <%= link_to t("nuntius.admin.shared.page.back"), back, class: "button" %>
+      <% end %>
+      <%= render partial: "nuntius/admin/shared/page_action", collection: actions, as: :action %>
+      <% if form %>
+        <%= button_tag t("nuntius.admin.shared.page.save"), name: "commit", value: "continue", class: "button primary" %>
+      <% end %>
+    </div>
+  </div>
+  <% content = capture do %>
+    <% if tabs.any? %>
+      <div class="nuntius-page__tabs" role="tablist">
+        <% tabs.each_with_index do |tab, index| %>
+          <button type="button" role="tab" class="nuntius-page__tab" id="<%= name %>_<%= tab.id %>_tab" aria-controls="<%= name %>_<%= tab.id %>" aria-selected="<%= index.zero? %>" data-nuntius--tabs-target="tab" data-action="nuntius--tabs#select"><%= tab.label %></button>
+        <% end %>
+      </div>
+      <% tabs.each_with_index do |tab, index| %>
+        <%= tag.div tab.content, role: "tabpanel", id: "#{name}_#{tab.id}", class: ("nuntius-page__body" if tab.padding), hidden: !index.zero?, "aria-labelledby": "#{name}_#{tab.id}_tab", data: {"nuntius--tabs-target": "panel"} %>
+      <% end %>
+    <% else %>
+      <div class="nuntius-page__body"><%= body %></div>
+    <% end %>
+  <% end %>
+  <% if aside %>
+    <div class="nuntius-page__columns">
+      <div class="nuntius-page__main"><%= content %></div>
+      <aside class="nuntius-page__aside"><%= aside %></aside>
+    </div>
+  <% else %>
+    <%= content %>
+  <% end %>
+</div>

@@ -17,21 +17,24 @@ bin/rails nuntius:install:migrations
 bin/rails db:migrate
 ```
 
-Nuntius' admin pages need [Satis](https://github.com/entdec/satis), importmap-rails, Propshaft and Tailwind CSS 4 through tailwindcss-rails 4.3 or later (for engine support). Import Nuntius' JavaScript after Satis, whose Stimulus application it uses:
+Nuntius' admin pages need importmap-rails, Propshaft, Tailwind CSS 4 through tailwindcss-rails 4.3 or later (for engine support), [Mensa](https://github.com/entdec/mensa) for their tables, and [FormComponents](https://github.com/entdec/form_components) for their forms, a dependency from GitHub: add `gem "form_components", github: "entdec/form_components"` to your Gemfile. Import Nuntius' JavaScript, which uses your app's Stimulus application (`window.Stimulus`) or starts one, and register FormComponents' controllers with it:
 
 ```js
 // app/javascript/application.js
-import "satis"
 import "nuntius"
+import { registerFormComponents } from "form_components"
+
+registerFormComponents(window.Stimulus)
 ```
 
-and add the styles of Nuntius, the email editor and the forms' view components ([entdec-view_components](https://github.com/entdec/view_components), a dependency from GitHub: add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile) to your Tailwind CSS:
+and add the styles of Nuntius, the email editor, FormComponents and the forms' view components ([entdec-view_components](https://github.com/entdec/view_components), a dependency from GitHub: add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile) to your Tailwind CSS:
 
 ```css
 /* app/assets/tailwind/application.css */
 @import "../builds/tailwind/nuntius";
 @import "../builds/tailwind/tess_edit";
 @import "../builds/tailwind/entdec_view_components";
+@import "../builds/tailwind/form_components";
 ```
 
 With jsbundling-rails (esbuild) instead of importmap-rails, your build has to find the gems' JavaScript, which imports its own modules by importmap names without `.js`: `nuntius` is the nuntius gem's `app/javascript/nuntius/application.js` and `nuntius/x` its `app/javascript/nuntius/x.js`, `tess_edit` is the tess_edit gem's `app/javascript/tess_edit/index.js` and `tess_edit/x` its `app/javascript/tess_edit/x.js`, except `tess_edit/vendor/tiptap`, which is its `vendor/javascript/tess_edit/tiptap.js`, and `entdec/view_components` is the entdec-view_components gem's `app/javascript/entdec/view_components.js` and `entdec/components/x` its `app/components/entdec/x.js`. For example, with a plugin in your esbuild config:
@@ -174,7 +177,18 @@ class UserMessenger < ApplicationMessenger
 end
 ```
 
-**The admin** shows, creates and changes the `visible` records only: other accounts' records give a 404. New records get the current account. A template's layout, and a campaign's list and layout, must belong to its own account. The template form has a Global switch when `config.can_create_global` allows it.
+**The admin** shows, creates and changes the `visible` records only: other accounts' records give a 404. New records get the current account. A template's layout, and a campaign's list and layout, must belong to its own account. The template form has a Global check box when `config.can_create_global` allows it.
+
+### Admin pages
+
+Each admin page is drawn by a frame, a partial in `nuntius/admin/shared`, which your app can have itself to show the pages in its own look: copy Nuntius' to `app/views/nuntius/admin/shared/` in your app and change it. The pages give the frames what's on them; the frames decide how it looks.
+
+- `_index`, an index page: `name` (the page's, as `nuntius_admin_templates`), `title`, `icon` and `actions`. The block (`yield`) is its table.
+- `_page`, a record's page: `name`, `title` (a text, or HTML: the field that edits a template's description in place), `icon`, `form` (the builder of the page's form, nil for a page that isn't one), `actions`, `back` (where a new record's page goes back to, or nil), `tabs` (`Nuntius::Page::Tab`s, with `id`, `label`, `padding` and `content`: `padding` is false for a tab its content fills, an editor or a table), `aside` (what's about the record, a message's state or a list's settings, shown beside the tabs whichever is open, or nil) and `body` (the content of a page without tabs). Save sends `commit=continue`, which keeps the user on the record.
+- `_page_action`, one of the actions, a `Nuntius::PageAction`: `id`, `label`, `link` and `icon`, with `method` (a request other than GET, through Turbo's `data-turbo-method`) and `confirm`, or `submit` (Send test, Import: it sends the page's form to `link` instead). A `submit` action has to be a button inside the form, with `formaction`; a frame that shows the actions outside the form keeps a hidden button there and clicks it.
+- `_attachments`, a Media tab: `form`, `attribute` (`images` or `attachments`) and `delete`, a proc giving an attachment's delete path.
+
+Nuntius' own frames are styled by its `nuntius-*` classes; yours don't need them. Their icons are Font Awesome's (which your app loads), by what they're for: Font Awesome Free's by default. With Font Awesome Pro, set `config.icons = Nuntius::Configuration::PRO_ICONS`, or merge your own in: `config.icons = Nuntius::Configuration::FREE_ICONS.merge(template: "fa-solid fa-envelope")`.
 
 ## Usage
 

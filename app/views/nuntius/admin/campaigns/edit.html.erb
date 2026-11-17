@@ -1,0 +1,109 @@
+<%# A draft campaign is edited like a template (templates/edit.html.erb): in an editor with its settings in the root's
+    Inspect, when it's published, its list and conditions as slots. An email in the email editor, with its layout as a
+    slot too, an SMS or call in the editor for its messages (kits/messages.js). An email on an old layout, or without
+    a layout, has the Edit tab. %>
+<% if @campaign.draft? %>
+  <% editor = if @campaign.email? && @campaign.layout && !@campaign.old_layout then :email elsif @campaign.message_design? then :message end %>
+  <%= form_with model: [:admin, @campaign], builder: FormComponents::FormBuilder do |f| %>
+    <%# The name is the page's title, edited in place %>
+    <% title = capture do %>
+      <% if editor %>
+        <div class="nuntius-title">
+          <%= nuntius_plain_form(f).text_field :name, class: "nuntius-title__input", placeholder: Nuntius::Campaign.human_attribute_name(:name), "aria-label": Nuntius::Campaign.human_attribute_name(:name) %>
+        </div>
+        <% if @campaign.errors[:name].any? %>
+          <p class="mt-1 text-sm font-normal text-red-600" role="alert"><%= @campaign.errors.full_messages_for(:name).to_sentence %></p>
+        <% end %>
+      <% else %>
+        <%= t(".card.nuntius_admin_campaigns.title") %>
+      <% end %>
+    <% end %>
+    <% actions = @campaign.persisted? ? [Nuntius::PageAction.new(id: :send_test, label: t(".send_test"), link: send_test_admin_campaign_path(@campaign), submit: true)] : [] %>
+    <%= nuntius_page :nuntius_admin_campaigns, title: title, icon: nuntius_icon(:campaign), form: f, actions: actions, back: (@back_path if @campaign.new_record?) do |page| %>
+      <% if editor %>
+        <%# The editor fills the tab %>
+        <% page.tab :design, padding: false do %>
+          <% if @campaign.metadata_variables.any? %>
+            <div class="m-4 grid grid-cols-12 gap-4">
+              <%= render "nuntius/admin/shared/metadata_variables", variables: @campaign.metadata_variables, message: t(".metadata_variables") %>
+            </div>
+          <% end %>
+          <% slots = capture do %>
+            <%# What it sends is chosen when it's made (see new) %>
+            <%= f.hidden_field :transport if @campaign.new_record? %>
+            <div data-tess-edit-target="slot" data-tess-edit-slot="trigger" hidden>
+              <%= f.datetime_local_field :publish_at %>
+            </div>
+            <div data-tess-edit-target="slot" data-tess-edit-slot="audience" hidden>
+              <%= f.collection_select :list_id, @lists, :id, :name, {include_blank: true, description: t(".list_hint")} %>
+              <%# If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip] %>
+              <div class="mt-4"><%= nuntius_conditions f %></div>
+            </div>
+            <% if editor == :email %>
+              <div data-tess-edit-target="slot" data-tess-edit-slot="layout" hidden>
+                <%= f.collection_select :layout_id, @layouts, :id, :name, {include_blank: false, label: false, description: t("nuntius.admin.templates.edit.layout_moves")} %>
+              </div>
+            <% end %>
+          <% end %>
+          <% if editor == :email %>
+            <%= render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?), variables: @campaign.variable_roots, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), options: {campaign: true}, attributes: %i[from subject list], slots: slots, frame: false %>
+          <% else %>
+            <%= render "nuntius/admin/shared/message_editor", record: @campaign, name: "campaign", options: {campaign: true}, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), slots: slots %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <% page.tab :edit do %>
+          <div class="grid grid-cols-12 gap-4">
+            <%= render "nuntius/admin/shared/metadata_variables", variables: @campaign.metadata_variables, message: t(".metadata_variables") %>
+            <div class="col-span-12"><%= f.text_field :name %></div>
+            <div class="col-span-12 sm:col-span-6"><%= f.collection_select :layout_id, @layouts, :id, :name, {description: t(".layout_hint")} %></div>
+            <div class="col-span-12 sm:col-span-6"><%= f.collection_select :list_id, @lists, :id, :name, {include_blank: true, description: t(".list_hint")} %></div>
+            <div class="col-span-12">
+              <%= nuntius_liquid_field f do %>
+                <%= f.text_field :from, description: t(".from_hint") %>
+              <% end %>
+            </div>
+            <%# If [all] of the following conditions are met: [Subscriber › Tags] [contains] [vip] %>
+            <div class="col-span-12"><%= nuntius_conditions f %></div>
+            <% if @campaign.email? %>
+              <div class="col-span-12 sm:col-span-4"><%= f.check_box :link_tracking, switch: true %></div>
+              <div class="col-span-12 sm:col-span-4"><%= f.check_box :open_tracking, switch: true %></div>
+            <% end %>
+            <div class="col-span-12 sm:col-span-4"><%= f.datetime_local_field :publish_at %></div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if @campaign.persisted? && @campaign.email? %>
+        <% page.tab :media do %>
+          <%= render "nuntius/admin/shared/attachments", form: f, attribute: :images, delete: ->(attachment) { delete_media_admin_campaign_path(@campaign, attachment) } %>
+        <% end %>
+      <% end %>
+
+      <% if @campaign.persisted? %>
+        <% page.tab :translations do %>
+          <%= render "nuntius/admin/shared/translations", record: @campaign, url: translations_admin_campaign_path(@campaign) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% actions = [] %>
+  <% actions << Nuntius::PageAction.new(id: :deschedule, label: t(".deschedule"), link: deschedule_admin_campaign_path(@campaign), method: :post) if @campaign.can_deschedule? %>
+  <% actions << Nuntius::PageAction.new(id: :cancel, label: t(".cancel"), link: cancel_admin_campaign_path(@campaign), method: :post, confirm: t("campaign_cancel_confirm")) if @campaign.can_cancel? %>
+  <%= nuntius_page :nuntius_admin_campaigns, title: @campaign.name, icon: nuntius_icon(:campaign), actions: actions do |page| %>
+    <% page.tab :statistics do %>
+      <dl class="nuntius-statistics">
+        <% {messages_sent: @campaign.messages.where(state: "sent").count, messages_not_sent: @campaign.messages.where.not(state: "sent").count, messages_opened: @campaign.messages.where("open_count >= 1").count, messages_clicked: @campaign.messages.where("click_count >= 1").count}.each do |key, count| %>
+          <div class="nuntius-statistics__item">
+            <dt class="nuntius-statistics__label"><%= t(".#{key}") %></dt>
+            <dd class="nuntius-statistics__value"><%= count %></dd>
+          </div>
+        <% end %>
+      </dl>
+    <% end %>
+    <% page.tab :messages, padding: false do %>
+      <%= table :"nuntius/campaign_messages", params: {campaign_id: @campaign.id} %>
+    <% end %>
+  <% end %>
+<% end %>

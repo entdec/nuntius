@@ -137,6 +137,13 @@ en:
     admin:
       not_saved: "%{resource} could not be saved: %{errors}"
       shared:
+        page:
+          back: Back
+          save: Save
+        attachments:
+          add: Add images
+          delete: Delete
+          delete_confirm: "Delete %{name}?"
         new:
           what: What do you want to send?
           which_layout: Which layout do you want to start from?
@@ -229,12 +236,12 @@ en:
           card:
             nuntius_admin_lists:
               title: Lists
-          description_hint: Describe the list in detail for the subscribers, explain if they can unsubscribe, how often they will receive messages, etc.
+          description_hint: "What subscribers read about the list: what it's about and how often they get messages."
           tabs:
             main:
               tab:
                 edit: Edit
-                subscribers: Abonnees
+                subscribers: Subscribers
         index:
           card:
             nuntius_admin_lists:
@@ -323,6 +330,14 @@ en:
           convert_hint: "Its body goes into one HTML block in this layout's Content block, as it is sent now. You then edit it in the Design tab."
           convert: Convert to the email editor
           convert_confirm: "Convert this template? Its old layout and body are kept, but it is edited in the email editor from now on."
+          tabs:
+            main:
+              tab:
+                design: Design
+                edit: Edit
+                media: Media
+                translations: Translations
+                messages: Messages
         trigger:
           send_via: Send via
           due_today:

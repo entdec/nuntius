@@ -20,15 +20,20 @@ module Nuntius
       t(transport, scope: "nuntius.transports", default: transport.to_s.humanize)
     end
 
-    # A transport's icon: Font Awesome's, or the product's logo for Slack and
-    # Teams (Font Awesome has none for Teams)
+    # An icon's Font Awesome classes, by what it's for (see config.icons)
+    def nuntius_icon(name)
+      Nuntius.config.icons.fetch(name)
+    end
+
+    # A transport's icon: Font Awesome's, or the product's logo for Teams
+    # (Font Awesome has none for it)
     def nuntius_transport_icon(transport, css_class = "")
       case transport.to_s
       when "teams"
         render "nuntius/admin/shared/teams_logo", css_class: css_class
       else
-        icon = {"mail" => "fa-solid fa-envelope", "sms" => "fa-solid fa-comment-sms", "push" => "fa-solid fa-bell", "voice" => "fa-solid fa-phone", "slack" => "fa-brands fa-slack"}
-        tag.i(class: [icon.fetch(transport.to_s, "fa-solid fa-paper-plane"), css_class], "aria-hidden": true)
+        icon = Nuntius.config.icons[:"transport_#{transport}"] || nuntius_icon(:transport)
+        tag.i(class: [icon, css_class], "aria-hidden": true)
       end
     end
 
@@ -59,53 +64,67 @@ module Nuntius
       {"data-nuntius--variables-urls-value" => urls.to_json, "data-nuntius--variables-for-value" => "#{form.object_name}[klass]"}
     end
 
-    def nuntius_dashboard_menu
-      Satis::Menus::Builder.build(:dashboard) do |m|
-        m.item :messages, link: nuntius.admin_messages_path, icon: "fal fa-envelope"
-        m.item :templates, link: nuntius.admin_templates_path, icon: "fal fa-file"
-        m.item :layouts, link: nuntius.admin_layouts_path, icon: "fal fa-table-layout"
-        m.item :locales, link: nuntius.admin_locales_path, icon: "fal fa-language"
-        m.item :campaigns, link: nuntius.admin_campaigns_path, icon: "fal fa-megaphone"
-        m.item :lists, link: nuntius.admin_lists_path, icon: "fal fa-address-book"
+    # The form's builder as Rails' own, for what draws its fields itself inline: the trigger's sentence
+    # (entdec_pill_select), a title edited in place, and the editors inside a Liquid field (entdec_code_editor);
+    # FormComponents' builder would put a label and description around each
+    def nuntius_plain_form(form)
+      ActionView::Helpers::FormBuilder.new(form.object_name, form.object, self, form.options)
+    end
+
+    # An admin page in its frame (shared/_page, which the host app may draw its own way): its title, actions and,
+    # for a form (form:), its Save, over the tabs its block adds (page.tab) or else what the block gives, with what
+    # it puts beside them (page.aside)
+    #
+    #   <%= nuntius_page :nuntius_admin_locales, title: t(".title"), icon: nuntius_icon(:locale), form: f do |page| %>
+    #     <%= f.text_field :key %>
+    #   <% end %>
+    def nuntius_page(name, title:, icon: nil, form: nil, actions: [], back: nil, &block)
+      page = Nuntius::Page.new(self)
+      body = capture(page, &block)
+      render "nuntius/admin/shared/page", name: name, title: title, icon: icon, form: form, actions: actions, back: back, tabs: page.tabs, aside: page.aside, body: body
+    end
+
+    # One of a record's details, labelled by its page's info_item.main.<key> (else the message's attribute's name),
+    # in a list of them (dl.nuntius-info); wide: across it, the block for what to show instead of value
+    def nuntius_info_item(key, value = nil, wide: false, icon: nil, &block)
+      label = safe_join([(tag.i(class: icon) if icon), t(".info_item.main.#{key}", default: Nuntius::Message.human_attribute_name(key))].compact, " ")
+      tag.div(class: ["nuntius-info__item", ("nuntius-info__item--wide" if wide)]) do
+        tag.dt(label, class: "nuntius-info__label") + tag.dd(block ? capture(&block) : value, class: "nuntius-info__value")
       end
     end
 
-    def nuntius_templates_menu
-      Satis::Menus::Builder.build([:nuntius, :templates]) do |m|
-        m.item :new, link: nuntius.new_admin_template_path
-      end
+    # The index pages' actions, for their frame (shared/_index) to show as it shows actions
+    def nuntius_templates_actions
+      [nuntius_action(:new, :templates, nuntius.new_admin_template_path)]
     end
 
-    def nuntius_layouts_menu
-      Satis::Menus::Builder.build([:nuntius, :layouts]) do |m|
-        m.item :new, link: nuntius.new_admin_layout_path
-      end
+    def nuntius_layouts_actions
+      [nuntius_action(:new, :layouts, nuntius.new_admin_layout_path)]
     end
 
-    def nuntius_locales_menu
-      Satis::Menus::Builder.build([:nuntius, :locales]) do |m|
-        m.item :new, link: nuntius.new_admin_locale_path
-      end
+    def nuntius_locales_actions
+      [nuntius_action(:new, :locales, nuntius.new_admin_locale_path)]
     end
 
-    def nuntius_campaigns_menu
-      Satis::Menus::Builder.build([:nuntius, :campaigns]) do |m|
-        m.item :new, link: nuntius.new_admin_campaign_path
-        m.item :lists, link: nuntius.admin_lists_path
-      end
+    def nuntius_campaigns_actions
+      [nuntius_action(:new, :campaigns, nuntius.new_admin_campaign_path), nuntius_action(:lists, :campaigns, nuntius.admin_lists_path, icon: nuntius_icon(:lists))]
     end
 
-    def nuntius_lists_menu
-      Satis::Menus::Builder.build([:nuntius, :lists]) do |m|
-        m.item :new, link: nuntius.new_admin_list_path
-      end
+    def nuntius_lists_actions
+      [nuntius_action(:new, :lists, nuntius.new_admin_list_path)]
     end
 
-    def nuntius_list_menu
-      Satis::Menus::Builder.build([:nuntius, :lists]) do |m|
-        m.item :new_subscriber, link: nuntius.new_admin_list_subscriber_path(@list) if @list.persisted?
-        m.item :import_subscribers, link: nuntius.import_admin_list_subscribers_path(@list) if @list.persisted?
-      end
+    # A saved list's: adding its subscribers
+    def nuntius_list_actions(list)
+      return [] unless list.persisted?
+
+      [nuntius_action(:new_subscriber, :lists, nuntius.new_admin_list_subscriber_path(list), icon: nuntius_icon(:subscriber)),
+        nuntius_action(:import_subscribers, :lists, nuntius.import_admin_list_subscribers_path(list), icon: nuntius_icon(:subscribers_import))]
+    end
+
+    # An action labelled menu.nuntius.<page>.<id>, New's with its icon
+    def nuntius_action(id, page, link, icon: (nuntius_icon(:new) if id == :new), **options)
+      Nuntius::PageAction.new(id: id, label: t("menu.nuntius.#{page}.#{id}"), link: link, icon: icon, **options)
     end
 
     def present(model, presenter_class = nil)

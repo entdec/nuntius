@@ -1,7 +1,0 @@
-= message_html(@message)
-- @message.attachments.reject(&:inline).each do |attachment|
-  = link_to(attachment.filename, main_app.rails_blob_path(attachment, disposition: "attachment"), title: attachment.filename)
-  br
-
-- content_for :context_menu do
-  =< link_to(t('nuntius.context_menu.root'), root_path, class: 'ui-button')

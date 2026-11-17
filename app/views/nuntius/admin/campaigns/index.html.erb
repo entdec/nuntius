@@ -1,0 +1,3 @@
+<%= render layout: "nuntius/admin/shared/index", locals: {name: :nuntius_admin_campaigns, title: t(".card.nuntius_admin_campaigns.title"), icon: nuntius_icon(:campaigns), actions: nuntius_campaigns_actions} do %>
+  <%= table :"nuntius/campaigns" %>
+<% end %>

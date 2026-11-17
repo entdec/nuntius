@@ -9,7 +9,7 @@ module Nuntius
       column(:description)
       action :delete do
         link { |layout| nuntius.admin_layout_url(layout) }
-        icon "fa-solid fa-trash"
+        icon Nuntius.config.icons[:delete]
         link_attributes data: {"turbo-confirm": "Are you sure you want to delete the layout?", "turbo-method": :delete}
       end
 

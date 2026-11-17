@@ -1,0 +1,8 @@
+<%= form_with url: import_admin_list_subscribers_path(@list), multipart: true, builder: FormComponents::FormBuilder do |f| %>
+  <%= nuntius_page :nuntius_admin_lists_subscribers_import, title: t(".title"), icon: nuntius_icon(:subscribers_import), back: edit_admin_list_path(@list), actions: [Nuntius::PageAction.new(id: :import, label: t(".import"), link: import_admin_list_subscribers_path(@list), submit: true)] do %>
+    <div class="grid gap-4">
+      <p class="text-sm text-gray-600 dark:text-gray-400"><%= t(".hint") %></p>
+      <%= f.file_field :file, accept: ".csv", label: t(".file_label"), description: t(".columns_hint") %>
+    </div>
+  <% end %>
+<% end %>

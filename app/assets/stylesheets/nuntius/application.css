@@ -28,3 +28,143 @@
 .nuntius-title__auto {
   @apply static shrink-0;
 }
+
+/* An admin page's frame (shared/_index, shared/_page) when the host app doesn't draw its own: a card */
+.nuntius-index,
+.nuntius-page {
+  @apply h-full overflow-hidden bg-white sm:rounded-lg sm:shadow dark:bg-gray-800;
+}
+
+.nuntius-index__header,
+.nuntius-page__header {
+  @apply flex flex-wrap items-center gap-4 border-b border-gray-200 bg-white px-4 py-5 sm:px-6 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300;
+}
+
+.nuntius-index__icon,
+.nuntius-page__icon {
+  @apply shrink-0 text-primary-600 dark:text-gray-300;
+}
+
+.nuntius-index__title,
+.nuntius-page__title {
+  @apply min-w-0 flex-1 text-lg leading-6 font-medium text-gray-900 dark:text-white;
+}
+
+.nuntius-index__actions,
+.nuntius-page__actions {
+  @apply flex shrink-0 flex-wrap gap-1;
+}
+
+.nuntius-page__tabs {
+  @apply flex gap-6 overflow-x-auto border-b border-gray-200 px-4 sm:px-6 dark:border-gray-700 dark:bg-gray-900;
+}
+
+.nuntius-page__tab {
+  @apply -mb-px shrink-0 cursor-pointer border-b-2 border-transparent px-1 py-4 text-sm font-medium whitespace-nowrap text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300;
+}
+
+.nuntius-page__tab[aria-selected="true"] {
+  @apply border-primary-500 text-primary-600 dark:text-white;
+}
+
+.nuntius-page__body {
+  @apply px-6 py-6;
+}
+
+/* With what's about the record beside its tabs (page.aside) */
+.nuntius-page__columns {
+  @apply grid lg:grid-cols-[minmax(0,1fr)_18rem];
+}
+
+.nuntius-page__main {
+  @apply min-w-0;
+}
+
+.nuntius-page__aside {
+  @apply border-t border-gray-200 px-6 py-6 lg:border-t-0 lg:border-l dark:border-gray-700;
+}
+
+/* A record's images (shared/_attachments) when the host app doesn't draw its own */
+.nuntius-attachments__list {
+  @apply mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6;
+}
+
+.nuntius-attachments__item {
+  @apply flex flex-col gap-1 text-sm;
+}
+
+.nuntius-attachments__link {
+  @apply flex flex-col gap-1 text-gray-700 hover:text-gray-900 dark:text-gray-300;
+}
+
+.nuntius-attachments__image {
+  @apply aspect-square w-full rounded-md border border-gray-200 object-contain dark:border-gray-700;
+}
+
+.nuntius-attachments__name {
+  @apply truncate;
+}
+
+.nuntius-attachments__delete {
+  @apply text-red-600 hover:text-red-700;
+}
+
+.nuntius-attachments__label {
+  @apply mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.nuntius-attachments__field {
+  @apply block w-full text-sm;
+}
+
+/* A record's details (nuntius_info_item) */
+.nuntius-info {
+  @apply grid grid-cols-1 gap-4 sm:grid-cols-3;
+}
+
+.nuntius-info__item--wide {
+  @apply sm:col-span-3;
+}
+
+/* One below the other, in a narrow column (page.aside) */
+.nuntius-info--stacked {
+  @apply sm:grid-cols-1;
+}
+
+.nuntius-info__label {
+  @apply flex items-center gap-1 text-sm font-medium text-gray-500 dark:text-gray-400;
+}
+
+.nuntius-info__value {
+  @apply mt-1 text-sm break-words text-gray-900 dark:text-white;
+}
+
+/* A sent campaign's numbers */
+.nuntius-statistics {
+  @apply grid grid-cols-2 gap-1 overflow-hidden rounded-2xl text-center lg:grid-cols-4;
+}
+
+.nuntius-statistics__item {
+  @apply flex flex-col bg-gray-100 p-8 dark:bg-gray-900;
+}
+
+.nuntius-statistics__label {
+  @apply text-sm leading-6 font-semibold text-gray-600 dark:text-gray-400;
+}
+
+.nuntius-statistics__value {
+  @apply order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-white;
+}
+
+/* Subscribing to a list, on the app's public layout */
+.nuntius-public {
+  @apply mx-auto flex max-w-xl flex-col gap-4 p-6;
+}
+
+.nuntius-public__title {
+  @apply text-lg font-medium text-gray-900 dark:text-white;
+}
+
+.nuntius-public__actions {
+  @apply flex justify-end;
+}

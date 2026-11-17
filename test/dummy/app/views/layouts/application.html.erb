@@ -1,0 +1,37 @@
+<%= sts.page do |page| %>
+  <% page.with_head do %>
+    <title>Nuntius</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= javascript_importmap_tags %>
+    <%= stylesheet_link_tag "tailwind" %>
+    <%# Font Awesome Free (from mensa), icon packs load before fontawesome.js %>
+    <%= javascript_include_tag asset_url("regular.js"), defer: true %>
+    <%= javascript_include_tag asset_url("brands.js"), defer: true %>
+    <%= javascript_include_tag asset_url("solid.js"), defer: true %>
+    <%= javascript_include_tag asset_url("fontawesome.js"), defer: true %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <% if content_for?(:head) %>
+      <%= yield(:head) %>
+    <% end %>
+  <% end %>
+
+  <% page.with_navbar do |navbar| %>
+    <div class="flex-1 flex"></div>
+    <div id="top-bar-menu" class="ml-4 flex items-center md:ml-6 space-x-4">
+      <%= sts.appearance_switcher %>
+    </div>
+  <% end %>
+
+  <% page.with_sidebar_mobile do |sidebar| %>
+  <% end %>
+
+  <%# Satis's sidebar, with the arrow that collapses it to icons (as in Slimmegroep) %>
+  <% page.with_sidebar do |sidebar| %>
+    <%= render Satis::Sidebar::Component.new(sidebar_menu) %>
+  <% end %>
+
+  <% page.with_body do %>
+    <%= yield %>
+  <% end %>
+<% end %>

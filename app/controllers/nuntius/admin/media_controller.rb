@@ -7,7 +7,7 @@ module Nuntius
     # The images the email editor's Image blocks choose from and upload to
     # (TessEdit's mediaUrl): a layout's attachments, or a template's or
     # campaign's images together with its layout's. The editor refers to an
-    # image by its name (see EmailImages).
+    # image by its name (see EmailImages). The Media tab deletes them here.
     class MediaController < ApplicationAdminController
       OWNERS = {"layout" => "Nuntius::Layout", "template" => "Nuntius::Template", "campaign" => "Nuntius::Campaign"}.freeze
       # The editor's image references in MJML, see EmailImages
@@ -26,6 +26,12 @@ module Nuntius
         name = email_images.unique_filename(file.original_filename)
         uploads.attach(io: file, filename: name, content_type: file.content_type)
         render json: image_json(uploads.find { |attachment| attachment.filename.to_s == name }), status: :created
+      end
+
+      # One of the record's own images, from its Media tab, which it goes back to
+      def destroy
+        uploads.find(params[:attachment_id]).purge_later
+        redirect_to [:edit, :admin, @record], status: :see_other
       end
 
       # TessEdit's compile endpoint (compileUrl), with the images the MJML

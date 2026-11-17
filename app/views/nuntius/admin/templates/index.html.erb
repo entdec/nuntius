@@ -1,0 +1,4 @@
+<%# The templates, as a table. The page's frame (shared/_index) is the host app's to draw its own way %>
+<%= render layout: "nuntius/admin/shared/index", locals: {name: :nuntius_admin_templates, title: t(".card.nuntius_admin_templates.title"), icon: nuntius_icon(:templates), actions: nuntius_templates_actions} do %>
+  <%= table :"nuntius/templates" %>
+<% end %>

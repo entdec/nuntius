@@ -45,9 +45,15 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - A template's translations move along when its scope changes (its layout, class, event, transport or description, also when converted to a new layout), and a layout's when it's renamed.
 - A locale's key is unique in its account, and its data must start with languages (`en`, `pt-BR`), each with its translations under it. YAML that can't be read is a validation error instead of an exception.
 - Default views in the admin tables: open (draft and scheduled), sent and cancelled campaigns; enabled and disabled templates; subscribed and unsubscribed subscribers of a list.
+- Admin pages are drawn by frames (`nuntius/admin/shared/_index`, `_page`, `_page_action` and `_attachments`), which an app can have itself to show them in its own look (see [Admin pages](README.md#admin-pages)). Their icons are configurable (`config.icons`), Font Awesome Free's by default, or Pro's with `Nuntius::Configuration::PRO_ICONS`.
+- A message's details (its state, addressee, when it was sent, …) are beside its Preview and Tracking tabs. A list with subscribers shows them as its page, with its settings beside them.
 
 ### Changed
 
+- **The admin's forms use [FormComponents](https://github.com/entdec/form_components) instead of Satis**, a new dependency from GitHub (see Upgrading), and Nuntius' views are ERB instead of Slim. Satis isn't needed any more, and neither is slim-rails, which Nuntius no longer depends on.
+- A form's Update and Continue buttons are one Save button, which keeps the user on the record.
+- A yes or no that isn't itself on or off is a check box instead of a switch: a list's Allow unsubscribe, a subscriber's Test recipient, a template's Global. Enabled and link and open tracking stay switches.
+- An image on a Media tab is deleted through Nuntius' own route (`DELETE …/campaigns/:id/media/:attachment_id`, and the same for layouts and templates), no longer Satis' attachments routes.
 - **A campaign's translation scope is its layout's** (`basic`), no longer `nuntius` and its layout (`nuntius.basic`), the same as the start of its templates' scopes, so a layout's keys work in both. Move the translations of draft campaigns' keys starting with a dot up from under `nuntius` in the locales.
 - An account's locales merge in the order they were created, later ones winning, instead of in no particular order.
 - A template with several addresses in its To renders a message for each, instead of the mail and push transports copying one message. `Template#new_message` is deprecated, and gives only the first, no longer one with every address in its To.
@@ -92,11 +98,13 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 1. **Send, delete or cancel draft campaigns first.** The migration refuses to run while campaigns are in draft or sending, and names them, with how many messages each sent. Campaigns now have a `cancelled` state, for campaigns that won't be sent (any further): cancelling a partly sent campaign keeps the messages it sent, and its statistics, where deleting it would lose them. In 1.x there is no way to cancel, so the migration's message gives the SQL: `UPDATE nuntius_campaigns SET state = 'cancelled' WHERE id IN (…)`. Sent and cancelled campaigns keep the HTML they were sent with.
 2. **Install libvips** on the servers that run the admin. Nuntius now depends on image_processing for previews of images on the Media tabs, which needs it: e.g. `apt-get install libvips` or `brew install vips`. Active Storage has to be set up as well, as it was for layout attachments.
-3. **Use Propshaft, importmap-rails and Tailwind CSS 4** (tailwindcss-rails 4.3 or later). Import Nuntius' JavaScript after Satis in `app/javascript/application.js`:
+3. **Use Propshaft, importmap-rails and Tailwind CSS 4** (tailwindcss-rails 4.3 or later), **and add FormComponents** (`gem "form_components", github: "entdec/form_components"`), which the admin's forms use instead of Satis. Import Nuntius' JavaScript and register FormComponents' controllers in `app/javascript/application.js`:
 
    ```js
-   import "satis"
    import "nuntius"
+   import { registerFormComponents } from "form_components"
+
+   registerFormComponents(window.Stimulus)
    ```
 
    and add the styles to `app/assets/tailwind/application.css`:
@@ -104,7 +112,10 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
    ```css
    @import "../builds/tailwind/nuntius";
    @import "../builds/tailwind/tess_edit";
+   @import "../builds/tailwind/form_components";
    ```
+
+   Admin views your app has itself need redoing: they're ERB now, and drawn by frames, which are what to have yourself for your own look (see [Admin pages](README.md#admin-pages)).
 
    An app that bundles its JavaScript with jsbundling-rails (esbuild) instead of importmap-rails resolves the gems' JavaScript itself: `nuntius` and `nuntius/*` from the nuntius gem's `app/javascript/nuntius/` (`nuntius` is its `application.js`), `tess_edit` and `tess_edit/*` from the tess_edit gem's `app/javascript/tess_edit/` (`tess_edit` is its `index.js`), and `tess_edit/vendor/tiptap` from its `vendor/javascript/tess_edit/tiptap.js`. The README has an esbuild plugin that does this.
 

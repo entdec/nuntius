@@ -8,6 +8,8 @@ require "nuntius/active_storage_helpers"
 require "nuntius/i18n_store"
 require "nuntius/mail_allow_list"
 require "nuntius/account_backfill"
+require "nuntius/page_action"
+require "nuntius/page"
 
 module Nuntius
   extend Configurable

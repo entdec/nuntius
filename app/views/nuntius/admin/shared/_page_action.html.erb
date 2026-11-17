@@ -1,0 +1,12 @@
+<%# An action on a page (Nuntius::PageAction), as a button: a link, a request other than GET (Turbo's), or a button
+    of the page's form sending it elsewhere %>
+<% if action.submit %>
+  <button type="submit" class="button" formaction="<%= action.link %>"><%= action.label %></button>
+<% else %>
+  <%= link_to action.link, class: "button", data: {turbo_method: action.method, turbo_confirm: action.confirm}.compact do %>
+    <% if action.icon %>
+      <i class="<%= action.icon %>"></i>
+    <% end %>
+    <%= action.label %>
+  <% end %>
+<% end %>

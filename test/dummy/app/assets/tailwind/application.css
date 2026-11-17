@@ -9,9 +9,12 @@
 @import "../builds/tailwind/nuntius";
 @import "../builds/tailwind/tess_edit";
 @import "../builds/tailwind/entdec_view_components";
+@import "../builds/tailwind/form_components";
 
 /* Satis' appearance switcher toggles a dark class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));
+/* Form components' dark mode follows it too */
+@custom-variant auto-dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Inter var", ui-sans-serif, system-ui, sans-serif;

@@ -38,11 +38,68 @@ module Nuntius
   class Configuration
     include Options
 
+    # The icons the admin shows (Font Awesome classes, by what they're for): Font Awesome Free's by default. An app
+    # with Font Awesome Pro takes PRO_ICONS (config.icons = Nuntius::Configuration::PRO_ICONS), or merges its own in.
+    # A list (templates) is its index page's icon, a record (template) its own page's and the dashboard menu's.
+    FREE_ICONS = {
+      templates: "fa-solid fa-file",
+      template: "fa-solid fa-file",
+      layouts: "fa-solid fa-table-columns",
+      layout: "fa-solid fa-table-columns",
+      locales: "fa-solid fa-language",
+      locale: "fa-solid fa-language",
+      campaigns: "fa-solid fa-bullhorn",
+      campaign: "fa-solid fa-bullhorn",
+      lists: "fa-solid fa-address-book",
+      list: "fa-solid fa-address-book",
+      subscriber: "fa-solid fa-address-card",
+      subscribers_import: "fa-solid fa-file-import",
+      messages: "fa-solid fa-envelope",
+      message: "fa-solid fa-envelope",
+      new: "fa-solid fa-plus",
+      delete: "fa-solid fa-trash",
+      resend: "fa-solid fa-rotate-right",
+      schedule: "fa-solid fa-paper-plane",
+      deschedule: "fa-solid fa-calendar-xmark",
+      cancel: "fa-solid fa-ban",
+      attachment: "fa-solid fa-paperclip",
+      sent_at: "fa-solid fa-envelope",
+      created_at: "fa-solid fa-calendar",
+      transport_mail: "fa-solid fa-envelope",
+      transport_sms: "fa-solid fa-comment-sms",
+      transport_push: "fa-solid fa-bell",
+      transport_voice: "fa-solid fa-phone",
+      transport_slack: "fa-brands fa-slack",
+      transport: "fa-solid fa-paper-plane"
+    }.freeze
+
+    PRO_ICONS = FREE_ICONS.merge(
+      templates: "fad fa-file",
+      template: "fal fa-file",
+      layouts: "fad fa-table-layout",
+      layout: "fal fa-table-layout",
+      locales: "fad fa-language",
+      locale: "fal fa-language",
+      campaigns: "fad fa-megaphone",
+      campaign: "fal fa-megaphone",
+      lists: "fad fa-address-book",
+      list: "fad fa-address-book",
+      subscriber: "fad fa-address-card",
+      subscribers_import: "fad fa-file-import",
+      messages: "fad fa-envelope",
+      message: "fad fa-envelope",
+      new: "fal fa-plus",
+      resend: "fal fa-rotate-right",
+      sent_at: "fal fa-envelope",
+      created_at: "fal fa-calendar"
+    ).freeze
+
     option :logger, default: -> { Rails.logger }, proc: true
     option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
     option :base_controller, default: "::ApplicationController"
     option :layout, default: "application"
     option :admin_layout, default: "application"
+    option :icons, default: FREE_ICONS
     option :jobs_queue_name, default: "message"
     option :allow_custom_events, default: false
     # The hour from which templates about a date (a birthday) are sent on it

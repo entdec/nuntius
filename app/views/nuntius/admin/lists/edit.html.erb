@@ -1,0 +1,27 @@
+<%# A list: its subscribers, with its settings beside them; without subscribers yet, just its settings %>
+<%= form_with model: [:admin, @list], builder: FormComponents::FormBuilder do |f| %>
+  <%= nuntius_page :nuntius_admin_lists, title: t(".card.nuntius_admin_lists.title"), icon: nuntius_icon(:list), form: f, actions: nuntius_list_actions(@list) do |page| %>
+    <% if @list.subscribers.exists? %>
+      <% page.tab :subscribers, padding: false do %>
+        <%= table :"nuntius/subscribers", params: {list_id: @list.id} %>
+      <% end %>
+      <% page.aside do %>
+        <div class="grid gap-4">
+          <%= f.text_field :name %>
+          <%= f.text_field :slug %>
+          <%= f.check_box :allow_unsubscribe %>
+          <%= f.rich_text_area :description, description: t(".description_hint") %>
+        </div>
+      <% end %>
+    <% else %>
+      <% page.tab :edit do %>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-12 sm:col-span-6"><%= f.text_field :name %></div>
+          <div class="col-span-8 sm:col-span-4"><%= f.text_field :slug %></div>
+          <div class="col-span-4 sm:col-span-2"><%= f.check_box :allow_unsubscribe %></div>
+          <div class="col-span-12"><%= f.rich_text_area :description, description: t(".description_hint") %></div>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -1,12 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 // A second input for a field of its form, kept in step with it both ways:
-// a layout's name, as its card's title and in the email editor's Inspect.
+// a layout's name, as its page's title and in the email editor's Inspect.
 // Its own input has no name, so only the form's field is submitted.
-// A Satis switch says it changed with a change event on its hidden input.
 //
 //   <div data-controller="nuntius--mirror" data-nuntius--mirror-for-value="layout[name]">
-//     …an input, or a Satis switch, without a name…
+//     …an input without a name…
 //   </div>
 export default class extends Controller {
   static values = { for: String }

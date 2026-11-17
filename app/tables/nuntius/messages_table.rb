@@ -10,7 +10,7 @@ module Nuntius
       column(:last_sent_at)
       action :resend do
         link { |message| nuntius.resend_admin_message_path(message) }
-        icon "fal fa-rotate-right"
+        icon Nuntius.config.icons[:resend]
         link_attributes data: {"turbo-confirm": "Are you sure you want to resend the message?", "turbo-method": :post}
         show ->(message) { true }
       end

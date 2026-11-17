@@ -1,0 +1,51 @@
+<%= form_with model: [:admin, @layout], builder: FormComponents::FormBuilder do |f| %>
+  <%# The name is the page's title, edited in place, and in the root's Inspect too, in step with it %>
+  <% title = capture do %>
+    <div class="nuntius-title">
+      <%= nuntius_plain_form(f).text_field :name, class: "nuntius-title__input", placeholder: Nuntius::Layout.human_attribute_name(:name), "aria-label": Nuntius::Layout.human_attribute_name(:name) %>
+    </div>
+    <% if @layout.errors[:name].any? %>
+      <p class="mt-1 text-sm font-normal text-red-600" role="alert"><%= @layout.errors.full_messages_for(:name).to_sentence %></p>
+    <% end %>
+  <% end %>
+  <%= nuntius_page :nuntius_admin_layouts, title: title, icon: nuntius_icon(:layout), form: f do |page| %>
+    <%# The editor fills the tab %>
+    <% page.tab :edit, padding: false do %>
+      <% if @layout.metadata_variables.any? %>
+        <div class="m-4 grid grid-cols-12 gap-4">
+          <%= render "nuntius/admin/shared/metadata_variables", variables: @layout.metadata_variables, message: t(".metadata_variables") %>
+        </div>
+      <% end %>
+      <% if @layout.new_record? %>
+        <div class="m-4 flex flex-wrap items-center gap-2 text-sm">
+          <span class="text-gray-600"><%= t(".start_from") %></span>
+          <% Nuntius::Layout::STARTING_LAYOUTS.each do |key| %>
+            <%= link_to t(".starting_layouts.#{key}"), new_admin_layout_path(start: key), class: "rounded-md border px-2 py-1 #{((params[:start].presence || "basic") == key) ? "border-gray-900 font-medium" : "border-gray-200 text-gray-700"}" %>
+          <% end %>
+        </div>
+      <% end %>
+      <% slots = capture do %>
+        <div data-tess-edit-target="slot" data-tess-edit-slot="name" hidden data-controller="nuntius--mirror" data-nuntius--mirror-for-value="layout[name]">
+          <%= f.text_field :name, label: false, name: nil, id: "layout_name_inspect" %>
+        </div>
+        <div data-tess-edit-target="slot" data-tess-edit-slot="description" hidden>
+          <%= f.text_area :description, label: false, rows: 3, description: t(".description_hint") %>
+        </div>
+      <% end %>
+      <%= render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, media_url: (media_admin_layout_path(@layout) if @layout.persisted?), variables: @layout.variable_roots, translations_url: (translations_admin_layout_path(@layout) if @layout.persisted?), attributes: %i[name description], slots: slots, frame: false %>
+    <% end %>
+    <% if @layout.persisted? %>
+      <% page.tab :media do %>
+        <%= render "nuntius/admin/shared/attachments", form: f, attribute: :attachments, delete: ->(attachment) { delete_media_admin_layout_path(@layout, attachment) } %>
+      <% end %>
+      <% page.tab :translations do %>
+        <%= render "nuntius/admin/shared/translations", record: @layout, url: translations_admin_layout_path(@layout) %>
+      <% end %>
+    <% end %>
+    <% if @layout.templates.exists? %>
+      <% page.tab :templates, padding: false do %>
+        <%= table :"nuntius/templates", params: {layout_id: @layout.id} %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

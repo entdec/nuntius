@@ -1,0 +1,23 @@
+<%# A record's images (its Media tab): each one, opening it, with a delete; and a field to add more, which saving
+    the form attaches. An app draws it its own way by having app/views/nuntius/admin/shared/_attachments.html.erb
+    itself. Locals: form, attribute (images, attachments), delete (a proc of an attachment, its delete's path) %>
+<% attachments = form.object.public_send(attribute).select(&:persisted?) %>
+<div class="nuntius-attachments">
+  <% if attachments.any? %>
+    <ul class="nuntius-attachments__list">
+      <% attachments.each do |attachment| %>
+        <li class="nuntius-attachments__item">
+          <%= link_to main_app.rails_blob_path(attachment, disposition: "inline"), target: "_blank", class: "nuntius-attachments__link" do %>
+            <% if attachment.image? %>
+              <%= image_tag main_app.rails_blob_path(attachment, disposition: "inline"), alt: "", class: "nuntius-attachments__image" %>
+            <% end %>
+            <span class="nuntius-attachments__name"><%= attachment.filename %></span>
+          <% end %>
+          <%= link_to t("nuntius.admin.shared.attachments.delete"), delete.call(attachment), class: "nuntius-attachments__delete", data: {turbo_method: :delete, turbo_confirm: t("nuntius.admin.shared.attachments.delete_confirm", name: attachment.filename)} %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+  <%= label form.object_name, attribute, t("nuntius.admin.shared.attachments.add"), class: "nuntius-attachments__label" %>
+  <%= file_field form.object_name, attribute, multiple: true, class: "nuntius-attachments__field" %>
+</div>

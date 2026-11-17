@@ -148,7 +148,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     get_table "campaigns"
     assert_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/deschedule"
     get "/nuntius/admin/campaigns/#{campaign.id}/edit"
-    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/deschedule']"
+    assert_select "a[href='/nuntius/admin/campaigns/#{campaign.id}/deschedule'][data-turbo-method='post']"
 
     post "/nuntius/admin/campaigns/#{campaign.id}/deschedule"
     assert_redirected_to "/nuntius/admin/campaigns/#{campaign.id}/edit"
@@ -187,7 +187,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     campaign.update_column(:state, "sending")
 
     get "/nuntius/admin/campaigns/#{campaign.id}/edit"
-    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/cancel'][data-turbo-confirm^='Are you sure you want to cancel']"
+    assert_select "a[href='/nuntius/admin/campaigns/#{campaign.id}/cancel'][data-turbo-method='post'][data-turbo-confirm^='Are you sure you want to cancel']"
     get_table "campaigns", view: "sent"
     assert_includes response.body, "/nuntius/admin/campaigns/#{campaign.id}/cancel"
     assert_includes response.body, "Are you sure you want to cancel this campaign?"
@@ -197,7 +197,7 @@ class AdminAccountsTest < ActionDispatch::IntegrationTest
     assert campaign.reload.cancelled?
 
     get "/nuntius/admin/campaigns/#{campaign.id}/edit"
-    assert_select "form[action='/nuntius/admin/campaigns/#{campaign.id}/cancel']", count: 0
+    assert_select "a[href='/nuntius/admin/campaigns/#{campaign.id}/cancel']", count: 0
 
     other = Nuntius::Campaign.create!(name: "Other", transport: "sms", list: Nuntius::List.create!(name: "Other list", slug: "other-list", account: @other), account: @other)
     post "/nuntius/admin/campaigns/#{other.id}/cancel"

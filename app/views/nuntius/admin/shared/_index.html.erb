@@ -1,0 +1,16 @@
+<%# An index page's frame: its title and actions over its table, on a card. An app draws it its own way by having
+    app/views/nuntius/admin/shared/_index.html.erb itself.
+    Locals: name (the page's, as nuntius_admin_templates), title, icon, actions (Nuntius::PageAction); the block is
+    the table %>
+<div class="nuntius-index" id="<%= name %>">
+  <div class="nuntius-index__header">
+    <i class="nuntius-index__icon <%= icon %>"></i>
+    <h3 class="nuntius-index__title"><%= title %></h3>
+    <% if actions.any? %>
+      <div class="nuntius-index__actions">
+        <%= render partial: "nuntius/admin/shared/page_action", collection: actions, as: :action %>
+      </div>
+    <% end %>
+  </div>
+  <%= yield %>
+</div>
