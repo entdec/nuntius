@@ -20,7 +20,7 @@ module Nuntius
       column(:campaign_id) do
         render do
           html do |message|
-            link_to message.campaign&.name, nuntius.edit_admin_campaign_path(message.campaign) if message.campaign
+            link_to message.campaign.name, nuntius.edit_admin_campaign_path(message.campaign), class: Nuntius::ApplicationTable::LINK_CLASS if message.campaign
           end
         end
       end
@@ -31,7 +31,7 @@ module Nuntius
             # A message from a global template is the account's, the template isn't
             next message.template.description unless Nuntius::Template.visible.exists?(message.template.id)
 
-            link_to message.template.description, nuntius.edit_admin_template_path(message.template)
+            link_to message.template.description, nuntius.edit_admin_template_path(message.template), class: Nuntius::ApplicationTable::LINK_CLASS
           end
         end
       end
@@ -41,16 +41,10 @@ module Nuntius
       column :nuntiable_id do
         internal true # Needed for related_object below
       end
-      column(:object) do # do |message|
+      column(:object) do
         render do
           html do |message|
-            if message.nuntiable
-              link_to "#{message.nuntiable} (#{message.nuntiable_type})", begin
-                url_for(message.nuntiable)
-              rescue
-                ""
-              end
-            end
+            Nuntius::ApplicationTable.object_link(self, message.nuntiable)
           end
         end
       end

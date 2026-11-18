@@ -109,6 +109,9 @@ module Nuntius
     option :timebased_limit, default: 500
     option :active_storage_service
     option :host, default: ->(message) {}, proc: true
+    # The path to a message's or subscriber's object in the admin tables, when
+    # it isn't a route of its engine or the app, as [:admin, object] or object
+    option :object_path, default: ->(object) {}, proc: true
 
     # Every template, campaign, list, layout, locale and message belongs to an account.
     #

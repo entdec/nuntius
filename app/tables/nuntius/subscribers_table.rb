@@ -41,16 +41,10 @@ module Nuntius
         end
       end
 
-      column(:object) do # do |message|
+      column(:object) do
         render do
-          html do |message|
-            if message.nuntiable
-              link_to "#{message.nuntiable} (#{message.nuntiable_type})", begin
-                url_for(message.nuntiable)
-              rescue
-                ""
-              end
-            end
+          html do |subscriber|
+            Nuntius::ApplicationTable.object_link(self, subscriber.nuntiable)
           end
         end
       end
