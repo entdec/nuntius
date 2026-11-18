@@ -38,7 +38,9 @@ class Nuntius::BaseMessageBoxTest < ActiveSupport::TestCase
       mailbox :orders, {address: "imap.example.com"}
     end
     inboxes = [["returns", {address: "imap.example.org"}]]
-    klass.mailboxes { inboxes }
+    called = false
+    klass.mailboxes { inboxes.tap { called = true } }
+    refute called, "not when it's given: the app's data may not be there yet when the class is loaded"
 
     assert_equal({"orders" => {address: "imap.example.com"}, "returns" => {address: "imap.example.org"}}, klass.mailboxes)
     inboxes << [42, {}]

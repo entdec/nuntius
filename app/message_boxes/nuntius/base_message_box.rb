@@ -55,11 +55,12 @@ module Nuntius
       end
 
       # Its mailboxes, by name: those of mailbox, and those the block gives (pairs of a name and its settings), which
-      # is called each time mail is fetched, so they can come from the app's data:
+      # is called each time mail is fetched, not when it's given, so they can come from the app's data:
       #
       #   mailboxes { Inbox.active.map { |inbox| [inbox.id, inbox.imap_settings] } }
       def mailboxes(&block)
-        @mailboxes_block = block if block
+        return @mailboxes_block = block if block
+
         dynamic = @mailboxes_block ? @mailboxes_block.call.to_h { |name, settings| [name.to_s, settings] } : {}
         fixed_mailboxes.merge(dynamic)
       end
