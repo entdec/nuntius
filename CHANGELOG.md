@@ -8,6 +8,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Added
 
+- A mail message box has several mailboxes: `mailbox :orders, settings`, once for each, or `mailboxes { ... }`, pairs of a name and settings from the app's data, asked each time mail is fetched. An inbound message records the message box and mailbox it was fetched from (`message_box`, `mailbox`), and the message box gives it (`mailbox`). See [Mail](README.md#mail). Copy in the migration with `bin/rails nuntius:install:migrations`.
 - A message for each addressee, rendered with the addressee as `to`: a template's To can be drops, like `{{ order.contacts }}`, sent to their email or phone number (see [Addressees](README.md#addressees)). `Template#new_messages` gives them.
 - The forms use view components from [entdec-view_components](https://github.com/entdec/view_components), a new dependency from GitHub (add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile, and `@import "../builds/tailwind/entdec_view_components";` to your Tailwind CSS): pill selects, a variable picker, conditions, Liquid fields and a code editor (CodeMirror 6, replacing Satis's editor in Nuntius's forms).
 - Liquid fields: a template's From, To and its text for SMS, push and Teams (now a plain text field), its code fields (Voice's TwiML, now with Liquid highlighted, Slack's and Teams' payloads, an old layout's subject and body), and a campaign's From and Voice text, suggest the object's variables while typing `{{`, with a `{ }` button to browse them, like the email editor's fields. They follow the class chosen in the form.
@@ -50,6 +51,8 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Changed
 
+- Fetched mail goes to the message box that fetched it, to its route for it, not to the first message box of its transport and provider with a route for it.
+- The same mail in two mailboxes is two inbound messages.
 - **The admin's forms use [FormComponents](https://github.com/entdec/form_components) instead of Satis**, a new dependency from GitHub (see Upgrading), and Nuntius' views are ERB instead of Slim. Satis isn't needed any more, and neither is slim-rails, which Nuntius no longer depends on.
 - A form's Update and Continue buttons are one Save button, which keeps the user on the record.
 - A yes or no that isn't itself on or off is a check box instead of a switch: a list's Allow unsubscribe, a subscriber's Test recipient, a template's Global. Enabled and link and open tracking stay switches.
@@ -73,6 +76,10 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The admin only edits the metadata of templates that use an old layout. Layouts, lists, locales and messages have no metadata any more; inbound messages keep the provider's parameters as `params`.
 - Lettermint events are matched on the message id Nuntius sends as Lettermint metadata (`X-LM-Metadata-nuntius_message_id`), and the Lettermint message id is no longer stored.
 
+### Deprecated
+
+- A message box's `settings`: it's `mailbox :default, settings`.
+
 ### Removed
 
 - **`timebased_scope` no longer works.** A messenger that still calls it gets a warning, and the scope is ignored: no event is made of it, and templates with its event are no longer sent (`Nuntius::TimebasedEventsJob` logs a warning for each). Send around the model's timestamps instead, with conditions for what else the scope selected; see step 10 of [Upgrading from 1.x](#upgrading-from-1x). `Nuntius::MessageMessenger`'s `after_opened`, `after_clicked` and `after_sent` scopes are gone too (they queried screenings); messages' `opened_at`, `clicked_at` and `last_sent_at` are timestamps.
@@ -93,6 +100,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The `t` filter raised ("Liquid error: internal") instead of translating with the account's locales, and keys starting with a dot had no scope. It needs Liquidum 1.4 and its configuration (see Upgrading).
 - Liquid that doesn't parse in a template's From, To, subject, body or text (`validates …, liquid: true`) is a validation error. The validator added its error in a way Rails no longer keeps, so such templates saved.
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
+- A mailbox's `address` and `user_name` aren't replaced by `host` and `username`, which they can still be given as.
 
 ### Upgrading from 1.x
 

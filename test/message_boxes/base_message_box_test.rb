@@ -30,4 +30,55 @@ class Nuntius::BaseMessageBoxTest < ActiveSupport::TestCase
     end
     assert_equal "hatseflats", QuxMessageBox.hatseflats
   end
+
+  test "a message box's mailboxes: its own, and those its block gives each time" do
+    klass = Class.new(Nuntius::BaseMessageBox) do
+      transport :mail
+      provider :imap
+      mailbox :orders, {address: "imap.example.com"}
+    end
+    inboxes = [["returns", {address: "imap.example.org"}]]
+    klass.mailboxes { inboxes }
+
+    assert_equal({"orders" => {address: "imap.example.com"}, "returns" => {address: "imap.example.org"}}, klass.mailboxes)
+    inboxes << [42, {}]
+    assert_equal %w[orders returns 42], klass.mailboxes.keys
+  end
+
+  test "settings is its default mailbox's, deprecated" do
+    klass = Class.new(Nuntius::BaseMessageBox)
+
+    assert_output(nil, /settings is deprecated/) { klass.settings({address: "imap.example.com"}) }
+    assert_equal({"default" => {address: "imap.example.com"}}, klass.mailboxes)
+    assert_equal({address: "imap.example.com"}, klass.settings)
+  end
+
+  test "fetched mail is recorded with its message box and mailbox, and goes to that message box" do
+    Nuntius::RetrieveInboundMailService.perform(settings: {}, message_box: "BarMessageBox", mailbox: "default")
+    message = Nuntius::InboundMessage.order(:created_at).last
+    assert_equal ["BarMessageBox", "default"], [message.message_box, message.mailbox]
+
+    # BarMessageBox has no route for it, so QuxMessageBox's catch-all doesn't get it either
+    QuxMessageBox.instance_variable_set(:@hatseflats, nil)
+    assert_nil Nuntius::BaseMessageBox.deliver(message)
+    assert_nil QuxMessageBox.hatseflats
+
+    message.update!(message_box: "QuxMessageBox")
+    assert Nuntius::BaseMessageBox.deliver(message)
+    assert_equal "hatseflats", QuxMessageBox.hatseflats
+  end
+
+  test "the same mail in two mailboxes is two messages, fetched once each" do
+    assert_difference "Nuntius::InboundMessage.count", 40 do
+      Nuntius::RetrieveInboundMailService.perform(settings: {}, message_box: "QuxMessageBox", mailbox: "orders")
+      Nuntius::RetrieveInboundMailService.perform(settings: {}, message_box: "QuxMessageBox", mailbox: "returns")
+      Nuntius::RetrieveInboundMailService.perform(settings: {}, message_box: "QuxMessageBox", mailbox: "returns")
+    end
+  end
+
+  test "a message box's mailbox is the one its message was fetched from" do
+    message = Nuntius::InboundMessage.new(transport: "mail", provider: "imap", mailbox: "returns")
+
+    assert_equal "returns", QuxMessageBox.new(message).mailbox
+  end
 end

@@ -664,32 +664,42 @@ end
 ```
 
 #### Mail
-Nuntius will look at a mailbox and for each of the mails will check whether it can find a route for it in any of the message-boxes. 
-After delivery, on the next round of fetching mail, nuntius will move processed message to the Archive folder 
+Nuntius fetches the mail of each mailbox of the mail message boxes, and delivers each mail to the message box that fetched it, to its route for it.
+After delivery, on the next round of fetching mail, nuntius will move processed message to the Archive folder.
+
+A message box has one or more mailboxes, each by a name and its settings: with `mailbox`, once for each.
 
 ```ruby
 class BarMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
 
-  settings({
+  mailbox :orders, {
     address: 'imap.gmail.com',
     port: 993,
-    user_name: '',
-    password: '',
-    authentication: '',
-    enable_ssl: false,
-    enable_starttls: false
-  })
-  
-  route to: :process
-  
+    user_name: 'orders@example.com',
+    password: ENV['ORDERS_PASSWORD'],
+    enable_ssl: true
+  }
+  mailbox :returns, {address: 'imap.gmail.com', port: 993, user_name: 'returns@example.com', password: ENV['RETURNS_PASSWORD'], enable_ssl: true}
+
+  route :to, /.+/, to: :process
+
   def process
     puts message.state # message is Nuntius's inbound message.
     puts mail.to # mail gives you the Mail representation, when it's a mail (transport)
+    puts mailbox # the name of the mailbox it came from: "orders" or "returns"
   end
 end
 ```
+
+Or with `mailboxes`, from the app's data: its block gives pairs of a name and settings, and is called each time mail is fetched.
+
+```ruby
+  mailboxes { Inbox.active.map { |inbox| [inbox.id, inbox.imap_settings] } }
+```
+
+The same mail in two mailboxes is two inbound messages, each with its `message_box` and `mailbox`. `settings` (one mailbox) still works, deprecated: it's `mailbox :default`.
 
 Add `Nuntius::RetrieveMailJob` to your cron.
 

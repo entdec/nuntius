@@ -145,7 +145,7 @@ class QuxMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
 
-  settings({})
+  mailbox :default, {}
 
   class << self
     def hatseflats(wut = nil)
@@ -167,8 +167,6 @@ class FooMessageBox < Nuntius::BaseMessageBox
   transport :sms
   provider :twilio
 
-  settings({})
-
   route :to, /\+31.*/, to: :dutchies
 end
 
@@ -176,7 +174,7 @@ class BarMessageBox < Nuntius::BaseMessageBox
   transport :mail
   provider :imap
 
-  settings({})
+  mailbox :default, {}
 end
 
 Dir[File.expand_path("support/**/*.rb", __dir__)].each { |file| require file }

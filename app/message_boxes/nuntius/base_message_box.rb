@@ -21,6 +21,11 @@ module Nuntius
       @mail = Mail.new(message.raw_message.download)
     end
 
+    # The name of the mailbox the message was fetched from (see mailbox and mailboxes), nil when it wasn't fetched
+    def mailbox
+      message.mailbox
+    end
+
     class << self
       attr_reader :routes
 
@@ -40,14 +45,40 @@ module Nuntius
         @routes
       end
 
-      # Defines the settings
-      def settings(hash = nil)
-        @settings = hash if hash
-        @settings
+      # A mailbox it fetches mail from, by its name and its settings (for IMAP: address, port, user_name, password,
+      # enable_ssl, …). Once for each:
+      #
+      #   mailbox :orders, address: "imap.example.com", user_name: "orders@example.com", password: ENV["ORDERS_PASSWORD"]
+      #   mailbox :returns, address: "imap.example.com", user_name: "returns@example.com", password: ENV["RETURNS_PASSWORD"]
+      def mailbox(name, settings = {})
+        fixed_mailboxes[name.to_s] = settings
       end
 
+      # Its mailboxes, by name: those of mailbox, and those the block gives (pairs of a name and its settings), which
+      # is called each time mail is fetched, so they can come from the app's data:
+      #
+      #   mailboxes { Inbox.active.map { |inbox| [inbox.id, inbox.imap_settings] } }
+      def mailboxes(&block)
+        @mailboxes_block = block if block
+        dynamic = @mailboxes_block ? @mailboxes_block.call.to_h { |name, settings| [name.to_s, settings] } : {}
+        fixed_mailboxes.merge(dynamic)
+      end
+
+      # Its one mailbox's settings: deprecated, it's mailbox :default
+      def settings(hash = nil)
+        if hash
+          Nuntius::Deprecator.new.deprecation_warning("#{name}.settings", "use mailbox :default, settings")
+          mailbox(:default, hash)
+        end
+        fixed_mailboxes["default"]
+      end
+
+      # To the message box that fetched it (see mailboxes), else to the one of its transport and provider with a route
+      # for it
       def deliver(message)
         klasses = message_box_for(transport: message.transport.to_sym, provider: message.provider.to_sym)
+        fetched_by = klasses.select { |klass| klass.name == message.message_box }
+        klasses = fetched_by if fetched_by.any?
         klass, method = message_box_for_route(klasses, message)
 
         if method
@@ -64,6 +95,10 @@ module Nuntius
       end
 
       private
+
+      def fixed_mailboxes
+        @fixed_mailboxes ||= {}
+      end
 
       def descendants
         ObjectSpace.each_object(Class).select { |k| k < self }
