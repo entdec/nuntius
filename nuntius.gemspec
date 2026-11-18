@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
     It also uses state-events to send messages based on state changes.
   DESCRIPTION
   s.license = "MIT"
-  s.required_ruby_version = Gem::Requirement.new(">= 2.6.5")
+  s.required_ruby_version = ">= 4.0"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 

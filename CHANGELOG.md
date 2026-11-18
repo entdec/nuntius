@@ -51,6 +51,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Changed
 
+- **Nuntius needs Ruby 4.0 or later.**
 - Fetched mail goes to the message box that fetched it, to its route for it, not to the first message box of its transport and provider with a route for it.
 - The same mail in two mailboxes is two inbound messages.
 - **The admin's forms use [FormComponents](https://github.com/entdec/form_components) instead of Satis**, a new dependency from GitHub (see Upgrading), and Nuntius' views are ERB instead of Slim. Satis isn't needed any more, and neither is slim-rails, which Nuntius no longer depends on.
