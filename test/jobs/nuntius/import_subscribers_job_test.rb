@@ -33,6 +33,38 @@ module Nuntius
       assert_equal "Smith", list.subscribers.first.last_name
     end
 
+    test "says what it imported for the app to tell its user" do
+      list = Nuntius::List.create!(name: "Test List", slug: "test-list")
+      blob = create_blob("first_name,email\nBob,bob@example.com\nAnn,ann@example.com")
+
+      payload = imported_subscribers { Nuntius::ImportSubscribersJob.perform_now(list, blob, :user) }
+
+      assert_equal list, payload[:list]
+      assert_equal :user, payload[:user]
+      assert_equal 2, payload[:imported]
+      assert_equal 0, payload[:failed]
+      assert_nil payload[:error]
+      assert payload[:text].present?
+    end
+
+    test "says why a CSV that isn't valid wasn't imported" do
+      list = Nuntius::List.create!(name: "Test List", slug: "test-list")
+      blob = create_blob("first_name,email\n\"Bob,bob@example.com")
+
+      payload = imported_subscribers { Nuntius::ImportSubscribersJob.perform_now(list, blob, :user) }
+
+      assert payload[:error].present?
+      assert_includes payload[:text], payload[:error]
+      assert_empty list.subscribers
+    end
+
+    # The payload of the import_subscribers.nuntius event while yielding
+    def imported_subscribers(&block)
+      payload = nil
+      ActiveSupport::Notifications.subscribed(->(event) { payload = event.payload }, "import_subscribers.nuntius", &block)
+      payload
+    end
+
     def create_blob(content)
       ActiveStorage::Blob.create_and_upload!(
         io: StringIO.new(content),

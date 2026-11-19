@@ -1,5 +1,6 @@
-<%# A page's frame: its title, its actions and its form's Save (which stays on the record) over its tabs or its
-    content, on a card. An app draws it its own way by having app/views/nuntius/admin/shared/_page.html.erb itself.
+<%# A page's frame: its title, its actions and its form's Save (which stays on the record), why its record wasn't
+    saved, over its tabs or its content, on a card. An app draws it its own way by having
+    app/views/nuntius/admin/shared/_page.html.erb itself.
     Locals: name (the page's, as nuntius_admin_layouts), title (a text, or HTML: a field to edit it in place), icon,
     form (the page's form's builder, for a page that is a form), actions (Nuntius::PageAction), back (where a new
     record's page goes back to), tabs (Nuntius::Page::Tab), aside (what's beside them, or nil), body (the content
@@ -16,10 +17,13 @@
       <% end %>
       <%= render partial: "nuntius/admin/shared/page_action", collection: actions, as: :action %>
       <% if form %>
-        <%= button_tag t("nuntius.admin.shared.page.save"), name: "commit", value: "continue", class: "button primary" %>
+        <%= button_tag t("nuntius.admin.shared.page.save"), class: "button primary" %>
       <% end %>
     </div>
   </div>
+  <% if form&.object.respond_to?(:errors) && form.object.errors.any? %>
+    <p class="nuntius-page__errors" role="alert"><%= t("nuntius.admin.not_saved", resource: form.object.model_name.human, errors: form.object.errors.full_messages.to_sentence) %></p>
+  <% end %>
   <% content = capture do %>
     <% if tabs.any? %>
       <div class="nuntius-page__tabs" role="tablist">

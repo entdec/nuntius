@@ -7,8 +7,7 @@ Nuntius.setup do |config|
   config.base_controller = "::ApplicationController"
   config.logger = -> { Rails.logger }
 
-  # The dummy app has no users, so no authentication for the admin pages
-  config.admin_authentication_module = nil
+  # The dummy app has no users, so no authentication for the admin pages (admin_authentication_module)
   config.current_account = -> { Current.account }
   # The environment's own OrbStack domain, which differs per worktree (bin/de)
   config.host = ->(_message) { "app.#{ENV.fetch("DEV_ENV_NAME", "nuntius")}.orb.local" }

@@ -39,7 +39,7 @@ module Nuntius
       def create
         assign_design
         @campaign.save(context: :admin)
-        respond_with :admin, @campaign, action: :edit
+        respond_with_saved @campaign
       end
 
       def show
@@ -56,7 +56,7 @@ module Nuntius
         images = Array(params.dig(:campaign, :images)).compact_blank
         @campaign.images.attach(images) if @campaign.save(context: :admin) && images.any?
 
-        respond_with :admin, @campaign, action: :edit
+        respond_with_saved @campaign
       end
 
       # Saves the campaign and sends it to its list's test recipients

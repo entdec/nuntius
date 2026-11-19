@@ -55,6 +55,11 @@
   @apply flex shrink-0 flex-wrap gap-1;
 }
 
+/* Why the page's record wasn't saved */
+.nuntius-page__errors {
+  @apply border-b border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-6 dark:border-red-900 dark:bg-red-950 dark:text-red-300;
+}
+
 .nuntius-page__tabs {
   @apply flex gap-6 overflow-x-auto border-b border-gray-200 px-4 sm:px-6 dark:border-gray-700 dark:bg-gray-900;
 }
@@ -167,4 +172,13 @@
 
 .nuntius-public__actions {
   @apply flex justify-end;
+}
+
+/* A notice or alert on the public pages (layouts/empty) */
+.nuntius-flash {
+  @apply mx-auto my-4 max-w-xl rounded-md bg-green-50 px-4 py-3 text-sm text-green-700;
+}
+
+.nuntius-flash--alert {
+  @apply bg-red-50 text-red-700;
 }

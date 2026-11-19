@@ -7,6 +7,8 @@ module Nuntius
     module Lists
       class SubscribersController < ApplicationAdminController
         before_action :set_objects
+        # An app with its own import turns Nuntius' off (config.subscribers_import)
+        before_action -> { head :not_found }, only: :import, unless: -> { Nuntius.config.subscribers_import }
 
         def index
           @subscribers = @list.subscribers.all
@@ -16,10 +18,7 @@ module Nuntius
           return unless request.post?
 
           file = params[:file]
-          if file.blank?
-            Signum.error(Current.user, text: t(".no_file"))
-            redirect_to import_admin_list_subscribers_path(@list) and return
-          end
+          return redirect_to(import_admin_list_subscribers_path(@list), alert: t(".no_file"), status: :see_other) if file.blank?
 
           blob = ActiveStorage::Blob.create_and_upload!(
             io: file,
@@ -28,8 +27,7 @@ module Nuntius
           )
           ImportSubscribersJob.perform_later(@list, blob, Current.user)
 
-          Signum.info(Current.user, text: t(".queued"))
-          redirect_to nuntius.admin_list_path(@list)
+          redirect_to nuntius.admin_list_path(@list), notice: t(".queued"), status: :see_other
         end
 
         def new
@@ -40,8 +38,7 @@ module Nuntius
         def create
           @subscriber = @list.subscribers.new(subscriber_params)
           @subscriber.save
-          # FIXME: This should redirect to list
-          respond_with :admin, :list, @subscriber, collection_location: -> { nuntius.admin_list_url(@list) }, location: -> { nuntius.admin_list_url(@list) }, status: :see_other
+          respond_with_saved @subscriber, edit_admin_list_subscriber_path(@list, @subscriber)
         end
 
         def edit
@@ -51,8 +48,7 @@ module Nuntius
         def update
           @subscriber = @list.subscribers.find(params[:id])
           @subscriber.update(subscriber_params)
-          # FIXME: This should redirect to list
-          respond_with :admin, :list, @subscriber, collection_location: -> { nuntius.admin_list_url(@list) }, location: -> { nuntius.admin_list_url(@list) }, status: :see_other
+          respond_with_saved @subscriber, edit_admin_list_subscriber_path(@list, @subscriber)
         end
 
         private

@@ -8,6 +8,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Added
 
+- `config.subscribers_import = false` takes Nuntius' Import of subscribers off a list's page, for an app with its own. See [Your app's part](README.md#your-apps-part).
 - A mail message box has several mailboxes: `mailbox :orders, settings`, once for each, or `mailboxes { ... }`, pairs of a name and settings from the app's data, asked each time mail is fetched. An inbound message records the message box and mailbox it was fetched from (`message_box`, `mailbox`), and the message box gives it (`mailbox`). See [Mail](README.md#mail). Copy in the migration with `bin/rails nuntius:install:migrations`.
 - A message for each addressee, rendered with the addressee as `to`: a template's To can be drops, like `{{ order.contacts }}`, sent to their email or phone number (see [Addressees](README.md#addressees)). `Template#new_messages` gives them.
 - The forms use view components from [entdec-view_components](https://github.com/entdec/view_components), a new dependency from GitHub (add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile, and `@import "../builds/tailwind/entdec_view_components";` to your Tailwind CSS): pill selects, a variable picker, conditions, Liquid fields and a code editor (CodeMirror 6, replacing Satis's editor in Nuntius's forms).
@@ -51,6 +52,10 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Changed
 
+- Nuntius no longer depends on [Auxilium](https://github.com/entdec/auxilium), so neither on its rolify, pundit and responders. Your app adds what it needs, see [Your app's part](README.md#your-apps-part) in the README.
+- The admin pages have no authentication of their own: `config.admin_authentication_module` is `nil` by default instead of `"Auxilium::Concerns::AdminAuthenticated"` (which required `current_user.has_role?(:admin)`). Set it to a concern of your app's, or to that one if your app has Auxilium.
+- Saving a record keeps the user on its page, also for a new one and for a subscriber (which went back to its list), and says nothing; when it doesn't save, the page says why (`.nuntius-page__errors`), instead of a notification. Save no longer sends `commit=continue`. An app with its own `_page` frame shows the errors itself.
+- Resending a message, importing subscribers and the public subscription pages say what they did in the flash (`notice`, `alert`) instead of through Signum, which Nuntius didn't depend on; the subscription pages show it. An import's result is an `import_subscribers.nuntius` event (`ActiveSupport::Notifications`) for your app to show, see [Your app's part](README.md#your-apps-part).
 - **Nuntius needs Ruby 4.0 or later.**
 - Fetched mail goes to the message box that fetched it, to its route for it, not to the first message box of its transport and provider with a route for it.
 - The same mail in two mailboxes is two inbound messages.

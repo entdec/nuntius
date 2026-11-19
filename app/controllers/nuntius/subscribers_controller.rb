@@ -16,8 +16,7 @@ module Nuntius
     def create
       @subscriber = Nuntius::Subscriber.new(subscriber_params)
       if @subscriber.save
-        Signum.success(request.session.id, text: "You have been subscribed.")
-        redirect_to nuntius.edit_subscriber_path(@subscriber), status: :see_other
+        redirect_to nuntius.edit_subscriber_path(@subscriber), notice: "You have been subscribed.", status: :see_other
       else
         render :edit, status: :unprocessable_entity
       end
@@ -32,8 +31,7 @@ module Nuntius
       @subscriber = Nuntius::Subscriber.find(params[:id])
       @list = @subscriber.list
       if @subscriber.update(subscriber_params)
-        Signum.success(request.session.id, text: "Subscription has been updated.")
-        redirect_to nuntius.edit_subscriber_path(@subscriber), status: :see_other
+        redirect_to nuntius.edit_subscriber_path(@subscriber), notice: "Subscription has been updated.", status: :see_other
       else
         render :edit, status: :unprocessable_entity
       end
@@ -52,16 +50,13 @@ module Nuntius
     def subscribe
       @subscriber = Nuntius::Subscriber.find(params[:id])
       @subscriber.update(unsubscribed_at: nil)
-      Signum.success(request.session.id, text: "Subscription has been restored.")
-
-      redirect_to nuntius.subscriber_path(@subscriber), status: :see_other
+      redirect_to nuntius.subscriber_path(@subscriber), notice: "Subscription has been restored.", status: :see_other
     end
 
     def unsubscribe
       @subscriber = Nuntius::Subscriber.find(params[:id])
       @subscriber.touch(:unsubscribed_at)
-      Signum.success(request.session.id, text: "Subscription has been removed.")
-      redirect_to nuntius.subscriber_path(@subscriber), status: :see_other
+      redirect_to nuntius.subscriber_path(@subscriber), notice: "Subscription has been removed.", status: :see_other
     end
 
     private

@@ -21,7 +21,7 @@ module Nuntius
         @layout = Nuntius::Layout.new(layout_params)
         assign_layout_design
         @layout.save
-        respond_with :admin, @layout
+        respond_with_saved @layout
       end
 
       def edit
@@ -42,13 +42,13 @@ module Nuntius
             @layout.attachments.attach(attachment)
           end
         end
-        respond_with :admin, @layout
+        respond_with_saved @layout
       end
 
       def destroy
         @layout = Nuntius::Layout.visible.find(params[:id])
         @layout.destroy
-        respond_with @layout
+        respond_with_destroyed @layout, admin_layouts_path
       end
 
       private

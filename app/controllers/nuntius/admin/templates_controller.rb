@@ -40,7 +40,7 @@ module Nuntius
         @template = Nuntius::Template.new(template_params)
         assign_design
         @template.save(context: :admin)
-        respond_with :admin, @template, action: :edit
+        respond_with_saved @template
       end
 
       def edit
@@ -58,7 +58,7 @@ module Nuntius
         # Images uploaded on the Media tab
         images = Array(params.dig(:template, :images)).compact_blank
         @template.images.attach(images) if @template.save(context: :admin) && images.any?
-        respond_with :admin, @template
+        respond_with_saved @template
       end
 
       # Converts a template with an old layout into the email editor
@@ -82,7 +82,7 @@ module Nuntius
       def destroy
         @template = Nuntius::Template.visible.find(params[:id])
         @template.destroy
-        respond_with :admin, @template
+        respond_with_destroyed @template, admin_templates_path
       end
 
       private

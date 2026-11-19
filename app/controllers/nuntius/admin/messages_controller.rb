@@ -17,7 +17,11 @@ module Nuntius
       def resend
         @message = Nuntius::Message.visible.find(params[:id])
         @message.resend
-        respond_with @message, success: t(".resend_success"), error: t(".resend_error")
+        if @message.errors.none?
+          redirect_to admin_message_path(@message), notice: t(".resend_success"), status: :see_other
+        else
+          redirect_to admin_message_path(@message), alert: t(".resend_error"), status: :see_other
+        end
       end
     end
   end

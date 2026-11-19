@@ -17,7 +17,7 @@ module Nuntius
       def create
         @locale = Nuntius::Locale.new(locale_params)
         @locale.save
-        respond_with :admin, @locale
+        respond_with_saved @locale
       end
 
       def show
@@ -31,7 +31,7 @@ module Nuntius
       def update
         @locale = Nuntius::Locale.visible.find(params[:id])
         @locale.update(locale_params)
-        respond_with :admin, @locale
+        respond_with_saved @locale
       end
 
       private

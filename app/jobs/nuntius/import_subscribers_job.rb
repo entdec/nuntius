@@ -40,9 +40,14 @@ module Nuntius
         end
       end
 
-      Signum.success(user, text: I18n.t("nuntius.admin.lists.subscribers.import.success", imported: imported, failed: failed)) if defined?(Signum)
+      imported_subscribers(list, user, imported: imported, failed: failed, text: I18n.t("nuntius.admin.lists.subscribers.import.success", imported: imported, failed: failed))
     rescue CSV::MalformedCSVError => e
-      Signum.error(user, text: I18n.t("nuntius.admin.lists.subscribers.import.invalid_csv", message: e.message)) if defined?(Signum)
+      imported_subscribers(list, user, error: e.message, text: I18n.t("nuntius.admin.lists.subscribers.import.invalid_csv", message: e.message))
+    end
+
+    # The result, for the app to tell the user who started the import, see "Your app's part" in the README
+    def imported_subscribers(list, user, **result)
+      ActiveSupport::Notifications.instrument("import_subscribers.nuntius", list: list, user: user, **result)
     end
 
     # Detect column separator based on the first 50 bytes of the CSV, it's naive but works for most cases

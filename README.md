@@ -184,11 +184,61 @@ end
 Each admin page is drawn by a frame, a partial in `nuntius/admin/shared`, which your app can have itself to show the pages in its own look: copy Nuntius' to `app/views/nuntius/admin/shared/` in your app and change it. The pages give the frames what's on them; the frames decide how it looks.
 
 - `_index`, an index page: `name` (the page's, as `nuntius_admin_templates`), `title`, `icon` and `actions`. The block (`yield`) is its table.
-- `_page`, a record's page: `name`, `title` (a text, or HTML: the field that edits a template's description in place), `icon`, `form` (the builder of the page's form, nil for a page that isn't one), `actions`, `back` (where a new record's page goes back to, or nil), `tabs` (`Nuntius::Page::Tab`s, with `id`, `label`, `padding` and `content`: `padding` is false for a tab its content fills, an editor or a table), `aside` (what's about the record, a message's state or a list's settings, shown beside the tabs whichever is open, or nil) and `body` (the content of a page without tabs). Save sends `commit=continue`, which keeps the user on the record.
+- `_page`, a record's page: `name`, `title` (a text, or HTML: the field that edits a template's description in place), `icon`, `form` (the builder of the page's form, nil for a page that isn't one), `actions`, `back` (where a new record's page goes back to, or nil), `tabs` (`Nuntius::Page::Tab`s, with `id`, `label`, `padding` and `content`: `padding` is false for a tab its content fills, an editor or a table), `aside` (what's about the record, a message's state or a list's settings, shown beside the tabs whichever is open, or nil) and `body` (the content of a page without tabs). Save submits the page's form and keeps the user on the record's page; when it doesn't save, the page shows the form again with why (`.nuntius-page__errors`, from the form's object).
 - `_page_action`, one of the actions, a `Nuntius::PageAction`: `id`, `label`, `link` and `icon`, with `method` (a request other than GET, through Turbo's `data-turbo-method`) and `confirm`, or `submit` (Send test, Import: it sends the page's form to `link` instead). A `submit` action has to be a button inside the form, with `formaction`; a frame that shows the actions outside the form keeps a hidden button there and clicks it.
 - `_attachments`, a Media tab: `form`, `attribute` (`images` or `attachments`) and `delete`, a proc giving an attachment's delete path.
 
 Nuntius' own frames are styled by its `nuntius-*` classes; yours don't need them. Their icons are Font Awesome's (which your app loads), by what they're for: Font Awesome Free's by default. With Font Awesome Pro, set `config.icons = Nuntius::Configuration::PRO_ICONS`, or merge your own in: `config.icons = Nuntius::Configuration::FREE_ICONS.merge(template: "fa-solid fa-envelope")`.
+
+### Your app's part
+
+Nuntius brings as little as it can: no authentication, roles or notifications. Your app adds what it needs.
+
+**Authentication.** The admin pages have none of their own: anyone who can reach where you mounted Nuntius can use them, until you set `config.admin_authentication_module` to a concern of your app's. The admin controllers, and the email editor's compile endpoint, include it:
+
+```ruby
+# app/controllers/concerns/nuntius_admin_authenticated.rb
+module NuntiusAdminAuthenticated
+  extend ActiveSupport::Concern
+
+  included do
+    before_action :authenticate_user!
+    before_action { head :forbidden unless current_user.admin? }
+  end
+end
+
+Nuntius.setup do |config|
+  config.admin_authentication_module = "NuntiusAdminAuthenticated"
+end
+```
+
+Or guard the mount in your routes, e.g. with Devise: `authenticate(:user, ->(user) { user.admin? }) { mount Nuntius::Engine, at: "/messaging", as: "nuntius" }`. Don't authenticate in `config.base_controller` (default `"::ApplicationController"`): every Nuntius controller inherits from it, also the public ones (subscription pages, tracking, webhooks and callbacks).
+
+**Layouts.** The admin pages render in `config.admin_layout`, the other pages in `config.layout`, both your app's (default `"application"`); the public subscription pages have Nuntius' own `empty` layout.
+
+**Messages.** Saving says nothing: the page stays, or shows why it didn't save. What an action did (a test sent, a message resent, an import queued, a template converted, a subscription changed) is in the flash, as `notice` or `alert`, which your admin layout shows: as text, or through your app's own notifications. An import's result comes later, from a job, as an `import_subscribers.nuntius` event, for your app to tell the user who started it:
+
+```ruby
+# config/initializers/nuntius.rb
+ActiveSupport::Notifications.subscribe("import_subscribers.nuntius") do |event|
+  # list, user, text (what to tell them), and imported and failed, or error when the CSV isn't valid
+  result = event.payload
+  Signum.send(result[:error] ? :error : :success, result[:user], text: result[:text])
+end
+```
+
+**Importing subscribers.** A list's page has an Import of subscribers from a CSV. An app with its own import turns Nuntius' off with `config.subscribers_import = false`, which takes away the action and its page, and adds its own action to the list's page (see [Admin pages](#admin-pages)), creating subscribers with `list.subscribers.create(...)`.
+
+**More.** To add to every admin page's controller, include your own concern in Nuntius' when your app loads:
+
+```ruby
+# config/initializers/nuntius.rb
+Rails.application.config.to_prepare do
+  Nuntius::ApplicationAdminController.include(NuntiusAdminAdditions)
+end
+```
+
+How the pages look is your app's too, see [Admin pages](#admin-pages).
 
 ## Usage
 

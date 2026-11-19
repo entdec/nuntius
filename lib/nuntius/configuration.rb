@@ -95,13 +95,16 @@ module Nuntius
     ).freeze
 
     option :logger, default: -> { Rails.logger }, proc: true
-    option :admin_authentication_module, default: "Auxilium::Concerns::AdminAuthenticated"
+    # The concern the admin controllers include to authenticate, e.g. "AdminAuthenticated" (your app's own)
+    option :admin_authentication_module, default: nil
     option :base_controller, default: "::ApplicationController"
     option :layout, default: "application"
     option :admin_layout, default: "application"
     option :icons, default: FREE_ICONS
     option :jobs_queue_name, default: "message"
     option :allow_custom_events, default: false
+    # Whether a list's page has Nuntius' Import of subscribers from a CSV; false for an app with its own import
+    option :subscribers_import, default: true
     # The hour from which templates about a date (a birthday) are sent on it
     option :timebased_send_hour, default: 9
     # At most this many messages a timebased template sends in a run; one that

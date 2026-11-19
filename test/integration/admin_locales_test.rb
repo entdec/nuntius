@@ -3,10 +3,10 @@
 require "test_helper"
 
 class AdminLocalesTest < ActionDispatch::IntegrationTest
-  test "updating a locale and continuing shows its form again" do
+  test "a locale, once saved, stays on its page" do
     locale = nuntius_locales(:en)
 
-    patch "/nuntius/admin/locales/#{locale.id}", params: {commit: "continue", locale: {key: "en", data_yaml: "en:\n  greeting: Hello\n"}}
+    patch "/nuntius/admin/locales/#{locale.id}", params: {locale: {key: "en", data_yaml: "en:\n  greeting: Hello\n"}}
     follow_redirect! while response.redirect?
 
     assert_response :success

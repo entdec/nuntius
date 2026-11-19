@@ -34,8 +34,8 @@ class AdminFramesTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_select "form[action='/nuntius/admin/lists/#{list.id}'] .nuntius-page#nuntius_admin_lists" do
-      assert_select ".nuntius-page__actions button[name=commit]", count: 1
-      assert_select ".nuntius-page__actions button[name=commit][value=continue]", "Save"
+      assert_select ".nuntius-page__actions button[type=submit]", count: 1
+      assert_select ".nuntius-page__actions button[type=submit]", "Save"
       assert_select ".nuntius-page__actions a[href='/nuntius/admin/lists/#{list.id}/subscribers/new']"
       assert_select "[role=tab][aria-selected=true]", "Subscribers"
       assert_select "[role=tabpanel]:not([hidden]) .mensa-table"
@@ -94,5 +94,21 @@ class AdminFramesTest < ActionDispatch::IntegrationTest
       assert_select "input[type=file][name=file]"
       assert_select "button[type=submit]", "Import"
     end
+  end
+
+  test "an app with its own import has no Import of Nuntius'" do
+    list = nuntius_lists(:valentines)
+
+    Nuntius.config.stub(:subscribers_import, false) do
+      get "/nuntius/admin/lists/#{list.id}/edit"
+      assert_select ".nuntius-page__actions a[href='/nuntius/admin/lists/#{list.id}/subscribers/import']", count: 0
+      assert_select ".nuntius-page__actions a[href='/nuntius/admin/lists/#{list.id}/subscribers/new']"
+
+      get "/nuntius/admin/lists/#{list.id}/subscribers/import"
+      assert_response :not_found
+    end
+
+    get "/nuntius/admin/lists/#{list.id}/edit"
+    assert_select ".nuntius-page__actions a[href='/nuntius/admin/lists/#{list.id}/subscribers/import']"
   end
 end

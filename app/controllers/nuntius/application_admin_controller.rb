@@ -11,18 +11,26 @@ module Nuntius
     layout Nuntius.config.admin_layout
     helper_method :image_url_options
 
-    # A record that doesn't save shows its form again (new renders edit, there are no new views), with what was
-    # filled in, and the notification (Auxilium::Responder's, with Signum for the current user) says why
-    def respond_with(*resources, **options, &block)
-      record = resources.last
-      if record.respond_to?(:errors) && record.errors.any?
-        options[:action] ||= :edit
-        options[:error] ||= t("nuntius.admin.not_saved", resource: record.model_name.human, errors: record.errors.full_messages.to_sentence) if defined?(Signum) && respond_to?(:current_user, true)
+    private
+
+    # Saving keeps the user on the record: on its page once saved, or its form again with what was filled in (new
+    # renders edit, there are no new views) and, on the page, why it wasn't
+    def respond_with_saved(record, location = [:edit, :admin, record])
+      if record.errors.none? && record.persisted?
+        redirect_to location, status: :see_other
+      else
+        render :edit, status: :unprocessable_entity
       end
-      super
     end
 
-    private
+    # A record that's gone goes back to its list; one that couldn't go shows its form again, saying why
+    def respond_with_destroyed(record, location)
+      if record.destroyed?
+        redirect_to location, status: :see_other
+      else
+        render :edit, status: :unprocessable_entity
+      end
+    end
 
     # Where the email editor shows uploaded images from: Nuntius' public host,
     # as the emails load them, so nothing (like the port) comes from the

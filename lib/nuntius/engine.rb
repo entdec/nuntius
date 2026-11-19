@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "auxilium"
 require "importmap-rails"
 require "tess_edit"
 require "entdec/view_components"

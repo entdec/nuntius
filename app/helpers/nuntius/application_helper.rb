@@ -119,7 +119,7 @@ module Nuntius
       return [] unless list.persisted?
 
       [nuntius_action(:new_subscriber, :lists, nuntius.new_admin_list_subscriber_path(list), icon: nuntius_icon(:subscriber)),
-        nuntius_action(:import_subscribers, :lists, nuntius.import_admin_list_subscribers_path(list), icon: nuntius_icon(:subscribers_import))]
+        (nuntius_action(:import_subscribers, :lists, nuntius.import_admin_list_subscribers_path(list), icon: nuntius_icon(:subscribers_import)) if Nuntius.config.subscribers_import)].compact
     end
 
     # An action labelled menu.nuntius.<page>.<id>, New's with its icon

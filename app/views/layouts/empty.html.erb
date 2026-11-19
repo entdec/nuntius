@@ -17,8 +17,9 @@
 </head>
 <body>
   <main>
+    <% flash.each do |type, text| %>
+      <p class="nuntius-flash nuntius-flash--<%= type %>" role="<%= type.to_s == "alert" ? "alert" : "status" %>"><%= text %></p>
+    <% end %>
     <%= yield %>
   </main>
-
-  <%= render(Signum::Notifications::Component.new([request.session.id])) %>
 </body>

@@ -18,7 +18,7 @@ module Nuntius
 
       def create
         @list = Nuntius::List.create(list_params)
-        respond_with :admin, @list, action: :edit
+        respond_with_saved @list
       end
 
       def show
@@ -30,7 +30,7 @@ module Nuntius
 
       def update
         @list.update(list_params)
-        respond_with :admin, @list, action: :edit
+        respond_with_saved @list
       end
 
       private
