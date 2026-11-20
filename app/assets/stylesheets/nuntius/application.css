@@ -16,13 +16,16 @@
 }
 
 /* An email template's description as its card's title, edited in place,
-   with its Auto toggle beside it */
+   with its Auto toggle beside it: in the title's type and colour, so it
+   looks the same in a host app's heading */
 .nuntius-title {
   @apply flex items-center gap-3;
 }
 
 .nuntius-title__input {
-  @apply -mx-1.5 w-full min-w-0 rounded-md border border-transparent bg-transparent px-1.5 py-0.5 text-lg font-medium text-gray-900 shadow-none hover:border-gray-300 focus:border-gray-400 focus:ring-0 dark:text-white dark:hover:border-gray-600;
+  font: inherit;
+  color: inherit;
+  @apply -mx-1.5 w-full min-w-0 rounded-md border border-transparent bg-transparent px-1.5 py-0.5 shadow-none hover:border-gray-300 focus:border-gray-400 focus:ring-0 dark:hover:border-gray-600;
 }
 
 .nuntius-title__auto {

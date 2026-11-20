@@ -5,6 +5,8 @@
 // Outside the editor its contents are marked with two comments, which
 // Nuntius::EmailDesign uses to put a template's content into its layout.
 
+import { t } from "tess_edit/core/i18n"
+
 export const CONTENT_START = "<mj-raw><!-- nuntius:content --></mj-raw>"
 export const CONTENT_END = "<mj-raw><!-- /nuntius:content --></mj-raw>"
 
@@ -20,7 +22,7 @@ export default {
   defaults: () => ({ attributes: {}, data: {} }),
   fields: [],
   hint: "The content of the templates and campaigns using this layout goes here. What you put inside is example content for designing the layout.",
-  label: () => "Content",
+  label: () => t("Content"),
   render: {
     mjml(node, { editor, children }) {
       const inner = children(node)

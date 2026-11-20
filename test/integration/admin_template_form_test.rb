@@ -137,4 +137,14 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
       assert_select "input[name='template[timebased_limit]']", count: 0
     end
   end
+
+  test "the editor has its words, TessEdit's and Nuntius's, in the page's language" do
+    I18n.with_locale(:nl) { get "/nuntius/admin/templates/new", params: {transport: "sms"} }
+
+    words = JSON.parse(css_select("[data-controller='tess-edit'] script[data-tess-edit-target='translations']").first.text)
+    assert_equal "Blokken", words["Blocks"]
+    assert_equal "Doelgroep", words["Audience"]
+    assert_equal "Spraak", words["Voice"]
+    assert_equal "Met voorbeeldwaarden: %{summary}", words["With sample values: %{summary}"]
+  end
 end

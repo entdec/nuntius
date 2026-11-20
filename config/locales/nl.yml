@@ -22,6 +22,7 @@ nl:
         list_id: Lijst
         list_name: Lijst naam
         name: Naam
+        publish_at: Publiceren op
         state: Staat
         subject: Onderwerp
         transport: Versturen via

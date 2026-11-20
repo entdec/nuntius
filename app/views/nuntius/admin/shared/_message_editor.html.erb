@@ -15,6 +15,7 @@
 <% end %>
 <%# An empty variables URL when its class has none, so the variables controller can point it at another %>
 <%= tag.div class: "h-[80vh]", data: {controller: "tess-edit", tess_edit_kit_value: record.transport, tess_edit_sample_value: "false", tess_edit_frame_value: "false", tess_edit_variables_url_value: Nuntius::Variables.url(self, record.variable_roots) || "", tess_edit_translations_url_value: local_assigns[:translations_url], tess_edit_options_value: options.merge(previewUrl: preview_admin_templates_path).to_json} do %>
+  <%= tess_edit_translations "nuntius.editor" %>
   <%= hidden_field_tag "#{name}[design_json]", record.message_document.to_json, id: nil, data: {tess_edit_target: "jsonInput"} %>
   <%= slots %>
 <% end %>

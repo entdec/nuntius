@@ -9,6 +9,7 @@
 
 import { registerBlock, registerKit } from "tess_edit/core/registry"
 import { createDocument } from "tess_edit/core/document"
+import { t } from "tess_edit/core/i18n"
 import { highlightHtml } from "tess_edit/ui/code_input"
 import { audience, recipient, when } from "nuntius/blocks/email"
 
@@ -95,7 +96,7 @@ const page = (doc, body) => `<!doctype html><html><head><meta charset="utf-8"><s
 
 const text = (value, empty) => (String(value ?? "").trim() ? escape(value) : `<span class="empty">${escape(empty)}</span>`)
 const json = (payload) => escape(JSON.stringify(payload, null, 2))
-const sender = (doc) => escape(doc.data.from || "Sender")
+const sender = (doc) => escape(doc.data.from || t("Sender"))
 
 const PREVIEWS = {
   // Counted without the ‹ › around the samples, which aren't GSM characters
@@ -103,23 +104,23 @@ const PREVIEWS = {
     <div class="phone"><div class="screen">
       <div class="bar"><span>9:41</span><span>●●●</span></div>
       <div class="sender">${sender(doc)}</div>
-      <div class="bubble">${text(message, "No text yet")}</div>
+      <div class="bubble">${text(message, t("No text yet"))}</div>
     </div></div>
-    <p class="note">With sample values: ${escape(smsSummary(String(message ?? "").replace(/[‹›]/g, "")))}</p>`,
+    <p class="note">${escape(t("With sample values: %{summary}", { summary: smsSummary(String(message ?? "").replace(/[‹›]/g, "")) }))}</p>`,
 
   push: (doc, { text: message, payload }) => `
     <div class="phone"><div class="lock">
       <div class="clock">9:41</div>
-      <div class="date">Monday 9 June</div>
-      <div class="notification"><header><span class="icon"></span><span>App</span><span>now</span></header>${text(message, "No text yet")}</div>
+      <div class="date">${escape(t("Monday 9 June"))}</div>
+      <div class="notification"><header><span class="icon"></span><span>${escape(t("App"))}</span><span>${escape(t("now"))}</span></header>${text(message, t("No text yet"))}</div>
     </div></div>
-    ${payload ? `<div class="panel"><h2>Data</h2><pre>${json(payload)}</pre></div>` : ""}`,
+    ${payload ? `<div class="panel"><h2>${escape(t("Data"))}</h2><pre>${json(payload)}</pre></div>` : ""}`,
 
   teams: (doc, { text: message, payload }) => `
     <div class="panel">
-      <div class="message"><span class="avatar"></span><div><strong>${sender(doc)}</strong><div class="text">${text(message, "No text yet")}</div></div></div>
-      ${payload ? `<h2>Card</h2><pre>${json(payload)}</pre>` : ""}
-      <a class="open" data-tess-open href="https://adaptivecards.io/designer/">Open the Adaptive Cards Designer ↗</a>
+      <div class="message"><span class="avatar"></span><div><strong>${sender(doc)}</strong><div class="text">${text(message, t("No text yet"))}</div></div></div>
+      ${payload ? `<h2>${escape(t("Card"))}</h2><pre>${json(payload)}</pre>` : ""}
+      <a class="open" data-tess-open href="https://adaptivecards.io/designer/">${escape(t("Open the Adaptive Cards Designer ↗"))}</a>
     </div>`,
 
   slack: (doc, { text: message, payload }) => {
@@ -127,9 +128,9 @@ const PREVIEWS = {
     const builder = `https://app.slack.com/block-kit-builder#${encodeURIComponent(JSON.stringify(blocks || { blocks: [] }))}`
     return `
     <div class="panel">
-      <div class="message"><span class="avatar"></span><div><strong>${sender(doc)}</strong><div class="text">${text(message, "No text yet")}</div></div></div>
-      ${payload ? `<h2>Blocks</h2><pre>${json(payload)}</pre>` : ""}
-      <a class="open" data-tess-open href="${escape(builder)}">Open in Block Kit Builder ↗</a>
+      <div class="message"><span class="avatar"></span><div><strong>${sender(doc)}</strong><div class="text">${text(message, t("No text yet"))}</div></div></div>
+      ${payload ? `<h2>${escape(t("Blocks"))}</h2><pre>${json(payload)}</pre>` : ""}
+      <a class="open" data-tess-open href="${escape(builder)}">${escape(t("Open in Block Kit Builder ↗"))}</a>
     </div>`
   },
 
@@ -137,12 +138,12 @@ const PREVIEWS = {
   // call (TwilioVoiceProvider), "/" unless its front matter says otherwise
   voice: (doc, { text: script }) => {
     const parts = String(script || "").replace(/\r/g, "").split("\n\n").filter((part) => part.trim())
-    if (!parts.length) return `<div class="panel"><pre><span class="empty">No TwiML yet</span></pre></div>`
+    if (!parts.length) return `<div class="panel"><pre><span class="empty">${escape(t("No TwiML yet"))}</span></pre></div>`
     return `<div class="panel">${parts
       .map((part) => {
         const front = part.match(/^---\n([\s\S]*?)\n---\n?/)
         const path = front?.[1].match(/^path:\s*(.+)$/m)?.[1].trim() || "/"
-        return `<h2>Path ${escape(path)}</h2><pre>${highlightHtml(front ? part.slice(front[0].length) : part)}</pre>`
+        return `<h2>${escape(t("Path %{path}", { path }))}</h2><pre>${highlightHtml(front ? part.slice(front[0].length) : part)}</pre>`
       })
       .join("")}</div>`
   }
@@ -151,7 +152,7 @@ const PREVIEWS = {
 // --- the kits --------------------------------------------------------------------------
 
 const MESSAGE = {
-  sms: [{ key: "data.text", label: "Text", type: "textarea", liquid: true, hint: (value) => `${smsSummary(value)}, as typed` }],
+  sms: [{ key: "data.text", label: "Text", type: "textarea", liquid: true, hint: (value) => t("%{summary}, as typed", { summary: smsSummary(value) }) }],
   push: [
     { key: "data.text", label: "Text", type: "textarea", liquid: true },
     { key: "data.payload", label: "Payload", type: "code", language: "yaml", hint: "YAML, sent with the notification as its data." }

@@ -2,6 +2,7 @@
 // unsubscribe. Only campaigns have subscribers: in a template the block
 // renders nothing. Campaigns to lists that allow unsubscribing need one.
 
+import { t } from "tess_edit/core/i18n"
 import { linkFields, linkText } from "nuntius/blocks/link"
 
 const TEXT = "Manage your subscription"
@@ -15,7 +16,7 @@ export default {
   defaults: () => ({ attributes: { align: "center", padding: "10px 25px", "font-size": "12px" }, data: { before: "", text: "" } }),
   fields: linkFields(TEXT),
   hint: "Only shown in campaigns, where it links to the subscriber's page.",
-  label: () => "Manage subscription",
+  label: () => t("Manage subscription"),
   render: {
     mjml(node, ctx) {
       const text = linkText(node, ctx, "{{ subscriber_url }}", TEXT)

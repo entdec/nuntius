@@ -21,7 +21,8 @@ en:
         layout_name: Layout
         list: List
         name: Name
-        state: Staat
+        publish_at: Publish at
+        state: State
         subject: Subject
         transport: Send via
         html: Body
