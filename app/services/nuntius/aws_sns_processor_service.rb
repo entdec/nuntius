@@ -14,9 +14,8 @@
 module Nuntius
   class AwsSnsProcessorService < ApplicationService
     context do
-      attribute :notification, typecaster: lambda { |value|
-                                             value.with_indifferent_access
-                                           }
+      attribute :notification
+      define_method(:notification=) { |value| super(value&.with_indifferent_access) }
     end
 
     def perform

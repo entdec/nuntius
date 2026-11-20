@@ -13,9 +13,8 @@
 module Nuntius
   class LettermintWebhookProcessorService < ApplicationService
     context do
-      attribute :event, typecaster: lambda { |value|
-                                      value.with_indifferent_access
-                                    }
+      attribute :event
+      define_method(:event=) { |value| super(value&.with_indifferent_access) }
     end
 
     def perform

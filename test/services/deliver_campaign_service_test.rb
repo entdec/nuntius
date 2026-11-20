@@ -47,7 +47,9 @@ module Nuntius
     test "an SMS campaign's message has its text, rendered for the subscriber" do
       campaign = Campaign.create!(name: "News", transport: "sms", list: nuntius_lists(:valentines), text: "Hi {{ subscriber.first_name }}")
 
-      message = DeliverCampaignService.send(:new, campaign: campaign).new_message(nuntius_subscribers(:romeo))
+      service = DeliverCampaignService.new
+      service.context = DeliverCampaignService.context_class.new(campaign: campaign)
+      message = service.new_message(nuntius_subscribers(:romeo))
 
       assert_equal "Hi Romeo", message.text
       assert_equal nuntius_subscribers(:romeo).phone_number, message.to

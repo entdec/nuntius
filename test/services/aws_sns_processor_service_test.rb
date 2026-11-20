@@ -6,7 +6,7 @@ module Nuntius
   class AwsSnsProcessorServiceTest < ActiveSupport::TestCase
     test "Processes a bounce with DSN" do
       message = Nuntius::Message.create!(transport: "mail", provider_id: "00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000", state: :sent)
-      Nuntius::AwsSnsProcessorService.call(notification: bounce_with_dsn_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
+      Nuntius::AwsSnsProcessorService.perform(notification: bounce_with_dsn_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "bounced", message.state
       assert_equal "bounce", message.feedback["type"]
@@ -15,7 +15,7 @@ module Nuntius
 
     test "Processes a bounce without DSN" do
       message = Nuntius::Message.create!(transport: "mail", provider_id: "00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000", state: :sent)
-      Nuntius::AwsSnsProcessorService.call(notification: bounce_without_dsn_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
+      Nuntius::AwsSnsProcessorService.perform(notification: bounce_without_dsn_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "bounced", message.state
       assert_equal "bounce", message.feedback["type"]
@@ -24,7 +24,7 @@ module Nuntius
 
     test "Processes a complaint with Feedback" do
       message = Nuntius::Message.create!(transport: "mail", provider_id: "00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000", state: :sent)
-      Nuntius::AwsSnsProcessorService.call(notification: complaint_with_feedback_report("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
+      Nuntius::AwsSnsProcessorService.perform(notification: complaint_with_feedback_report("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "complaint", message.state
       assert_equal "complaint", message.feedback["type"]
@@ -33,7 +33,7 @@ module Nuntius
 
     test "Processes a complaint without Feedback" do
       message = Nuntius::Message.create!(transport: "mail", provider_id: "00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000", state: :sent)
-      Nuntius::AwsSnsProcessorService.call(notification: complaint_without_feedback_report("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
+      Nuntius::AwsSnsProcessorService.perform(notification: complaint_without_feedback_report("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "complaint", message.state
       assert_equal "complaint", message.feedback["type"]
@@ -41,7 +41,7 @@ module Nuntius
 
     test "Processes a delivery notification" do
       message = Nuntius::Message.create!(transport: "mail", provider_id: "00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000", state: :sent)
-      Nuntius::AwsSnsProcessorService.call(notification: delivery_notification_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
+      Nuntius::AwsSnsProcessorService.perform(notification: delivery_notification_json("00000138111222aa-33322211-cccc-cccc-cccc-ddddaaaa0680-000000"))
       message.reload
       assert_equal "delivered", message.state
       assert_equal "a8-70.smtp-out.amazonses.com", message.feedback["info"]["reportingMTA"]

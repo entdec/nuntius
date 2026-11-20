@@ -53,6 +53,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Changed
 
+- Nuntius' services are [Facio](https://github.com/entdec/facio)'s instead of Servitium's, a dependency from RubyGems: Servitium is no longer one. Performed, a service still gives its context (`Nuntius::DeliverCampaignService.perform(...).messages`); `.call` is gone, use `.perform`.
 - Nuntius no longer depends on [Auxilium](https://github.com/entdec/auxilium), so neither on its rolify, pundit and responders. Your app adds what it needs, see [Your app's part](README.md#your-apps-part) in the README.
 - The admin pages have no authentication of their own: `config.admin_authentication_module` is `nil` by default instead of `"Auxilium::Concerns::AdminAuthenticated"` (which required `current_user.has_role?(:admin)`). Set it to a concern of your app's, or to that one if your app has Auxilium.
 - Saving a record keeps the user on its page, also for a new one and for a subscriber (which went back to its list), and says nothing; when it doesn't save, the page says why (`.nuntius-page__errors`), instead of a notification. Save no longer sends `commit=continue`. An app with its own `_page` frame shows the errors itself.

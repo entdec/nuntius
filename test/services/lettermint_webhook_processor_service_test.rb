@@ -9,7 +9,7 @@ module Nuntius
     end
 
     test "marks a message delivered, matched on the X-Nuntius-Message-Id header" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", response: {status_code: 250}))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.delivered", response: {status_code: 250}))
       @message.reload
       assert_equal "delivered", @message.state
       assert_equal "delivered", @message.feedback["type"]
@@ -18,65 +18,65 @@ module Nuntius
 
     test "marks a pending message sent" do
       @message.update!(state: :pending)
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.sent"))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.sent"))
       assert_equal "sent", @message.reload.state
     end
 
     test "matches on the nuntius_message_id metadata, also without headers" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.hard_bounced", headers: [], metadata: {nuntius_message_id: @message.id}))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.hard_bounced", headers: [], metadata: {nuntius_message_id: @message.id}))
       assert_equal "bounced", @message.reload.state
     end
 
     test "matches on the X-Nuntius-Message-Id header without metadata" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", metadata: {}))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.delivered", metadata: {}))
       assert_equal "delivered", @message.reload.state
     end
 
     test "matches on the Message-ID header" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.spam_complaint", headers: [{name: "Message-ID", value: "<abc123@example.com>"}]))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.spam_complaint", headers: [{name: "Message-ID", value: "<abc123@example.com>"}]))
       assert_equal "complaint", @message.reload.state
     end
 
     test "maps failure events to message states" do
       {"message.failed" => "undelivered", "message.suppressed" => "blocked", "message.policy_rejected" => "rejected"}.each do |event_type, state|
         @message.update!(state: :sent)
-        Nuntius::LettermintWebhookProcessorService.call(event: event(event_type))
+        Nuntius::LettermintWebhookProcessorService.perform(event: event(event_type))
         assert_equal state, @message.reload.state
       end
     end
 
     test "marks a message soft bounced, and delivered once a retry succeeds" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.soft_bounced"))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.soft_bounced"))
       assert_equal "soft_bounced", @message.reload.state
 
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered"))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.delivered"))
       assert_equal "delivered", @message.reload.state
     end
 
     test "does not soft bounce a delivered or bounced message" do
       %w[delivered bounced].each do |state|
         @message.update!(state: state)
-        Nuntius::LettermintWebhookProcessorService.call(event: event("message.soft_bounced"))
+        Nuntius::LettermintWebhookProcessorService.perform(event: event("message.soft_bounced"))
         assert_equal state, @message.reload.state
       end
     end
 
     test "does not move a delivered message back to sent" do
       @message.update!(state: :delivered)
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.sent"))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.sent"))
       assert_equal "delivered", @message.reload.state
     end
 
     test "does not mark a bounced message delivered" do
       @message.update!(state: :bounced)
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered"))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.delivered"))
       assert_equal "bounced", @message.reload.state
     end
 
     test "records opens" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.opened", opened_at: "2025-08-08T20:17:00+00:00", classification_revision: 1))
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.opened", opened_at: "2025-08-09T20:17:00+00:00", classification_revision: 1))
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.opened", opened_at: "2025-08-09T20:17:00+00:00", classification_revision: 2))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.opened", opened_at: "2025-08-08T20:17:00+00:00", classification_revision: 1))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.opened", opened_at: "2025-08-09T20:17:00+00:00", classification_revision: 1))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.opened", opened_at: "2025-08-09T20:17:00+00:00", classification_revision: 2))
       @message.reload
       assert_equal "sent", @message.state
       assert_equal Time.zone.parse("2025-08-08T20:17:00+00:00"), @message.opened_at
@@ -84,7 +84,7 @@ module Nuntius
     end
 
     test "records clicks" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.clicked", clicked_at: "2025-08-08T20:18:30+00:00", destination_url: "https://example.com/product/123"))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.clicked", clicked_at: "2025-08-08T20:18:30+00:00", destination_url: "https://example.com/product/123"))
       @message.reload
       assert_equal Time.zone.parse("2025-08-08T20:18:30+00:00"), @message.clicked_at
       assert_equal 1, @message.click_count
@@ -92,7 +92,7 @@ module Nuntius
     end
 
     test "ignores unknown messages" do
-      Nuntius::LettermintWebhookProcessorService.call(event: event("message.delivered", headers: [], metadata: {nuntius_message_id: SecureRandom.uuid}))
+      Nuntius::LettermintWebhookProcessorService.perform(event: event("message.delivered", headers: [], metadata: {nuntius_message_id: SecureRandom.uuid}))
       assert_equal "sent", @message.reload.state
     end
 

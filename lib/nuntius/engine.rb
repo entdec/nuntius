@@ -8,7 +8,7 @@ require "faraday/follow_redirects"
 require "liquidum"
 require "premailer"
 require "state_machines-activerecord"
-require "servitium"
+require "facio"
 
 # Load tailwindcss-rails (when available) before our engine, so lib/tasks/nuntius_tasks.rake can enhance tailwindcss:build
 begin
