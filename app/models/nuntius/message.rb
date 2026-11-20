@@ -183,6 +183,17 @@ module Nuntius
     #
     # Convenience method to easily send messages without having a template
     #
+    # What sent it, so a provider's settings can tell them apart: a campaign,
+    # or its template, by what that's based on (Template#based_on) as it is
+    # now. One sent without either is none of them.
+    def campaign? = campaign_id.present?
+
+    def event_based? = template&.based_on == "event"
+
+    def time_based? = template&.based_on == "time"
+
+    def on_demand? = template&.based_on == "on_demand"
+
     def deliver_as(transport)
       klass = BaseTransport.class_from_name(transport).new
       klass.deliver(self)

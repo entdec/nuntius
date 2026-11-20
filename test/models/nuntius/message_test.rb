@@ -144,5 +144,18 @@ module Nuntius
       mail = Mail::TestMailer.deliveries.find { |m| m.to.first == "test@example.com" }
       assert_equal ["test@example.com"], mail.to
     end
+
+    test "what sent it: a campaign, or its template, based on an event, a time or on demand, or none of them" do
+      event = Template.new(klass: "User", event: "activate")
+      time = Template.new(klass: "User", event: "before_born_on", interval: "1 week")
+      on_demand = Template.new(klass: "User", event: "on_demand")
+
+      assert_equal [true, false, false], [Message.new(template: event).event_based?, Message.new(template: event).time_based?, Message.new(template: event).on_demand?]
+      assert Message.new(template: time).time_based?
+      assert Message.new(template: on_demand).on_demand?
+      assert_not Message.new(template: on_demand).event_based?
+      assert_equal [false, false, false, false], [Message.new.event_based?, Message.new.time_based?, Message.new.on_demand?, Message.new.campaign?]
+      assert Message.new(campaign: nuntius_campaigns(:xmas)).campaign?
+    end
   end
 end

@@ -88,7 +88,7 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
     assert_includes css_select("select[name='template[klass]'] option").map(&:text), "Custom event"
     assert_includes response.body, "activated"
     assert_includes response.body, "Send via"
-    assert_equal ["an event", "a time"], css_select("select[name='template[based_on]'] option").map(&:text)
+    assert_equal ["an event", "a time", "on demand"], css_select("select[name='template[based_on]'] option").map(&:text)
     assert_select ".nuntius-sentence .nuntius-sentence__on", text: "on"
     assert_select ".nuntius-sentence .nuntius-sentence__when", text: "when"
   ensure

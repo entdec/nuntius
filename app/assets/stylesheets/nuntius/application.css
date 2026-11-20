@@ -1,7 +1,9 @@
 /* The template form's sentence reads on [User] [activate] for an event, when [User] [Born on] is in
-   for a time: the word for what isn't chosen is hidden */
+   for a time, and [on demand] for [Contact] on demand: the words for what isn't chosen are hidden */
 .nuntius-sentence:has(select[name="template[based_on]"] option[value="time"]:checked) .nuntius-sentence__on,
-.nuntius-sentence:has(select[name="template[based_on]"] option[value="event"]:checked) .nuntius-sentence__when {
+.nuntius-sentence:has(select[name="template[based_on]"] option[value="event"]:checked) .nuntius-sentence__when,
+.nuntius-sentence:has(select[name="template[based_on]"] option[value="on_demand"]:checked) :is(.nuntius-sentence__based-on, .nuntius-sentence__on, .nuntius-sentence__when),
+.nuntius-sentence:not(:has(select[name="template[based_on]"] option[value="on_demand"]:checked)) :is(.nuntius-sentence__on-demand, .nuntius-sentence__for) {
   display: none;
 }
 

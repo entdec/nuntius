@@ -80,6 +80,7 @@ en:
     based_on:
       event: an event
       time: a time
+      on_demand: on demand
     directions:
       before: is in
       after: was
@@ -350,6 +351,8 @@ en:
           due_over_limit: Would send to more than %{limit}, so it's held and sends nothing
           limit: "· at most"
           when: when
+          on_demand: on demand
+          for: for
           based_on: based on
           ago: ago
           'on': 'on'

@@ -14,8 +14,12 @@ module Nuntius
 
     attribute :transport, default: -> { Nuntius.config.default_transport }
 
+    # The event of a template sent on demand: by the app, when someone asks for
+    # it (see deliver_to), not by an event or a time
+    ON_DEMAND = "on_demand"
+
     # The template form's parts of the event and interval (see compose_event):
-    # based on an event, or on time: a timestamp it's before or after
+    # based on an event, or on time: a timestamp it's before or after, or on demand
     INTERVAL_UNITS = %w[minutes hours days weeks months].freeze
     attribute :based_on, :string
     attribute :timestamp, :string
@@ -34,13 +38,14 @@ module Nuntius
     validates :text, liquid: true
 
     validates :event, presence: true
-    validates :event, format: {with: /.+#.+/}, if: ->(t) { t.klass == "Custom" }
+    validates :event, format: {with: /.+#.+/}, if: ->(t) { t.klass == "Custom" && !t.on_demand? }
     validates :interval, format: {allow_blank: true, with: /\A[0-9]+\s(month|week|day|hour|minute)s?\z/}
     validates :recurrence, inclusion: {in: Timestamp::RECURRENCES.keys, allow_blank: true}
     validates :timebased_limit, numericality: {only_integer: true, greater_than: 0, allow_nil: true}
 
     # A global template is used for every account, not only for its own
     scope :global, -> { where(global: true) }
+    scope :on_demand, -> { where(event: ON_DEMAND) }
     # The templates an account sends with: its own and the global ones
     scope :available_to, ->(account) { owned_by(account).or(global) }
 
@@ -138,7 +143,22 @@ module Nuntius
     end
 
     def based_on
-      super || ((event.present? && timebased) ? "time" : "event")
+      return super if super
+      return "on_demand" if on_demand?
+
+      (event.present? && timebased) ? "time" : "event"
+    end
+
+    def on_demand?
+      event == ON_DEMAND
+    end
+
+    # Sends it to the object now, through the object's messenger as an event
+    # would: with its conditions, to the addressees its To gives. For a template
+    # sent on demand, which the app sends when someone asks for it. Returns the
+    # messages it sent: none when its conditions aren't met or its To is empty.
+    def deliver_to(object, params = {})
+      BaseMessenger.messenger_for_obj(object).new(object, event, params).dispatch([self])
     end
 
     # At most how many messages it sends in a run of TimebasedEventsJob: its
@@ -259,8 +279,15 @@ module Nuntius
     end
 
     # From the form's parts: an event has no interval or recurrence; a time
-    # before_ or after_ its timestamp, an interval and a recurrence
+    # before_ or after_ its timestamp, an interval and a recurrence; on demand
+    # is its own event, without either
     def compose_event
+      if based_on == "on_demand"
+        self.event = ON_DEMAND
+        self.interval = nil
+        self.recurrence = nil
+        return
+      end
       if based_on == "event"
         self.interval = nil
         self.recurrence = nil

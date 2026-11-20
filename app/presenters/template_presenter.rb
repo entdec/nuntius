@@ -16,7 +16,7 @@ class TemplatePresenter < ApplicationPresenter
   end
 
   def based_on_options
-    %w[event time].map { |based_on| [t(based_on, scope: "nuntius.based_on"), based_on] }
+    %w[event time on_demand].map { |based_on| [t(based_on, scope: "nuntius.based_on"), based_on] }
   end
 
   # Every class's events that aren't time based, by their names for people,

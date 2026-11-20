@@ -46,6 +46,15 @@ module Nuntius
       assert_predicate t.recurrence, :blank?
     end
 
+    test "on demand: its own event, without an interval or recurrence, also for Custom" do
+      t = template(based_on: "on_demand", event: "activate", interval: "2 days", recurrence: "yearly")
+      assert_equal ["on_demand", nil, nil], [t.event, t.interval, t.recurrence]
+      assert t.on_demand?
+      assert_equal "on_demand", Template.new(klass: "User", event: "on_demand").based_on
+
+      assert_not_includes template(klass: "Custom", based_on: "on_demand").errors.attribute_names, :event
+    end
+
     test "the parts of a saved template" do
       t = Template.new(klass: "User", event: "before_born_on", interval: "1 week", recurrence: "yearly")
       assert_equal ["time", "born_on", "before", "1", "weeks"], [t.based_on, t.timestamp, t.direction, t.interval_amount, t.interval_unit]

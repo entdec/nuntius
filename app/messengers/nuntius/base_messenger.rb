@@ -34,9 +34,9 @@ module Nuntius
 
     # Turns the templates in messages, one for each addressee (see
     # Template#new_messages), and dispatches the messages to transports: those
-    # whose conditions are met
+    # whose conditions are met. Returns the messages.
     def dispatch(filtered_templates)
-      filtered_templates.each do |template|
+      filtered_templates.flat_map do |template|
         assigns = liquid_context
         next unless template.conditions_met?(assigns.merge("template" => template))
 
@@ -49,6 +49,7 @@ module Nuntius
           apply_mail_overrides(msg)
 
           transport.deliver(msg)
+          msg
         end
       end
     end

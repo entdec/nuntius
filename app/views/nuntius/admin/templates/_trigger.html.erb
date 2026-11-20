@@ -1,6 +1,7 @@
 <%# When a template sends: a sentence of pills (see TemplatePresenter) and its conditions.
     Send via [mail] based on [an event] on [Order] [shipped],
-    or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year].
+    or based on [a time] when [User] [Born on] [is in] [4] [weeks] [every year],
+    or [on demand] for [Contact]: sent by the app (Template#deliver_to).
     The description controller reads it, around it in edit. f is Rails' own builder (nuntius_plain_form): its fields are pills. %>
 <div class="grid grid-cols-12 gap-4">
   <div class="nuntius-sentence col-span-12 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-gray-700" data-nuntius--description-target="sentence">
@@ -8,7 +9,7 @@
     <%# What it sends is chosen when it's made (see new) %>
     <span class="font-medium text-gray-900"><%= nuntius_transport_name(template.transport) %></span>
     <%= f.hidden_field :transport %>
-    <span data-description-skip><%= t(".based_on") %></span>
+    <span class="nuntius-sentence__based-on" data-description-skip><%= t(".based_on") %></span>
     <%# contents: the nested toggles' fields wrap as part of the sentence %>
     <div class="contents" data-controller="nuntius--toggle">
       <div class="contents" data-description-skip>
@@ -17,6 +18,9 @@
       <%# on [User] [activate], or when [User] [Born on] is in: by what it's based on (see nuntius-sentence) %>
       <span class="nuntius-sentence__on"><%= t(".on") %></span>
       <span class="nuntius-sentence__when"><%= t(".when") %></span>
+      <%# The pill says on demand, but the description skips it: it reads Email on demand for Contact %>
+      <span class="nuntius-sentence__on-demand sr-only"><%= t(".on_demand") %></span>
+      <span class="nuntius-sentence__for"><%= t(".for") %></span>
       <%= entdec_pill_select f, :klass, template.klass_options, selected: template.klass, tone: :neutral %>
       <div class="contents" data-nuntius--toggle-target="insertion"></div>
 

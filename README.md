@@ -375,6 +375,30 @@ Nuntius.setup do
 end
 ```
 
+### On demand
+
+A template can also be sent on demand: neither by an event nor by a time, but by your app, when
+someone asks for it, like a message to the contacts someone picked. Its form reads *Send via
+[Email] [on demand] for [Contact]*, and it gets the event `on_demand`. Your app offers these
+templates (`Nuntius::Template.on_demand`, with the class it sends for) and sends the chosen one:
+
+```ruby
+messages = template.deliver_to(contact)
+```
+
+That goes through the object's messenger as an event would, with the template's conditions and
+its To, open and link tracking. It returns the messages it sent: none when its conditions aren't
+met or its To renders empty, like a contact without an email address.
+
+A message says what sent it with `campaign?`, or `on_demand?`, `event_based?` and `time_based?`
+from its template as it is now, so a provider's settings can send them through another server:
+
+```ruby
+config.provider :smtp, transport: :mail, settings: lambda { |message|
+  (message.campaign? || message.on_demand?) ? bulk_settings : outbound_settings
+}
+```
+
 ### Conditions
 
 A template or campaign can send only when its conditions are met: *If [all] of the following conditions are met: [Screening › Payment needed?] [is] [true]*. Instead of a Liquid `if` around the recipient,

@@ -93,6 +93,7 @@ nl:
     based_on:
       event: een gebeurtenis
       time: een tijd
+      on_demand: op verzoek
     directions:
       before: is over
       after: was
@@ -365,6 +366,8 @@ nl:
           due_over_limit: Zou naar meer dan %{limit} versturen, dus wordt tegengehouden en verstuurt niets
           limit: "· hoogstens"
           when: wanneer
+          on_demand: op verzoek
+          for: voor
           based_on: op basis van
           ago: geleden
           'on': bij

@@ -69,6 +69,19 @@ module Nuntius
       assert_equal "a@example.com", message.to
     end
 
+    test "an on demand template is sent to an object when asked, and gives its messages" do
+      template = Template.create!(klass: "Account", based_on: "on_demand", transport: "mail", description: "news", to: "{{ account.users }}", from: "from@example.com", subject: "Hi {{ to.name }}", text: "Body", enabled: true, account: @account)
+
+      messages = template.deliver_to(@account)
+
+      assert_equal %w[ann@example.com bob@example.com], messages.map(&:to).sort
+      assert_equal [@account], messages.map(&:nuntiable).uniq
+      assert_equal messages.map(&:id).sort, Nuntius::Message.where(template: template).pluck(:id).sort
+      assert_equal [template], Template.on_demand.to_a
+      template.update!(to: "{{ account.nothing }}")
+      assert_empty template.deliver_to(@account)
+    end
+
     test "the messenger dispatches a message per addressee" do
       template = Template.create!(klass: "Account", event: "created", transport: "mail", description: "created", to: "{{ account.users }}", from: "from@example.com", subject: "Hi {{ to.name }}", text: "Body", enabled: true, account: @account)
 
