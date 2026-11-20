@@ -8,6 +8,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Added
 
+- `config.tables_readable`: whether the current user may see the admin's tables, which Mensa serves outside the admin's controllers. The tables answer it as `readable?`, for an app that asks a table before serving it. See [Your app's part](README.md#your-apps-part).
 - `config.subscribers_import = false` takes Nuntius' Import of subscribers off a list's page, for an app with its own. See [Your app's part](README.md#your-apps-part).
 - A mail message box has several mailboxes: `mailbox :orders, settings`, once for each, or `mailboxes { ... }`, pairs of a name and settings from the app's data, asked each time mail is fetched. An inbound message records the message box and mailbox it was fetched from (`message_box`, `mailbox`), and the message box gives it (`mailbox`). See [Mail](README.md#mail). Copy in the migration with `bin/rails nuntius:install:migrations`.
 - A message for each addressee, rendered with the addressee as `to`: a template's To can be drops, like `{{ order.contacts }}`, sent to their email or phone number (see [Addressees](README.md#addressees)). `Template#new_messages` gives them.

@@ -2,6 +2,9 @@ module Nuntius
   class ApplicationTable < Mensa::Base
     LINK_CLASS = "underline underline-offset-2 hover:no-underline"
 
+    # Whether the current user may see the table's rows: config.tables_readable
+    def readable? = Nuntius.config.tables_readable
+
     # A link to a message's or subscriber's object (its nuntiable), or just its
     # name when there's no route to it. The html blocks run in the page's view,
     # which may be the host app's, so this isn't a helper.

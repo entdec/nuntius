@@ -212,6 +212,14 @@ Nuntius.setup do |config|
 end
 ```
 
+The tables on the admin pages are [Mensa](https://github.com/entdec/mensa)'s, whose rows, filters and exports Mensa serves where your app mounted it, so neither the concern nor a guarded mount covers them. Each answers `readable?` from `config.tables_readable` (default: anyone), for your app to ask before Mensa serves a table:
+
+```ruby
+Nuntius.setup do |config|
+  config.tables_readable = -> { Current.user&.admin? }
+end
+```
+
 Or guard the mount in your routes, e.g. with Devise: `authenticate(:user, ->(user) { user.admin? }) { mount Nuntius::Engine, at: "/messaging", as: "nuntius" }`. Don't authenticate in `config.base_controller` (default `"::ApplicationController"`): every Nuntius controller inherits from it, also the public ones (subscription pages, tracking, webhooks and callbacks).
 
 **Layouts.** The admin pages render in `config.admin_layout`, the other pages in `config.layout`, both your app's (default `"application"`); the public subscription pages have Nuntius' own `empty` layout.

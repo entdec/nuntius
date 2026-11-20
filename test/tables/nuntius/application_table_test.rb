@@ -10,6 +10,16 @@ module Nuntius
 
     teardown do
       Nuntius.config.object_path = ->(object) {}
+      Nuntius.config.tables_readable = -> { true }
+    end
+
+    test "a table is readable by anyone, unless config.tables_readable says otherwise" do
+      assert MessagesTable.new.readable?
+
+      Nuntius.config.tables_readable = -> { false }
+
+      assert_not MessagesTable.new.readable?
+      assert_not LayoutsTable.new.readable?
     end
 
     test "an object of a mounted engine links to its admin page" do

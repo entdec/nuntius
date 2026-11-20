@@ -97,6 +97,10 @@ module Nuntius
     option :logger, default: -> { Rails.logger }, proc: true
     # The concern the admin controllers include to authenticate, e.g. "AdminAuthenticated" (your app's own)
     option :admin_authentication_module, default: nil
+    # Whether the current user may see the admin's tables, which Mensa serves outside the admin's controllers (at
+    # its own mount), so admin_authentication_module doesn't guard them: their readable? answers it, for a host
+    # that asks a table before serving it
+    option :tables_readable, default: -> { true }, proc: true
     option :base_controller, default: "::ApplicationController"
     option :layout, default: "application"
     option :admin_layout, default: "application"
