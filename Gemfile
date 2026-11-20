@@ -20,8 +20,6 @@ git_source(:entdec) { |repo_name| "git@github.com:entdec/#{repo_name}.git" }
 gem "mensa", entdec: "mensa"
 gem "entdec-view_components", entdec: "view_components"
 gem "form_components", entdec: "form_components"
-# Not on rubygems; the gemspec has its version
-gem "tess_edit", git: "git@github.com:tdegrunt/tess_edit.git", branch: "main"
 
 gem "sidekiq"
 
