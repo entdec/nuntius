@@ -47,6 +47,25 @@ class Nuntius::BaseMessageBoxTest < ActiveSupport::TestCase
     assert_equal %w[orders returns 42], klass.mailboxes.keys
   end
 
+  test "a mailbox that can't be fetched is reported, the others are fetched, and their message boxes hear how it went" do
+    fetches = []
+    QuxMessageBox.fetched { |mailbox, error| fetches << [mailbox, error&.message] }
+    failing = ->(settings:, message_box:, mailbox:) { raise SocketError, "Invalid credentials" if message_box == "BarMessageBox" }
+
+    Nuntius::RetrieveInboundMailService.stub(:perform, failing) do
+      assert_error_reported(SocketError) { Nuntius::RetrieveMailJob.perform_now }
+    end
+    assert_equal [["default", nil]], fetches
+
+    BarMessageBox.fetched { |mailbox, error| fetches << [mailbox, error&.message] }
+    Nuntius::RetrieveInboundMailService.stub(:perform, failing) do
+      Nuntius::RetrieveMailJob.perform_now
+    end
+    assert_includes fetches, ["default", "Invalid credentials"]
+  ensure
+    [QuxMessageBox, BarMessageBox].each { |klass| klass.instance_variable_set(:@fetched_block, nil) }
+  end
+
   test "settings is its default mailbox's, deprecated" do
     klass = Class.new(Nuntius::BaseMessageBox)
 

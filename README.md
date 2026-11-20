@@ -759,6 +759,12 @@ Or with `mailboxes`, from the app's data: its block gives pairs of a name and se
 
 The same mail in two mailboxes is two inbound messages, each with its `message_box` and `mailbox`. `settings` (one mailbox) still works, deprecated: it's `mailbox :default`.
 
+A mailbox that can't be fetched (it can't connect or sign in, say) is reported through `Rails.error`, and the other mailboxes are still fetched. With `fetched`, a message box hears how each fetch went: its block gets the mailbox's name, and the error when it couldn't be fetched (nil when it was), to show whether a mailbox works.
+
+```ruby
+  fetched { |mailbox, error| Inbox.find_by(id: mailbox)&.update(fetched_at: Time.current, fetch_error: error&.message) }
+```
+
 Add `Nuntius::RetrieveMailJob` to your cron.
 
 ## Campaigns

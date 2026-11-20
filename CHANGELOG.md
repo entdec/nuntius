@@ -10,6 +10,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 - `config.tables_readable`: whether the current user may see the admin's tables, which Mensa serves outside the admin's controllers. The tables answer it as `readable?`, for an app that asks a table before serving it. See [Your app's part](README.md#your-apps-part).
 - `config.subscribers_import = false` takes Nuntius' Import of subscribers off a list's page, for an app with its own. See [Your app's part](README.md#your-apps-part).
+- A mail message box hears how each fetch of its mailboxes went, with `fetched { |mailbox, error| ... }`: the error when it couldn't be fetched, nil when it was. See [Mail](README.md#mail).
 - A mail message box has several mailboxes: `mailbox :orders, settings`, once for each, or `mailboxes { ... }`, pairs of a name and settings from the app's data, asked each time mail is fetched. An inbound message records the message box and mailbox it was fetched from (`message_box`, `mailbox`), and the message box gives it (`mailbox`). See [Mail](README.md#mail). Copy in the migration with `bin/rails nuntius:install:migrations`.
 - A message for each addressee, rendered with the addressee as `to`: a template's To can be drops, like `{{ order.contacts }}`, sent to their email or phone number (see [Addressees](README.md#addressees)). `Template#new_messages` gives them.
 - The forms use view components from [entdec-view_components](https://github.com/entdec/view_components), a new dependency from GitHub (add `gem "entdec-view_components", github: "entdec/view_components"` to your Gemfile, and `@import "../builds/tailwind/entdec_view_components";` to your Tailwind CSS): pill selects, a variable picker, conditions, Liquid fields and a code editor (CodeMirror 6, replacing Satis's editor in Nuntius's forms).
@@ -108,6 +109,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 - The `t` filter raised ("Liquid error: internal") instead of translating with the account's locales, and keys starting with a dot had no scope. It needs Liquidum 1.4 and its configuration (see Upgrading).
 - Liquid that doesn't parse in a template's From, To, subject, body or text (`validates …, liquid: true`) is a validation error. The validator added its error in a way Rails no longer keeps, so such templates saved.
 - A new layout, template or campaign that didn't save raised (a missing `new` view, or no media URL for the editor) instead of showing its form again. It now shows the form with what was filled in, and with Signum the error notification says why.
+- One mailbox that couldn't be fetched stopped `Nuntius::RetrieveMailJob`, so the mailboxes after it weren't fetched. It's now reported through `Rails.error`, and the others are fetched.
 - A mailbox's `address` and `user_name` aren't replaced by `host` and `username`, which they can still be given as.
 
 ### Upgrading from 1.x

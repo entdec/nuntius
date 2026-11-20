@@ -65,6 +65,16 @@ module Nuntius
         fixed_mailboxes.merge(dynamic)
       end
 
+      # How a fetch of one of its mailboxes went, to keep with the app's data: the block gets the mailbox's name, and
+      # the error when it couldn't be fetched, nil when it was. Without a block it tells the block.
+      #
+      #   fetched { |mailbox, error| Inbox.find_by(id: mailbox)&.update(fetched_at: Time.current, fetch_error: error&.message) }
+      def fetched(mailbox = nil, error = nil, &block)
+        return @fetched_block = block if block
+
+        @fetched_block&.call(mailbox, error)
+      end
+
       # Its one mailbox's settings: deprecated, it's mailbox :default
       def settings(hash = nil)
         if hash
