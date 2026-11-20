@@ -94,6 +94,17 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
     assert_select "[data-tess-edit-compile-url-value='/nuntius/admin/templates/#{@template.id}/media/compile']"
   end
 
+  test "a new template's editor shows its layout's images from their URLs, before it is saved" do
+    image = {"id" => "blogo", "type" => "image", "attributes" => {}, "data" => {"image" => "logo.png", "source" => "upload", "embed" => true}, "children" => []}
+    @layout.update_column(:json, layout_json.merge("children" => [image, *layout_json["children"]]))
+
+    get "/nuntius/admin/templates/new", params: {layout_id: @layout.id, transport: "mail"}
+
+    document = JSON.parse(css_select("input[name='template[design_json]']").first["value"])
+    opened = document["children"].find { |node| node["id"] == "blogo" }
+    assert_match %r{/rails/active_storage/blobs/redirect/[^/]+/logo.png\z}, opened.dig("attributes", "src")
+  end
+
   test "uploading to a layout adds it to its attachments" do
     post "/nuntius/admin/layouts/#{@layout.id}/media", params: {file: upload}
 

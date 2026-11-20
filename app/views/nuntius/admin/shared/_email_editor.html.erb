@@ -2,8 +2,8 @@
     Nuntius::EmailDesignParams takes them in the controller.
     Locals: record, name (the form's param key), document, lock (optional),
     media_url (optional: the images Image blocks choose from, MediaController)
-    With images, they are named in the document, with URLs for the canvas,
-    and the preview compiles with them shown (MediaController#compile).
+    Images are named in the document, with URLs for the canvas; with
+    media_url the preview compiles with them shown (MediaController#compile).
     variables (optional: the record's variable_roots) has the editor suggest
     them, when the host app mounts Liquidum (Nuntius::Variables.url).
     translations_url (optional: Admin::TranslationsController's) shows and
@@ -19,7 +19,8 @@
 <% media_url = local_assigns[:media_url] %>
 <%# (an empty one when its class has none, so the variables controller can point it at another) %>
 <% variables_url = (Nuntius::Variables.url(self, local_assigns[:variables]) || "") if local_assigns.key?(:variables) %>
-<% document = Nuntius::EmailImages.new(record).normalize(document, **image_url_options) if media_url && document %>
+<%# (also before the record is saved: a new template or campaign shows its layout's images) %>
+<% document = Nuntius::EmailImages.new(record).normalize(document, **image_url_options) if document %>
 <% compile_url = media_url ? "#{media_url}/compile" : tess_edit.compile_path %>
 <% problems = record.errors[:base] + [:mjml, *local_assigns[:attributes]].flat_map { |attribute| record.errors.full_messages_for(attribute) } %>
 <% if problems.any? %>

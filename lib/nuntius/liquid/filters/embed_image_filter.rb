@@ -13,11 +13,12 @@ module EmbedImageFilter
   #                                                     as older Image blocks put it)
   #
   # Each image is attached once per message, however often it is used.
-  # Without a message (a preview) a URL is returned as it is.
+  # Without a message (a preview) it is linked instead: a URL as it is, a
+  # stored image from its URL on Nuntius' host.
   def embed_image(input)
     message = @context.registers["message"]
     input = stored_image(input) || input
-    return input.is_a?(String) ? input : "" unless message
+    return preview_url(input) unless message
 
     data = input.is_a?(String) ? nil : input.download
     key = data ? Digest::SHA256.hexdigest(data) : input
@@ -30,6 +31,12 @@ module EmbedImageFilter
   end
 
   private
+
+  def preview_url(input)
+    return input if input.is_a?(String)
+
+    input.respond_to?(:signed_id) ? Nuntius::EmailImages.new(nil).url(input) : ""
+  end
 
   # The editor's image a name refers to (see Nuntius::EmailImages), or the
   # Active Storage blob a signed id (not a URL) refers to

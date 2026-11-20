@@ -82,6 +82,16 @@ module Nuntius
       assert_equal "https://example.com/logo.png", ::Liquidum.render(%({{ "https://example.com/logo.png" | embed_image }}))
     end
 
+    test "links an image uploaded in the editor without a message, as a preview shows it" do
+      layout = logo_layout
+
+      html = ::Liquidum.render(%(<img src="{{ 'logo.png' | embed_image }}">), registers: {"template" => layout})
+
+      assert_match %r{<img src="https://#{Regexp.escape(Nuntius.config.host(nil))}/rails/active_storage/blobs/redirect/[^/]+/logo.png">}, html
+      layout.update_column(:html, %(<img src="{{ 'logo.png' | embed_image }}">))
+      assert_match %r{<img src="https://[^"]+/logo.png">}, layout.preview_html
+    end
+
     test "the mail has the HTML and its images together, apart from other attachments" do
       message = build_message
       message.html = render(%(<p>Hi</p><img src="{{ layout.attachments.first | embed_image }}">), message: message, assigns: {"layout" => logo_layout})
