@@ -2,6 +2,19 @@
 
 module Nuntius
   module ApplicationHelper
+    # The email editor's images (Admin::MediaController) and the URL its
+    # preview compiles with them shown: a saved record's, or a new one's,
+    # which uploads before it is saved, in the layout it starts from
+    def nuntius_media_urls(record)
+      key = {Nuntius::Layout => "layout", Nuntius::Template => "template", Nuntius::Campaign => "campaign"}.fetch(record.class)
+      if record.persisted?
+        {media_url: public_send(:"media_admin_#{key}_path", record), compile_url: public_send(:"media_compile_admin_#{key}_path", record)}
+      else
+        query = {layout_id: record.try(:layout_id)}.compact
+        {media_url: public_send(:"media_admin_#{key.pluralize}_path", query), compile_url: public_send(:"media_compile_admin_#{key.pluralize}_path", query)}
+      end
+    end
+
     # The enabled transports by their names for people, alphabetically
     def nuntius_transport_options
       Nuntius.config.transports

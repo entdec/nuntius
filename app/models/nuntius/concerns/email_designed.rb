@@ -25,6 +25,8 @@ module Nuntius
         has_many_attached :images, service: Nuntius.config.active_storage_service
 
         validate :design_compiles
+        # Before their names are stored: those uploaded before it was saved
+        before_save :attach_pending_images, if: :new_record?
         before_save :store_image_names, if: :json_changed?
         # Every email needs a layout when edited in the admin; the old ones keep
         # their old layout until they are converted.
@@ -145,6 +147,10 @@ module Nuntius
         raise EmailDesign::Error, result.errors.join("; ") unless result.html
 
         self.html = result.html
+      end
+
+      def attach_pending_images
+        PendingImages.new(self).attach
       end
 
       # Uploaded images are kept by name only, see EmailImages

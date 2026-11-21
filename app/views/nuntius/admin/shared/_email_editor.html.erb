@@ -2,6 +2,7 @@
     Nuntius::EmailDesignParams takes them in the controller.
     Locals: record, name (the form's param key), document, lock (optional),
     media_url (optional: the images Image blocks choose from, MediaController)
+    and compile_url (optional: its compile action's, nuntius_media_urls)
     Images are named in the document, with URLs for the canvas; with
     media_url the preview compiles with them shown (MediaController#compile).
     variables (optional: the record's variable_roots) has the editor suggest
@@ -21,7 +22,7 @@
 <% variables_url = (Nuntius::Variables.url(self, local_assigns[:variables]) || "") if local_assigns.key?(:variables) %>
 <%# (also before the record is saved: a new template or campaign shows its layout's images) %>
 <% document = Nuntius::EmailImages.new(record).normalize(document, **image_url_options) if document %>
-<% compile_url = media_url ? "#{media_url}/compile" : tess_edit.compile_path %>
+<% compile_url = local_assigns[:compile_url] || (media_url ? "#{media_url}/compile" : tess_edit.compile_path) %>
 <% problems = record.errors[:base] + [:mjml, *local_assigns[:attributes]].flat_map { |attribute| record.errors.full_messages_for(attribute) } %>
 <% if problems.any? %>
   <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 <%= frame ? "mb-3" : "m-4" %>" role="alert">

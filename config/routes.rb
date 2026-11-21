@@ -34,6 +34,12 @@ Nuntius::Engine.routes.draw do
 
   namespace :admin do
     resources :campaigns do
+      # A new campaign's editor's images, before it is saved
+      collection do
+        get "media", to: "media#index", defaults: {owner: "campaign"}
+        post "media", to: "media#create", defaults: {owner: "campaign"}
+        post "media/compile", to: "media#compile", defaults: {owner: "campaign"}
+      end
       member do
         post "schedule", action: "schedule"
         post "deschedule", action: "deschedule"
@@ -49,6 +55,12 @@ Nuntius::Engine.routes.draw do
       end
     end
     resources :layouts do
+      # A new layout's editor's images, before it is saved
+      collection do
+        get "media", to: "media#index", defaults: {owner: "layout"}
+        post "media", to: "media#create", defaults: {owner: "layout"}
+        post "media/compile", to: "media#compile", defaults: {owner: "layout"}
+      end
       member do
         get "media", to: "media#index", defaults: {owner: "layout"}
         post "media", to: "media#create", defaults: {owner: "layout"}
@@ -74,6 +86,12 @@ Nuntius::Engine.routes.draw do
     resources :layouts
     resources :locales
     resources :templates do
+      # A new template's editor's images, before it is saved
+      collection do
+        get "media", to: "media#index", defaults: {owner: "template"}
+        post "media", to: "media#create", defaults: {owner: "template"}
+        post "media/compile", to: "media#compile", defaults: {owner: "template"}
+      end
       post "preview", on: :collection
       member do
         get "media", to: "media#index", defaults: {owner: "template"}

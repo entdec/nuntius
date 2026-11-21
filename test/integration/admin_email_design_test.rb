@@ -21,7 +21,8 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     get "/nuntius/admin/layouts/new"
 
     assert_response :success
-    assert_equal "/nuntius/tess_edit/compile", editor_value("compile-url")
+    # Its preview shows the images uploaded before it is saved
+    assert_equal "/nuntius/admin/layouts/media/compile", editor_value("compile-url")
     assert_select "input[name='layout[design_json]']"
     assert_select "input[name='layout[design_mjml]']"
   end

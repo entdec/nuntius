@@ -46,7 +46,7 @@
             <% end %>
           <% end %>
           <% if editor == :email %>
-            <%= render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_campaign_path(@campaign) if @campaign.persisted?), variables: @campaign.variable_roots, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), options: {campaign: true}, attributes: %i[from subject list], slots: slots, frame: false %>
+            <%= render "nuntius/admin/shared/email_editor", record: @campaign, name: "campaign", document: @campaign.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, **nuntius_media_urls(@campaign), variables: @campaign.variable_roots, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), options: {campaign: true}, attributes: %i[from subject list], slots: slots, frame: false %>
           <% else %>
             <%= render "nuntius/admin/shared/message_editor", record: @campaign, name: "campaign", options: {campaign: true}, translations_url: (translations_admin_campaign_path(@campaign) if @campaign.persisted?), slots: slots %>
           <% end %>

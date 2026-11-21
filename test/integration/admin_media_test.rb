@@ -130,10 +130,53 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
     assert_select "[data-tess-edit-media-url-value='/nuntius/admin/campaigns/#{campaign.id}/media']"
   end
 
-  test "a new layout has no images to choose from until it is saved" do
-    get "/nuntius/admin/layouts/new"
+  test "a new campaign's editor uploads before it is saved, and the campaign keeps the images its design shows, by name" do
+    get "/nuntius/admin/campaigns/new", params: {transport: "mail", layout_id: @layout.id}
+    assert_select "[data-tess-edit-media-url-value='/nuntius/admin/campaigns/media?layout_id=#{@layout.id}']"
+    assert_select "[data-tess-edit-compile-url-value='/nuntius/admin/campaigns/media/compile?layout_id=#{@layout.id}']"
+    get "/nuntius/admin/campaigns/media", params: {layout_id: @layout.id}, as: :json
+    assert_equal ["logo.png"], names, "its layout's"
 
-    assert_select "[data-controller='tess-edit']:not([data-tess-edit-media-url-value])"
+    post "/nuntius/admin/campaigns/media", params: {file: upload("logo.png"), layout_id: @layout.id}
+    assert_response :created
+    uploaded = response.parsed_body
+    assert_equal "logo-2.png", uploaded["name"], "not its layout's name"
+    assert_equal ActiveStorage::Blob.find_signed(uploaded["id"]).filename.to_s, "logo-2.png", "referred to by its signed id until the campaign is saved"
+    post "/nuntius/admin/campaigns/media", params: {file: upload("unused.png")}
+    unused = ActiveStorage::Blob.find_signed(response.parsed_body["id"])
+
+    content = %(<mj-section><mj-column><mj-image src="{{ '#{uploaded["id"]}' | image_url }}" /></mj-column></mj-section>)
+    post "/nuntius/admin/campaigns/media/compile", params: {mjml: "<mjml><mj-body>#{content}</mj-body></mjml>", layout_id: @layout.id}, as: :json
+    assert_match %r{src="https://[^"]+/logo-2.png"}, response.parsed_body["html"], "the preview shows it"
+
+    image = {"id" => "bphoto", "type" => "image", "attributes" => {"src" => uploaded["url"]}, "data" => {"image" => uploaded["id"], "source" => "upload"}, "children" => []}
+    document = Nuntius::EmailDesign.document_with(@layout.json, [image], subject: "Spring", preview_text: "")
+    mjml = layout_mjml.sub(content_mjml("Example content"), "#{Nuntius::EmailDesign::CONTENT_START}\n#{content}\n#{Nuntius::EmailDesign::CONTENT_END}")
+    post "/nuntius/admin/campaigns", params: {campaign: {name: "Spring", transport: "mail", layout_id: @layout.id, design_json: document.to_json, design_mjml: mjml}}
+
+    campaign = Nuntius::Campaign.find_by!(name: "Spring")
+    assert_equal ["logo-2.png"], campaign.images.map { |attachment| attachment.filename.to_s }
+    assert_not campaign.images.first.blob.metadata.key?("pending")
+    assert_equal "logo-2.png", campaign.json.first.dig("data", "image")
+    assert_includes campaign.mjml, "{{ 'logo-2.png' | image_url }}"
+    assert_not_includes campaign.html, uploaded["id"]
+    assert unused.reload.metadata["pending"], "left for the host to purge"
+    assert_empty unused.attachments
+  end
+
+  test "a new layout keeps the images uploaded before it was saved" do
+    get "/nuntius/admin/layouts/new"
+    assert_select "[data-tess-edit-media-url-value='/nuntius/admin/layouts/media']"
+
+    post "/nuntius/admin/layouts/media", params: {file: upload("header.png")}
+    uploaded = response.parsed_body
+    json = layout_json
+    json["children"].unshift({"id" => "bheader", "type" => "image", "attributes" => {"src" => uploaded["url"]}, "data" => {"image" => uploaded["id"], "source" => "upload"}, "children" => []})
+    layout = Nuntius::Layout.create!(name: "With header", json: json, mjml: layout_mjml(header: %(<img src="{{ '#{uploaded["id"]}' | image_url }}">)))
+
+    assert_equal ["header.png"], layout.attachments.map { |attachment| attachment.filename.to_s }
+    assert_equal "header.png", layout.json["children"].first.dig("data", "image")
+    assert_includes layout.mjml, "{{ 'header.png' | image_url }}"
   end
 
   def campaign

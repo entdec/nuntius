@@ -32,7 +32,7 @@
           <%= f.text_area :description, label: false, rows: 3, description: t(".description_hint") %>
         </div>
       <% end %>
-      <%= render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, media_url: (media_admin_layout_path(@layout) if @layout.persisted?), variables: @layout.variable_roots, translations_url: (translations_admin_layout_path(@layout) if @layout.persisted?), attributes: %i[name description], slots: slots, frame: false %>
+      <%= render "nuntius/admin/shared/email_editor", record: @layout, name: "layout", document: @layout.json.presence || Nuntius::Layout.starting_document, **nuntius_media_urls(@layout), variables: @layout.variable_roots, translations_url: (translations_admin_layout_path(@layout) if @layout.persisted?), attributes: %i[name description], slots: slots, frame: false %>
     <% end %>
     <% if @layout.persisted? %>
       <% page.tab :media do %>

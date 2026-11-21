@@ -51,7 +51,7 @@
               <% end %>
             <% end %>
             <% if editor == :email %>
-              <%= render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, media_url: (media_admin_template_path(@template) if @template.persisted?), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots, frame: false %>
+              <%= render "nuntius/admin/shared/email_editor", record: @template, name: "template", document: @template.editor_document, lock: Nuntius::Concerns::EmailDesigned::EDITOR_LOCK, **nuntius_media_urls(@template), variables: @template.variable_roots, translations_url: (translations_admin_template_path(@template) if @template.persisted?), options: {template: true}, attributes: %i[from to subject], slots: slots, frame: false %>
             <% else %>
               <%= render "nuntius/admin/shared/message_editor", record: @template, name: "template", options: {template: true}, translations_url: (translations_admin_template_path(@template) if @template.persisted?), slots: slots %>
             <% end %>

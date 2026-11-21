@@ -14,7 +14,9 @@ module Nuntius
   #   {{ 'logo.png' | embed_image }}   sent with the email
   #
   # Designs from before names kept an image's signed id and its URL. find
-  # takes those too, and normalize turns them into names.
+  # takes those too, and normalize turns them into names. An image uploaded
+  # before its record was saved is referred to by its signed id until then
+  # (PendingImages).
   class EmailImages
     # The editor's image fields: where the name is, the attribute the image's
     # URL goes in, and where the image comes from ("upload" or "web")
@@ -134,6 +136,9 @@ module Nuntius
           data[field[:image]] = image.filename.to_s
           data[field[:source]] = "upload"
           url_options.empty? ? attributes.delete(field[:url]) : attributes[field[:url]] = url(image, **url_options)
+        elsif (blob = PendingImages.find(reference.to_s))
+          # Uploaded before the record was saved, named once it is
+          attributes[field[:url]] = url(blob, **url_options) unless url_options.empty?
         elsif attributes[field[:url]].present?
           data.delete(field[:image])
           data[field[:source]] = "web"

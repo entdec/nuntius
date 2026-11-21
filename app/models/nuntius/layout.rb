@@ -14,6 +14,8 @@ module Nuntius
 
     validates :name, :mjml, presence: true
     validate :one_content_block
+    # Those uploaded before it was saved (PendingImages), named in its design
+    before_save :attach_pending_images, if: :new_record?
     before_save :compile, if: :mjml_changed?
     before_save :store_image_names, if: :json_changed?
     after_save :recompose_emails, if: :saved_change_to_mjml?
@@ -75,6 +77,10 @@ module Nuntius
 
     def compile
       self.html = TessEdit.compile(mjml).html
+    end
+
+    def attach_pending_images
+      PendingImages.new(self).attach
     end
 
     # Uploaded images are kept by name only, see EmailImages
