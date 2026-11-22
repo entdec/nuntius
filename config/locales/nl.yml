@@ -73,7 +73,7 @@ nl:
       list: Lijst
       message: Bericht
       subscriber: Abonnee
-      template: Template
+      template: Sjabloon
   menu:
     nuntius:
       campaigns:
@@ -88,7 +88,7 @@ nl:
       locales:
         new: Nieuwe locale
       templates:
-        new: Nieuwe template
+        new: Nieuw sjabloon
   nuntius:
     based_on:
       event: een gebeurtenis
@@ -232,14 +232,14 @@ nl:
             newsletter: Een kop met kolommen voor artikelen, en een voet met de link naar het abonnement.
             transactional: Eenvoudig en to the point, voor bonnen, meldingen en bevestigingen.
             empty: Alleen de inhoud, om alles zelf te ontwerpen.
-          description_hint: Staat onder de voorbeeldweergave bij het kiezen van een layout voor een nieuwe template.
+          description_hint: Staat onder de voorbeeldweergave bij het kiezen van een layout voor een nieuw sjabloon.
           tabs:
             main:
               tab:
                 edit: Edit
                 media: Media
                 translations: Vertalingen
-                templates: Templates
+                templates: Sjablonen
         index:
           card:
             nuntius_admin_layouts:
@@ -328,25 +328,25 @@ nl:
                 tracking: Tracking
       templates:
         new:
-          title: Nieuwe template
+          title: Nieuw sjabloon
         edit:
           description_auto: Automatisch
           description_if: als
           description_or: "of"
           card:
             nuntius_admin_templates:
-              title: Template
+              title: Sjabloon
           metadata: Metadata
           layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
           layout_moves: "De eigen inhoud verhuist bij opslaan naar de gekozen layout."
           global_hint: Gebruikt voor elk account, niet alleen dit
-          metadata_variables: "Het ontwerp van deze template leest nog metadata, die gaat verdwijnen:"
+          metadata_variables: "Het ontwerp van dit sjabloon leest nog metadata, die gaat verdwijnen:"
           old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
-          old_layout: "Deze template gebruikt nog de oude layout %{name}. Die blijft werken tot de template is omgezet."
+          old_layout: "Dit sjabloon gebruikt nog de oude layout %{name}. Die blijft werken tot het sjabloon is omgezet."
           convert_layout: Omzetten naar layout
           convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
           convert: Omzetten naar de e-maileditor
-          convert_confirm: "Deze template omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je hem in de e-maileditor."
+          convert_confirm: "Dit sjabloon omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je het in de e-maileditor."
           tabs:
             main:
               tab:
@@ -372,7 +372,7 @@ nl:
           ago: geleden
           'on': bij
         convert:
-          converted: De template gebruikt nu de e-maileditor. Controleer hem in het tabblad Ontwerp.
+          converted: Het sjabloon gebruikt nu de e-maileditor. Controleer het in het tabblad Ontwerp.
           tabs:
             main:
               tab:
@@ -385,8 +385,8 @@ nl:
           card:
             nuntius_admin_templates:
               tab:
-                Nuntius templates: Templates
-              title: Templates
+                Nuntius templates: Sjablonen
+              title: Sjablonen
     subscribers:
       edit:
         subscribe_to_list: Abbonnement op %{list}
