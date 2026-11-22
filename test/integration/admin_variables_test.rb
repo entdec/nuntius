@@ -33,6 +33,18 @@ class AdminVariablesTest < ActionDispatch::IntegrationTest
     assert_includes variables(url, "template"), "layout"
   end
 
+  test "the template and layout editors get Liquidum's filters and tags, for completion and checks" do
+    [
+      "/nuntius/admin/templates/#{@template.id}/edit",
+      "/nuntius/admin/layouts/#{@layout.id}/edit"
+    ].each do |page|
+      get page
+      editor = css_select("[data-controller='tess-edit']").first
+      assert_equal "/liquidum/filters", editor["data-tess-edit-filters-url-value"], page
+      assert_equal "/liquidum/tags", editor["data-tess-edit-tags-url-value"], page
+    end
+  end
+
   test "the layout editor gets the variables of the templates and campaigns it's part of" do
     get "/nuntius/admin/layouts/#{@layout.id}/edit"
 

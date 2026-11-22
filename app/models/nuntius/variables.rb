@@ -28,6 +28,20 @@ module Nuntius
       routes.liquidum.variables_path(roots: Liquidum::Variables.new(roots).token)
     end
 
+    # The editor's data attributes for Liquidum's filters and tags endpoints,
+    # for its completion after | and {% and its checks: those the host's
+    # Liquidum has (filters from 1.4.2, tags from 1.4.3), none when it hasn't
+    # mounted Liquidum
+    def liquid_urls(routes)
+      return {} unless routes.respond_to?(:liquidum)
+
+      liquidum = routes.liquidum
+      {
+        tess_edit_filters_url_value: (liquidum.filters_path if liquidum.respond_to?(:filters_path)),
+        tess_edit_tags_url_value: (liquidum.tags_path if liquidum.respond_to?(:tags_path))
+      }.compact
+    end
+
     # For conditions (EntDec::Conditions::Component): a variable's labels from
     # the root ("User › Name") and its type, from its path; nil when unknown
     def describer(roots)

@@ -34,6 +34,7 @@ module Nuntius
 
     test "the editor's URL only when the host app mounts Liquidum" do
       assert_nil Variables.url(Object.new, {"template" => TemplateDrop})
+      assert_equal({}, Variables.liquid_urls(Object.new))
     end
 
     test "Nuntius's drops describe their variables, through to other Nuntius objects" do
