@@ -199,8 +199,21 @@ module Nuntius
       #   describe :born_on, label: -> { I18n.t("users.birthday") }
       #
       # Without it the label comes from event_label's translations.
-      def describe(event, label:)
-        event_descriptions[event.to_sym] = {label: label}
+      #
+      # An event sent with other objects than its own (Nuntius.event(:unassigned,
+      # task, contact: …)) names them, for the editor to know them: what's in
+      # Liquid besides its object, as variable roots (a drop, or its name)
+      #
+      #   describe :unassigned, variables: {"contact" => "ContactDrop"}
+      def describe(event, label: nil, variables: {})
+        event_descriptions[event.to_sym] = {label: label, variables: variables.to_h.transform_keys(&:to_s)}.compact
+      end
+
+      # The variables an event has besides its object (see describe)
+      def event_variables(event)
+        return {} if event.blank?
+
+        event_descriptions.dig(event.to_sym, :variables).to_h.transform_values { |drop| drop.is_a?(String) ? drop.constantize : drop }
       end
 
       def event_descriptions

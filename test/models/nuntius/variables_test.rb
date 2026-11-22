@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "minitest/mock"
 
 module Nuntius
   class VariablesTest < ActiveSupport::TestCase
@@ -18,6 +19,14 @@ module Nuntius
     test "a template has the object it's sent for and itself" do
       assert_equal({"account" => AccountDrop, "template" => TemplateDrop}, Template.new(klass: "Account").variable_roots)
       assert_equal({"template" => TemplateDrop}, Template.new(klass: "Custom").variable_roots)
+    end
+
+    test "a template has what its event is sent with besides its object, as its messenger describes it" do
+      messenger = Class.new(AccountMessenger) { describe :merged, variables: {other: "UserDrop", note: :string} }
+      BaseMessenger.stub(:messenger_for_class, messenger) do
+        assert_equal({"account" => AccountDrop, "other" => UserDrop, "note" => :string, "template" => TemplateDrop}, Template.new(klass: "Account", event: "merged").variable_roots)
+        assert_equal({"account" => AccountDrop, "template" => TemplateDrop}, Template.new(klass: "Account", event: "created").variable_roots)
+      end
     end
 
     test "a campaign has itself, the subscriber and what its list's subscribers are" do

@@ -19,6 +19,14 @@ module Nuntius
       drop ? {model.name.demodulize.underscore => drop} : {}
     end
 
+    # What a class's event has besides its object, as its messenger describes
+    # it (BaseMessenger.describe's variables)
+    def for_event(name, event)
+      return {} if name.blank? || name.to_s == "Custom" || !name.to_s.safe_constantize
+
+      BaseMessenger.messenger_for_class(name.to_s)&.event_variables(event) || {}
+    end
+
     # The URL of Liquidum's variables endpoint for these roots, signed, or nil
     # when the host app hasn't mounted Liquidum. `routes` is the view (with the
     # host's mounted engines' route helpers).

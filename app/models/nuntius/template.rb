@@ -203,10 +203,11 @@ module Nuntius
     end
 
     # What its Liquid can use (see Variables): the object it's sent for, under
-    # its messenger's name for it (none for Custom), and itself. For another
+    # its messenger's name for it (none for Custom), what its event is sent
+    # with besides it (the messenger's describe), and itself. For another
     # class, what it would be (the form, before the class is saved).
     def variable_roots(klass = self.klass)
-      Variables.for_class(klass).merge("template" => TemplateDrop)
+      Variables.for_class(klass).merge(Variables.for_event(klass, event)).merge("template" => TemplateDrop)
     end
 
     # The scope of the keys starting with a dot that its Liquid translates
