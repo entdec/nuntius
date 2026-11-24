@@ -413,6 +413,8 @@ A condition is one of the Liquid variables the template or campaign renders with
 
 The form chooses the variables with Liquidum's endpoint, so your app needs to mount it (see [Variables](#variables)); without it they're typed in, like `screening.payment_needed?`. They're stored in a `conditions` column (`{"match" => "all", "rules" => [{"variable", "operator", "value", "value_to"}]}`): copy in the migration with `bin/rails nuntius:install:migrations`. A campaign checks its conditions for each subscriber, with `campaign`, `subscriber` and the subscriber's object.
 
+They're checked by Liquidum (`Liquidum::Conditions`, which `Nuntius::Conditions` is), whose JavaScript checks them the same way in the browser.
+
 ### Locales
 
 Translate in a template or campaign with Liquidum's `t` filter. Its translations are the locales of its account: add a locale in the admin for each language, with the language as its top key:
