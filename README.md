@@ -390,6 +390,16 @@ That goes through the object's messenger as an event would, with the template's 
 its To, open and link tracking. It returns the messages it sent: none when its conditions aren't
 met or its To renders empty, like a contact without an email address.
 
+Your app can say whom it goes to and from whom, in place of the template's own To and From and
+in the same forms (addresses, drops, lists of them), and leave the template's conditions out,
+when something else decides whether it's sent, like an automation's steps:
+
+```ruby
+template.deliver_to(contract, to: "{{ contract.contact }}, board@example.com", from: "sponsors@example.com", conditions: false)
+```
+
+So one template can go to others from different places. Without them, it's sent as above.
+
 A message says what sent it with `campaign?`, or `on_demand?`, `event_based?` and `time_based?`
 from its template as it is now, so a provider's settings can send them through another server:
 

@@ -34,15 +34,17 @@ module Nuntius
 
     # Turns the templates in messages, one for each addressee (see
     # Template#new_messages), and dispatches the messages to transports: those
-    # whose conditions are met. Returns the messages.
-    def dispatch(filtered_templates)
+    # whose conditions are met. Returns the messages. to and from send them to
+    # and from others than the templates say (Template#new_messages);
+    # conditions: false sends them whatever their conditions.
+    def dispatch(filtered_templates, to: nil, from: nil, conditions: true)
       filtered_templates.flat_map do |template|
         assigns = liquid_context
-        next unless template.conditions_met?(assigns.merge("template" => template))
+        next [] if conditions && !template.conditions_met?(assigns.merge("template" => template))
 
         template.layout = override_layout(template.layout)
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
-        template.new_messages(@object, assigns, params, account: account).each do |msg|
+        template.new_messages(@object, assigns, params, account: account, to:, from:).each do |msg|
           @attachments.each do |attachment|
             msg.add_attachment(attachment)
           end

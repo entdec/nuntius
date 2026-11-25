@@ -82,6 +82,29 @@ module Nuntius
       assert_empty template.deliver_to(@account)
     end
 
+    test "who sends it can say whom it goes to and from whom instead, as its own To and From" do
+      template = Template.create!(klass: "Account", based_on: "on_demand", transport: "mail", description: "news", to: "{{ account.users }}", from: "info@example.com", subject: "Hi {{ to.name }}", text: "Body", enabled: true, account: @account)
+
+      to_board = template.deliver_to(@account, to: "board@example.com, {{ account.name | downcase }}@example.com", from: "{{ account.name | downcase }}-sponsors@example.com")
+      assert_equal ["board@example.com", "#{@account.name.downcase}@example.com"], to_board.map(&:to)
+      assert_equal ["#{@account.name.downcase}-sponsors@example.com"], to_board.map(&:from).uniq
+
+      ann = @account.users.find_by!(name: "Ann")
+      to_ann = template.new_messages(@account, {"account" => @account, "ann" => ann}, to: "{{ ann }}")
+      assert_equal [["ann@example.com", "Hi Ann"]], to_ann.map { |message| [message.to, message.subject] }
+
+      own = template.deliver_to(@account, to: "", from: nil)
+      assert_equal [%w[ann@example.com bob@example.com], ["info@example.com"]], [own.map(&:to).sort, own.map(&:from).uniq]
+    end
+
+    test "its conditions keep it from being sent, unless who sends it leaves them out" do
+      template = Template.create!(klass: "Account", based_on: "on_demand", transport: "mail", description: "news", to: "a@example.com", from: "from@example.com", subject: "Hi", text: "Body", enabled: true, account: @account,
+        conditions: {"match" => "all", "rules" => [{"variable" => "account.name", "operator" => "is", "value" => "Nobody"}]})
+
+      assert_equal [], template.deliver_to(@account)
+      assert_equal ["a@example.com"], template.deliver_to(@account, conditions: false).map(&:to)
+    end
+
     test "the messenger dispatches a message per addressee" do
       template = Template.create!(klass: "Account", event: "created", transport: "mail", description: "created", to: "{{ account.users }}", from: "from@example.com", subject: "Hi {{ to.name }}", text: "Body", enabled: true, account: @account)
 

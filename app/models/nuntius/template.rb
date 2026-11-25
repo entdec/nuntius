@@ -69,20 +69,22 @@ module Nuntius
 
     # The messages it sends: one for each addressee in its To (see addressees),
     # rendered with the addressee as `to`. account is the account they're sent
-    # for, by default the template's own.
-    def new_messages(object, assigns = {}, params = {}, account: self.account)
+    # for, by default the template's own. to and from, Liquid as its own To
+    # and From, send it to others or from another than it says (an
+    # automation's step sending it: whom to is the step's).
+    def new_messages(object, assigns = {}, params = {}, account: self.account, to: nil, from: nil)
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
       locale = params[:locale].to_sym if params[:locale]
 
-      addressees(assigns, locale).map do |address, to|
+      addressees(assigns, locale, to.presence || self.to).map do |address, recipient|
         message = Nuntius::Message.new(template: self, account: account, transport: transport, to: address)
         message.nuntiable = object unless object.is_a? Hash
 
-        message_assigns = assigns.merge("to" => to)
+        message_assigns = assigns.merge("to" => recipient)
         options = {registers: {"template" => self, "message" => message}}
 
-        message.from = render(:from, message_assigns, locale, options).split(",").reject(&:empty?).join(",")
+        message.from = render(:from, message_assigns, locale, options, source: from.presence || self.from).split(",").reject(&:empty?).join(",")
         message.subject = render(:subject, message_assigns, locale, options)
         message.html = render(:html, message_assigns, locale, options.merge(layout: old_layout&.data))
         message.text = render(:text, message_assigns, locale, options)
@@ -99,15 +101,15 @@ module Nuntius
       new_messages(...).first
     end
 
-    # Whom its To sends to, as [address, to] pairs, where to is what a message
+    # Whom its To (or another To given) sends to, as [address, to] pairs, where to is what a message
     # to the address renders with as `to`. A To of a single variable, like
     # {{ order.contacts }}, can give drops or hashes (or a list of them): each
     # is an addressee, at its address attribute for the transport (see
     # ADDRESS_ATTRIBUTES), and is the message's `to`. Otherwise each of the
     # comma separated addresses the To renders to is one, and is its `to`.
-    def addressees(assigns, locale)
-      value = to_value(assigns, locale)
-      value = render(:to, assigns, locale) unless value.present? && !value.is_a?(String)
+    def addressees(assigns, locale, to = self.to)
+      value = to_value(assigns, locale, to)
+      value = render(:to, assigns, locale, source: to) unless value.present? && !value.is_a?(String)
 
       Array.wrap(value).flat_map do |to|
         to = to.to_liquid
@@ -157,8 +159,14 @@ module Nuntius
     # would: with its conditions, to the addressees its To gives. For a template
     # sent on demand, which the app sends when someone asks for it. Returns the
     # messages it sent: none when its conditions aren't met or its To is empty.
-    def deliver_to(object, params = {})
-      BaseMessenger.messenger_for_obj(object).new(object, event, params).dispatch([self])
+    #
+    # Who sends it can say whom it goes to and from whom instead (to, from:
+    # Liquid as its own To and From), and leave its conditions out (an
+    # automation, whose steps are the conditions):
+    #
+    #   template.deliver_to(contract, to: "{{ contract.contact }}", from: "sponsors@svbaarn.nl", conditions: false)
+    def deliver_to(object, params = {}, to: nil, from: nil, conditions: true)
+      BaseMessenger.messenger_for_obj(object).new(object, event, params).dispatch([self], to:, from:, conditions:)
     end
 
     # At most how many messages it sends in a run of TimebasedEventsJob: its
@@ -302,7 +310,7 @@ module Nuntius
 
     # What a To of only one variable (with filters) is, unrendered: nil for
     # anything else, or when evaluating it fails (render it instead)
-    def to_value(assigns, locale)
+    def to_value(assigns, locale, to = self.to)
       nodes = Liquid::Template.parse(to.to_s).root.nodelist.reject { |node| node.is_a?(String) && node.strip.empty? }
       return unless nodes.one? && nodes.first.is_a?(Liquid::Variable)
 
@@ -321,17 +329,18 @@ module Nuntius
       value.to_s.strip
     end
 
-    def render(attr, assigns, locale, options = {})
+    # An attribute rendered, or source given in its place (another To or From)
+    def render(attr, assigns, locale, options = {}, source: send(attr))
       I18n.with_locale(locale) do
         if attr == :payload
-          YAML.safe_load(::Liquidum.render(send(attr), {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options)))
+          YAML.safe_load(::Liquidum.render(source, {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options)))
         elsif attr == :html && email_design?
           # Already a whole email: only Liquid is left to render
-          ::Liquidum.render(send(attr), {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options.except(:layout)))
+          ::Liquidum.render(source, {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options.except(:layout)))
         elsif attr == :html
-          ::Liquidum.render(send(attr), {filter: "markdown", assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options))
+          ::Liquidum.render(source, {filter: "markdown", assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options))
         else
-          ::Liquidum.render(send(attr), {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options))
+          ::Liquidum.render(source, {assigns: assigns.merge("template" => self), registers: {"template" => self}}.merge(options))
         end
       end
     end
