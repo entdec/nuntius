@@ -84,7 +84,7 @@ module Nuntius
 
     def templates?(obj, event)
       messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event)
-      return false unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym) || Triggers.for(obj.class).include?(event.to_sym)
+      return false unless messenger.handles_event?
 
       result = messenger.call
       return false if result == false

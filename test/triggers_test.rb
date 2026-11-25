@@ -28,6 +28,14 @@ class Nuntius::TriggersTest < ActiveSupport::TestCase
     assert_equal %i[reminded], Nuntius::Triggers.for(model)
   end
 
+  test "a trigger's templates are sent, though its messenger has no method by its name" do
+    assert_not UserMessenger.method_defined?(:active)
+
+    assert_difference -> { Nuntius::Message.where(nuntiable: @user, template: nuntius_templates(:user_activate)).count }, 1 do
+      perform_enqueued_jobs(only: [Nuntius::MessengerJob]) { @user.activate! }
+    end
+  end
+
   test "a transition sends the templates for the state it goes to, not those for its event; staying sends nothing" do
     on_state = Nuntius::Template.create!(description: "state", klass: "User", transport: "mail", event: "active", to: "a@example.org", html: "Hi", account: accounts(:one))
     on_event = Nuntius::Template.create!(description: "event", klass: "User", transport: "mail", event: "activate", to: "b@example.org", html: "Hi", account: accounts(:one))

@@ -22,6 +22,12 @@ module Nuntius
       @smtp_envelope_from = params[:smtp_envelope_from]
     end
 
+    # Whether it sends for its event: a trigger of its object's class (a state,
+    # the life cycle's, one of its own), or a method of its own by that name
+    def handles_event?
+      Triggers.for(object.class).include?(event.to_sym) || respond_to?(event.to_sym)
+    end
+
     # Calls the event method on the messenger
     def call
       select_templates

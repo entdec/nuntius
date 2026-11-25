@@ -8,7 +8,7 @@ module Nuntius
 
       ActiveRecord::Base.transaction do
         messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event, params)
-        return unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym)
+        return unless messenger.handles_event?
 
         result = messenger.call
         return if result == false
