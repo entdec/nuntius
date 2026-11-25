@@ -21,11 +21,9 @@ class Nuntius::TriggersTest < ActiveSupport::TestCase
   end
 
   test "a class's own triggers, declared with nuntiable triggers:, are fired by name" do
-    model = Class.new(ApplicationRecord) do
-      self.table_name = "reports"
-      def self.name = "Report"
-      nuntiable triggers: %i[reminded]
-    end
+    # As nuntiable triggers: %i[reminded] leaves it, without adding a class to Nuntius' nuntiable ones
+    model = Class.new(Report)
+    model.instance_variable_set(:@_nuntius_nuntiable_options, {triggers: %i[reminded]})
 
     assert_equal %i[reminded], Nuntius::Triggers.for(model)
   end
