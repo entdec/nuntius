@@ -40,7 +40,7 @@ en:
       nuntius/template:
         description: Description
         enabled: Enabled
-        event: Event
+        event: Trigger
         layout_name: Layout
         global: Global
         from: From
@@ -77,8 +77,13 @@ en:
       templates:
         new: New template
   nuntius:
+    life_cycle:
+      created: created
+      updated: updated
+      saved: saved
+      destroyed: destroyed
     based_on:
-      event: an event
+      event: a trigger
       time: a time
       on_demand: on demand
     directions:
@@ -122,7 +127,7 @@ en:
       invalid_locale: "%{locale} is not one of the languages"
       taken: "%{key} is part of another translation's key"
     templates:
-      custom: Custom event
+      custom: Custom trigger
     tables:
       campaigns:
         views:

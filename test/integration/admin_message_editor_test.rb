@@ -6,7 +6,7 @@ require "test_helper"
 # (app/javascript/nuntius/kits/messages.js)
 class AdminMessageEditorTest < ActionDispatch::IntegrationTest
   def template(**attributes)
-    Nuntius::Template.create!({description: "Welcome", klass: "User", event: "activate", transport: "sms", text: "Hi {{ user.name }}", to: "{{ user.phone_number }}", account: accounts(:one)}.merge(attributes))
+    Nuntius::Template.create!({description: "Welcome", klass: "User", event: "active", transport: "sms", text: "Hi {{ user.name }}", to: "{{ user.phone_number }}", account: accounts(:one)}.merge(attributes))
   end
 
   def editor
@@ -49,7 +49,7 @@ class AdminMessageEditorTest < ActionDispatch::IntegrationTest
   test "a new one is made in the editor, and its errors show above it" do
     design = {"id" => "broot", "type" => "sms", "data" => {"text" => "{% if user %}Hi"}, "children" => []}
 
-    post "/nuntius/admin/templates", params: {template: {description: "Hi", klass: "User", event: "activate", transport: "sms", design_json: design.to_json}}
+    post "/nuntius/admin/templates", params: {template: {description: "Hi", klass: "User", event: "active", transport: "sms", design_json: design.to_json}}
 
     assert_response :unprocessable_entity
     assert_select "[role='alert']", /Text is not valid liquid/

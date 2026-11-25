@@ -25,11 +25,11 @@ module Nuntius
 
       assert_includes events, :before_born_on
       assert_includes events, :after_activated_at
-      assert_includes events, :activate
+      assert_includes events, :active
       assert_not_includes events, :after_updated_at
       assert_equal :before, UserMessenger.timebased(:before_born_on, "User")
       assert_equal :after, AccountMessenger.timebased(:after_created_at, "Account")
-      assert_nil UserMessenger.timebased(:activate, "User")
+      assert_nil UserMessenger.timebased(:active, "User")
 
       messenger = Class.new(UserMessenger) { hide_timestamps :born_on }
       assert_not_includes messenger.events("User"), :before_born_on

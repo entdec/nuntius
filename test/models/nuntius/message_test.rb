@@ -146,7 +146,7 @@ module Nuntius
     end
 
     test "what sent it: a campaign, or its template, based on an event, a time or on demand, or none of them" do
-      event = Template.new(klass: "User", event: "activate")
+      event = Template.new(klass: "User", event: "active")
       time = Template.new(klass: "User", event: "before_born_on", interval: "1 week")
       on_demand = Template.new(klass: "User", event: "on_demand")
 

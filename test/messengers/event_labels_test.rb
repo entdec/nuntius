@@ -43,7 +43,7 @@ class EventLabelsTest < ActiveSupport::TestCase
 
     assert_equal "User", Nuntius::Template.new(klass: "User").klass_label
     assert_equal "activated", Nuntius::Template.new(klass: "User", event: "activate").event_label
-    assert_equal "Custom event", Nuntius::Template.new(klass: "Custom").klass_label
+    assert_equal "Custom trigger", Nuntius::Template.new(klass: "Custom").klass_label
     assert_equal "order#shipped", Nuntius::Template.new(klass: "Custom", event: "order#shipped").event_label
   end
 end

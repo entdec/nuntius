@@ -34,7 +34,7 @@ user_activate:
   account: one
   transport: mail
   klass: User
-  event: activate
+  event: active
   to: "{{user.email}}"
   subject: "Subject"
   html: "<b>Hoi</b>"
@@ -44,7 +44,7 @@ user_create:
   account: one
   transport: mail
   klass: User
-  event: create
+  event: created
   to: "{{user.email}}"
   subject: "Subject"
   html: "<b>Hoi</b>"

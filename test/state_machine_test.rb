@@ -7,7 +7,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
 
   test "firing an event creates nuntius-events" do
     user = User.create!(name: "test", email: "test@example.com")
-    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
 
     assert_equal "pending", user.state
 
@@ -24,7 +24,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
 
   test "firing an multiple event in multiple transaction creates nuntius-events " do
     user = User.create!(name: "test", email: "test@example.com")
-    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
 
     assert_equal "pending", user.state
 
@@ -50,7 +50,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
 
   test "firing multiple event in single transaction creates nuntius-events " do
     user = User.create!(name: "test", email: "test@example.com")
-    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
 
     assert_equal "pending", user.state
 
@@ -70,17 +70,17 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
 
   test "an event is dispatched once when the object is committed again while dispatching" do
     user = User.create!(name: "test", email: "test@example.com")
-    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
 
     # Like a job that saves the object while the messenger is still rendering its attachments
-    nuntius_event = Nuntius.method(:event)
+    nuntius_fire = Nuntius.method(:fire)
     committed_again = false
-    Nuntius.stub(:event, ->(*args, **kwargs) {
-      if args.first == :activate && !committed_again
+    Nuntius.stub(:fire, ->(*args, **kwargs) {
+      if args.first == :active && !committed_again
         committed_again = true
         User.find(user.id).dispatch_nuntius_events
       end
-      nuntius_event.call(*args, **kwargs)
+      nuntius_fire.call(*args, **kwargs)
     }) do
       perform_enqueued_jobs(only: [Nuntius::MessengerJob]) do
         User.transaction do
@@ -96,7 +96,7 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     user = User.create!(name: "test", email: "test@example.com")
     report = Report.create!(name: "test report", email: "test@example.com")
 
-    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
 
     assert_equal "pending", user.state
 
@@ -119,8 +119,8 @@ class Nuntius::StateMachineTest < ActiveSupport::TestCase
     user = User.create!(name: "test", email: "test@example.com")
     report = Report.create!(name: "test report", email: "test@example.com")
 
-    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
-    Nuntius::Template.create!(description: "template2", klass: "Report", transport: "mail", event: "activate", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "User", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
+    Nuntius::Template.create!(description: "template2", klass: "Report", transport: "mail", event: "active", to: "test@example.org", html: "Hello {{name}} - 10 days")
 
     assert_equal "pending", user.state
 

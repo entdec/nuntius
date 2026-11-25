@@ -65,7 +65,7 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
   end
 
   test "what a template sends stays as it was made" do
-    template = Nuntius::Template.create!(description: "Welcome", klass: "User", event: "activate", transport: "sms", account: accounts(:one))
+    template = Nuntius::Template.create!(description: "Welcome", klass: "User", event: "active", transport: "sms", account: accounts(:one))
 
     patch "/nuntius/admin/templates/#{template.id}", params: {template: {transport: "push", text: "Hi"}}
 
@@ -81,14 +81,14 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
     assert_equal "sms", views.find { |view| view.name == "SMS" }.config.dig(:filters, :transport, :value)
   end
 
-  test "the classes and events by their names for people" do
-    I18n.backend.store_translations(:en, nuntius: {events: {user: {activate: "activated"}}})
+  test "the classes and triggers by their names for people: a state by its own, the life cycle's, a translation" do
+    I18n.backend.store_translations(:en, nuntius: {events: {user: {disabled: "switched off"}}})
     get "/nuntius/admin/templates/new", params: {transport: "sms"}
 
-    assert_includes css_select("select[name='template[klass]'] option").map(&:text), "Custom event"
-    assert_includes response.body, "activated"
+    assert_includes css_select("select[name='template[klass]'] option").map(&:text), "Custom trigger"
+    assert_includes response.body, "switched off"
     assert_includes response.body, "Send via"
-    assert_equal ["an event", "a time", "on demand"], css_select("select[name='template[based_on]'] option").map(&:text)
+    assert_equal ["a trigger", "a time", "on demand"], css_select("select[name='template[based_on]'] option").map(&:text)
     assert_select ".nuntius-sentence .nuntius-sentence__on", text: "on"
     assert_select ".nuntius-sentence .nuntius-sentence__when", text: "when"
   ensure
@@ -122,7 +122,7 @@ class AdminTemplateFormTest < ActionDispatch::IntegrationTest
     travel_to Time.zone.local(2027, 3, 10, 10) do
       User.create!(name: "Juliet", email: "juliet@example.org", born_on: Date.new(1990, 3, 10), account: accounts(:one))
       template = Nuntius::Template.create!(description: "Birthday", klass: "User", event: "before_born_on", interval: "0 days", recurrence: "yearly", transport: "sms", account: accounts(:one))
-      event = Nuntius::Template.create!(description: "Activated", klass: "User", event: "activate", transport: "sms", account: accounts(:one))
+      event = Nuntius::Template.create!(description: "Activated", klass: "User", event: "active", transport: "sms", account: accounts(:one))
 
       get "/nuntius/admin/templates/#{template.id}/edit"
       assert_select "[role=status]", text: /Sends to 1 today/

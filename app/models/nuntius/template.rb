@@ -122,6 +122,48 @@ module Nuntius
       end
     end
 
+    # Moves templates from Nuntius 1's events to triggers (Triggers), for an
+    # app's data migration: a state machine event to the one state it goes to
+    # (ship to shipped), a life cycle's to its name now (create to created),
+    # and those the app renames itself, by class (its subclasses' too) and
+    # event:
+    #
+    #   Nuntius::Template.move_to_triggers!("Order" => {"remind" => "reminded"})
+    #
+    # Gives the templates it left, with why: an event that goes to several
+    # states or stays in its own, or isn't a trigger. Saved without
+    # validating, so their translations move along.
+    def self.move_to_triggers!(renames = {})
+      renames = renames.to_h { |klass, events| [klass.to_s, events.to_h.transform_keys(&:to_s).transform_values(&:to_s)] }
+      left = []
+      unscoped.where.not(klass: [nil, "", "Custom"]).where.not(event: [nil, "", ON_DEMAND]).find_each do |template|
+        model = template.klass.safe_constantize
+        next unless model.is_a?(Class)
+
+        name = template.event.to_s
+        names = model.ancestors.select { |ancestor| ancestor.is_a?(Class) && ancestor.name }.map(&:name)
+        renamed = names.lazy.filter_map { |each| renames.dig(each, name) }.first
+        messenger = BaseMessenger.messenger_for_class(template.klass)
+        next if renamed.nil? && messenger.events(template.klass).map(&:to_s).include?(name)
+
+        trigger = renamed || Triggers::OLD_LIFE_CYCLE[name.to_sym]&.to_s
+        unless trigger
+          event = Triggers.state_machine_event(model, name)
+          targets = event ? Triggers.targets(event) : []
+          if targets.one?
+            trigger = targets.first.to_s
+          else
+            left << [template, event ? (targets.any? ? :several_states : :no_other_state) : :not_a_trigger]
+            next
+          end
+        end
+
+        template.event = trigger
+        template.save!(validate: false)
+      end
+      left
+    end
+
     # A class templates are sent for, by its name for people
     def self.klass_label(name)
       return I18n.t("nuntius.templates.custom") if name == "Custom"

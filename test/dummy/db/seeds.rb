@@ -45,7 +45,7 @@ end
 rule = ->(variable, operator, value = "") { {"variable" => variable, "operator" => operator, "value" => value} }
 
 [
-  {description: "Welcome an activated user", klass: "User", event: "activate",
+  {description: "Welcome an activated user", klass: "User", event: "active",
    to: "{{ user.email }}", text: "Welcome, {{ user.name }}!",
    conditions: {"match" => "all", "rules" => [rule.call("user.email", "isnt_empty")]}},
   {description: "Birthday", klass: "User", event: "before_born_on", interval: "2 days", recurrence: "yearly",

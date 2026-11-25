@@ -5,7 +5,7 @@ require "test_helper"
 # If [all] of the following conditions are met: [User › State] [is] [active]
 class AdminConditionsFormTest < ActionDispatch::IntegrationTest
   def template_with(rules)
-    Nuntius::Template.create!(description: "Welcome", klass: "User", event: "activate", transport: "sms", account: accounts(:one), conditions: {"match" => "any", "rules" => rules})
+    Nuntius::Template.create!(description: "Welcome", klass: "User", event: "active", transport: "sms", account: accounts(:one), conditions: {"match" => "any", "rules" => rules})
   end
 
   test "a template's conditions, with its variables by their names for people" do

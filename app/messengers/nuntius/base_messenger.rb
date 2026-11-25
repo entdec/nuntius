@@ -204,7 +204,7 @@ module Nuntius
       #
       # Without it the label comes from event_label's translations.
       #
-      # An event sent with other objects than its own (Nuntius.event(:unassigned,
+      # A trigger fired with other objects than its own (Nuntius.fire(:unassigned,
       # task, contact: …)) names them, for the editor to know them: what's in
       # Liquid besides its object, as variable roots (a drop, or its name)
       #
@@ -224,10 +224,11 @@ module Nuntius
         @event_descriptions ||= {}
       end
 
-      # The events templates can be sent on: the messenger's own methods, and
-      # before and after each of the model's timestamps
+      # The triggers templates can be sent on (Triggers): the model's states,
+      # life cycle and own, the messenger's own methods, and before and after
+      # each of the model's timestamps
       def events(class_name = default_class_name)
-        (instance_methods(false) + timestamps(class_name).flat_map(&:events)).uniq
+        (Triggers.for(class_name.to_s.safe_constantize) + instance_methods(false) + timestamps(class_name).flat_map(&:events)).uniq
       end
 
       # Leaves timestamps out of the events (updated_at always is). Subclasses
@@ -259,10 +260,11 @@ module Nuntius
         timestamp_for(event, class_name) && event.to_s.split("_").first.to_sym
       end
 
-      # An event's name for people, for the model class it's sent for: from
+      # A trigger's name for people, for the model class it's sent for: from
       # describe, the nuntius.events.<model>.<event> translation, the model's
-      # state machine event (activerecord.state_machines.<model>.events.<event>),
-      # or the event itself
+      # state (activerecord.state_machines.<model>.states.<state>), the life
+      # cycle's (nuntius.life_cycle.<created>), a state machine event's (old
+      # templates), or the name itself
       #
       # A timestamp's events read "<timestamp> is in" and "<timestamp> was",
       # by the timestamp's describe or human_attribute_name.
@@ -277,6 +279,8 @@ module Nuntius
 
         key = model.respond_to?(:model_name) ? model.model_name.i18n_key : class_name.to_s.underscore
         I18n.t(event, scope: [:nuntius, :events, key], default: nil) ||
+          state_label(model, event) ||
+          I18n.t(event, scope: [:nuntius, :life_cycle], default: nil) ||
           state_machine_event_label(model, event) ||
           event.to_s.humanize(capitalize: false)
       end
@@ -333,6 +337,17 @@ module Nuntius
       def described_label(name)
         label = event_descriptions.dig(name.to_sym, :label)
         label.respond_to?(:call) ? label.call : label
+      end
+
+      # A state's name (activerecord.state_machines.<model>.states.<state>)
+      def state_label(model, state)
+        return unless model.is_a?(Class) && Triggers.states(model).include?(state.to_sym)
+
+        model.state_machines.each_value do |machine|
+          found = machine.states[state.to_sym]
+          return found.human_name(model) if found
+        end
+        nil
       end
 
       def state_machine_event_label(model, event)

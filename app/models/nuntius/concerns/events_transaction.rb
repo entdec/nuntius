@@ -1,27 +1,26 @@
 module Nuntius
   module Concerns
+    # nuntiable use_state_machine: true: a transition sends the templates for
+    # the state it goes to (Triggers), once its transaction commits. It's
+    # recorded in the transaction (Nuntius::Event), so a rollback takes it
+    # along; a transition that stays in its state sends nothing.
     module EventsTransaction
       extend ActiveSupport::Concern
 
       included do
-        state_machine.events.map(&:name)
-          .reject { |event_name| messenger.method_defined?(event_name) }
-          .each do |event_name|
-          messenger.send(:define_method, event_name) { |object, options = {}| }
-        end
-
         state_machine do
           after_transition any => any do |object, transition|
-            if object.persisted? && Nuntius.templates?(object, transition.event)
-              Nuntius::Event.find_or_create_by!(
-                transitionable_type: object.class.name,
-                transitionable_id: object.id,
-                transition_event: transition.event.to_s,
-                transition_attribute: transition.attribute.to_s
-              ) do |event|
-                event.transition_from = transition.from.to_s
-                event.transition_to = transition.to.to_s
-              end
+            next if transition.loopback? || !object.persisted?
+            next unless Nuntius.templates?(object, transition.to_name)
+
+            Nuntius::Event.find_or_create_by!(
+              transitionable_type: object.class.name,
+              transitionable_id: object.id,
+              transition_to: transition.to.to_s,
+              transition_attribute: transition.attribute.to_s
+            ) do |event|
+              event.transition_event = transition.event.to_s
+              event.transition_from = transition.from.to_s
             end
           end
         end
@@ -32,16 +31,14 @@ module Nuntius
       def dispatch_nuntius_events
         Nuntius::Event
           .where(transitionable_type: self.class.name, transitionable_id: id)
-          .includes(:transitionable)
-          .select(:transition_event, :transition_attribute, :transitionable_type, :transitionable_id).distinct.each do |event|
+          .select(:transition_to, :transition_attribute).distinct.each do |event|
           # Claim the events before dispatching: another commit of this object, in this process or
           # another, may be dispatching them as well, and only the one that deletes them sends
           claimed = Nuntius::Event.where(transitionable_type: self.class.name, transitionable_id: id,
-            transition_event: event.transition_event.to_s,
-            transition_attribute: event.transition_attribute).delete_all
+            transition_to: event.transition_to.to_s, transition_attribute: event.transition_attribute).delete_all
           next if claimed.zero?
 
-          Nuntius.event(event.transition_event.to_sym, event.transitionable)
+          Nuntius.fire(event.transition_to.to_sym, self)
         end
       end
     end

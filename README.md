@@ -134,12 +134,19 @@ class CarMessenger < Nuntius::BaseMessenger
 end
 ```
 
-If you are using the state_machines-activemodel gem you can pass use_state_machine: true to the
-nuntiable call, this will automatically define empty methods for these events on the model's
-messenger class if they are not defined already.
+### Triggers
 
-Additionally the use_state_machine option will add an after_commit hook to the state machine
-to automatically trigger the event for the state transition.
+Templates are sent on a trigger of their object, named for what it is or what happened to it:
+
+- with the state_machines-activemodel gem, `nuntiable use_state_machine: true`: each state its events
+  go to. A template for Order on `shipped` is sent when an order goes to shipped, whichever event took
+  it there, once the transaction commits. A transition that stays in its state sends nothing;
+- `nuntiable life_cycle: true`: `created`, `updated`, `saved` (either) and `destroyed`;
+- its own, fired by name (see [With templates](#with-templates)), declared so templates can choose them:
+  `nuntiable triggers: %i[reminded]`, or by a messenger's methods;
+- before and after its dates and times (see [Timebased events](#timebased-events)).
+
+Name your own for what happened, as the states are: `reminded`, not `remind`.
 
 ### Accounts
 
@@ -257,22 +264,26 @@ How the pages look is your app's too, see [Admin pages](#admin-pages).
 
 ### With templates
 
-Usually you would call Nuntius programatically with code by using Templates. In this case you would use for example:
+States and the life cycle send their templates themselves. A trigger of the object's own is fired by name:
 
 ```ruby
- Nuntius.event(:your_event, car)
+Nuntius.fire(:reminded, car)
 ```
 
 When custom events are enabled you can also do the following:
 
 ```ruby
- Nuntius.event('shipped', { shipped: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
+Nuntius.fire(:shipped, {shipped: {to: "test@example.com", ref: "Test-123"}}, attachments: [{url: "https://example.com"}])
 ```
+
+`Nuntius.event` is deprecated: it fires a state machine event as the one state it goes to (`ship` as
+`shipped`), and fails for one that goes to several states or stays where it is; Nuntius 1's life cycle
+events (`create`) by their names now (`created`).
 
 For the above cases you need to define templates, this is done with the maintenace pages under
 /messaging/admin/templates (/messaging is whatever you have defined in your routes file).
 
-When an event is fired a message is sent for every matching template of the account it's sent for (see
+When a trigger is fired a message is sent for every matching template of the account it's sent for (see
 [Accounts](#accounts)). To send different messages under different circumstances you can specify a
 template_scope on the messenger class, a scope on the templates given the nuntiable object, that
 narrows down which templates are used:
@@ -293,12 +304,12 @@ Dear {{ to.name }},
 
 Drops without an address for the transport are left out.
 
-### Naming events
+### Naming triggers
 
-The template form reads as a sentence: *Send via [Email] based on [an event] on [Order] [shipped]*,
+The template form reads as a sentence: *Send via [Email] based on [a trigger] on [Order] [shipped]*,
 or based on [a time] (see [Timebased events](#timebased-events)). The object is
 its model's `model_name.human`, the transports are in alphabetical order (new templates send by mail),
-and an event's name comes from the first of:
+and a trigger's name comes from the first of:
 
 1. the messenger's `describe`:
 
@@ -315,15 +326,15 @@ and an event's name comes from the first of:
      nuntius:
        events:
          order:
-           ship: is verzonden
+           reminded: herinnerd
            after_shipped: na verzending
    ```
 
-3. the state machine's own name for the event, `activerecord.state_machines.<model>.events.<event>`
-   (from state_machines' translations), for the events of `nuntiable use_state_machine: true`;
-4. the event itself, `after shipped`.
+3. the state's own name, `activerecord.state_machines.<model>.states.<state>` (from state_machines'
+   translations), for `nuntiable use_state_machine: true`; the life cycle's, `nuntius.life_cycle.<created>`;
+4. the trigger itself, `after shipped`.
 
-Name an event for how it reads after the object: "on Order *shipped*". The transports' names are
+Name a trigger for how it reads after the object: "on Order *shipped*". The transports' names are
 `nuntius.transports.<transport>`.
 
 ### Timebased events
@@ -516,7 +527,7 @@ Here we still need a nuntiable object, in case provider settings can differ from
 You can also define custom events, which take a scope and an event name:
 
 ```ruby
-Nuntius.event('packed', packing: {smurrefluts: 'hatseflats'})
+Nuntius.fire(:packed, packing: {smurrefluts: "hatseflats"})
 ```
 
 The main key of the hash passed will also be the liquid variable.

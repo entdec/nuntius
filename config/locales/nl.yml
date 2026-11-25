@@ -41,7 +41,7 @@ nl:
       nuntius/template:
         description: Omschrijving
         enabled: Ingeschakeld
-        event: Gebeurtenis
+        event: Trigger
         from: Van
         layout_name: Layout
         global: Globaal
@@ -90,8 +90,13 @@ nl:
       templates:
         new: Nieuw sjabloon
   nuntius:
+    life_cycle:
+      created: aangemaakt
+      updated: gewijzigd
+      saved: opgeslagen
+      destroyed: verwijderd
     based_on:
-      event: een gebeurtenis
+      event: een trigger
       time: een tijd
       on_demand: op verzoek
     directions:
@@ -135,7 +140,7 @@ nl:
       invalid_locale: "%{locale} is niet een van de talen"
       taken: "%{key} is deel van de sleutel van een andere vertaling"
     templates:
-      custom: Eigen gebeurtenis
+      custom: Eigen trigger
     tables:
       campaigns:
         views:

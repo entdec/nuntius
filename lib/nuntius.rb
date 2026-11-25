@@ -10,6 +10,7 @@ require "nuntius/mail_allow_list"
 require "nuntius/account_backfill"
 require "nuntius/page_action"
 require "nuntius/page"
+require "nuntius/triggers"
 
 module Nuntius
   extend Configurable
@@ -20,29 +21,61 @@ module Nuntius
 
   class << self
     #
-    # Fires an event for use with templates with the object
+    # Sends the templates for a trigger of the object: a state it went to, a
+    # life cycle's (created, updated, saved, destroyed), or one of its own
+    # (see Triggers), named for what happened:
     #
-    # Nuntius.event(:your_event, car)
+    #   Nuntius.fire(:reminded, order)
     #
-    # When custom events are enabled you can also do the following:
+    # For a hash, a custom trigger (templates of class Custom, on
+    # shipped#shipped):
     #
-    # Nuntius.event('shipped', { shipped: { to: 'test@example.com', ref: 'Test-123'} }, attachments: [ { url: 'http://example.com' } ])
+    #   Nuntius.fire(:shipped, {shipped: {to: "test@example.com", ref: "Test-123"}}, attachments: [{url: "https://example.com"}])
     #
-    def event(event, obj, params = {})
-      return unless event
+    def fire(name, obj, params = {})
+      return unless name
       return unless obj.is_a?(Hash) || obj.nuntiable?
-      return unless templates?(obj, event)
+      return unless templates?(obj, name)
 
-      params = (Nuntius.config.default_params(event, obj) || {}).merge(params)
+      params = (Nuntius.config.default_params(name, obj) || {}).merge(params)
       options = params[:options] || {}
 
       if options[:perform_now] == true
-        Nuntius::MessengerJob.perform_now(obj, event.to_s, params)
+        Nuntius::MessengerJob.perform_now(obj, name.to_s, params)
       else
         job = Nuntius::MessengerJob
         job.set(wait: options[:wait]) if options[:wait]
-        job.perform_later(obj, event.to_s, params)
+        job.perform_later(obj, name.to_s, params)
       end
+    end
+
+    # Deprecated: Nuntius.fire, by the trigger's name. A state machine event
+    # is sent as the one state it goes to (ship as shipped), and fails when it
+    # goes to several or stays where it is; Nuntius 1's life cycle events as
+    # their names now (create as created).
+    def event(event, obj, params = {})
+      return unless event
+
+      name = trigger_for_event(event, obj)
+      Nuntius::Deprecator.new.deprecation_warning("Nuntius.event", "Nuntius.fire(:#{name}, …): triggers are named for what happened, a state rather than its event")
+      fire(name, obj, params)
+    end
+
+    # What Nuntius.event's event is now
+    def trigger_for_event(event, obj)
+      return event if obj.is_a?(Hash)
+
+      model = obj.class
+      return event if Triggers.for(model).include?(event.to_sym) || BaseMessenger.messenger_for_obj(obj).method_defined?(event.to_sym)
+      return Triggers::OLD_LIFE_CYCLE[event.to_sym] if Triggers::OLD_LIFE_CYCLE.key?(event.to_sym)
+
+      state_event = Triggers.state_machine_event(model, event)
+      return event unless state_event
+
+      targets = Triggers.targets(state_event)
+      raise ArgumentError, "Nuntius.event(:#{event}): #{model.name}'s event #{event} goes to #{targets.any? ? "several states (#{targets.join(", ")})" : "no other state"}; fire a trigger of its own by name instead" unless targets.one?
+
+      targets.first
     end
 
     def active_storage_enabled?
@@ -51,7 +84,7 @@ module Nuntius
 
     def templates?(obj, event)
       messenger = Nuntius::BaseMessenger.messenger_for_obj(obj).new(obj, event)
-      return false unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym)
+      return false unless messenger.is_a?(Nuntius::CustomMessenger) || messenger.respond_to?(event.to_sym) || Triggers.for(obj.class).include?(event.to_sym)
 
       result = messenger.call
       return false if result == false

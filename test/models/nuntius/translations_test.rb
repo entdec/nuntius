@@ -100,11 +100,11 @@ module Nuntius
 
     test "a layout's keys are its templates' and campaigns'" do
       layout = Layout.new(name: "Slimme Groep")
-      template = Template.new(layout: layout, klass: "User", event: "activate", transport: "mail", description: "Welcome")
+      template = Template.new(layout: layout, klass: "User", event: "active", transport: "mail", description: "Welcome")
       campaign = Campaign.new(layout: layout)
 
       assert_equal "slimme_groep", layout.translation_scope
-      assert_equal "slimme_groep.user.activate.mail.welcome", template.translation_scope
+      assert_equal "slimme_groep.user.active.mail.welcome", template.translation_scope
       assert_equal "slimme_groep", campaign.translation_scope
     end
 

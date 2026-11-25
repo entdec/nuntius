@@ -39,7 +39,7 @@ class Nuntius::Test < ActiveSupport::TestCase
 
   test "messenger for superclass" do
     assert_nothing_raised do
-      Nuntius.event(:created, StiChild.create)
+      Nuntius.fire(:created, StiChild.create)
     end
   end
 
@@ -52,6 +52,6 @@ class Nuntius::Test < ActiveSupport::TestCase
 
   test "returns whether there are templates" do
     user = User.create!(name: "test", email: "test@example.com")
-    assert Nuntius.templates?(user, :create)
+    assert Nuntius.templates?(user, :created)
   end
 end

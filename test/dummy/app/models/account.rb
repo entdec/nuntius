@@ -15,14 +15,14 @@ class Account < ApplicationRecord
   private
 
   def send_create
-    Nuntius.event(:created, self)
+    Nuntius.fire(:created, self)
   end
 
   def send_update
-    Nuntius.event(:updated, self)
+    Nuntius.fire(:updated, self)
   end
 
   def send_destroy
-    Nuntius.event(:detroyed, self)
+    Nuntius.fire(:destroyed, self)
   end
 end

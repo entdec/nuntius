@@ -48,7 +48,7 @@ module Nuntius
 
     test "delivering a mail to multiple recipients with translations should work" do
       perform_enqueued_jobs(only: [Nuntius::TransportDeliveryJob, Nuntius::MessengerJob]) do
-        Nuntius.event(:translationtest, accounts(:one), locale: "nl")
+        Nuntius.fire(:translationtest, accounts(:one), locale: "nl")
       end
       assert_performed_jobs 3
 
