@@ -46,11 +46,18 @@ fi
 # The commands of a repository's bin/de, also listed by the de repository's help
 usage_commands() {
   cat <<'EOF'
-  new <branch> [folder] [--from <ref>] [--no-trust]
+  new <branch> [folder] [--from <ref>] [--copy-data[=<services>]]
+      [--copy-data-from <checkout>] [--yes] [--no-trust]
                      Create a worktree for a branch (next to the main checkout
                      as <repository>-<branch> unless a folder is given) and
                      start its environment. New branches start from the
                      default branch, or from --from. --no-trust as for up.
+                     --copy-data starts it with a copy of the volumes of the
+                     environment it branches off (an existing branch: this
+                     checkout's, or --copy-data-from's), of every service but
+                     app or the listed ones, e.g. --copy-data=postgres,redis.
+                     Those services are stopped during the copy, after
+                     confirming, or right away with --yes.
   up [--rebuild] [--no-trust]
                      Create or start this checkout's environment and prepare
                      its databases. --rebuild recreates the containers after
@@ -58,7 +65,35 @@ usage_commands() {
                      checkout's mise config on the host, unless --no-trust.
   exec <command...>  Run a command in this checkout's devcontainer, in the same
                      directory relative to the checkout.
+  kamal <arguments>  Run the checkout's bin/kamal in its devcontainer, with
+                     a Docker config of its own (~/.docker-kamal there): its
+                     logins are stored in it, not by the credential helper
+                     VS Code puts in ~/.docker/config.json, which only works
+                     while VS Code is attached.
   status             Show the environment's containers, health and URLs.
+  site [--external | --print | --close] [<subdomain>]
+                     Open the app, https://[<subdomain>.]app.<env>.orb.local
+                     (OrbStack's domain), at SITE_SUBDOMAIN from env.conf
+                     unless one is given: in Orca's browser in an Orca
+                     terminal, else (or with --external) the default
+                     browser. --print prints it. --close then closes the
+                     Orca terminal tab it ran in, as for a quick command.
+  db [--print] [<database>]
+                     Open the development database, as config/database.yml
+                     (read by bin/rails in the container) connects to it, at
+                     OrbStack's domain for its service, e.g.
+                     postgresql://postgres.<env>.orb.local/myapp_development,
+                     in the Mac's app for such URLs, e.g. TablePlus.
+                     <database> picks another one from database.yml than
+                     primary. --print prints the URL.
+  procs [--here] [<mprocs options>]
+                     Run the processes from Procfile.dev in mprocs on this
+                     machine, each through bin/de exec, starting the
+                     environment first if needed. In an Orca terminal in a
+                     new tab of this checkout's worktree, "procs", unless
+                     --here.
+  start [<mprocs options>]
+                     bin/de code, then bin/de procs.
   code [<checkout>]  Open a checkout in VS Code inside its devcontainer,
                      starting it first if needed. <checkout> is a branch,
                      environment name, worktree folder name or a path in
@@ -107,11 +142,14 @@ repository's copy ($DE_ROOT): it sets repositories up, and hands every other
 command to the bin/de of the checkout you're in.
 
 Commands:
-  init [<repository>] [--force]
+  init [<repository>] [--name <name>] [--force]
                      Set up development environments in a repository (default
                      the current one). Repository specific files that already
-                     exist there are kept, unless --force is given.
-  update [<repository>] [--force]
+                     exist there are kept, unless --force is given. --name
+                     sets ENV_REPO, the prefix of its environment names,
+                     default the repository's folder name: needed when two
+                     repositories have folders of the same name.
+  update [<repository>] [--name <name>] [--force]
                      Update a repository's bin/de, and add what's new in the
                      setup, like init but only where it's set up already.
   upgrade            Update this copy of de with a git pull. Then run de
@@ -176,14 +214,25 @@ env_is_persistent_branch() {
 env_name_for() {
   local dir="$1" branch name
   branch="$(git -C "$dir" symbolic-ref --short -q HEAD || true)"
-  if [ -n "$branch" ] && env_is_primary_branch "$branch"; then
-    name="$(env_sanitize "$ENV_REPO")"
-  elif [ -n "$branch" ]; then
-    name="$(env_sanitize "$ENV_REPO-$branch")"
-  else
-    name="$(env_sanitize "$ENV_REPO-detached-$(basename "$dir")")"
+  if [ -n "$branch" ]; then
+    env_name_for_branch "$branch"
+    return
   fi
-  # Compose project names and OrbStack domain labels max out at 63 characters
+  env_name_shorten "$(env_sanitize "$ENV_REPO-detached-$(basename "$dir")")"
+}
+
+# Prints the environment name for a checkout of a branch
+env_name_for_branch() {
+  if env_is_primary_branch "$1"; then
+    env_name_shorten "$(env_sanitize "$ENV_REPO")"
+  else
+    env_name_shorten "$(env_sanitize "$ENV_REPO-$1")"
+  fi
+}
+
+# Compose project names and OrbStack domain labels max out at 63 characters
+env_name_shorten() {
+  local name="$1"
   if [ "${#name}" -gt 63 ]; then
     name="${name:0:54}-$(printf '%s' "$name" | shasum | cut -c1-8)"
   fi
@@ -330,6 +379,136 @@ checkouts() {
     END          { if (path != "") print path "\t" branch }'
 }
 
+# Prints the checkout a branch, environment name, worktree folder name or a
+# path in it names, nothing when none does
+checkout_for() {
+  local path branch
+  while IFS=$'\t' read -r path branch; do
+    [ -d "$path" ] || continue
+    if [ "$1" = "$branch" ] || [ "$1" = "$(basename "$path")" ] || [ "$1" = "$(env_name_for "$path")" ]; then
+      printf '%s' "$path"
+      return
+    fi
+  done < <(checkouts)
+  # Or any folder in a checkout, e.g. the absolute path Orca's "Open in" adds
+  if [ -d "$1" ]; then
+    (cd "$(git -C "$1" rev-parse --show-toplevel)" && pwd -P) || die "$1 is not inside a git checkout"
+  fi
+}
+
+# Lists the checkouts with their environment names, on stderr
+checkouts_print() {
+  local path branch
+  while IFS=$'\t' read -r path branch; do
+    [ -d "$path" ] && printf '  %-40s %-30s %s\n' "$(env_name_for "$path")" "${branch:-(detached)}" "$path" >&2
+  done < <(checkouts)
+}
+
+# --- Copying data -------------------------------------------------------
+
+# Succeeds when service $1 is one of the comma separated services in $2, or
+# with "all", when it's any service but the devcontainer itself (app, whose
+# docker-in-docker volume is a cache)
+copy_data_wants() {
+  if [ "$2" = all ]; then
+    [ "$1" != app ]
+  else
+    [[ ",$2," == *",$1,"* ]]
+  fi
+}
+
+# Finds the named volumes of environment $1 to copy, those of the services $2
+# wants (see copy_data_wants). Sets COPY_VOLUMES ("<volume> <compose volume
+# key> <image>"), and COPY_RUNNING and COPY_RUNNING_SERVICES: the running
+# containers mounting them and their services.
+copy_data_find() {
+  local src="$1" wanted="$2" id service image volume key available="" chosen="" found
+  COPY_VOLUMES=() COPY_RUNNING="" COPY_RUNNING_SERVICES=""
+  for id in $(docker container ls -aq --filter "label=com.docker.compose.project=$src"); do
+    service="$(docker container inspect "$id" --format '{{ index .Config.Labels "com.docker.compose.service" }}')"
+    image="$(docker container inspect "$id" --format '{{ .Config.Image }}')"
+    found=false
+    # Named volumes of this environment only, not anonymous or shared ones
+    for volume in $(docker container inspect "$id" --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ println .Name }}{{ end }}{{ end }}'); do
+      [ "$(docker volume inspect "$volume" --format '{{ index .Labels "com.docker.compose.project" }}')" = "$src" ] || continue
+      key="$(docker volume inspect "$volume" --format '{{ index .Labels "com.docker.compose.volume" }}')"
+      [ -n "$key" ] || continue
+      found=true
+      copy_data_wants "$service" "$wanted" || continue
+      [ "$volume" = "${src}_$key" ] || die "volume $volume of $service has a fixed name, it can't be copied"
+      COPY_VOLUMES+=("$volume $key $image")
+    done
+    $found || continue
+    available="$available $service"
+    copy_data_wants "$service" "$wanted" || continue
+    chosen="$chosen $service "
+    if [ "$(docker container inspect "$id" --format '{{ .State.Running }}')" = true ]; then
+      COPY_RUNNING="$COPY_RUNNING $id"
+      COPY_RUNNING_SERVICES="$COPY_RUNNING_SERVICES $service"
+    fi
+  done
+
+  if [ "$wanted" != all ]; then
+    for service in ${wanted//,/ }; do
+      [[ "$chosen" == *" $service "* ]] ||
+        die "$src has no service $service with a named volume, these have one:${available:- none}"
+    done
+  fi
+  [ "${#COPY_VOLUMES[@]}" -gt 0 ] || die "$src has no data to copy, its services with a named volume:${available:- none}"
+}
+
+# Copies the COPY_VOLUMES of environment $1 into new volumes for the
+# environment of branch $2 in checkout $3, labelled as compose creates them,
+# so bin/de up adopts them and bin/de down removes them. The services using
+# them are stopped meanwhile, so e.g. postgres's files are consistent, and
+# started again afterwards, also when the copy fails.
+copy_data() {
+  local src="$1" branch="$2" path="$3" target kind=ephemeral entry volume key image
+  target="$(env_name_for_branch "$branch")"
+  env_is_persistent_branch "$branch" && kind=persistent
+
+  if [ -n "$COPY_RUNNING" ]; then
+    log "Stopping$COPY_RUNNING_SERVICES of $src for the copy"
+    # shellcheck disable=SC2086
+    run docker container stop $COPY_RUNNING >/dev/null
+    # shellcheck disable=SC2064
+    trap "log 'Starting$COPY_RUNNING_SERVICES of $src again'; run docker container start $COPY_RUNNING >/dev/null" EXIT
+  fi
+
+  for entry in "${COPY_VOLUMES[@]}"; do
+    read -r volume key image <<<"$entry"
+    log "Copying $volume to ${target}_$key"
+    run docker volume create \
+      --label "dev.env.name=$target" --label "dev.env.kind=$kind" --label "dev.env.branch=$branch" \
+      --label "dev.env.path=$path" --label "dev.env.gitdir=$ENV_GIT_COMMON_DIR" \
+      --label "com.docker.compose.project=$target" --label "com.docker.compose.volume=$key" \
+      "${target}_$key" >/dev/null
+    run docker run --rm --user 0:0 --entrypoint "" \
+      -v "$volume:/from:ro" -v "${target}_$key:/to" "$image" cp -a /from/. /to/
+    grep -qE "^  $key:" "$path/.devcontainer/docker-compose.yml" ||
+      warn "$branch's docker-compose.yml has no volume $key, the copy isn't used"
+  done
+
+  if [ -n "$COPY_RUNNING" ]; then
+    trap - EXIT
+    log "Starting$COPY_RUNNING_SERVICES of $src again"
+    # shellcheck disable=SC2086
+    run docker container start $COPY_RUNNING >/dev/null
+  fi
+}
+
+# Prints what in a checkout's devcontainer.json keeps bin/de from working,
+# e.g. one kept from before de that starts another compose file, nothing when
+# it's fine
+devcontainer_json_problems() {
+  local file="$1/.devcontainer/devcontainer.json"
+  [ -f "$file" ] || { echo "there's no .devcontainer/devcontainer.json"; return; }
+  grep -q '"dockerComposeFile".*docker-compose\.yml' "$file" ||
+    echo "its \"dockerComposeFile\" isn't docker-compose.yml, so another setup starts"
+  grep -q '"workspaceFolder": *"/workspaces\${localWorkspaceFolder}"' "$file" ||
+    echo "its \"workspaceFolder\" isn't \"/workspaces\${localWorkspaceFolder}\", where docker-compose.yml mounts the checkout"
+}
+
 # --- Commands -----------------------------------------------------------
 
 # Writes the local feature devcontainer.json includes as ./de-host, from
@@ -413,16 +592,23 @@ cmd_initialize() {
 # generic and always updated; the template is repository
 # specific, a starting point that is only copied when missing, or with --force.
 # As de update, the same for a repository that's set up already.
+# The repository's name (ENV_REPO, @REPO@ in the template) is --name, else
+# the ENV_REPO it already has, else its main checkout's folder name.
 cmd_init() {
-  local target="" force=false arg rel src common repo up_command entry
-  local usage_line="usage: de $command [<repository>] [--force]"
-  for arg in "$@"; do
-    case "$arg" in
-      --force) force=true ;;
+  local target="" force=false name="" rel src common repo current up_command entry
+  local usage_line="usage: de $command [<repository>] [--name <name>] [--force]"
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --force) force=true; shift ;;
+      --name) [ "$#" -ge 2 ] || die "$usage_line"; name="$2"; shift 2 ;;
+      --name=*) name="${1#--name=}"; shift ;;
       -*) die "$usage_line" ;;
-      *) [ -z "$target" ] || die "$usage_line"; target="$arg" ;;
+      *) [ -z "$target" ] || die "$usage_line"; target="$1"; shift ;;
     esac
   done
+  if [ -n "$name" ] && [ "$(env_sanitize "$name")" != "$name" ]; then
+    die "--name $name: use lowercase letters, digits and dashes, e.g. $(env_sanitize "$name")"
+  fi
   target="${target:-$PWD}"
   [ -d "$target" ] || die "$target doesn't exist"
   target="$(cd "$(git -C "$target" rev-parse --show-toplevel 2>/dev/null)" && pwd -P)" ||
@@ -432,8 +618,24 @@ cmd_init() {
     die "$target isn't set up yet, run: de init"
   fi
 
-  common="$(cd "$target" && cd "$(git rev-parse --git-common-dir)" && pwd -P)"
-  repo="$(env_sanitize "$(basename "$(dirname "$common")")")"
+  # In a subshell, env.conf is shell and sets more than ENV_REPO
+  current=""
+  if [ -f "$target/.devcontainer/env.conf" ]; then
+    current="$(ENV_REPO="" && source "$target/.devcontainer/env.conf" && printf '%s' "$ENV_REPO")"
+  fi
+  # Renaming would leave environments behind under the old name
+  if [ -n "$name" ] && [ -n "$current" ] && [ "$name" != "$current" ]; then
+    $force || die "$target is named $current already. To rename it, run bin/de down in each of its checkouts, then set ENV_REPO=$name in .devcontainer/env.conf (and \"name\" in devcontainer.json)"
+    warn "renaming $current to $name, environments created as $current are left as they are"
+  fi
+  if [ -n "$name" ]; then
+    repo="$name"
+  elif [ -n "$current" ]; then
+    repo="$current"
+  else
+    common="$(cd "$target" && cd "$(git rev-parse --git-common-dir)" && pwd -P)"
+    repo="$(env_sanitize "$(basename "$(dirname "$common")")")"
+  fi
   if [ -d "$target/test/dummy" ] && [ -x "$target/bin/rails" ]; then
     up_command="env RAILS_ENV=test bin/rails app:db:prepare"
   elif [ -x "$target/bin/rails" ]; then
@@ -472,6 +674,9 @@ cmd_init() {
     sed -i '' -e "s|@REPO@|$repo|g" -e "s|@UP_COMMAND@|$up_command|g" "$target/$rel"
   done < <(cd "$DE_TEMPLATE" && find . -type f | sort)
 
+  devcontainer_json_problems "$target" | while IFS= read -r problem; do
+    warn ".devcontainer/devcontainer.json: $problem. Change it as in $DE_TEMPLATE/.devcontainer/devcontainer.json, or replace it with --force"
+  done
   if ! grep -q '"\./de-host"' "$target/.devcontainer/devcontainer.json"; then
     warn "add \"./de-host\": {} to the features in .devcontainer/devcontainer.json, for your own tools from $DE_CONFIG"
   fi
@@ -529,11 +734,17 @@ cmd_upgrade() {
 }
 
 cmd_new() {
-  local branch="" folder="" from="" file dest up_args=()
-  local usage_line="usage: bin/de new <branch> [folder] [--from <ref>] [--no-trust]"
+  local branch="" folder="" from="" file dest up_args=() existing=false
+  local copy="" copy_from="" yes=false source="" source_name="" target_name path checkout_branch answer
+  local usage_line="usage: bin/de new <branch> [folder] [--from <ref>] [--copy-data[=<services>]] [--copy-data-from <checkout>] [--yes] [--no-trust]"
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --from) [ "$#" -ge 2 ] || die "$usage_line"; from="$2"; shift 2 ;;
+      --copy-data) copy=all; shift ;;
+      --copy-data=*) copy="${1#--copy-data=}"; [ -n "$copy" ] || die "$usage_line"; shift ;;
+      --copy-data-from) [ "$#" -ge 2 ] || die "$usage_line"; copy_from="$2"; shift 2 ;;
+      --copy-data-from=*) copy_from="${1#--copy-data-from=}"; shift ;;
+      --yes | -y) yes=true; shift ;;
       --no-trust) up_args+=(--no-trust); shift ;;
       -*) die "$usage_line" ;;
       *)
@@ -547,22 +758,74 @@ cmd_new() {
   done
   [ -n "$branch" ] || die "$usage_line"
   git check-ref-format --branch "$branch" >/dev/null || die "$branch isn't a valid branch name"
+  [ -n "$copy_from" ] && [ -z "$copy" ] && copy=all
 
   [ -n "$folder" ] || folder="$(dirname "$ENV_MAIN_CHECKOUT")/$(env_sanitize "$ENV_REPO-$branch")"
   [ -e "$folder" ] && die "$folder already exists"
 
+  if git -C "$ENV_PATH" show-ref --verify --quiet "refs/heads/$branch" ||
+    [ -n "$(git -C "$ENV_PATH" for-each-ref --format='%(refname)' "refs/remotes/*/$branch")" ]; then
+    existing=true
+  elif [ -z "$from" ]; then
+    from="$(git -C "$ENV_PATH" symbolic-ref --quiet --short refs/remotes/origin/HEAD || echo HEAD)"
+    # Prefer the local branch when there is one, e.g. main over origin/main
+    git -C "$ENV_PATH" show-ref --verify --quiet "refs/heads/${from#origin/}" && from="${from#origin/}"
+  fi
+
+  # Everything about the copy is checked before the worktree is created.
+  # The data comes from the checkout of the branch the new one starts from,
+  # or for an existing branch, from this checkout.
+  if [ -n "$copy" ]; then
+    if [ -n "$copy_from" ]; then
+      source="$(checkout_for "$copy_from")"
+      if [ -z "$source" ]; then
+        warn "no checkout of $ENV_REPO matches $copy_from, these exist:"
+        checkouts_print
+        die "nothing created"
+      fi
+    elif $existing || [ "$from" = HEAD ]; then
+      source="$ENV_PATH"
+    else
+      while IFS=$'\t' read -r path checkout_branch; do
+        if [ -d "$path" ] && [ -n "$checkout_branch" ] &&
+          { [ "$from" = "$checkout_branch" ] || [ "$from" = "origin/$checkout_branch" ]; }; then
+          source="$path"
+          break
+        fi
+      done < <(checkouts)
+      [ -n "$source" ] || die "$from isn't checked out, so it has no environment to copy data from. Pick one with --copy-data-from <checkout>"
+    fi
+    source_name="$(env_name_for "$source")"
+    target_name="$(env_name_for_branch "$branch")"
+    [ "$source_name" != "$target_name" ] || die "$branch's environment is $source_name itself, nothing to copy"
+    [ -n "$(docker container ls -aq --filter "label=com.docker.compose.project=$source_name")" ] ||
+      die "$source_name has no environment to copy data from, start it with bin/de up in $source"
+    [ -z "$(docker volume ls -q --filter "label=com.docker.compose.project=$target_name")" ] ||
+      die "$target_name has volumes already, remove them first, e.g. with bin/de prune"
+    copy_data_find "$source_name" "$copy"
+
+    log "Copying data from $source_name ($source) to $target_name:"
+    printf '  %s\n' "${COPY_VOLUMES[@]%% *}" >&2
+    if [ -n "$COPY_RUNNING" ] && ! $yes; then
+      [ -t 0 ] || die "pass --yes to stop$COPY_RUNNING_SERVICES of $source_name for the copy without a terminal"
+      read -r -p "This stops$COPY_RUNNING_SERVICES of $source_name during the copy, then starts them again. Continue? [y/N] " answer
+      [ "$answer" = y ] || [ "$answer" = Y ] || die "nothing created"
+    fi
+  fi
+
+  # A worktree whose folder was removed without git stays registered, and
+  # keeps its branch checked out, until git prunes it. Only git's records
+  # go, the environment stays for bin/de up to reuse or bin/de prune.
+  if [ -n "$(git -C "$ENV_PATH" worktree prune --dry-run 2>&1)" ]; then
+    log "Pruning worktrees whose folder is gone"
+    run git -C "$ENV_PATH" worktree prune --verbose
+  fi
+
   log "Creating worktree $folder for $branch"
-  if git -C "$ENV_PATH" show-ref --verify --quiet "refs/heads/$branch"; then
-    run git -C "$ENV_PATH" worktree add "$folder" "$branch"
-  elif [ -n "$(git -C "$ENV_PATH" for-each-ref --format='%(refname)' "refs/remotes/*/$branch")" ]; then
-    # Creates a local branch tracking the remote one
+  if $existing; then
+    # Creates a local branch tracking the remote one, when there's only that
     run git -C "$ENV_PATH" worktree add "$folder" "$branch"
   else
-    if [ -z "$from" ]; then
-      from="$(git -C "$ENV_PATH" symbolic-ref --quiet --short refs/remotes/origin/HEAD || echo HEAD)"
-      # Prefer the local branch when there is one, e.g. main over origin/main
-      git -C "$ENV_PATH" show-ref --verify --quiet "refs/heads/${from#origin/}" && from="${from#origin/}"
-    fi
     run git -C "$ENV_PATH" worktree add -b "$branch" "$folder" "$from"
   fi
   folder="$(cd "$folder" && pwd -P)"
@@ -584,6 +847,7 @@ cmd_new() {
     warn "$branch's bin/de doesn't support --no-trust, it won't trust mise config anyway"
     up_args=()
   fi
+  [ -z "$copy" ] || copy_data "$source_name" "$branch" "$folder"
   run "$folder/bin/de" up ${up_args[@]+"${up_args[@]}"}
 
   cat <<EOF
@@ -598,7 +862,7 @@ EOF
 }
 
 cmd_up() {
-  local up_args=() trust=true arg other entry health deadline
+  local up_args=() trust=true arg other entry health deadline problems
   for arg in "$@"; do
     case "$arg" in
       --rebuild) up_args=(--remove-existing-container) ;;
@@ -608,6 +872,9 @@ cmd_up() {
   done
 
   log "Environment $ENV_NAME ($ENV_KIND, branch ${ENV_BRANCH:-detached}) for $ENV_PATH"
+
+  problems="$(devcontainer_json_problems "$ENV_PATH")"
+  [ -z "$problems" ] || die ".devcontainer/devcontainer.json doesn't fit bin/de:"$'\n'"$(sed 's/^/  /' <<<"$problems")"$'\n'"Change it as in the de repository's template/.devcontainer/devcontainer.json"
 
   # Share nothing: refuse to adopt another checkout's resources
   other="$(env_label "$ENV_NAME" dev.env.path)"
@@ -696,6 +963,22 @@ cmd_exec() {
     bash -c 'cd "$1" && shift && PATH="$HOME/.local/bin:$PATH" exec mise exec -- "$@"' de-exec "$dir" "$@"
 }
 
+# bin/kamal in the devcontainer, with DOCKER_CONFIG ~/.docker-kamal: the
+# config.json there stores Kamal's logins itself, as ~/.docker/config.json's
+# credsStore (VS Code's Dev Containers sets one) only works while VS Code is
+# attached. Its buildx and contexts are ~/.docker's, so Kamal's builders stay.
+cmd_kamal() {
+  [ -x "$ENV_PATH/bin/kamal" ] || die "$ENV_PATH has no bin/kamal"
+  cmd_exec bash -c '
+    kamal="$1" && shift
+    config="$HOME/.docker-kamal"
+    mkdir -p "$config" "$HOME/.docker/buildx" "$HOME/.docker/contexts"
+    ln -sfn "$HOME/.docker/buildx" "$config/buildx"
+    ln -sfn "$HOME/.docker/contexts" "$config/contexts"
+    DOCKER_CONFIG="$config" exec "$kamal" "$@"
+  ' de-kamal "$ENV_PATH_IN_CONTAINER/bin/kamal" "$@"
+}
+
 cmd_status() {
   local ids id service port
   [ "$#" -eq 0 ] || die "usage: bin/de status"
@@ -735,33 +1018,234 @@ EOF
   run docker network ls --filter "label=dev.env.name=$ENV_NAME"
 }
 
+# Prints Orca's CLI when running in Orca: an agent's shell has
+# ORCA_CLI_COMMAND, a terminal tab only ORCA_CLI_BIN_DIR
+orca_cli() {
+  if [ -n "${ORCA_CLI_COMMAND:-}" ]; then
+    echo "$ORCA_CLI_COMMAND"
+  elif [ -n "${ORCA_CLI_BIN_DIR:-}" ] && [ -x "$ORCA_CLI_BIN_DIR/orca" ]; then
+    echo "$ORCA_CLI_BIN_DIR/orca"
+  else
+    return 1
+  fi
+}
+
+# Opens the app at OrbStack's domain for its container, over https. In an
+# Orca terminal (orca_cli) in Orca's browser, as a tab of this
+# checkout's worktree; else, or with --external, in the default browser.
+# --close closes the Orca terminal tab it ran in (ORCA_TERMINAL_HANDLE) once
+# the site is open, for a quick command, whose tab stays after an exit.
+cmd_site() {
+  local print=false external=false close=false subdomain="${SITE_SUBDOMAIN:-}" url orca
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --print) print=true ;;
+      --external) external=true ;;
+      --close) close=true ;;
+      -*) die "usage: bin/de site [--external | --print | --close] [subdomain]" ;;
+      *) subdomain="$1" ;;
+    esac
+    shift
+  done
+  url="https://${subdomain:+$subdomain.}app.$ENV_NAME.orb.local"
+
+  if $print; then
+    echo "$url"
+    return
+  fi
+  env_running "$ENV_NAME" || die "$ENV_NAME isn't running, start it with bin/de up"
+
+  if ! $external && orca="$(orca_cli)" && "$orca" tab create --url "$url" --worktree "path:$ENV_PATH" --json >/dev/null; then
+    log "Opened $url in Orca"
+  elif command -v open >/dev/null; then
+    open "$url"
+    log "Opened $url"
+  elif command -v xdg-open >/dev/null; then
+    xdg-open "$url"
+    log "Opened $url"
+  else
+    echo "$url"
+    return
+  fi
+
+  if $close && [ -n "${ORCA_TERMINAL_HANDLE:-}" ] && orca="$(orca_cli)"; then
+    "$orca" terminal close --terminal "$ORCA_TERMINAL_HANDLE" --tab --json >/dev/null
+  fi
+}
+
+# Ruby for bin/de db, run by bin/rails runner in the container, so the
+# connection comes from config/database.yml as the app reads it (ERB,
+# DATABASE_URL and all). ARGV: environment name, its label for the
+# connection's name (empty for a primary branch), the database's name in
+# database.yml (empty for primary). Prints DB_URL=<url>, with the host, a
+# compose service, at OrbStack's domain for it, and a color (TablePlus'
+# statusColor) picked by the environment's name.
+DB_URL_RUBY='
+env, label, name = ARGV
+config = if name.to_s.empty?
+  ActiveRecord::Base.connection_db_config
+else
+  ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: name) or
+    abort "no database #{name} in config/database.yml for #{Rails.env}"
+end
+h = config.configuration_hash
+scheme = { "postgresql" => "postgresql", "postgis" => "postgresql", "mysql2" => "mysql", "trilogy" => "mysql" }[config.adapter] or
+  abort "bin/de db does not support the #{config.adapter} adapter"
+host = h[:host].to_s
+if host.empty? || host == "localhost" || host.start_with?("127.", "/")
+  abort "#{config.name} in config/database.yml connects to #{host.empty? ? "a local socket" : host}, not to a service, e.g. host: <%= ENV.fetch(\"DB_HOST\", \"localhost\") %>"
+end
+host = "#{host}.#{env}.orb.local" unless host.include?(".")
+enc = ->(s) { ERB::Util.url_encode(s.to_s) }
+user = h[:username] ? enc[h[:username]] + (h[:password] ? ":#{enc[h[:password]]}" : "") + "@" : ""
+port = h[:port] ? ":#{h[:port]}" : ""
+db = h[:database].to_s
+title = label.to_s.empty? ? db : "#{db} (#{label})"
+# A color of its own per environment, the same every time
+colors = %w[007AFF 34C759 FF9500 AF52DE FF2D55 5AC8FA FFCC00 A2845E 30B0C7 FF3B30]
+color = colors[Zlib.crc32(env) % colors.size]
+query = { name: title, sslmode: (scheme == "postgresql" ? "disable" : nil), statusColor: color }.compact
+puts "DB_URL=#{scheme}://#{user}#{host}#{port}/#{enc[db]}?" + query.map { |k, v| "#{k}=#{enc[v]}" }.join("&")
+'
+
+# Opens the app's database (from config/database.yml, through bin/rails in
+# the container) in the Mac's app for postgresql:// or mysql:// URLs, e.g.
+# TablePlus, at OrbStack's domain for its service. --print prints the URL.
+cmd_db() {
+  local print=false name="" label="" url
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --print) print=true ;;
+      -*) die "usage: bin/de db [--print] [<database>]" ;;
+      *) name="$1" ;;
+    esac
+    shift
+  done
+  [ -x "$ENV_PATH/bin/rails" ] || die "$ENV_PATH has no bin/rails to read config/database.yml with"
+  [ "$ENV_NAME" = "$(env_name_shorten "$(env_sanitize "$ENV_REPO")")" ] || label="$ENV_NAME"
+
+  url="$(cd "$ENV_PATH" && cmd_exec bin/rails runner "$DB_URL_RUBY" "$ENV_NAME" "$label" "$name" | sed -n 's/^DB_URL=//p')"
+  [ -n "$url" ] || die "could not read the database's connection from config/database.yml"
+
+  if $print || ! command -v open >/dev/null; then
+    echo "$url"
+  else
+    open "$url"
+    log "Opened ${url%%\?*}"
+  fi
+}
+
+# In the container, every process of bin/de procs writes its process group
+# to /tmp/de-procs/<name>, see procs_stop_leftovers
+PROCS_WRAPPER='mkdir -p /tmp/de-procs && ps -o pgid= -p $$ | tr -d " " > "/tmp/de-procs/$1" && eval "$2"'
+
+# Stops what's left of bin/de procs' processes in the container: when mprocs
+# quits, the Ctrl-C it types can still be on its way through bin/de exec. As
+# Ctrl-C does, interrupts each process group, then terminates and kills what
+# doesn't stop.
+procs_stop_leftovers() {
+  env_running "$ENV_NAME" || return 0
+  cmd_exec sh -c '
+    cd /tmp/de-procs 2>/dev/null || exit 0
+    left=""
+    for name in *; do
+      [ -f "$name" ] || continue
+      group="$(cat "$name")"
+      rm -f "$name"
+      [ -n "$group" ] && kill -0 "-$group" 2>/dev/null || continue
+      echo "Stopping $name, left running in the container" >&2
+      kill -INT "-$group"
+      left="$left $group"
+    done
+    for signal in TERM KILL; do
+      [ -n "$left" ] || exit 0
+      i=0
+      while [ "$i" -lt 10 ]; do
+        alive=""
+        for group in $left; do kill -0 "-$group" 2>/dev/null && alive="$alive $group"; done
+        [ -n "$alive" ] || exit 0
+        sleep 1
+        i=$((i + 1))
+      done
+      echo "Sending $signal to what is left" >&2
+      for group in $alive; do kill "-$signal" "-$group" 2>/dev/null; done
+      left="$alive"
+    done'
+}
+
+# In an Orca terminal (orca_cli), opens a terminal tab "procs" in
+# this checkout's worktree that runs bin/de procs --here, with the same
+# mprocs options. Fails when Orca can't, so the caller runs it here instead.
+procs_in_orca_tab() {
+  local command arg orca
+  orca="$(orca_cli)" || return 1
+  command="$(printf '%q' "$ENV_PATH/bin/de") procs --here"
+  for arg in "$@"; do command+=" $(printf '%q' "$arg")"; done
+  "$orca" terminal create --worktree "path:$ENV_PATH" --title procs \
+    --command "$command" --focus --json >/dev/null
+}
+
+# mprocs gives every process its own terminal, which bin/de exec passes on
+# into the container. Stopping a process types Ctrl-C into that terminal:
+# a signal would only stop bin/de exec here, and leave the process running
+# in the container. PORT defaults to 3000, as bin/dev sets it.
+cmd_procs() {
+  local procfile="" file config status=0 here=false
+  if [ "${1:-}" = --here ]; then here=true; shift; fi
+  command -v mprocs >/dev/null 2>&1 || die "bin/de procs needs mprocs: brew install mprocs"
+  for file in Procfile.dev Procfile; do
+    if [ -f "$ENV_PATH/$file" ]; then procfile="$file"; break; fi
+  done
+  [ -n "$procfile" ] || die "$ENV_PATH has no Procfile.dev"
+
+  if ! env_running "$ENV_NAME"; then
+    log "Environment $ENV_NAME isn't running, starting it"
+    "$ENV_PATH/bin/de" up || die "bin/de up failed"
+  fi
+
+  if ! $here && orca_cli >/dev/null; then
+    if procs_in_orca_tab "$@"; then
+      log "Running $procfile in mprocs in Orca's terminal tab procs"
+      return
+    fi
+    warn "Orca couldn't open a terminal tab, running $procfile here"
+  fi
+
+  # mprocs reads a config as YAML or JSON by its extension
+  config="$(mktemp -d -t de-procs)/mprocs.json"
+  jq -R -s --arg de "$ENV_PATH/bin/de" --arg cwd "$ENV_PATH" --arg port "${PORT:-3000}" --arg wrapper "$PROCS_WRAPPER" '{
+      procs: ([split("\n")[] | capture("^(?<name>[A-Za-z0-9_-]+):\\s*(?<command>.+)$")]
+        | map({ key: .name, value: {
+            cmd: [$de, "exec", "env", "PORT=\($port)", "sh", "-c", $wrapper, "de-procs", .name, .command],
+            cwd: $cwd,
+            stop: { "send-keys": ["<C-c>"] }
+          } })
+        | from_entries)
+    }' "$ENV_PATH/$procfile" > "$config"
+  log "Running $procfile in mprocs"
+  mprocs --config "$config" "$@" || status=$?
+  rm -rf "$(dirname "$config")"
+  procs_stop_leftovers
+  return "$status"
+}
+
+cmd_start() {
+  cmd_code
+  cmd_procs "$@"
+}
+
 # Runs `code` (CODE to override, e.g. CODE=cursor) with the dev container URI
 # itself: vscli resolves ${localWorkspaceFolder} in devcontainer.json to
 # /workspaces/<folder name> instead of the host path.
 cmd_code() {
-  local target="$ENV_PATH" path branch name host_hex
+  local target="$ENV_PATH" name host_hex
   if [ "$#" -gt 1 ]; then
     die "usage: bin/de code [branch | environment | folder | path]"
   elif [ "$#" -eq 1 ]; then
-    target=""
-    while IFS=$'\t' read -r path branch; do
-      [ -d "$path" ] || continue
-      if [ "$1" = "$branch" ] || [ "$1" = "$(basename "$path")" ] || [ "$1" = "$(env_name_for "$path")" ]; then
-        target="$path"
-        break
-      fi
-    done < <(checkouts)
-    # Or any folder in a checkout, e.g. the absolute path Orca's "Open in" adds
-    if [ -z "$target" ] && [ -d "$1" ]; then
-      target="$(cd "$(git -C "$1" rev-parse --show-toplevel)" && pwd -P)" ||
-        die "$1 is not inside a git checkout"
-    fi
-
+    target="$(checkout_for "$1")"
     if [ -z "$target" ]; then
       warn "no checkout of $ENV_REPO matches $1, these exist:"
-      while IFS=$'\t' read -r path branch; do
-        [ -d "$path" ] && printf '  %-40s %-30s %s\n' "$(env_name_for "$path")" "${branch:-(detached)}" "$path" >&2
-      done < <(checkouts)
+      checkouts_print
       die "create one with: bin/de new $1"
     fi
   fi
@@ -890,9 +1374,10 @@ if [ -n "$DE_TEMPLATE" ]; then
     init | update) cmd_init "$@"; exit ;;
     upgrade) cmd_upgrade "$@"; exit ;;
   esac
-  # `code <folder>` (Orca's "Open in" runs it from /) opens the checkout that
-  # folder is in, from inside it, so a checkout's older bin/de handles it too
-  if [ "$command" = code ] && [ "$#" -eq 1 ] && [ -d "$1" ]; then
+  # `code <folder>`, `db <folder>` or `site <folder>` (Orca's "Open in" runs
+  # it from /, adding the worktree's path) is for the checkout that folder is
+  # in, run from inside it, so a checkout's older bin/de handles it too
+  if [[ "$command" =~ ^(code|db|site)$ ]] && [ "$#" -eq 1 ] && [ -d "$1" ]; then
     cd "$1"
     shift
   fi
@@ -905,7 +1390,7 @@ fi
 
 case "$command" in
   help | -h | --help) usage; exit ;;
-  initialize | new | up | exec | status | code | down | prune) ;;
+  initialize | new | up | exec | kamal | status | site | db | procs | start | code | down | prune) ;;
   init | update | upgrade) die "run de $command from the de repository, which bin/de comes from" ;;
   *) usage >&2; die "unknown command: $command" ;;
 esac

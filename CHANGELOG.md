@@ -10,6 +10,8 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 - The email kit is Nuntius' own (`app/javascript/nuntius/email`), no longer TessEdit's: the email, its MJML, its Wrapper, Hero, Social and Navbar blocks, and TessEdit's blocks with their MJML. MJML is compiled with MRML by `Nuntius::Mjml` (the `mrml` gem, a new dependency), which TessEdit's compile endpoint uses as its `mjml` compiler. It needs TessEdit 0.6.
 - Templates sent on demand: neither by an event nor by a time, but by the app when someone asks for it (*Send via [Email] [on demand] for [Contact]*, event `on_demand`). `Template.on_demand` finds them and `template.deliver_to(object)` sends one, returning its messages; `BaseMessenger#dispatch` now returns the messages it sent too, and a message says what sent it with `campaign?`, `on_demand?`, `event_based?` and `time_based?` (its template's, as it is now), for a provider's settings. See [On demand](README.md#on-demand).
+- A model needs no messenger: `nuntiable` works without one, and `Nuntius::DefaultMessenger` sends its templates. Write one only for events of its own or to change which templates are sent.
+- An Attachment block in the email editor attaches a file on the web or what a variable gives, as the `attach` tag. The tag also takes what a drop makes (`{content:, filename:, content_type:}`), lists of files, and nothing, so a drop can give a record's PDF instead of a messenger adding it. See [Attachments](README.md#attachments).
 - Who sends a template can say whom it goes to and from whom instead of its own To and From, in the same forms (addresses, drops, lists of them), and leave its conditions out: `template.deliver_to(object, to: "{{ contract.contact }}", from: "sponsors@example.com", conditions: false)`, for an app whose automations decide whom and when (their steps are the conditions). `BaseMessenger#dispatch` and `Template#new_messages` take them too. See [On demand](README.md#on-demand).
 - `config.tables_readable`: whether the current user may see the admin's tables, which Mensa serves outside the admin's controllers. The tables answer it as `readable?`, for an app that asks a table before serving it. See [Your app's part](README.md#your-apps-part).
 - `config.subscribers_import = false` takes Nuntius' Import of subscribers off a list's page, for an app with its own. See [Your app's part](README.md#your-apps-part).
@@ -104,6 +106,7 @@ Every template, campaign, list, layout, locale and message now belongs to an acc
 
 ### Fixed
 
+- The `attach` tag attaches a URL over http(s) only: `{% attach 'file:///…' %}` in a template's text attached a file of the server, which anyone writing templates in the admin could send themselves. It also no longer fails without a message to attach to (a preview).
 - A state machine event could be sent twice when its object was committed again while the event was being dispatched, for example by a job that attaches a file to it while the messenger still renders its attachments. The events are now claimed before they're dispatched, so only one commit sends them.
 - `Nuntius::CampaignPublishJob` raised instead of publishing the campaigns that were due.
 - An SMS or Voice campaign sent its messages without their text: its text is now rendered for each subscriber.

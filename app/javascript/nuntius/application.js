@@ -9,6 +9,7 @@ import { imageFields } from "tess_edit/core/media"
 import "nuntius/email/kit"
 import content from "nuntius/blocks/content"
 import viewInBrowser from "nuntius/blocks/view_in_browser"
+import attachment from "nuntius/blocks/attachment"
 import subscription from "nuntius/blocks/subscription"
 import nuntiusImage from "nuntius/blocks/image"
 import "nuntius/blocks/email"
@@ -25,7 +26,7 @@ import { registerViewComponents } from "entdec/view_components"
 
 registerCategory({ key: "mailing", label: "Mailing", order: 25 })
 // image replaces TessEdit's own Image block
-;[content, viewInBrowser, subscription, nuntiusImage()].forEach(registerBlock)
+;[content, viewInBrowser, subscription, attachment, nuntiusImage()].forEach(registerBlock)
 // and the email's other blocks with images (backgrounds) refer to uploads by name
 blockTypes()
   .map(getBlock)

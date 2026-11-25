@@ -115,7 +115,12 @@ class Car < ApplicationRecord
 end
 ```
 
-Additionally you need to define an extension of the Nuntius::BaseMessenger for the same model with a matching name (in app/messengers). Messengers can set extra parameters, but also manipulate templates selected.
+A messenger is optional. Without one, `Nuntius::DefaultMessenger` sends the model's templates: on its
+state machine's and life cycle's events, around its timestamps, and on demand. Attachments come from the
+template itself (see [Attachments](#attachments)), and the account from `config.account_for`.
+
+Define an extension of Nuntius::BaseMessenger for the model with a matching name (in app/messengers) for
+events of its own (a method each), extra parameters, or to manipulate the templates selected:
 
 ```ruby
 class CarMessenger < Nuntius::BaseMessenger
@@ -558,6 +563,31 @@ Images in the editor (Image blocks, and the background images of heroes, section
 The design refers to an uploaded image by its name, which is unique on the layout, template or campaign (a second `logo.png` becomes `logo-2.png`), and the email by Liquid: `{{ 'logo.png' | image_url }}`. The `image_url` filter looks the name up in the template's or campaign's own images, then its layout's, and gives its URL on Nuntius' host for the message (`config.host(message)`), so a design copied to another environment or sent for an account with its own host shows its images from there. Designs from before names still work: their image URLs are left as they are until the design is opened in the editor and saved, which turns them into names.
 
 Images are loaded from Nuntius' host (`config.host`) when the email is opened. An uploaded image in an Image block can be sent with the email instead: turn on **Embed in the email**. That makes emails larger, but the image shows without the reader loading images. Background images are always loaded from their URL, since many mail clients don't show embedded backgrounds.
+
+### Attachments
+
+An email attaches files with an **Attachment** block: a file on the web (an https address), or what a
+variable gives, picked with the variable menu. It renders as the `attach` tag, which you can also write
+yourself, and shows nothing in the email:
+
+```liquid
+{% attach 'https://example.com/terms.pdf' %}
+{% attach order.label convert:'pdf' %}
+{% attach contract.pdf %}
+{% attach invoice.documents %}
+```
+
+A variable can give a stored file (Active Storage, one or many), or what a drop makes, a hash of `content`
+(a string or an IO), `filename` and `content_type`, or a list of those; nothing attaches nothing:
+
+```ruby
+class ContractDrop < ApplicationDrop
+  def pdf = {content: @object.to_pdf, filename: "contract.pdf", content_type: "application/pdf"}
+end
+```
+
+A URL is fetched over http(s) only, never as a file of the server (`file://`): a template's text is written in
+the admin.
 
 ### Embedded images
 

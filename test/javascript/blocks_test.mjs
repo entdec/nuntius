@@ -10,9 +10,10 @@ import { toMjml } from "nuntius/email/mjml"
 import content, { CONTENT_END, CONTENT_START } from "nuntius/blocks/content"
 import viewInBrowser from "nuntius/blocks/view_in_browser"
 import subscription from "nuntius/blocks/subscription"
+import attachment, { attachTag } from "nuntius/blocks/attachment"
 
 registerCategory({ key: "mailing", label: "Mailing", order: 25 })
-;[content, viewInBrowser, subscription].forEach(registerBlock)
+;[content, viewInBrowser, subscription, attachment].forEach(registerBlock)
 
 // A layout: a section, then a Content block holding a section with a column.
 function layout() {
@@ -104,3 +105,29 @@ for (const key of ["basic", "newsletter", "transactional", "empty"]) {
     assert.equal(mjml, readFileSync(file, "utf8"), "run UPDATE_SNAPSHOTS=1 npm test if the change is intended")
   })
 }
+
+test("an Attachment attaches a file on the web or what a variable gives, by Nuntius' attach tag, shown only in the editor", () => {
+  const doc = createDocument("email")
+  const column = insert(doc, doc.id, 0, createFromPalette("section-1")).children[0]
+  const file = insert(doc, column.id, 0, createNode("attachment", { data: { source: "file", url: "https://example.com/terms.pdf" } }))
+  insert(doc, column.id, 1, createNode("attachment", { data: { source: "variable", variable: "contract.pdf" } }))
+
+  const mjml = toMjml(doc)
+  assert.match(mjml, /<mj-raw>\{% attach 'https:\/\/example\.com\/terms\.pdf' %\}<\/mj-raw>/)
+  assert.match(mjml, /<mj-raw>\{% attach contract\.pdf %\}<\/mj-raw>/)
+  assert.doesNotMatch(mjml, /📎/)
+
+  const canvas = toMjml(doc, { editor: true })
+  assert.doesNotMatch(canvas, /\{% attach/)
+  assert.match(canvas, new RegExp(`css-class="tess-${file.id}"[^>]*>📎 Attachment: terms\\.pdf`))
+})
+
+test("an Attachment attaches nothing it can't send: a file not over http(s), a variable that isn't a path, nothing chosen", () => {
+  const tag = (data) => attachTag({ data })
+  assert.equal(tag({ source: "file", url: "file:///etc/passwd" }), "")
+  assert.equal(tag({ source: "file", url: "https://example.com/a.pdf' %}{% evil" }), "")
+  assert.equal(tag({ source: "variable", variable: "contract.pdf %}{{ x" }), "")
+  assert.equal(tag({ source: "variable", variable: "" }), "")
+  assert.equal(tag({ source: "file", url: "" }), "")
+  assert.equal(tag({ source: "variable", variable: " invoice.documents " }), "{% attach invoice.documents %}")
+})

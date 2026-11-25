@@ -145,17 +145,21 @@ module Nuntius
         end
       end
 
+      # The messenger for a class, by its name: its own (<Class>Messenger), its
+      # parent's or grandparent's (an STI class), else DefaultMessenger
       def messenger_for_class(name)
-        klass = messenger_name_for_class(name).safe_constantize
-        klass ||= messenger_name_for_class(name.safe_constantize.superclass).safe_constantize
-        klass ||= messenger_name_for_class(name.safe_constantize.superclass.superclass).safe_constantize
-        klass
+        klass = name.is_a?(Class) ? name : name.to_s.safe_constantize
+        names = [name.to_s]
+        names += [klass.superclass, klass.superclass&.superclass].compact.map(&:name) if klass.is_a?(Class)
+        names.lazy.filter_map { |candidate| messenger_name_for_class(candidate).safe_constantize }.first || DefaultMessenger
       end
 
       def messenger_name_for_class(name)
         "#{name}Messenger"
       end
 
+      # The messenger for an object: CustomMessenger for a hash, else its class's
+      # (messenger_for_class)
       def messenger_for_obj(obj)
         return Nuntius::CustomMessenger if obj.is_a? Hash
 
@@ -165,9 +169,7 @@ module Nuntius
         klass ||= messenger_name_for_obj(obj.class.superclass).safe_constantize
         klass ||= messenger_name_for_obj(obj.class.superclass.superclass).safe_constantize
 
-        raise Nuntius::MissingMessengerException.new(self), "messenger missing for #{obj.class.name}" unless klass
-
-        klass
+        klass || DefaultMessenger
       end
 
       def messenger_name_for_obj(obj)

@@ -15,8 +15,6 @@ module Nuntius
     end
 
     included do
-      raise "Nuntius Messenger has not been implemented for class #{name}" unless messenger
-
       Nuntius.config.add_nuntiable_class(self)
       has_many :messages, as: :nuntiable, class_name: "Nuntius::Message", dependent: :destroy
       has_many :nuntius_subscriptions, as: :nuntiable, class_name: "Nuntius::Subscriber", dependent: :delete_all

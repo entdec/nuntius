@@ -31,7 +31,7 @@ export const kit = registerKit({
     { key: "mobile", icon: "mobile", title: "Mobile", width: "375px" }
   ],
   // The Blocks panel's tiles: TessEdit's and the email's mixed, by category
-  palette: ["section-1", "section-2", "section-3", "section-4", "section-1-2", "section-2-1", "column", "wrapper", "hero", "content", "text", "heading", "image", "button", "divider", "spacer", "social", "navbar", "raw", "loop", "condition", "assign", "table"],
+  palette: ["section-1", "section-2", "section-3", "section-4", "section-1-2", "section-2-1", "column", "wrapper", "hero", "content", "text", "heading", "image", "button", "divider", "spacer", "social", "navbar", "attachment", "raw", "loop", "condition", "assign", "table"],
   previewTitle: "Preview the email as sent, with Liquid tags",
   canvas: (doc, { editor, ...options }) => mjmlCompile(toMjml(doc, { editor }), options),
   async outputs(doc, options) {
