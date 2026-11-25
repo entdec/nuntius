@@ -4,11 +4,13 @@
 # on [Order] [shipped], or based on [a time] when [User] [Born on]
 # [is in] [4] [weeks] [every year]
 class TemplatePresenter < ApplicationPresenter
-  # The classes templates can be sent for, by their names for people.
-  # The template's own class too, when it isn't (or no longer) nuntiable, so
-  # saving keeps it
+  # The classes templates can be sent for, by their names for people, but a
+  # subclass named as its parent (an STI class whose model_name is its
+  # parent's): it's its parent to people, and its messages use its parent's
+  # templates too. The template's own class too, when it isn't (or no longer)
+  # offered, so saving keeps it
   def klass_options
-    names = Nuntius.config.nuntiable_class_names
+    names = Nuntius.config.nuntiable_class_names.reject { |name| named_as_its_parent?(name) }
     names += [klass] if klass.present? && !names.include?(klass)
     names
       .map { |name| [Nuntius::Template.klass_label(name), name] }
@@ -54,6 +56,14 @@ class TemplatePresenter < ApplicationPresenter
   end
 
   private
+
+  def named_as_its_parent?(name)
+    model = name.to_s.safe_constantize
+    parent = model.try(:superclass)
+    return false unless model.respond_to?(:model_name) && parent.respond_to?(:model_name)
+
+    model.model_name.name == parent.model_name.name
+  end
 
   # [label, value, data-chain: class name], sorted by label, for the
   # nuntius--chained-select controller
