@@ -69,14 +69,14 @@ module Nuntius
       return if mjml.blank?
 
       EmailDesign.content_of(mjml)
-      result = TessEdit.compile(mjml)
+      result = Nuntius::Mjml.compile(mjml)
       errors.add(:mjml, "could not be compiled: #{result.errors.join("; ")}") unless result.html
     rescue EmailDesign::Error
       errors.add(:base, "A layout needs exactly one Content block, for the content of its templates and campaigns")
     end
 
     def compile
-      self.html = TessEdit.compile(mjml).html
+      self.html = Nuntius::Mjml.compile(mjml).html
     end
 
     def attach_pending_images

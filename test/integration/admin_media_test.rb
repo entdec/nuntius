@@ -71,7 +71,7 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
     @template.images.attach(io: StringIO.new(PNG), filename: "banner.png", content_type: "image/png")
     mjml = %(<mjml><mj-body><mj-section><mj-column><mj-image src="{{ 'banner.png' | image_url }}" /><mj-image src="{{ 'logo.png' | embed_image }}" /><mj-image src="{{ 'gone.png' | image_url }}" /></mj-column></mj-section></mj-body></mjml>)
 
-    post "/nuntius/admin/templates/#{@template.id}/media/compile", params: {mjml: mjml}, as: :json
+    post "/nuntius/admin/templates/#{@template.id}/media/compile", params: {compiler: "mjml", source: mjml}, as: :json
 
     assert_response :success
     html = response.parsed_body["html"]
@@ -146,7 +146,7 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
     unused = ActiveStorage::Blob.find_signed(response.parsed_body["id"])
 
     content = %(<mj-section><mj-column><mj-image src="{{ '#{uploaded["id"]}' | image_url }}" /></mj-column></mj-section>)
-    post "/nuntius/admin/campaigns/media/compile", params: {mjml: "<mjml><mj-body>#{content}</mj-body></mjml>", layout_id: @layout.id}, as: :json
+    post "/nuntius/admin/campaigns/media/compile", params: {compiler: "mjml", source: "<mjml><mj-body>#{content}</mj-body></mjml>", layout_id: @layout.id}, as: :json
     assert_match %r{src="https://[^"]+/logo-2.png"}, response.parsed_body["html"], "the preview shows it"
 
     image = {"id" => "bphoto", "type" => "image", "attributes" => {"src" => uploaded["url"]}, "data" => {"image" => uploaded["id"], "source" => "upload"}, "children" => []}

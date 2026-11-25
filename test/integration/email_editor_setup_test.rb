@@ -14,9 +14,17 @@ class EmailEditorSetupTest < ActionDispatch::IntegrationTest
   test "the editor compiles through Nuntius, behind its admin authentication" do
     assert_equal Nuntius::ApplicationAdminController, TessEdit::ApplicationController.superclass
 
-    post "/nuntius/tess_edit/compile", params: {mjml: "<mjml><mj-body><mj-text>Hi {{ name }}</mj-text></mj-body></mjml>"}, as: :json
+    post "/nuntius/tess_edit/compile", params: {compiler: "mjml", source: "<mjml><mj-body><mj-text>Hi {{ name }}</mj-text></mj-body></mjml>"}, as: :json
 
     assert_response :success
     assert_includes response.parsed_body["html"], "Hi {{ name }}"
+  end
+
+  test "TessEdit compiles MJML with Nuntius' MRML compiler" do
+    post "/nuntius/tess_edit/compile", params: {compiler: "mjml", source: "<mjml><mj-body>"}, as: :json
+
+    assert_response :unprocessable_content
+    assert_nil response.parsed_body["html"]
+    assert_not_empty response.parsed_body["errors"]
   end
 end

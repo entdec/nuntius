@@ -1,0 +1,17 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6">
+    <mj-section padding="20px 0px">
+      <mj-column>
+        <mj-table padding="10px 25px"><thead><tr><th style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top;background-color:#f3f4f6;font-weight:bold"><div style="padding:0px"><p style="margin:0">Heading</p></div></th><th style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top;background-color:#f3f4f6;font-weight:bold"><div style="padding:0px"><p style="margin:0">Heading</p></div></th><th style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top;background-color:#f3f4f6;font-weight:bold"><div style="padding:0px"><p style="margin:0">Heading</p></div></th></tr></thead><tbody><tr><td style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div style="padding:0px"><p style="margin:0"><br></p></div></td><td style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div style="padding:0px"><p style="margin:0"><br></p></div></td><td style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div style="padding:0px"><p style="margin:0"><br></p></div></td></tr>
+        <tr><td style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div style="padding:0px"><p style="margin:0"><br></p></div></td><td style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div style="padding:0px"><p style="margin:0"><br></p></div></td><td style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div style="padding:0px"><p style="margin:0"><br></p></div></td></tr></tbody></mj-table>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

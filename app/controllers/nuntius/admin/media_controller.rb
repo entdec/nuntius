@@ -43,14 +43,15 @@ module Nuntius
         redirect_to [:edit, :admin, @record], status: :see_other
       end
 
-      # TessEdit's compile endpoint (compileUrl), with the images the MJML
-      # refers to by name shown from their URLs, for the editor's preview
+      # TessEdit's compile endpoint (compileUrl), for the email kit's MJML
+      # ({compiler: "mjml", source: "…"}), with the images the MJML refers to
+      # by name shown from their URLs, for the editor's preview
       def compile
-        mjml = params.require(:mjml).gsub(IMAGE_REFERENCE) do |reference|
+        mjml = params.require(:source).gsub(IMAGE_REFERENCE) do |reference|
           image = email_images.find($1) || PendingImages.find($1)
           image ? email_images.url(image, **image_url_options) : reference
         end
-        result = TessEdit.compile(mjml)
+        result = Nuntius::Mjml.compile(mjml)
         render json: {html: result.html, errors: result.errors}, status: result.errors.empty? ? :ok : :unprocessable_content
       end
 

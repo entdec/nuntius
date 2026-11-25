@@ -2,12 +2,13 @@
 
 ## 2.0.0 (unreleased)
 
-Mail is now designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit), a new dependency from RubyGems) instead of written in Markdown or Trix. See [Email designs](README.md#email-designs) in the README.
+Mail is now designed in an email editor (Nuntius' email kit for [TessEdit](https://github.com/tdegrunt/tess_edit), a new dependency from RubyGems) instead of written in Markdown or Trix. See [Email designs](README.md#email-designs) in the README.
 
 Every template, campaign, list, layout, locale and message now belongs to an account, through an `account_id` column instead of an `account_id` in its metadata, and templates can be global. See [Accounts](README.md#accounts) in the README.
 
 ### Added
 
+- The email kit is Nuntius' own (`app/javascript/nuntius/email`), no longer TessEdit's: the email, its MJML, its Wrapper, Hero, Social and Navbar blocks, and TessEdit's blocks with their MJML. MJML is compiled with MRML by `Nuntius::Mjml` (the `mrml` gem, a new dependency), which TessEdit's compile endpoint uses as its `mjml` compiler. It needs TessEdit 0.6.
 - Templates sent on demand: neither by an event nor by a time, but by the app when someone asks for it (*Send via [Email] [on demand] for [Contact]*, event `on_demand`). `Template.on_demand` finds them and `template.deliver_to(object)` sends one, returning its messages; `BaseMessenger#dispatch` now returns the messages it sent too, and a message says what sent it with `campaign?`, `on_demand?`, `event_based?` and `time_based?` (its template's, as it is now), for a provider's settings. See [On demand](README.md#on-demand).
 - `config.tables_readable`: whether the current user may see the admin's tables, which Mensa serves outside the admin's controllers. The tables answer it as `readable?`, for an app that asks a table before serving it. See [Your app's part](README.md#your-apps-part).
 - `config.subscribers_import = false` takes Nuntius' Import of subscribers off a list's page, for an app with its own. See [Your app's part](README.md#your-apps-part).

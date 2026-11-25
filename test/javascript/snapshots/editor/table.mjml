@@ -1,0 +1,17 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6" css-class="tess-b1">
+    <mj-section padding="20px 0px" css-class="tess-b2">
+      <mj-column css-class="tess-b3">
+        <mj-table padding="10px 25px" css-class="tess-b4"><thead><tr class="tess-b5"><th class="tess-b6" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top;background-color:#f3f4f6;font-weight:bold"><div class="tess-b7" style="padding:0px"><p style="margin:0">Heading</p></div></th><th class="tess-b8" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top;background-color:#f3f4f6;font-weight:bold"><div class="tess-b9" style="padding:0px"><p style="margin:0">Heading</p></div></th><th class="tess-b10" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top;background-color:#f3f4f6;font-weight:bold"><div class="tess-b11" style="padding:0px"><p style="margin:0">Heading</p></div></th></tr></thead><tbody><tr class="tess-b12"><td class="tess-b13" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div class="tess-b14" style="padding:0px"><p style="margin:0"><br></p></div></td><td class="tess-b15" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div class="tess-b16" style="padding:0px"><p style="margin:0"><br></p></div></td><td class="tess-b17" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div class="tess-b18" style="padding:0px"><p style="margin:0"><br></p></div></td></tr>
+        <tr class="tess-b19"><td class="tess-b20" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div class="tess-b21" style="padding:0px"><p style="margin:0"><br></p></div></td><td class="tess-b22" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div class="tess-b23" style="padding:0px"><p style="margin:0"><br></p></div></td><td class="tess-b24" style="border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top"><div class="tess-b25" style="padding:0px"><p style="margin:0"><br></p></div></td></tr></tbody></mj-table>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -24,7 +24,7 @@ module Nuntius
       assert_includes mjml, "<mj-title>Order {{ order.number }} &amp; more</mj-title>"
       assert_includes mjml, "<mj-preview>Hi &lt;there&gt;</mj-preview>"
       assert_not_includes mjml, "Layout title"
-      assert TessEdit.compile(mjml).html
+      assert Nuntius::Mjml.compile(mjml).html
     end
 
     test "escaping leaves Liquid alone" do

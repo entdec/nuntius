@@ -4,7 +4,8 @@
 // attaches it and refers to it by cid:.
 
 import image from "tess_edit/blocks/image"
-import { kitOf } from "tess_edit/core/registry"
+import { getBlock, kitOf } from "tess_edit/core/registry"
+import { mjml as emailMjml } from "nuntius/email/render"
 import { IMAGE_FIELD, imageSource } from "tess_edit/core/media"
 import { liquidImage, uploadedName } from "nuntius/blocks/image_names"
 
@@ -31,17 +32,23 @@ function withEmbed(group, index) {
   return { ...group, fields }
 }
 
-export default {
-  ...image,
-  fields: image.fields.map(withEmbed),
-  render: {
-    mjml(node, ctx) {
-      // The editor's canvas shows the image from its URL
-      const name = !ctx.editor && uploadedName(node, IMAGE_FIELD)
-      if (!name) return image.render.mjml(node, ctx)
+// Registered in place of TessEdit's, so it keeps the kits and render hooks
+// the Image block has by then, such as the email's (nuntius/email)
+export default function nuntiusImage(registered = getBlock("image")) {
+  return {
+    ...image,
+    kits: registered?.kits || ["email"],
+    fields: image.fields.map(withEmbed),
+    render: {
+      ...registered?.render,
+      mjml(node, ctx) {
+        // The editor's canvas shows the image from its URL
+        const name = !ctx.editor && uploadedName(node, IMAGE_FIELD)
+        if (!name) return emailMjml.image(node, ctx)
 
-      const filter = node.data?.embed === true ? "embed_image" : "image_url"
-      return image.render.mjml({ ...node, attributes: { ...node.attributes, src: liquidImage(name, filter) } }, ctx)
+        const filter = node.data?.embed === true ? "embed_image" : "image_url"
+        return emailMjml.image({ ...node, attributes: { ...node.attributes, src: liquidImage(name, filter) } }, ctx)
+      }
     }
   }
 }

@@ -1,0 +1,15 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6">
+    <mj-hero mode="fixed-height" height="320px" background-url="https://placehold.co/1200x640/1f2937/1f2937.png" background-width="600px" background-height="320px" background-color="#1f2937" vertical-align="middle" padding="40px 0px">
+      <mj-text padding="10px 25px" align="center" color="#ffffff" font-size="32px" font-weight="700"><p style="margin:0">A big headline</p></mj-text>
+      <mj-button href="#" background-color="#ffffff" color="#111827" border-radius="6px" inner-padding="12px 24px" padding="10px 25px" font-weight="600" align="center">Find out more</mj-button>
+    </mj-hero>
+  </mj-body>
+</mjml>

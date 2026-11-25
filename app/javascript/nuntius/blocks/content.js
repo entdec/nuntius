@@ -13,6 +13,7 @@ export const CONTENT_END = "<mj-raw><!-- /nuntius:content --></mj-raw>"
 export default {
   type: "content",
   name: "Content",
+  kits: ["email"],
   icon: '<rect x="3" y="4" width="18" height="16" rx="2" stroke-dasharray="3 2"/><path d="M7 9h10M7 13h10M7 17h6"/>',
   category: "layout",
   // Like Loop and Condition it adds no HTML of its own and takes what its

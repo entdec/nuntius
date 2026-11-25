@@ -1,0 +1,20 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6" css-class="tess-b1">
+    <mj-section padding="20px 0px" css-class="tess-b2">
+      <mj-column css-class="tess-b3">
+        <mj-navbar align="center" css-class="tess-b4">
+          <mj-navbar-link href="https://example.com/" color="#111827" font-size="14px" padding="10px 15px">Home</mj-navbar-link>
+          <mj-navbar-link href="https://example.com/products" color="#111827" font-size="14px" padding="10px 15px">Products</mj-navbar-link>
+          <mj-navbar-link href="https://example.com/contact" color="#111827" font-size="14px" padding="10px 15px">Contact</mj-navbar-link>
+        </mj-navbar>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

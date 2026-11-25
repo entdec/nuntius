@@ -9,6 +9,7 @@
 // so in its options; a layout's has its name and description instead.
 
 import { extendBlock } from "tess_edit/core/registry"
+import "nuntius/email/kit"
 
 const template = (node, editor) => Boolean(editor.options.template)
 const sends = (node, editor) => Boolean(editor.options.template || editor.options.campaign)

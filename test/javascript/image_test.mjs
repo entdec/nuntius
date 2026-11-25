@@ -4,15 +4,16 @@ import assert from "node:assert/strict"
 import { createDocument, createNode, find, insert } from "tess_edit/core/document"
 import { createFromPalette } from "tess_edit/core/document"
 import { getBlock, registerBlock } from "tess_edit/core/registry"
-import { toMjml } from "tess_edit/export/mjml"
-import image from "nuntius/blocks/image"
+import "nuntius/email/kit"
+import { toMjml } from "nuntius/email/mjml"
+import nuntiusImage from "nuntius/blocks/image"
 import { withImageNames } from "nuntius/blocks/image_names"
 
-registerBlock(image)
+registerBlock(nuntiusImage())
 ;["hero", "section"].forEach((type) => registerBlock(withImageNames(getBlock(type))))
 
 function emailWith(data) {
-  const doc = createDocument()
+  const doc = createDocument("email")
   const section = insert(doc, doc.id, 0, createFromPalette("section-1"))
   insert(doc, section.children[0].id, 0, createNode("image", { attributes: { src: "https://app.example.com/rails/active_storage/blobs/abc/logo.png" }, data }))
   return doc
@@ -45,7 +46,7 @@ test("a web image keeps its URL", () => {
 })
 
 test("an uploaded background is linked through image_url, by its name", () => {
-  const doc = createDocument()
+  const doc = createDocument("email")
   const background = { attributes: { "background-url": "https://app.example.com/rails/active_storage/blobs/abc/sky.png" }, data: { background: "sky.png", backgroundSource: "upload" } }
   insert(doc, doc.id, 0, createNode("hero", background))
   insert(doc, doc.id, 1, createFromPalette("section-1"))
@@ -70,11 +71,19 @@ test("the embed setting shows only in an email, not in another kit's document su
   const embed = getBlock("image").fields[0].fields.find((field) => field.key === "data.embed")
   const uploaded = createNode("image", { data: { image: "abc" } })
 
-  assert.equal(embed.visible(uploaded, { media: { enabled: true }, doc: createDocument() }), true)
+  assert.equal(embed.visible(uploaded, { media: { enabled: true }, doc: createDocument("email") }), true)
   assert.equal(embed.visible(uploaded, { media: { enabled: true }, doc: { type: "pdf", children: [] } }), false)
 })
 
 test("the embed setting comes right after the image", () => {
   const keys = getBlock("image").fields[0].fields.map((field) => field.key)
   assert.equal(keys[keys.indexOf("attributes.src") + 1], "data.embed")
+})
+
+test("it keeps the kits and render hooks the Image block had, such as the email's and a PDF kit's", () => {
+  assert.ok(getBlock("image").kits.includes("email"))
+  const replaced = nuntiusImage({ kits: ["email", "pdf"], render: { pdf: () => "pdf" } })
+  assert.deepEqual(replaced.kits, ["email", "pdf"])
+  assert.equal(replaced.render.pdf(), "pdf")
+  assert.equal(typeof replaced.render.mjml, "function")
 })

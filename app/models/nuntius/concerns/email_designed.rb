@@ -143,7 +143,7 @@ module Nuntius
         raise EmailDesign::Error, "Choose a layout" unless layout
 
         self.mjml = EmailDesign.merge(layout.mjml, content, subject: subject, preview_text: preview_text)
-        result = TessEdit.compile(mjml)
+        result = Nuntius::Mjml.compile(mjml)
         raise EmailDesign::Error, result.errors.join("; ") unless result.html
 
         self.html = result.html

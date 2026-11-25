@@ -1,0 +1,16 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6" css-class="tess-b1">
+    <mj-section padding="20px 0px" css-class="tess-b2">
+      <mj-column css-class="tess-b3">
+        <mj-button href="#" background-color="#2563eb" color="#ffffff" border-radius="6px" inner-padding="12px 24px" padding="10px 25px" font-weight="600" css-class="tess-b4">Click here</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

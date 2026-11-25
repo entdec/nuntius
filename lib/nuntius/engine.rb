@@ -2,6 +2,7 @@
 
 require "importmap-rails"
 require "tess_edit"
+require "nuntius/mjml"
 require "entdec/view_components"
 require "faraday"
 require "faraday/follow_redirects"
@@ -38,9 +39,11 @@ module Nuntius
     end
 
     # The editor's compile endpoint (mounted in config/routes.rb) sits behind
-    # Nuntius' admin authentication, unless the host app chose a controller itself.
+    # Nuntius' admin authentication, unless the host app chose a controller
+    # itself. It compiles the email kit's MJML with MRML (Nuntius::Mjml).
     initializer "nuntius.tess_edit" do
       TessEdit.parent_controller = "Nuntius::ApplicationAdminController" if TessEdit.parent_controller == "ActionController::Base"
+      TessEdit.register_compiler(:mjml) { |mjml| Nuntius::Mjml.compile(mjml) }
     end
 
     initializer "nuntius.lettermint_webhook" do |app|

@@ -5,7 +5,8 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { createDocument, createNode, insert, normalize } from "tess_edit/core/document"
 import { createFromPalette } from "tess_edit/core/document"
 import { registerBlock, registerCategory } from "tess_edit/core/registry"
-import { toMjml } from "tess_edit/export/mjml"
+import "nuntius/email/kit"
+import { toMjml } from "nuntius/email/mjml"
 import content, { CONTENT_END, CONTENT_START } from "nuntius/blocks/content"
 import viewInBrowser from "nuntius/blocks/view_in_browser"
 import subscription from "nuntius/blocks/subscription"
@@ -15,7 +16,7 @@ registerCategory({ key: "mailing", label: "Mailing", order: 25 })
 
 // A layout: a section, then a Content block holding a section with a column.
 function layout() {
-  const doc = createDocument()
+  const doc = createDocument("email")
   insert(doc, doc.id, 0, createFromPalette("section-1"))
   const box = insert(doc, doc.id, 1, createNode("content"))
   const section = insert(doc, box.id, 0, createFromPalette("section-1"))
@@ -38,7 +39,7 @@ test("the markers are the ones Nuntius::EmailDesign looks for", () => {
 })
 
 test("an empty Content block shows a placeholder in the editor", () => {
-  const doc = createDocument()
+  const doc = createDocument("email")
   const box = insert(doc, doc.id, 0, createNode("content"))
   assert.match(toMjml(doc, { editor: true }), new RegExp(`tessph-${box.id}`))
 })
@@ -75,7 +76,7 @@ test("the link text is escaped and keeps Liquid", () => {
 //
 //   UPDATE_SNAPSHOTS=1 npm test
 test("the layout fixture for the Ruby tests is up to date", () => {
-  const doc = createDocument()
+  const doc = createDocument("email")
   const header = insert(doc, doc.id, 0, createFromPalette("section-1"))
   insert(doc, header.children[0].id, 0, createNode("view_in_browser"))
   const box = insert(doc, doc.id, 1, createNode("content"))

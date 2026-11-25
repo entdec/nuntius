@@ -10,6 +10,7 @@ const TEXT = "View this email in your browser"
 export default {
   type: "view_in_browser",
   name: "View in browser",
+  kits: ["email"],
   icon: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><circle cx="6" cy="6.5" r=".5"/>',
   category: "mailing",
   roles: ["content"],

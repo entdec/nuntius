@@ -6,10 +6,11 @@ import { Application } from "@hotwired/stimulus"
 
 import { getBlock, blockTypes, registerBlock, registerCategory, registerTessEdit } from "tess_edit"
 import { imageFields } from "tess_edit/core/media"
+import "nuntius/email/kit"
 import content from "nuntius/blocks/content"
 import viewInBrowser from "nuntius/blocks/view_in_browser"
 import subscription from "nuntius/blocks/subscription"
-import image from "nuntius/blocks/image"
+import nuntiusImage from "nuntius/blocks/image"
 import "nuntius/blocks/email"
 import "nuntius/kits/messages"
 import { withImageNames } from "nuntius/blocks/image_names"
@@ -24,11 +25,11 @@ import { registerViewComponents } from "entdec/view_components"
 
 registerCategory({ key: "mailing", label: "Mailing", order: 25 })
 // image replaces TessEdit's own Image block
-;[content, viewInBrowser, subscription, image].forEach(registerBlock)
-// and the other blocks with images (backgrounds) refer to uploads by name
+;[content, viewInBrowser, subscription, nuntiusImage()].forEach(registerBlock)
+// and the email's other blocks with images (backgrounds) refer to uploads by name
 blockTypes()
   .map(getBlock)
-  .filter((definition) => definition.type !== "image" && imageFields(definition).length)
+  .filter((definition) => definition.type !== "image" && definition.render?.mjml && imageFields(definition).length)
   .forEach((definition) => registerBlock(withImageNames(definition)))
 
 window.Stimulus ||= Application.start()

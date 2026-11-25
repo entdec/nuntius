@@ -1,0 +1,49 @@
+<mjml>
+  <mj-head>
+    <mj-title>Your order {{ order.number }}</mj-title>
+    <mj-preview>Thanks for shopping with us, {{ customer.first_name }}.</mj-preview>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6">
+    <mj-section padding="24px 0px 8px">
+      <mj-column>
+        <mj-text padding="10px 25px" align="center" font-size="20px" font-weight="700" letter-spacing="1px"><p style="margin:0">ACME STORE</p></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="32px 0px" background-color="#ffffff" border-radius="8px">
+      <mj-column>
+        <mj-text padding="10px 25px" font-size="26px" font-weight="700" line-height="1.3"><p style="margin:0">Thanks for your order, {{ customer.first_name }}!</p></mj-text>
+        <mj-text padding="10px 25px"><p style="margin:0">We've received order <strong>{{ order.number }}</strong> and will let you know when it ships.</p><p style="margin:0"><br></p><p style="margin:0">Here's what you ordered:</p></mj-text>
+        <mj-raw>{% for line in order.lines %}</mj-raw>
+        <mj-text padding="4px 25px"><p style="margin:0">{{ line.quantity }} × {{ line.name }} — {{ line.total | money }}</p></mj-text>
+        <mj-raw>{% endfor %}</mj-raw>
+        <mj-divider border-color="#e5e7eb" border-width="1px" padding="16px 25px" />
+        <mj-button href="{{ order.url }}" background-color="#2563eb" color="#ffffff" border-radius="6px" inner-padding="12px 24px" padding="10px 25px" font-weight="600">View your order</mj-button>
+      </mj-column>
+    </mj-section>
+    <mj-raw>{% if customer.orders_count == 1 %}</mj-raw>
+    <mj-section padding="24px 0px 0px">
+      <mj-column width="50%">
+        <mj-image src="https://placehold.co/600x400/dbeafe/1e3a8a.png?text=Welcome" padding="0px 12px 0px 25px" border-radius="6px" />
+      </mj-column>
+      <mj-column width="50%" vertical-align="middle">
+        <mj-text padding="10px 25px"><p style="margin:0"><strong>Welcome!</strong></p><p style="margin:0">This is your first order. Here's 10% off the next one with code WELCOME10.</p></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-raw>{% endif %}</mj-raw>
+    <mj-section padding="24px 0px">
+      <mj-column>
+        <mj-social mode="horizontal" align="center" icon-size="24px" padding="10px 25px">
+          <mj-social-element name="facebook" href="https://facebook.com/"></mj-social-element>
+          <mj-social-element name="instagram" href="https://instagram.com/"></mj-social-element>
+          <mj-social-element name="linkedin" href="https://linkedin.com/"></mj-social-element>
+        </mj-social>
+        <mj-text padding="10px 25px" align="center" font-size="12px" color="#6b7280"><p style="margin:0">ACME Store · Main Street 1 · Amsterdam</p><p style="margin:0"><a href="{{ unsubscribe_url }}" style="color:inherit;">Unsubscribe</a></p></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

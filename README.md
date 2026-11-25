@@ -4,7 +4,7 @@ Nuntius offers messaging and notifications for ActiveRecord models in Ruby on Ra
 
 ## Setup
 
-Add Nuntius to your Gemfile. It brings [TessEdit](https://github.com/tdegrunt/tess_edit), the email editor it uses, from RubyGems.
+Add Nuntius to your Gemfile. It brings [TessEdit](https://github.com/tdegrunt/tess_edit), the drag-and-drop editor its email editor is built on, from RubyGems.
 
 ```ruby
 gem "nuntius"
@@ -508,7 +508,7 @@ The main key of the hash passed will also be the liquid variable.
 
 ## Email designs
 
-Mail templates and campaigns are designed in an email editor ([TessEdit](https://github.com/tdegrunt/tess_edit)), which builds [MJML](https://mjml.io); Nuntius compiles it to HTML with [MRML](https://github.com/jdrouet/mrml). Liquid works everywhere in the design and is rendered when a message is sent.
+Mail templates and campaigns are designed in an email editor: Nuntius' email kit for [TessEdit](https://github.com/tdegrunt/tess_edit) (`app/javascript/nuntius/email`), which builds [MJML](https://mjml.io); Nuntius compiles it to HTML with [MRML](https://github.com/jdrouet/mrml) (`Nuntius::Mjml`), which TessEdit's compile endpoint uses too, as its `mjml` compiler. Liquid works everywhere in the design and is rendered when a message is sent.
 
 ### Layouts
 
@@ -516,7 +516,7 @@ A layout is the part every email shares: header, footer, width, fonts, colors an
 
 Templates and campaigns follow their layout: when you change a layout, every template and draft campaign that uses it is put together again with the new layout. In their editor the layout's parts are visible but locked; only the Content block, the subject and the preview text are theirs.
 
-Besides TessEdit's blocks, the editor has three Nuntius blocks:
+The email kit has TessEdit's blocks (Section, Column, Text, Image, Button, Divider, Spacer, HTML, Loop, Condition, Assign, Table), with their MJML, and blocks of its own: the Email itself, Wrapper, Hero, Social and Navbar, and three for Nuntius:
 
 - **Content**, the template's or campaign's own part of the layout
 - **View in browser**, a link to the message online (`{{ message_url }}`)

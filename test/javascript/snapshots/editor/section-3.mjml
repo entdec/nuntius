@@ -1,0 +1,22 @@
+<mjml>
+  <mj-head>
+    <mj-breakpoint width="480px" />
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" line-height="1.6" color="#111827" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="600px" background-color="#f3f4f6" css-class="tess-b1">
+    <mj-section padding="20px 0px" css-class="tess-b2">
+      <mj-column width="33.33%" css-class="tess-b3">
+        <mj-text css-class="tessph-b3" align="center" color="#94a3b8" font-size="13px" padding="18px 25px">Drop content here</mj-text>
+      </mj-column>
+      <mj-column width="33.33%" css-class="tess-b4">
+        <mj-text css-class="tessph-b4" align="center" color="#94a3b8" font-size="13px" padding="18px 25px">Drop content here</mj-text>
+      </mj-column>
+      <mj-column width="33.33%" css-class="tess-b5">
+        <mj-text css-class="tessph-b5" align="center" color="#94a3b8" font-size="13px" padding="18px 25px">Drop content here</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
