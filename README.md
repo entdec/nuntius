@@ -416,6 +416,16 @@ template.deliver_to(contract, to: "{{ contract.contact }}, board@example.com", f
 
 So one template can go to others from different places. Without them, it's sent as above.
 
+And it can say what sent the messages, any record, as their `source` (its object stays their
+`nuntiable`, what they're about):
+
+```ruby
+template.deliver_to(contract, source: automation_run, conditions: false)
+```
+
+A message's page shows both, linked as the tables link a message's object (`config.object_path`,
+else a route of the app or the engine it's from).
+
 A message says what sent it with `campaign?`, or `on_demand?`, `event_based?` and `time_based?`
 from its template as it is now, so a provider's settings can send them through another server:
 

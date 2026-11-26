@@ -295,6 +295,8 @@ en:
             nuntius_admin_messages:
           info_item:
             main:
+              nuntiable: About
+              source: Sent by
               created_at: Created At
               from: From
               html: HTML

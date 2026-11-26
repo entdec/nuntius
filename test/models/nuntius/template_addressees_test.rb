@@ -105,6 +105,16 @@ module Nuntius
       assert_equal ["a@example.com"], template.deliver_to(@account, conditions: false).map(&:to)
     end
 
+    test "who sends it can say what sent its messages, their source, besides what they're about" do
+      template = Template.create!(klass: "Account", based_on: "on_demand", transport: "mail", description: "news", to: "a@example.com", from: "from@example.com", subject: "Hi", text: "Body", enabled: true, account: @account)
+      sender = @account.users.find_by!(name: "Ann")
+
+      messages = template.deliver_to(@account, source: sender)
+
+      assert_equal [[@account, sender]], messages.map { |message| [message.reload.nuntiable, message.source] }
+      assert_nil template.deliver_to(@account).sole.source
+    end
+
     test "the messenger dispatches a message per addressee" do
       template = Template.create!(klass: "Account", event: "created", transport: "mail", description: "created", to: "{{ account.users }}", from: "from@example.com", subject: "Hi {{ to.name }}", text: "Body", enabled: true, account: @account)
 

@@ -308,6 +308,8 @@ nl:
             nuntius_admin_messages:
           info_item:
             main:
+              nuntiable: Over
+              source: Verstuurd door
               attachments: Bijlagen
               created_at: Created At
               from: Van

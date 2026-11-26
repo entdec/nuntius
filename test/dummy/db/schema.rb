@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -234,10 +234,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_200000) do
     t.jsonb "headers", default: {}, null: false
     t.string "envelope_from"
     t.boolean "test_message", default: false, null: false
+    t.string "source_type"
+    t.uuid "source_id"
     t.index ["account_id"], name: "index_nuntius_messages_on_account_id"
     t.index ["campaign_id"], name: "index_nuntius_messages_on_campaign_id"
     t.index ["nuntiable_type", "nuntiable_id"], name: "index_nuntius_messages_on_nuntiable_type_and_nuntiable_id"
     t.index ["parent_message_id"], name: "index_nuntius_messages_on_parent_message_id"
+    t.index ["source_type", "source_id"], name: "index_nuntius_messages_on_source"
     t.index ["subscriber_id"], name: "index_nuntius_messages_on_subscriber_id"
     t.index ["template_id"], name: "index_nuntius_messages_on_template_id"
   end

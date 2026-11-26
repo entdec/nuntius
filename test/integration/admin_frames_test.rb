@@ -78,6 +78,19 @@ class AdminFramesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a message's page says what it's about and what sent it" do
+    message = nuntius_messages(:one_recipient)
+    account = message.account
+    message.update!(nuntiable: account, source: account)
+
+    get "/nuntius/admin/messages/#{message.id}"
+
+    assert_select ".nuntius-page__aside dl.nuntius-info" do
+      assert_select "dt", /About/
+      assert_select "dt", /Sent by/
+    end
+  end
+
   test "a list's subscriber pages: a new one's form, and importing them" do
     list = nuntius_lists(:valentines)
 

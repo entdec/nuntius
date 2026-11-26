@@ -72,13 +72,13 @@ module Nuntius
     # for, by default the template's own. to and from, Liquid as its own To
     # and From, send it to others or from another than it says (an
     # automation's step sending it: whom to is the step's).
-    def new_messages(object, assigns = {}, params = {}, account: self.account, to: nil, from: nil)
+    def new_messages(object, assigns = {}, params = {}, account: self.account, to: nil, from: nil, source: nil)
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
       locale = params[:locale].to_sym if params[:locale]
 
       addressees(assigns, locale, to.presence || self.to).map do |address, recipient|
-        message = Nuntius::Message.new(template: self, account: account, transport: transport, to: address)
+        message = Nuntius::Message.new(template: self, account: account, transport: transport, to: address, source: source)
         message.nuntiable = object unless object.is_a? Hash
 
         message_assigns = assigns.merge("to" => recipient)
@@ -207,8 +207,8 @@ module Nuntius
     # automation, whose steps are the conditions):
     #
     #   template.deliver_to(contract, to: "{{ contract.contact }}", from: "sponsors@svbaarn.nl", conditions: false)
-    def deliver_to(object, params = {}, to: nil, from: nil, conditions: true)
-      BaseMessenger.messenger_for_obj(object).new(object, event, params).dispatch([self], to:, from:, conditions:)
+    def deliver_to(object, params = {}, to: nil, from: nil, conditions: true, source: nil)
+      BaseMessenger.messenger_for_obj(object).new(object, event, params).dispatch([self], to:, from:, conditions:, source:)
     end
 
     # At most how many messages it sends in a run of TimebasedEventsJob: its

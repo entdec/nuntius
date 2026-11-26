@@ -9,6 +9,13 @@
       <% end %>
       <%= nuntius_info_item(:last_sent_at, (l(@message.last_sent_at, format: :long) if @message.last_sent_at), icon: nuntius_icon(:sent_at)) %>
       <%= nuntius_info_item(:created_at, l(@message.created_at, format: :long), icon: nuntius_icon(:created_at)) %>
+      <%# What it's about and what sent it, linked as the tables link them %>
+      <% if @message.nuntiable %>
+        <%= nuntius_info_item(:nuntiable, Nuntius::ApplicationTable.object_link(self, @message.nuntiable)) %>
+      <% end %>
+      <% if @message.source %>
+        <%= nuntius_info_item(:source, Nuntius::ApplicationTable.object_link(self, @message.source)) %>
+      <% end %>
       <% if @message.link_tracking_enabled? %>
         <%= nuntius_info_item(:click_count, @message.click_count) %>
       <% end %>

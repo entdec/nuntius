@@ -43,14 +43,14 @@ module Nuntius
     # whose conditions are met. Returns the messages. to and from send them to
     # and from others than the templates say (Template#new_messages);
     # conditions: false sends them whatever their conditions.
-    def dispatch(filtered_templates, to: nil, from: nil, conditions: true)
+    def dispatch(filtered_templates, to: nil, from: nil, conditions: true, source: nil)
       filtered_templates.flat_map do |template|
         assigns = liquid_context
         next [] if conditions && !template.conditions_met?(assigns.merge("template" => template))
 
         template.layout = override_layout(template.layout)
         transport = Nuntius::BaseTransport.class_from_name(template.transport).new
-        template.new_messages(@object, assigns, params, account: account, to:, from:).each do |msg|
+        template.new_messages(@object, assigns, params, account: account, to:, from:, source:).each do |msg|
           @attachments.each do |attachment|
             msg.add_attachment(attachment)
           end

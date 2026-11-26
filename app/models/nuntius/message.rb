@@ -25,6 +25,10 @@ module Nuntius
     has_many :message_trackings, class_name: "MessageTracking", dependent: :destroy
 
     belongs_to :nuntiable, polymorphic: true, optional: true
+    # What sent it, when something did (Template#deliver_to's source:): its nuntiable is what it's about, its
+    # source what sent it, an app's automation run or mailing; its page links to it as to its nuntiable
+    # (config.object_path)
+    belongs_to :source, polymorphic: true, optional: true
 
     validates :transport, presence: true
 
