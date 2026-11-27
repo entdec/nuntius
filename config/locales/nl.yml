@@ -17,8 +17,8 @@ nl:
     attributes:
       nuntius/campaign:
         from: Van
-        layout_id: Layout
-        layout_name: Layout
+        layout_id: Huisstijl
+        layout_name: Huisstijl
         list_id: Lijst
         list_name: Lijst naam
         name: Naam
@@ -43,7 +43,7 @@ nl:
         enabled: Ingeschakeld
         event: Trigger
         from: Van
-        layout_name: Layout
+        layout_name: Huisstijl
         global: Globaal
         klass: Object
         interval: Interval
@@ -69,7 +69,7 @@ nl:
         state: Status
     models:
       campaign: Campagne
-      layout: Layout
+      layout: Huisstijl
       list: Lijst
       message: Bericht
       subscriber: Abonnee
@@ -80,7 +80,7 @@ nl:
         lists: Lijsten
         new: Nieuwe campagne
       layouts:
-        new: Nieuwe layout
+        new: Nieuwe huisstijl
       lists:
         new: Nieuwe lijst
         new_subscriber: Nieuwe abonnee
@@ -140,7 +140,7 @@ nl:
       half_yearly: elk half jaar
       yearly: elk jaar
     transport_hints:
-      mail: Ontworpen, met een layout
+      mail: Ontworpen, met een huisstijl
       push: Een melding op een telefoon
       slack: Een bericht in een kanaal
       sms: Een kort tekstbericht
@@ -186,10 +186,10 @@ nl:
           delete_confirm: "%{name} verwijderen?"
         new:
           what: Wat wil je versturen?
-          which_layout: Met welke layout wil je beginnen?
+          which_layout: Met welke huisstijl wil je beginnen?
           back: Terug
-          no_layouts: Er zijn nog geen layouts
-          create_layout: Maak eerst een layout
+          no_layouts: Er zijn nog geen huisstijlen
+          create_layout: Maak eerst een huisstijl
         translations:
           intro_html: "Wat de <code>{{ '.key' | t }}</code>-filters in elke taal zeggen, uit de locales van het account. Een sleutel die met een punt begint staat in %{path}, en wordt van daar richting de root opgezocht. Wijzigingen worden meteen bewaard."
           none_html: "Er wordt nog niets vertaald. Gebruik <code>{{ '.key' | t }}</code> in de teksten, of Vertaalbaar maken in de e-maileditor."
@@ -210,7 +210,7 @@ nl:
               title: Campagne
           from_hint: "Je kunt dit leeg laten, vul dit alleen in als je de standaard wilt overschrijven"
           list_hint: "Nodig om te versturen, niet om te ontwerpen. Je kunt een lijst hergebruiken van een vorige campagne, voor hetzelfde doel. Uitschrijvingen gebeuren tegen de lijst."
-          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout."
+          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze huisstijl."
           metadata_variables: "Het ontwerp van deze campagne leest nog metadata, die gaat verdwijnen:"
           tabs:
             main:
@@ -244,9 +244,9 @@ nl:
         edit:
           card:
             nuntius_admin_layouts:
-              title: Layouts
+              title: Huisstijlen
           start_from: "Begin met:"
-          metadata_variables: "Deze layout leest nog metadata, wat in layouts niet meer werkt:"
+          metadata_variables: "Deze huisstijl leest nog metadata, wat in huisstijlen niet meer werkt:"
           starting_layouts:
             basic: Eenvoudig
             newsletter: Nieuwsbrief
@@ -257,7 +257,7 @@ nl:
             newsletter: Een kop met kolommen voor artikelen, en een voet met de link naar het abonnement.
             transactional: Eenvoudig en to the point, voor bonnen, meldingen en bevestigingen.
             empty: Alleen de inhoud, om alles zelf te ontwerpen.
-          description_hint: Staat onder de voorbeeldweergave bij het kiezen van een layout voor een nieuw sjabloon.
+          description_hint: Staat onder de voorbeeldweergave bij het kiezen van een huisstijl voor een nieuw sjabloon.
           tabs:
             main:
               tab:
@@ -269,8 +269,8 @@ nl:
           card:
             nuntius_admin_layouts:
               tab:
-                Nuntius layouts: Layouts
-              title: Layouts
+                Nuntius layouts: Huisstijlen
+              title: Huisstijlen
       lists:
         edit:
           card:
@@ -364,16 +364,16 @@ nl:
             nuntius_admin_templates:
               title: Sjabloon
           metadata: Metadata
-          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze layout. Sla op nadat je er een hebt gekozen."
-          layout_moves: "De eigen inhoud verhuist bij opslaan naar de gekozen layout."
+          layout_hint: "De e-mail bewerk je in het tabblad Ontwerp, binnen deze huisstijl. Sla op nadat je er een hebt gekozen."
+          layout_moves: "De eigen inhoud verhuist bij opslaan naar de gekozen huisstijl."
           global_hint: Gebruikt voor elk account, niet alleen dit
           metadata_variables: "Het ontwerp van dit sjabloon leest nog metadata, die gaat verdwijnen:"
-          old_layout_metadata_variables: "De oude layout of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
-          old_layout: "Dit sjabloon gebruikt nog de oude layout %{name}. Die blijft werken tot het sjabloon is omgezet."
-          convert_layout: Omzetten naar layout
-          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze layout, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
+          old_layout_metadata_variables: "De oude huisstijl of tekst leest metadata, wat ontwerpen in de e-maileditor niet zouden moeten doen. Zet deze na het omzetten op een andere manier in het ontwerp:"
+          old_layout: "Dit sjabloon gebruikt nog de oude huisstijl %{name}. Die blijft werken tot het sjabloon is omgezet."
+          convert_layout: Omzetten naar huisstijl
+          convert_hint: "De inhoud komt in één HTML-blok in het Content-blok van deze huisstijl, zoals hij nu verstuurd wordt. Daarna bewerk je hem in het tabblad Ontwerp."
           convert: Omzetten naar de e-maileditor
-          convert_confirm: "Dit sjabloon omzetten? De oude layout en inhoud worden bewaard, maar vanaf nu bewerk je het in de e-maileditor."
+          convert_confirm: "Dit sjabloon omzetten? De oude huisstijl en inhoud worden bewaard, maar vanaf nu bewerk je het in de e-maileditor."
           tabs:
             main:
               tab:
