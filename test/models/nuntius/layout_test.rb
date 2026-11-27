@@ -24,6 +24,28 @@ module Nuntius
       end
     end
 
+    test "a starting layout's texts are in the current language" do
+      document = I18n.with_locale(:nl) { Layout.starting_document("basic") }.to_json
+
+      assert_includes document, "Je naam of logo"
+      assert_includes document, "Hier komt de inhoud van elk sjabloon en elke campagne."
+      assert_not_includes document, "Your name or logo"
+      assert_includes I18n.with_locale(:en) { Layout.starting_document("basic") }.to_json, "Your name or logo"
+    end
+
+    # Each text people see in a starting layout is one of its texts, in English
+    # and in Dutch (nuntius.starting_layouts.texts)
+    Layout::STARTING_LAYOUTS.each do |key|
+      test "the #{key} starting layout's texts are all translated" do
+        texts = Layout.starting_texts(::JSON.parse(Engine.root.join("config/nuntius/starting_layouts/#{key}.json").read))
+        english = I18n.t("nuntius.starting_layouts.texts", locale: :en)
+        dutch = I18n.t("nuntius.starting_layouts.texts", locale: :nl)
+
+        assert_empty texts - english.values, key
+        assert_equal english.keys.sort, dutch.keys.sort
+      end
+    end
+
     test "an unknown starting layout is the basic one" do
       assert_equal Layout.starting_document("basic"), Layout.starting_document("../../secrets")
     end

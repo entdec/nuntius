@@ -65,6 +65,11 @@ module Nuntius
         EmailDesign.document_with(layout.json, json, subject: subject, preview_text: preview_text, data: design_data)
       end
 
+      # What it's sent with as its subject: its own, else its layout's
+      def subject_to_send
+        subject.presence || layout&.default_subject
+      end
+
       # Takes the document and MJML the editor submits. Only the Content
       # block's insides, the subject and the preview text are taken; the rest
       # comes from the layout as it is now.
@@ -142,7 +147,7 @@ module Nuntius
         @design_error = nil
         raise EmailDesign::Error, "Choose a layout" unless layout
 
-        self.mjml = EmailDesign.merge(layout.mjml, content, subject: subject, preview_text: preview_text)
+        self.mjml = EmailDesign.merge(layout.mjml, content, subject: subject_to_send, preview_text: preview_text)
         result = Nuntius::Mjml.compile(mjml)
         raise EmailDesign::Error, result.errors.join("; ") unless result.html
 

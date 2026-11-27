@@ -199,4 +199,20 @@ class AdminMediaTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal 2, @layout.reload.attachments.count
   end
+
+  # The Media tab's file field is in the record's form, which sends the files
+  # only as multipart: else a browser sends their names
+  test "the Media tab's form sends its files" do
+    {"campaigns" => campaign, "templates" => @template, "layouts" => @layout}.each do |path, record|
+      get "/nuntius/admin/#{path}/#{record.id}/edit"
+
+      assert_select "form[enctype='multipart/form-data'] input[type=file][multiple]", {count: 1}, path
+    end
+  end
+
+  test "the Media tab adds a campaign's images" do
+    patch "/nuntius/admin/campaigns/#{campaign.id}", params: {campaign: {name: "Spring", images: [upload("banner.png")]}}
+
+    assert_equal ["banner.png"], campaign.reload.images.map { |image| image.filename.to_s }
+  end
 end

@@ -60,7 +60,7 @@ module Nuntius
         subscriber.phone_number
       end
 
-      message.subject = render(:subject, assigns, locale, message: message)
+      message.subject = render(:subject_to_send, assigns, locale, message: message)
       message.subject = "[Test] #{message.subject}" if test_only
       message.html = render(:html, assigns, locale, message: message, layout: campaign.old_layout&.data)
       # An SMS's or a call's
@@ -71,9 +71,9 @@ module Nuntius
     end
 
     # The Liquid variables of a subscriber's message, but its subscriber_url:
-    # the campaign, the subscriber and its nuntiable (see Campaign#variable_roots)
+    # the account, the campaign, the subscriber and its nuntiable (see Campaign#variable_roots)
     def assigns_for(subscriber)
-      assigns = {"campaign" => campaign, "subscriber" => subscriber}
+      assigns = {"account" => campaign.account, "campaign" => campaign, "subscriber" => subscriber}.compact
       assigns[Nuntius::BaseMessenger.liquid_variable_name_for(subscriber.nuntiable)] = subscriber.nuntiable if subscriber.nuntiable
       assigns
     end

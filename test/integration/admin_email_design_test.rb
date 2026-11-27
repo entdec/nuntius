@@ -17,6 +17,15 @@ class AdminEmailDesignTest < ActionDispatch::IntegrationTest
     css_select("[data-controller='tess-edit']").first["data-tess-edit-#{name}-value"]
   end
 
+  test "a campaign's name is in its editor's Inspect too, in step with its title" do
+    campaign = Nuntius::Campaign.create!(name: "Spring", transport: "mail", list: nuntius_lists(:valentines), layout: @layout)
+
+    get "/nuntius/admin/campaigns/#{campaign.id}/edit"
+
+    assert_select "input[name='campaign[name]'][value='Spring']", 1
+    assert_select "[data-tess-edit-slot='name'][data-nuntius--mirror-for-value='campaign[name]'] input#campaign_name_inspect:not([name])[value='Spring']"
+  end
+
   test "the layout editor opens a new layout with a starting design" do
     get "/nuntius/admin/layouts/new"
 

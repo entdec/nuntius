@@ -77,6 +77,28 @@ en:
       templates:
         new: New template
   nuntius:
+    # The texts of the starting layouts (config/nuntius/starting_layouts), in
+    # English as their files have them
+    starting_layouts:
+      texts:
+        name_or_logo: Your name or logo
+        content: Each template and campaign puts its own content here.
+        logo: Logo
+        news: News
+        events: Events
+        contact: Contact
+        news_title: This month's news
+        news_intro: "A short introduction to this edition: what's new, and what's coming up."
+        first_article: First article
+        first_article_text: A few lines about the first article.
+        second_article: Second article
+        second_article_text: A few lines about the second article.
+        read_more: Read more
+        address: Your company · Street 1 · 1234 AB City
+        order_title: Your order is on its way
+        order_text: "Hi {{ customer.name }}, thanks for your order. We'll let you know when it has been delivered."
+        view_order: View your order
+        questions: Questions? Just reply to this email.
     based_on:
       event: an event
       time: a time

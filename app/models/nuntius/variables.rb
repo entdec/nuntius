@@ -19,6 +19,13 @@ module Nuntius
       drop ? {model.name.demodulize.underscore => drop} : {}
     end
 
+    # The account a message is sent for, as every template, campaign and
+    # layout is rendered with it: the app's account class's drop
+    # (config.account_class), nothing without one
+    def account
+      for_class(Nuntius.config.account_class)
+    end
+
     # What a class's event has besides its object, as its messenger describes
     # it (BaseMessenger.describe's variables)
     def for_event(name, event)

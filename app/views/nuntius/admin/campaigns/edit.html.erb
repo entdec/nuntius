@@ -4,7 +4,7 @@
     a layout, has the Edit tab. %>
 <% if @campaign.draft? %>
   <% editor = if @campaign.email? && @campaign.layout && !@campaign.old_layout then :email elsif @campaign.message_design? then :message end %>
-  <%= form_with model: [:admin, @campaign], builder: FormComponents::FormBuilder do |f| %>
+  <%= form_with model: [:admin, @campaign], multipart: true, builder: FormComponents::FormBuilder do |f| %>
     <%# The name is the page's title, edited in place %>
     <% title = capture do %>
       <% if editor %>
@@ -31,6 +31,10 @@
           <% slots = capture do %>
             <%# What it sends is chosen when it's made (see new) %>
             <%= f.hidden_field :transport if @campaign.new_record? %>
+            <%# Its name in the root's Inspect too, in step with the title's %>
+            <div data-tess-edit-target="slot" data-tess-edit-slot="name" hidden data-controller="nuntius--mirror" data-nuntius--mirror-for-value="campaign[name]">
+              <%= f.text_field :name, label: false, name: nil, id: "campaign_name_inspect" %>
+            </div>
             <div data-tess-edit-target="slot" data-tess-edit-slot="trigger" hidden>
               <%= f.datetime_local_field :publish_at %>
             </div>

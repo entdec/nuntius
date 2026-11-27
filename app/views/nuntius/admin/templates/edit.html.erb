@@ -4,7 +4,7 @@
       editor for their messages (kits/messages.js). An email on an old layout, or without a layout, has the Edit tab. %>
   <% editor = if @template.email? && @template.layout && !@template.old_layout then :email elsif @template.message_design? then :message end %>
   <% designed = editor.present? %>
-  <%= form_with model: [:admin, @template], builder: FormComponents::FormBuilder do |f| %>
+  <%= form_with model: [:admin, @template], multipart: true, builder: FormComponents::FormBuilder do |f| %>
     <% plain = nuntius_plain_form(f) %>
     <%# The description is made from the trigger's sentence and conditions, until one is typed (see the description
         controller). Variable pickers, Liquid fields and the email editor follow the class chosen (see the variables

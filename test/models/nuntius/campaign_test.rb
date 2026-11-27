@@ -41,6 +41,14 @@ module Nuntius
       assert campaign.reload.cancelled?
     end
 
+    test "a campaign's messages are rendered with its account" do
+      campaign = nuntius_campaigns(:valentines_day)
+      campaign.update_columns(transport: "mail", subject: "News from {{ account.name }}")
+      campaign.list.subscribers.create!(first_name: "Juliet", email: "juliet@example.com", test_recipient: true)
+
+      assert_equal ["[Test] News from #{campaign.account.name}"], campaign.send_test.map(&:subject)
+    end
+
     test "a scheduled campaign goes back to draft when it's descheduled" do
       campaign = nuntius_campaigns(:valentines_day)
       assert_not campaign.can_publish?

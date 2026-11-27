@@ -45,10 +45,10 @@ class AdminVariablesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the layout editor gets the variables of the templates and campaigns it's part of" do
+  test "the layout editor gets the account and the variables of the templates and campaigns it's part of" do
     get "/nuntius/admin/layouts/#{@layout.id}/edit"
 
-    assert_equal %w[template campaign], variables(variables_url)
+    assert_equal %w[account template campaign], variables(variables_url)
   end
 
   test "the endpoint refuses roots that are not signed" do
