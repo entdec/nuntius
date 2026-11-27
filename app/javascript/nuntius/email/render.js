@@ -8,11 +8,12 @@ import { forTag } from "tess_edit/blocks/loop"
 import { ifTag } from "tess_edit/blocks/condition"
 import { assignTag } from "tess_edit/blocks/assign"
 import { tableHtml } from "tess_edit/export/table"
+import { backgroundImage, withBackgroundDefaults } from "nuntius/email/background"
 
 const mjRaw = (html) => `<mj-raw>${html}</mj-raw>`
 
 export const mjml = {
-  section: (node, { container }) => container("mj-section", node),
+  section: (node, { container }) => container("mj-section", withBackgroundDefaults(node)),
   column: (node, { container }) => container("mj-column", node),
   text: (node, { element, richText }) => element("mj-text", node, richText(node.data.content)),
   image: (node, { element }) => element("mj-image", node),
@@ -46,6 +47,6 @@ const fullWidth = { title: "Section", fields: [{ key: "attributes.full-width", l
 
 export function extendTessEditBlocks() {
   for (const [type, hook] of Object.entries(mjml)) {
-    extendBlock(type, { kits: ["email"], render: { mjml: hook }, fields: type === "section" ? [fullWidth] : [] })
+    extendBlock(type, { kits: ["email"], render: { mjml: hook }, fields: type === "section" ? [fullWidth, backgroundImage] : [] })
   }
 }
