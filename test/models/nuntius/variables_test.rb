@@ -16,9 +16,9 @@ module Nuntius
       assert_equal({}, Variables.for_class(nil))
     end
 
-    test "a template has the object it's sent for and itself" do
+    test "a template has the account it's sent for, the object it's sent for and itself" do
       assert_equal({"account" => AccountDrop, "template" => TemplateDrop}, Template.new(klass: "Account").variable_roots)
-      assert_equal({"template" => TemplateDrop}, Template.new(klass: "Custom").variable_roots)
+      assert_equal({"account" => AccountDrop, "template" => TemplateDrop}, Template.new(klass: "Custom").variable_roots)
     end
 
     test "a template has what its event is sent with besides its object, as its messenger describes it" do
@@ -34,11 +34,16 @@ module Nuntius
       list.subscribers.create!(first_name: "Juliet", nuntiable: ::User.create!(name: "Juliet", account: accounts(:one)))
       roots = Campaign.new(list: list).variable_roots
 
-      assert_equal({"user" => UserDrop, "campaign" => CampaignDrop, "subscriber" => SubscriberDrop, "subscriber_url" => :string}, roots)
+      assert_equal({"account" => AccountDrop, "user" => UserDrop, "campaign" => CampaignDrop, "subscriber" => SubscriberDrop, "subscriber_url" => :string}, roots)
     end
 
-    test "a layout has the template or campaign it's part of" do
-      assert_equal({"template" => TemplateDrop, "campaign" => CampaignDrop}, Layout.new.variable_roots)
+    test "a layout has the account and the template or campaign it's part of" do
+      assert_equal({"account" => AccountDrop, "template" => TemplateDrop, "campaign" => CampaignDrop}, Layout.new.variable_roots)
+    end
+
+    test "the account is the app's account class's drop, none without one" do
+      assert_equal({"account" => AccountDrop}, Variables.account)
+      Nuntius.config.stub(:account_class, "Cow") { assert_equal({}, Variables.account) }
     end
 
     test "the editor's URL only when the host app mounts Liquidum" do

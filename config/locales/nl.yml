@@ -95,6 +95,26 @@ nl:
       updated: gewijzigd
       saved: opgeslagen
       destroyed: verwijderd
+    starting_layouts:
+      texts:
+        name_or_logo: Je naam of logo
+        content: Hier komt de inhoud van elk sjabloon en elke campagne.
+        logo: Logo
+        news: Nieuws
+        events: Evenementen
+        contact: Contact
+        news_title: Het nieuws van deze maand
+        news_intro: "Een korte inleiding op deze editie: wat er nieuw is, en wat eraan komt."
+        first_article: Eerste artikel
+        first_article_text: Een paar regels over het eerste artikel.
+        second_article: Tweede artikel
+        second_article_text: Een paar regels over het tweede artikel.
+        read_more: Lees meer
+        address: Je bedrijf · Straat 1 · 1234 AB Plaats
+        order_title: Je bestelling is onderweg
+        order_text: "Hoi {{ customer.name }}, bedankt voor je bestelling. We laten je weten wanneer hij is bezorgd."
+        view_order: Bekijk je bestelling
+        questions: Vragen? Beantwoord deze e-mail gewoon.
     based_on:
       event: een trigger
       time: een tijd

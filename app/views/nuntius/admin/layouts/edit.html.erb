@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, @layout], builder: FormComponents::FormBuilder do |f| %>
+<%= form_with model: [:admin, @layout], multipart: true, builder: FormComponents::FormBuilder do |f| %>
   <%# The name is the page's title, edited in place, and in the root's Inspect too, in step with it %>
   <% title = capture do %>
     <div class="nuntius-title">

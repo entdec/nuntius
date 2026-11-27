@@ -84,7 +84,7 @@ module Nuntius
     # nuntiables), under their messengers' names
     def variable_roots
       types = list ? list.subscribers.where.not(nuntiable_type: nil).distinct.pluck(:nuntiable_type) : []
-      types.map { |type| Variables.for_class(type) }.reduce({}, :merge)
+      types.map { |type| Variables.for_class(type) }.reduce(Variables.account, :merge)
         .merge("campaign" => CampaignDrop, "subscriber" => SubscriberDrop, "subscriber_url" => :string)
     end
 

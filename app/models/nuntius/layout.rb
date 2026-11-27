@@ -24,8 +24,14 @@ module Nuntius
 
     # What its Liquid can use (see Variables): it's rendered as part of a
     # template or a campaign, with the one that uses it
+    # The subject an email in it has that has none of its own: its root's
+    # Subject in the editor
+    def default_subject
+      json.dig("data", "subject").presence if json.is_a?(Hash)
+    end
+
     def variable_roots
-      {"template" => TemplateDrop, "campaign" => CampaignDrop}
+      Variables.account.merge("template" => TemplateDrop, "campaign" => CampaignDrop)
     end
 
     # The scope of the keys starting with a dot that its Liquid translates
@@ -57,10 +63,38 @@ module Nuntius
 
     STARTING_LAYOUTS = %w[basic newsletter transactional empty].freeze
 
-    # A ready-made design to start a new layout from (config/nuntius/starting_layouts)
+    # The attributes of a starting layout's blocks that people read: a text's
+    # text, an image's alt, a menu item's label and a button's content
+    STARTING_TEXT_KEYS = %w[text alt label content].freeze
+
+    # A ready-made design to start a new layout from (config/nuntius/starting_layouts),
+    # its texts in the current language
     def self.starting_document(key = "basic")
       key = "basic" unless STARTING_LAYOUTS.include?(key.to_s)
-      ::JSON.parse(Engine.root.join("config/nuntius/starting_layouts/#{key}.json").read)
+      translate_starting_texts(::JSON.parse(Engine.root.join("config/nuntius/starting_layouts/#{key}.json").read))
+    end
+
+    # The texts people read in a starting layout's document
+    def self.starting_texts(node)
+      case node
+      when Hash then node.flat_map { |name, value| (STARTING_TEXT_KEYS.include?(name) && value.is_a?(String)) ? [value] : starting_texts(value) }.compact_blank
+      when Array then node.flat_map { |child| starting_texts(child) }
+      else []
+      end
+    end
+
+    # Its files have them in English, each translated by its key in
+    # nuntius.starting_layouts.texts, found by its English
+    def self.translate_starting_texts(node, keys = I18n.t("nuntius.starting_layouts.texts", locale: :en).invert)
+      case node
+      when Hash
+        node.to_h do |name, value|
+          key = keys[value] if STARTING_TEXT_KEYS.include?(name) && value.is_a?(String)
+          [name, key ? I18n.t("nuntius.starting_layouts.texts.#{key}", default: value) : translate_starting_texts(value, keys)]
+        end
+      when Array then node.map { |child| translate_starting_texts(child, keys) }
+      else node
+      end
     end
 
     private

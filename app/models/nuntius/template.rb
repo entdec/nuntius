@@ -69,9 +69,10 @@ module Nuntius
 
     # The messages it sends: one for each addressee in its To (see addressees),
     # rendered with the addressee as `to`. account is the account they're sent
-    # for, by default the template's own. to and from, Liquid as its own To
-    # and From, send it to others or from another than it says (an
-    # automation's step sending it: whom to is the step's).
+    # for, by default the template's own, and `account` in its Liquid unless
+    # the assigns have one. to and from, Liquid as its own To and From, send
+    # it to others or from another than it says (an automation's step sending
+    # it: whom to is the step's).
     def new_messages(object, assigns = {}, params = {}, account: self.account, to: nil, from: nil, source: nil)
       locale_proc = Nuntius::BaseMessenger.messenger_for_obj(object).locale
       locale = instance_exec(object, &locale_proc) if locale_proc
@@ -81,11 +82,11 @@ module Nuntius
         message = Nuntius::Message.new(template: self, account: account, transport: transport, to: address, source: source)
         message.nuntiable = object unless object.is_a? Hash
 
-        message_assigns = assigns.merge("to" => recipient)
+        message_assigns = {"account" => account}.compact.merge(assigns).merge("to" => recipient)
         options = {registers: {"template" => self, "message" => message}}
 
         message.from = render(:from, message_assigns, locale, options, source: from.presence || self.from).split(",").reject(&:empty?).join(",")
-        message.subject = render(:subject, message_assigns, locale, options)
+        message.subject = render(:subject_to_send, message_assigns, locale, options)
         message.html = render(:html, message_assigns, locale, options.merge(layout: old_layout&.data))
         message.text = render(:text, message_assigns, locale, options)
         message.payload = render(:payload, message_assigns, locale, options)
@@ -257,7 +258,7 @@ module Nuntius
     # with besides it (the messenger's describe), and itself. For another
     # class, what it would be (the form, before the class is saved).
     def variable_roots(klass = self.klass)
-      Variables.for_class(klass).merge(Variables.for_event(klass, event)).merge("template" => TemplateDrop)
+      Variables.account.merge(Variables.for_class(klass)).merge(Variables.for_event(klass, event)).merge("template" => TemplateDrop)
     end
 
     # The scope of the keys starting with a dot that its Liquid translates

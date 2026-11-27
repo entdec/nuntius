@@ -19,6 +19,15 @@ module Nuntius
       assert_equal ["Hi a@example.com", "Hi b@example.com"], messages.map(&:subject)
     end
 
+    test "a message is rendered with the account it's sent for, unless what it's sent with has one" do
+      template = Template.new(transport: "mail", to: "a@example.com", subject: "From {{ account.name }}")
+      other = Account.create!(name: "other")
+
+      assert_equal "From #{@account.name}", template.new_messages({}, {}, account: @account).first.subject
+      assert_equal "From other", template.new_messages({}, {"account" => other}, account: @account).first.subject
+      assert_equal "From ", template.new_messages({}).first.subject
+    end
+
     test "a message for each drop in the To, rendered with the drop as to" do
       template = Template.new(transport: "mail", to: "{{ account.users }}", subject: "Hi {{ to.name }}", text: "Dear {{ to.name }} of {{ account.name }}")
 

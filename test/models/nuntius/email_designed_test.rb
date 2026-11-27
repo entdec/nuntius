@@ -28,6 +28,32 @@ module Nuntius
       assert_includes template.html, "<title>Order {{ order.number }}</title>"
     end
 
+    test "an email without a subject of its own is sent with its layout's" do
+      layout = create_layout
+      layout.update!(json: layout.json.merge("data" => layout.json.fetch("data", {}).merge("subject" => "News from {{ account.name }}")))
+      template = Template.new(description: "Order", klass: "Custom", event: "order#placed", transport: "mail", to: "test@example.com", layout: layout)
+      template.assign_design(**submitted_design(layout, text: "Mine", subject: ""))
+      template.save!
+
+      message = template.new_messages({}, {}, account: accounts(:one)).first
+
+      assert_equal "News from one", message.subject
+      assert_includes message.html, "<title>News from one</title>"
+      template.update!(subject: "Mine")
+      assert_equal "Mine", template.new_messages({}).first.subject
+    end
+
+    test "a campaign without a subject of its own is sent with its layout's" do
+      layout = create_layout
+      layout.update!(json: layout.json.merge("data" => {"subject" => "News from {{ account.name }}"}))
+      campaign = Campaign.create!(name: "Spring", transport: "mail", list: nuntius_lists(:valentines), layout: layout, account: accounts(:one))
+      campaign.assign_design(**submitted_design(layout, text: "Mine", subject: ""))
+      campaign.save!
+      campaign.list.subscribers.create!(first_name: "Juliet", email: "juliet@example.com", test_recipient: true)
+
+      assert_equal ["[Test] News from one"], campaign.send_test.map(&:subject)
+    end
+
     test "the editor opens the layout with the template's own content in it" do
       layout = create_layout
       document = template_in(layout).editor_document
