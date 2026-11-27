@@ -67,6 +67,13 @@ module Nuntius
       end
     end
 
+    test "a full-width section with a css-class, as each block has in the editor's canvas, has its background on a div too, the class on its table" do
+      html = Mjml.compile("<mjml><mj-body><mj-section full-width=\"full-width\" css-class=\"tess-b1\" background-url=\"https://example.com/bg.jpg\"><mj-column><mj-text>In</mj-text></mj-column></mj-section></mj-body></mjml>").html
+
+      assert_match(%r{<div style="background:url\('https://example.com/bg.jpg'\)[^"]*"><table [^>]*class="tess-b1" style="width:100%;"><tbody><tr><td><!--\[if mso}, html)
+      assert_no_match(/<table[^>]*background/, html.gsub(/<!--.*?-->/m, ""))
+    end
+
     test "a full-width section's background image keeps its url through Premailer, as MailTransport sends it" do
       html = Mjml.compile("<mjml><mj-body><mj-section full-width=\"full-width\" background-url=\"https://example.com/bg.jpg\"><mj-column><mj-text>In</mj-text></mj-column></mj-section></mj-body></mjml>").html
       inlined = Premailer.new(html, with_html_string: true).to_inline_css
