@@ -48,5 +48,35 @@ module Nuntius
       assert_includes merged, "<mj-raw><!-- tess-edit:content --></mj-raw><mj-text>Own</mj-text><mj-raw><!-- /tess-edit:content --></mj-raw>"
       assert_includes Mjml.compile(merged).html, "Own"
     end
+
+    test "a full-width section's or wrapper's background image is on a div around its table, which Premailer leaves alone, and Outlook's in its conditional comments" do
+      ["<mj-section full-width=\"full-width\" background-url=\"https://example.com/bg.jpg\"><mj-column><mj-text>In</mj-text></mj-column></mj-section>",
+        "<mj-wrapper full-width=\"full-width\" background-url=\"https://example.com/bg.jpg\"><mj-section><mj-column><mj-text>In</mj-text></mj-column></mj-section></mj-wrapper>"].each do |block|
+        html = Mjml.compile("<mjml><mj-body>#{block}<mj-section><mj-column><mj-text>After</mj-text></mj-column></mj-section></mj-body></mjml>").html
+
+        assert_match(/<td><!--\[if mso \| IE\]><v:rect mso-width-percent="1000"[^>]*>.*?<!\[endif\]-->/m, html)
+        assert_includes html, "<!--[if mso | IE]></v:textbox></v:rect><![endif]-->"
+        visible = html.gsub(/<!--.*?-->/m, "")
+        assert_no_match(/<v:/, visible)
+        assert_includes visible, "In"
+        assert_includes visible, "After"
+        assert_equal visible.scan(/<table\b/).size, visible.scan("</table>").size
+        assert_equal visible.scan(/<div\b/).size, visible.scan("</div>").size
+        assert_match(%r{<div style="background:url\('https://example.com/bg.jpg'\) center top / auto repeat;[^"]*"><table [^>]*style="width:100%;"><tbody><tr><td><!--\[if mso}, html)
+        assert_no_match(/<table[^>]*background/, visible)
+      end
+    end
+
+    test "a full-width section's background image keeps its url through Premailer, as MailTransport sends it" do
+      html = Mjml.compile("<mjml><mj-body><mj-section full-width=\"full-width\" background-url=\"https://example.com/bg.jpg\"><mj-column><mj-text>In</mj-text></mj-column></mj-section></mj-body></mjml>").html
+      inlined = Premailer.new(html, with_html_string: true).to_inline_css
+
+      assert_match(%r{<div style="[^"]*background: url\('https://example.com/bg.jpg'\)}, inlined)
+    end
+
+    test "a section's own background image for Outlook, in its comments already, is left as it is" do
+      mjml = "<mjml><mj-body><mj-section background-url=\"https://example.com/bg.jpg\"><mj-column><mj-text>In</mj-text></mj-column></mj-section></mj-body></mjml>"
+      assert_equal MRML::Template.new(mjml).to_html, Mjml.compile(mjml).html
+    end
   end
 end
