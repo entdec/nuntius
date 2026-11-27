@@ -130,3 +130,36 @@ test("a section can be full width, in an email only", () => {
   assert.equal(field.visible(null, { kit: { key: "email" } }), true)
   assert.equal(field.visible(null, { kit: { key: "pdf" } }), false)
 })
+
+test("a section's or wrapper's background image covers it once unless it says otherwise", () => {
+  const { doc } = email()
+  const section = doc.children[0]
+  section.attributes = { "background-url": "https://example.com/bg.jpg" }
+  assert.match(toMjml(doc), /<mj-section background-url="https:\/\/example.com\/bg.jpg" background-size="cover" background-repeat="no-repeat"/)
+
+  section.attributes = { "background-url": "https://example.com/bg.jpg", "background-size": "auto", "background-repeat": "repeat", "background-position-x": "left", "background-position-y": "bottom" }
+  assert.match(toMjml(doc), /<mj-section background-url="https:\/\/example.com\/bg.jpg" background-size="auto" background-repeat="repeat" background-position-x="left" background-position-y="bottom"/)
+
+  section.attributes = { "background-color": "#ffffff" }
+  assert.doesNotMatch(toMjml(doc), /background-size|background-repeat/)
+
+  const wrapper = insert(doc, doc.id, 0, createFromPalette("wrapper"))
+  wrapper.attributes = { "background-url": "https://example.com/bg.jpg", "background-size": "contain" }
+  assert.match(toMjml(doc), /<mj-wrapper background-url="https:\/\/example.com\/bg.jpg" background-size="contain" background-repeat="no-repeat"/)
+})
+
+test("a section's and wrapper's Background image group shows once there's an image, before Border", () => {
+  const editor = { kit: { key: "email" } }
+  for (const type of ["section", "wrapper"]) {
+    const groups = getBlock(type).fields
+    const titles = groups.map((group) => group.title)
+    assert.equal(titles.indexOf("Background image") + 1, titles.indexOf("Border"), type)
+
+    const fields = groups.find((group) => group.title === "Background image").fields
+    assert.deepEqual(fields.map((field) => field.key), ["attributes.background-size", "attributes.background-repeat", "attributes.background-position-x", "attributes.background-position-y"])
+    const shown = (node) => fields.filter((field) => field.visible(node, editor)).length
+    assert.equal(shown({ attributes: {} }), 0, type)
+    assert.equal(shown({ attributes: { "background-url": "https://example.com/bg.jpg" } }), 4, type)
+    assert.equal(shown({ attributes: {}, data: { background: "bg.jpg" } }), 4, type)
+  }
+})
